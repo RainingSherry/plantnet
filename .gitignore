@@ -15,9 +15,15 @@ results/
 
 # Large data/model files (track these with Git LFS instead)
 # These patterns are here as a fallback for files not tracked by LFS:
-# *.h5
-# *.h5ad
-# *.pth
+*.h5
+*.h5ad
+*.pth
+*.pt
+*.npy
+*.npz
+*.parquet
+*.loom
+*.csv
 
 # OS files
 .DS_Store
