@@ -1,0 +1,51 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Symbolic link to external data directory
+data
+
+# Results / outputs (generated, not needed in repo)
+results/
+
+# Large data/model files (track these with Git LFS instead)
+# These patterns are here as a fallback for files not tracked by LFS:
+# *.h5
+# *.h5ad
+# *.pth
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Python build artifacts
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Temporary / scratch files
+*.tmp
+*.temp
+.cache/
+
+# Large PDFs
+0/普林斯顿数学指南.pdf

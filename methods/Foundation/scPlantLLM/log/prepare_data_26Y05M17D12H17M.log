@@ -1,0 +1,76 @@
+2026-05-17 12:17:10,639 - INFO - preprocess_data - config: <utils.ConfigObject object at 0x7f17ac475030>
+2026-05-17 12:17:10,639 - INFO - preprocess_data - Directory ./data/processed/has_celltype already exists.
+2026-05-17 12:17:10,639 - DEBUG - preprocess_data - Start processing gene expression data...
+2026-05-17 12:17:10,639 - INFO - preprocess_data - max batch effect label: 9, min batch effect label: 0
+2026-05-17 12:17:10,751 - INFO - preprocess_data - max gene label: 185621, min gene label: 0
+2026-05-17 12:17:10,751 - INFO - preprocess_data - max cell type label: 12, min cell type label: 0
+2026-05-17 12:17:10,995 - INFO - preprocess_data - start processing sample SRX5025979_seurat0.h5...(4133, 3000)
+2026-05-17 12:17:14,596 - INFO - preprocess_data - after binning, df max: 100, df min: 0
+2026-05-17 12:17:14,621 - INFO - preprocess_data - The number of cell in file: 3327
+2026-05-17 12:17:15,692 - DEBUG - preprocess_data - Processing cell: 1000
+2026-05-17 12:17:16,611 - DEBUG - preprocess_data - Processing cell: 2000
+2026-05-17 12:17:17,587 - DEBUG - preprocess_data - Processing cell: 3000
+2026-05-17 12:17:17,888 - INFO - preprocess_data - processing sample SRX5025979_seurat0.h5 done!
+2026-05-17 12:17:18,109 - INFO - preprocess_data - start processing sample SRX5025980_seurat0.h5...(3754, 3000)
+2026-05-17 12:17:21,484 - INFO - preprocess_data - after binning, df max: 100, df min: 0
+2026-05-17 12:17:21,514 - INFO - preprocess_data - The number of cell in file: 3062
+2026-05-17 12:17:22,593 - DEBUG - preprocess_data - Processing cell: 1000
+2026-05-17 12:17:23,550 - DEBUG - preprocess_data - Processing cell: 2000
+2026-05-17 12:17:24,635 - DEBUG - preprocess_data - Processing cell: 3000
+2026-05-17 12:17:24,694 - INFO - preprocess_data - processing sample SRX5025980_seurat0.h5 done!
+2026-05-17 12:17:25,718 - INFO - preprocess_data - start processing sample SRX5025981_seurat0.h5...(14546, 3000)
+2026-05-17 12:17:38,153 - INFO - preprocess_data - after binning, df max: 100, df min: 0
+2026-05-17 12:17:38,241 - INFO - preprocess_data - The number of cell in file: 8594
+2026-05-17 12:17:39,572 - DEBUG - preprocess_data - Processing cell: 1000
+2026-05-17 12:17:40,516 - DEBUG - preprocess_data - Processing cell: 2000
+2026-05-17 12:17:41,482 - DEBUG - preprocess_data - Processing cell: 3000
+2026-05-17 12:17:42,425 - DEBUG - preprocess_data - Processing cell: 4000
+2026-05-17 12:17:43,361 - DEBUG - preprocess_data - Processing cell: 5000
+2026-05-17 12:17:44,305 - DEBUG - preprocess_data - Processing cell: 6000
+2026-05-17 12:17:45,234 - DEBUG - preprocess_data - Processing cell: 7000
+2026-05-17 12:17:46,163 - DEBUG - preprocess_data - Processing cell: 8000
+2026-05-17 12:17:46,717 - INFO - preprocess_data - processing sample SRX5025981_seurat0.h5 done!
+2026-05-17 12:17:46,817 - INFO - preprocess_data - start processing sample SRX5025982_seurat0.h5...(1676, 3000)
+2026-05-17 12:17:48,384 - INFO - preprocess_data - after binning, df max: 100, df min: 0
+2026-05-17 12:17:48,400 - INFO - preprocess_data - The number of cell in file: 1403
+2026-05-17 12:17:49,434 - DEBUG - preprocess_data - Processing cell: 1000
+2026-05-17 12:17:49,798 - INFO - preprocess_data - processing sample SRX5025982_seurat0.h5 done!
+2026-05-17 12:17:49,853 - INFO - preprocess_data - start processing sample SRX5025983_seurat0.h5...(1067, 3000)
+2026-05-17 12:17:50,718 - INFO - preprocess_data - after binning, df max: 100, df min: 0
+2026-05-17 12:17:50,726 - INFO - preprocess_data - The number of cell in file: 742
+2026-05-17 12:17:51,402 - INFO - preprocess_data - processing sample SRX5025983_seurat0.h5 done!
+2026-05-17 12:17:51,450 - INFO - preprocess_data - start processing sample SRX5025984_seurat0.h5...(1294, 3000)
+2026-05-17 12:17:52,589 - INFO - preprocess_data - after binning, df max: 100, df min: 0
+2026-05-17 12:17:52,597 - INFO - preprocess_data - The number of cell in file: 1002
+2026-05-17 12:17:53,511 - DEBUG - preprocess_data - Processing cell: 1000
+2026-05-17 12:17:53,515 - INFO - preprocess_data - processing sample SRX5025984_seurat0.h5 done!
+2026-05-17 12:17:53,577 - INFO - preprocess_data - start processing sample SRX5025985_seurat0.h5...(1600, 3000)
+2026-05-17 12:17:54,924 - INFO - preprocess_data - after binning, df max: 100, df min: 0
+2026-05-17 12:17:54,938 - INFO - preprocess_data - The number of cell in file: 1230
+2026-05-17 12:17:55,854 - DEBUG - preprocess_data - Processing cell: 1000
+2026-05-17 12:17:56,052 - INFO - preprocess_data - processing sample SRX5025985_seurat0.h5 done!
+2026-05-17 12:17:56,093 - INFO - preprocess_data - start processing sample SRX5025986_seurat0.h5...(1100, 3000)
+2026-05-17 12:17:56,992 - INFO - preprocess_data - after binning, df max: 100, df min: 0
+2026-05-17 12:17:56,998 - INFO - preprocess_data - The number of cell in file: 753
+2026-05-17 12:17:57,689 - INFO - preprocess_data - processing sample SRX5025986_seurat0.h5 done!
+2026-05-17 12:17:57,880 - INFO - preprocess_data - start processing sample SRX5025987_seurat0.h5...(3637, 3000)
+2026-05-17 12:18:00,956 - INFO - preprocess_data - after binning, df max: 100, df min: 0
+2026-05-17 12:18:00,985 - INFO - preprocess_data - The number of cell in file: 2881
+2026-05-17 12:18:02,014 - DEBUG - preprocess_data - Processing cell: 1000
+2026-05-17 12:18:02,921 - DEBUG - preprocess_data - Processing cell: 2000
+2026-05-17 12:18:03,721 - INFO - preprocess_data - processing sample SRX5025987_seurat0.h5 done!
+2026-05-17 12:18:03,868 - INFO - preprocess_data - start processing sample SRX5025988_seurat0.h5...(2858, 3000)
+2026-05-17 12:18:06,489 - INFO - preprocess_data - after binning, df max: 100, df min: 0
+2026-05-17 12:18:06,512 - INFO - preprocess_data - The number of cell in file: 2344
+2026-05-17 12:18:07,540 - DEBUG - preprocess_data - Processing cell: 1000
+2026-05-17 12:18:08,465 - DEBUG - preprocess_data - Processing cell: 2000
+2026-05-17 12:18:08,784 - INFO - preprocess_data - processing sample SRX5025988_seurat0.h5 done!
+2026-05-17 12:18:08,784 - INFO - preprocess_data - Start converting data to DataFrame...
+2026-05-17 12:18:57,062 - INFO - preprocess_data - Expression shape: (25338, 1500)
+2026-05-17 12:18:57,297 - INFO - preprocess_data - Train shape: (22804, 1500)
+2026-05-17 12:18:57,321 - INFO - preprocess_data - Test shape: (1267, 1500)
+2026-05-17 12:18:57,416 - INFO - preprocess_data - Saved test.h5 in chunks!
+2026-05-17 12:18:57,508 - INFO - preprocess_data - Saved valid.h5 in chunks!
+2026-05-17 12:18:59,536 - INFO - preprocess_data - Saved train.h5 in chunks!
+2026-05-17 12:18:59,537 - INFO - preprocess_data - Total processing time: 108.89802122116089 seconds 
+
