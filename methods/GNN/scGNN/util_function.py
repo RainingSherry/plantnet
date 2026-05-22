@@ -689,10 +689,16 @@ def generateLouvainCluster(edgeList):
     """
     Gtmp = nx.Graph()
     Gtmp.add_weighted_edges_from(edgeList)
-    W = nx.adjacency_matrix(Gtmp)
-    W = W.todense()
-    graph = Graph.Weighted_Adjacency(
-        W.tolist(), mode=ADJ_UNDIRECTED, attr="weight", loops=False)
+    nodes = list(Gtmp.nodes())
+    nodesize = len(nodes)
+    if nodesize == 0:
+        return [], 0
+
+    node_index = {node: idx for idx, node in enumerate(nodes)}
+    edges = [(node_index[u], node_index[v]) for u, v in Gtmp.edges()]
+    weights = [float(Gtmp[u][v].get("weight", 1.0)) for u, v in Gtmp.edges()]
+    graph = Graph(n=nodesize, edges=edges, directed=False)
+    graph.es["weight"] = weights
     louvain_partition = graph.community_multilevel(
         weights=graph.es['weight'], return_levels=False)
     size = len(louvain_partition)

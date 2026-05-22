@@ -1,0 +1,38 @@
+{
+  "clustering_metrics": {
+    "nmi": 0.3965084941054205,
+    "ari": 0.18442208857679862,
+    "v_measure": 0.3965084941054205,
+    "homogeneity": 0.4131972934780234,
+    "completeness": 0.3811154613516078,
+    "fmi": 0.24294919227603548,
+    "acc": 0.3117216117216117,
+    "f1_macro": 0.06033766783673236,
+    "silhouette": -0.00018746071145869792
+  },
+  "rare_cell_metrics": {
+    "n_rare_types": 1,
+    "rare_preserved": 0,
+    "rare_preservation_rate": 0.0,
+    "rare_types": [
+      8
+    ],
+    "rare_sizes": [
+      9
+    ]
+  },
+  "sparsity_stats": {
+    "total_sparsity": 0.8078659340659341,
+    "total_zeros": 1102737,
+    "total_nonzeros": 262263,
+    "mean_cell_sparsity": 0.8078659340659341,
+    "mean_gene_sparsity": 0.8078659340659341,
+    "sparsity_q25": 0.776,
+    "sparsity_q50": 0.808,
+    "sparsity_q75": 0.842
+  },
+  "best_epoch": 10,
+  "best_nmi": 0.3965084941054205,
+  "n_clusters": 19,
+  "latent_dim": 64
+}

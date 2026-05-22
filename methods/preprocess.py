@@ -34,6 +34,8 @@ import pickle, os, numbers
 
 import h5py
 import numpy as np
+if not hasattr(np, 'string_'):
+    np.string_ = np.bytes_
 import scipy as sp
 import pandas as pd
 import scanpy as sc
