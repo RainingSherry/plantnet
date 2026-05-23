@@ -1,0 +1,20 @@
+{
+  "acc": 0.34994697773064687,
+  "nmi": 0.4219111215973789,
+  "ari": 0.24165501383173213,
+  "f1_macro": 0.19107266000030346,
+  "fmi": 0.3996960881693304,
+  "v_measure": 0.421911121597379,
+  "homogeneity": 0.5183032899070507,
+  "completeness": 0.35575002133039385,
+  "silhouette": 0.3363981544971466,
+  "rare_cell_preservation": 0.5549999999999999,
+  "marker_overlap": NaN,
+  "support_precision": 0.7526274138334162,
+  "support_recall": 0.6605329118761095,
+  "support_f1": 0.7035793011915592,
+  "predicted_sparsity": 0.6462375521659851,
+  "n_cells": 1886,
+  "n_genes": 2000,
+  "input_mode": "log1p"
+}

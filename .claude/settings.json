@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python methods/DeepLearning/PhytoCluster/run.py --data_path data/SRP182008.h5ad --save_dir /tmp/phytocluster_test --n_clusters 15 --pretrain_epochs 1 --cluster_epochs 1 --batch_size 64 --gpu 0)",
+      "Bash(ls -1 /tmp/phytocluster_test | sort)",
+      "Read(//tmp/phytocluster_test/**)",
+      "Bash(python -m pip install scikit-misc)"
+    ]
+  }
+}

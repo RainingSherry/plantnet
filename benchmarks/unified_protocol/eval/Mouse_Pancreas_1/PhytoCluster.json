@@ -1,0 +1,33 @@
+{
+  "dataset": "Mouse_Pancreas_1",
+  "method": "PhytoCluster",
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/benchmarks/unified_protocol/runs/Mouse_Pancreas_1/PhytoCluster/embedding.h5",
+  "label_key": "cell_type",
+  "metrics": {
+    "kmeans": {
+      "acc": 0.5742311770943797,
+      "nmi": 0.6927301408090787,
+      "ari": 0.48469627577611063,
+      "f1_macro": 0.4510405047706306,
+      "fmi": 0.6186808318020355,
+      "v_measure": 0.6927301408090786,
+      "homogeneity": 0.8203124211313929,
+      "completeness": 0.5994918403133813,
+      "n_pred_clusters": 13,
+      "silhouette": NaN
+    },
+    "leiden": {
+      "acc": 0.48886532343584305,
+      "nmi": 0.6507458413450204,
+      "ari": 0.3349155398372994,
+      "f1_macro": 0.4107829311220421,
+      "fmi": 0.4969120467600103,
+      "v_measure": 0.6507458413450204,
+      "homogeneity": 0.8239332361709576,
+      "completeness": 0.5377194196133978,
+      "n_pred_clusters": 16,
+      "silhouette": NaN,
+      "resolution": 1.0
+    }
+  }
+}

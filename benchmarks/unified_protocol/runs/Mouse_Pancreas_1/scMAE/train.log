@@ -1,0 +1,32 @@
+Using device: cuda:5
+Loading data...
+是否归一化: True, 是否 log1p 变换: True, 是否标准化: False
+数据未标准化，进行 scale 处理
+/data/luolie/conda/base/lib/python3.13/functools.py:934: UserWarning: zero-centering a sparse array/matrix densifies it.
+  return dispatch(args[0].__class__)(*args, **kw)
+Number of cells: 1886, Number of genes: 2000
+Number of clusters: 13
+Starting training...
+Epoch 10: acc: 0.5000, nmi: 0.6418, ari: 0.3670, f1_macro: 0.4012, fmi: 0.5221, v_measure: 0.6418, homogeneity: 0.7868, completeness: 0.5419
+Epoch 10/100, Loss: 0.4867, ACC: 0.5000, Best: 0.5000
+Epoch 20: acc: 0.5122, nmi: 0.6348, ari: 0.3390, f1_macro: 0.4040, fmi: 0.4954, v_measure: 0.6348, homogeneity: 0.7796, completeness: 0.5354
+Epoch 20/100, Loss: 0.4817, ACC: 0.5122, Best: 0.5122
+Epoch 30: acc: 0.5138, nmi: 0.6860, ari: 0.4044, f1_macro: 0.4177, fmi: 0.5561, v_measure: 0.6860, homogeneity: 0.8368, completeness: 0.5812
+Epoch 30/100, Loss: 0.4792, ACC: 0.5138, Best: 0.5138
+Epoch 40: acc: 0.5308, nmi: 0.6898, ari: 0.4112, f1_macro: 0.4248, fmi: 0.5621, v_measure: 0.6898, homogeneity: 0.8394, completeness: 0.5854
+Epoch 40/100, Loss: 0.4779, ACC: 0.5308, Best: 0.5308
+Epoch 50: acc: 0.5159, nmi: 0.6913, ari: 0.4055, f1_macro: 0.4207, fmi: 0.5574, v_measure: 0.6913, homogeneity: 0.8433, completeness: 0.5858
+Epoch 50/100, Loss: 0.4776, ACC: 0.5159, Best: 0.5308
+Epoch 60: acc: 0.5101, nmi: 0.6891, ari: 0.4030, f1_macro: 0.4167, fmi: 0.5554, v_measure: 0.6891, homogeneity: 0.8412, completeness: 0.5837
+Epoch 60/100, Loss: 0.4760, ACC: 0.5101, Best: 0.5308
+Epoch 70: acc: 0.5148, nmi: 0.6923, ari: 0.4053, f1_macro: 0.4195, fmi: 0.5576, v_measure: 0.6923, homogeneity: 0.8450, completeness: 0.5864
+Epoch 70/100, Loss: 0.4750, ACC: 0.5148, Best: 0.5308
+Epoch 80: acc: 0.5217, nmi: 0.7004, ari: 0.4099, f1_macro: 0.4225, fmi: 0.5618, v_measure: 0.7004, homogeneity: 0.8542, completeness: 0.5935
+Epoch 80/100, Loss: 0.4743, ACC: 0.5217, Best: 0.5308
+Epoch 90: acc: 0.5138, nmi: 0.7004, ari: 0.4082, f1_macro: 0.4179, fmi: 0.5605, v_measure: 0.7004, homogeneity: 0.8549, completeness: 0.5932
+Epoch 90/100, Loss: 0.4732, ACC: 0.5138, Best: 0.5308
+Epoch 100: acc: 0.5201, nmi: 0.6984, ari: 0.4093, f1_macro: 0.4253, fmi: 0.5611, v_measure: 0.6984, homogeneity: 0.8514, completeness: 0.5920
+Epoch 100/100, Loss: 0.4727, ACC: 0.5201, Best: 0.5308
+Best epoch: 40, Best ACC: 0.5308
+Epoch 40: acc: 0.5308, nmi: 0.6898, ari: 0.4112, f1_macro: 0.4248, fmi: 0.5621, v_measure: 0.6898, homogeneity: 0.8394, completeness: 0.5854
+Training completed. Results saved to: benchmarks/unified_protocol/runs/Mouse_Pancreas_1/scMAE

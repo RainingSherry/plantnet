@@ -1,0 +1,82 @@
+Using device: cuda:4
+============================================================
+Step 1: Loading and preprocessing data...
+============================================================
+Filtered data: 1886 cells, 2000 genes
+/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/cursor_Doloris/maskdiffusion/data.py:134: FutureWarning: Use `sc.pp.normalize_total` instead.
+  sc.pp.normalize_per_cell(adata, counts_per_cell_after=1e4)
+/data/luolie/conda/base/lib/python3.13/site-packages/anndata/_core/anndata.py:639: FutureWarning: Setting element `.X` of view of `AnnData` object will obey copy-on-write semantics in the next minor release. 
+  if self._handle_view_X_cow(value):
+/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/cursor_Doloris/maskdiffusion/data.py:181: FutureWarning: You are attempting to set `X` to a matrix on a view which has non-unique indices. The resulting `adata.X` will likely not equal the value to which you set it. To avoid this potential issue, please make a copy of the data first. In the future, this operation will throw an error.
+  adata.X = X
+/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/cursor_Doloris/maskdiffusion/data.py:181: ImplicitModificationWarning: Modifying `X` on a view results in data being overridden
+  adata.X = X
+Detected 13 clusters from column 'cell_type'
+Number of cells: 1886
+Number of genes: 2000
+Number of clusters: 13
+Ground truth cell types: 13
+Data sparsity: 0.5969
+
+============================================================
+Step 2: Creating dataloader...
+============================================================
+Number of training batches: 7
+Number of evaluation batches: 8
+
+============================================================
+Step 3: Building ScSpade model...
+============================================================
+Total parameters: 6,993,796
+
+============================================================
+Step 4: Training...
+============================================================
+Epoch 10/150 [WARMUP] | Loss: 0.1085 | NMI: 0.2203 | ARI: 0.1030
+Epoch 20/150 [WARMUP] | Loss: 0.1040 | NMI: 0.2203 | ARI: 0.1030
+Epoch 30/150 [WARMUP] | Loss: 0.1021 | NMI: 0.2203 | ARI: 0.1030
+Epoch 40/150 [JOINT] | Loss: 0.1197 | NMI: 0.4647 | ARI: 0.2192
+Epoch 50/150 [JOINT] | Loss: 0.1155 | NMI: 0.4189 | ARI: 0.1805
+Epoch 60/150 [JOINT] | Loss: 0.1132 | NMI: 0.3880 | ARI: 0.1605
+Epoch 70/150 [JOINT] | Loss: 0.1116 | NMI: 0.3730 | ARI: 0.1510
+Epoch 80/150 [JOINT] | Loss: 0.1101 | NMI: 0.3771 | ARI: 0.1494
+Epoch 90/150 [JOINT] | Loss: 0.1091 | NMI: 0.3783 | ARI: 0.1478
+Epoch 100/150 [JOINT] | Loss: 0.1085 | NMI: 0.3750 | ARI: 0.1511
+Epoch 110/150 [JOINT] | Loss: 0.1080 | NMI: 0.3580 | ARI: 0.1490
+Epoch 120/150 [JOINT] | Loss: 0.1077 | NMI: 0.3760 | ARI: 0.1526
+Epoch 130/150 [JOINT] | Loss: 0.1074 | NMI: 0.3755 | ARI: 0.1508
+Epoch 140/150 [JOINT] | Loss: 0.1074 | NMI: 0.3784 | ARI: 0.1509
+Epoch 150/150 [JOINT] | Loss: 0.1073 | NMI: 0.3788 | ARI: 0.1514
+
+Best NMI: 0.4647 (epoch 40)
+
+============================================================
+Step 5: Final evaluation...
+============================================================
+==================================================
+Clustering Evaluation Results
+==================================================
+NMI:          0.4623
+ARI:          0.2131
+V-Measure:    0.4623
+Homogeneity:  0.5700
+Completeness: 0.3888
+FMI:          0.3715
+ACC:          0.3929
+F1-macro:     0.0143
+Silhouette:   0.0560
+==================================================
+==================================================
+Rare Cell Preservation Analysis
+==================================================
+Rare types (< 10 cells): 3
+Preserved: 0/3
+Preservation rate: 0.0000
+==================================================
+
+============================================================
+Step 6: Saving results...
+============================================================
+Results saved to: benchmarks/unified_protocol/runs/Mouse_Pancreas_1/cursor_maskdiffusion
+
+Done!

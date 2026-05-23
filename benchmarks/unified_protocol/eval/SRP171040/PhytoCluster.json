@@ -1,0 +1,33 @@
+{
+  "dataset": "SRP171040",
+  "method": "PhytoCluster",
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/benchmarks/unified_protocol/runs/SRP171040/PhytoCluster/embedding.h5",
+  "label_key": "Celltype",
+  "metrics": {
+    "kmeans": {
+      "acc": 0.2813935681470138,
+      "nmi": 0.30301428151008347,
+      "ari": 0.12389350095783971,
+      "f1_macro": 0.1989936863305426,
+      "fmi": 0.24714720788831326,
+      "v_measure": 0.3030142815100834,
+      "homogeneity": 0.28589040466694376,
+      "completeness": 0.3223201797568055,
+      "n_pred_clusters": 12,
+      "silhouette": NaN
+    },
+    "leiden": {
+      "acc": 0.43980445282129815,
+      "nmi": 0.4490597447354684,
+      "ari": 0.21922864894499158,
+      "f1_macro": 0.4075316292317889,
+      "fmi": 0.2966129508644668,
+      "v_measure": 0.44905974473546834,
+      "homogeneity": 0.5239843021976821,
+      "completeness": 0.39288157654556033,
+      "n_pred_clusters": 23,
+      "silhouette": NaN,
+      "resolution": 1.0
+    }
+  }
+}

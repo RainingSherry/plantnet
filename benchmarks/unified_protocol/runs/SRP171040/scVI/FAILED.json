@@ -1,0 +1,24 @@
+{
+  "returncode": 1,
+  "log": "benchmarks/unified_protocol/runs/SRP171040/scVI/train.log",
+  "cmd": [
+    "/data/luolie/conda/base/bin/python",
+    "methods/DeepLearning/scVI/run.py",
+    "--data_path",
+    "benchmarks/unified_protocol/preprocessed/SRP171040_hvg2000.h5ad",
+    "--save_dir",
+    "benchmarks/unified_protocol/runs/SRP171040/scVI",
+    "--n_clusters",
+    "12",
+    "--n_top_genes",
+    "2000",
+    "--epochs",
+    "100",
+    "--batch_size",
+    "256",
+    "--gpu",
+    "3",
+    "--seed",
+    "42"
+  ]
+}

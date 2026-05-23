@@ -1,0 +1,21 @@
+Using device: cuda:3
+Loading data...
+Number of cells: 13514, Number of genes: 2000
+Number of clusters: 15
+
+Phase 1: Pretraining VAE
+[pretrain] Epoch 20/154: loss=0.1569
+[pretrain] Epoch 40/154: loss=0.1593
+[pretrain] Epoch 60/154: loss=0.1621
+[pretrain] Epoch 80/154: loss=0.1643
+[pretrain] Epoch 100/154: loss=0.1664
+[pretrain] Epoch 120/154: loss=0.1683
+[pretrain] Epoch 140/154: loss=0.1699
+[pretrain] Epoch 154/154: loss=0.1708
+
+Phase 2: PhytoCluster joint training
+[cluster] Epoch 20/20: loss=0.7252
+
+Phase 3: Final prediction
+Epoch 0: acc: 0.4321, nmi: 0.4551, ari: 0.2758, f1_macro: 0.3900, fmi: 0.3407, v_measure: 0.4551, homogeneity: 0.4691, completeness: 0.4419
+PhytoCluster completed. Results saved to: benchmarks/unified_protocol/runs/SRP182008/PhytoCluster

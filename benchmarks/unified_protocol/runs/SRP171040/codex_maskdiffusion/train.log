@@ -1,0 +1,39 @@
+Using device: cuda:4
+======================================================================
+Step 1: loading data and preserving support/value separation
+======================================================================
+Detected labels from 'Celltype' with 12 classes
+Input mode: log1p
+Cells: 33956 | genes: 2000 | clusters: 12
+Observed support density: 0.4766
+======================================================================
+Step 2: building model
+======================================================================
+Parameters: 6,977,251
+======================================================================
+Step 3: training with strong AE warmup, delayed diffusion, optional late cluster loss
+======================================================================
+Epoch 010/150 [AE_WARMUP] loss=0.0807 recon=0.0035 mask=0.3894 diff=3.3599 cluster=0.0000 direct_nmi=0.4964 direct_ari=0.2881
+Epoch 020/150 [AE_WARMUP] loss=0.0788 recon=0.0030 mask=0.3823 diff=3.7976 cluster=0.0000 direct_nmi=0.4908 direct_ari=0.3069
+Epoch 030/150 [AE_WARMUP] loss=0.0779 recon=0.0028 mask=0.3784 diff=4.2687 cluster=0.0000 direct_nmi=0.4757 direct_ari=0.2900
+Epoch 040/150 [DIFF_RAMP] loss=0.0784 recon=0.0037 mask=0.3760 diff=0.0037 cluster=0.0000 direct_nmi=0.4577 direct_ari=0.2642
+Epoch 050/150 [DIFF_RAMP] loss=0.0776 recon=0.0034 mask=0.3739 diff=0.0031 cluster=0.0000 direct_nmi=0.4935 direct_ari=0.3226
+Epoch 060/150 [DIFF_RAMP] loss=0.0768 recon=0.0030 mask=0.3721 diff=0.0012 cluster=0.0000 direct_nmi=0.5426 direct_ari=0.3303
+Epoch 070/150 [DIFF_RAMP] loss=0.0765 recon=0.0029 mask=0.3707 diff=0.0009 cluster=0.0000 direct_nmi=0.5444 direct_ari=0.3298
+Epoch 080/150 [DIFF_RAMP] loss=0.0762 recon=0.0028 mask=0.3697 diff=0.0007 cluster=0.0000 direct_nmi=0.5475 direct_ari=0.3351
+Epoch 090/150 [DIFF_FULL] loss=0.0760 recon=0.0027 mask=0.3689 diff=0.0006 cluster=0.0000 direct_nmi=0.5450 direct_ari=0.3296
+Epoch 100/150 [DIFF_FULL] loss=0.0758 recon=0.0027 mask=0.3682 diff=0.0005 cluster=0.0000 direct_nmi=0.5439 direct_ari=0.3269
+Epoch 110/150 [DIFF_FULL] loss=0.0757 recon=0.0027 mask=0.3677 diff=0.0004 cluster=0.0000 direct_nmi=0.5442 direct_ari=0.3278
+Epoch 120/150 [DIFF_FULL] loss=0.0756 recon=0.0027 mask=0.3674 diff=0.0003 cluster=0.0000 direct_nmi=0.5432 direct_ari=0.3261
+Epoch 130/150 [DIFF_FULL] loss=0.0755 recon=0.0026 mask=0.3670 diff=0.0003 cluster=0.0000 direct_nmi=0.5448 direct_ari=0.3288
+Epoch 140/150 [DIFF_FULL] loss=0.0755 recon=0.0026 mask=0.3668 diff=0.0002 cluster=0.0000 direct_nmi=0.5436 direct_ari=0.3274
+Epoch 150/150 [DIFF_FULL] loss=0.0755 recon=0.0026 mask=0.3668 diff=0.0002 cluster=0.0000 direct_nmi=0.5441 direct_ari=0.3282
+======================================================================
+Step 4: final direct and diffusion embedding evaluation
+======================================================================
+Epoch final: acc: 0.4681, nmi: 0.5475, ari: 0.3351, f1_macro: 0.4623, fmi: 0.4087, v_measure: 0.5475, homogeneity: 0.5598, completeness: 0.5358
+Epoch final: acc: 0.3503, nmi: 0.3350, ari: 0.1862, f1_macro: 0.3149, fmi: 0.2696, v_measure: 0.3350, homogeneity: 0.3478, completeness: 0.3230
+Final direct metrics: {'acc': 0.46807633407939686, 'nmi': 0.5475461794053844, 'ari': 0.3350926437395973, 'f1_macro': 0.46228315580025897, 'fmi': 0.4086718101561228, 'v_measure': 0.5475461794053845, 'homogeneity': 0.5598197200122257, 'completeness': 0.5357992655197348, 'silhouette': 0.15024788677692413}
+Final diffusion metrics: {'acc': 0.35027682883731887, 'nmi': 0.3349500327307067, 'ari': 0.18618058239403718, 'f1_macro': 0.3149069172450845, 'fmi': 0.26962320025863695, 'v_measure': 0.33495003273070667, 'homogeneity': 0.34777546174068535, 'completeness': 0.32303692331565514, 'silhouette': 0.11770002543926239}
+Primary embedding selected by NMI: direct
+Results saved to: benchmarks/unified_protocol/runs/SRP171040/codex_maskdiffusion

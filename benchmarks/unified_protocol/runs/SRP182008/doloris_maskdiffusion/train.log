@@ -1,0 +1,3 @@
+Epoch final: acc: 0.2106, nmi: 0.1800, ari: 0.0701, f1_macro: 0.2031, fmi: 0.1513, v_measure: 0.1800, homogeneity: 0.1853, completeness: 0.1750
+Finished MaskDiffusion clustering.
+{'acc': 0.21059641852893296, 'nmi': 0.18000046564280908, 'ari': 0.07013807674654157, 'f1_macro': 0.20307179426339994, 'fmi': 0.15131384913604654, 'v_measure': 0.18000046564280908, 'homogeneity': 0.18532193169150651, 'completeness': 0.1749760778170463, 'silhouette': 0.12426754087209702, 'rare_cell_preservation': 0.20676691729323307, 'marker_overlap': 0.34600760456273766, 'support_precision': 0.7919580703630554, 'support_recall': 0.6723714941118899, 'support_f1': 0.7272816775162335, 'predicted_sparsity': 0.722185492515564, 'n_cells': 13514, 'n_genes': 2000, 'input_mode': 'log1p'}

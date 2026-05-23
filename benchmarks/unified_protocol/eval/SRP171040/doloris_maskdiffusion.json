@@ -1,0 +1,33 @@
+{
+  "dataset": "SRP171040",
+  "method": "doloris_maskdiffusion",
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/benchmarks/unified_protocol/runs/SRP171040/doloris_maskdiffusion/embedding_final.npy",
+  "label_key": "Celltype",
+  "metrics": {
+    "kmeans": {
+      "acc": 0.3112557427258805,
+      "nmi": 0.35773619017331704,
+      "ari": 0.19047136810024526,
+      "f1_macro": 0.2506172575226594,
+      "fmi": 0.2754820752163591,
+      "v_measure": 0.357736190173317,
+      "homogeneity": 0.3683713432238999,
+      "completeness": 0.3476978948627525,
+      "n_pred_clusters": 12,
+      "silhouette": NaN
+    },
+    "leiden": {
+      "acc": 0.4426021910707975,
+      "nmi": 0.5645548324975509,
+      "ari": 0.27926791131111833,
+      "f1_macro": 0.4569528002441347,
+      "fmi": 0.3680222395320807,
+      "v_measure": 0.5645548324975509,
+      "homogeneity": 0.6921289476609425,
+      "completeness": 0.4766905966742349,
+      "n_pred_clusters": 31,
+      "silhouette": NaN,
+      "resolution": 1.0
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "dataset": "SRP182008",
+  "method": "traditional_leiden",
+  "cluster_method": "leiden",
+  "label_key": "Celltype",
+  "metrics": {
+    "acc": 0.6337871836613882,
+    "nmi": 0.6202291996263214,
+    "ari": 0.468540578688151,
+    "f1_macro": 0.629711841028202,
+    "fmi": 0.5183307953071056,
+    "v_measure": 0.6202291996263213,
+    "homogeneity": 0.6354487546684606,
+    "completeness": 0.6057216351705492,
+    "n_pred_clusters": 16,
+    "silhouette": 0.10680272430181503,
+    "resolution": NaN
+  }
+}

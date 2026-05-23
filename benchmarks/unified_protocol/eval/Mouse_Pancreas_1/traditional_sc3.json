@@ -1,0 +1,18 @@
+{
+  "dataset": "Mouse_Pancreas_1",
+  "method": "traditional_sc3",
+  "cluster_method": "sc3_consensus",
+  "label_key": "cell_type",
+  "metrics": {
+    "acc": 0.5047720042417816,
+    "nmi": 0.6926363928118983,
+    "ari": 0.4002383916777186,
+    "f1_macro": 0.41588790999377984,
+    "fmi": 0.5521577228861974,
+    "v_measure": 0.6926363928118984,
+    "homogeneity": 0.8432501180475878,
+    "completeness": 0.5876717660572089,
+    "n_pred_clusters": 13,
+    "silhouette": 0.27672842144966125
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "dataset": "SRP182008",
+  "method": "traditional_sc3",
+  "cluster_method": "sc3_consensus",
+  "status": "skipped_n_cells_gt_8000",
+  "n_cells": 13514
+}

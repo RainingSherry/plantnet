@@ -1,0 +1,33 @@
+{
+  "dataset": "Mouse_Pancreas_1",
+  "method": "scCDCG",
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/benchmarks/unified_protocol/runs/Mouse_Pancreas_1/scCDCG/embedding.h5",
+  "label_key": "cell_type",
+  "metrics": {
+    "kmeans": {
+      "acc": 0.3997879109225875,
+      "nmi": 0.46487470653976015,
+      "ari": 0.24916266691396954,
+      "f1_macro": 0.1847390827058994,
+      "fmi": 0.410682806286251,
+      "v_measure": 0.46487470653976015,
+      "homogeneity": 0.5229273186919839,
+      "completeness": 0.41842354772104307,
+      "n_pred_clusters": 13,
+      "silhouette": NaN
+    },
+    "leiden": {
+      "acc": 0.3462354188759279,
+      "nmi": 0.49098050442324503,
+      "ari": 0.21564518138750544,
+      "f1_macro": 0.21203725923761085,
+      "fmi": 0.3741252871674853,
+      "v_measure": 0.4909805044232449,
+      "homogeneity": 0.6062557164808812,
+      "completeness": 0.4125391244006374,
+      "n_pred_clusters": 13,
+      "silhouette": NaN,
+      "resolution": 1.0
+    }
+  }
+}

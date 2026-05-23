@@ -1,0 +1,19 @@
+{
+  "dataset": "Mouse_Pancreas_1",
+  "method": "traditional_louvain",
+  "cluster_method": "louvain",
+  "label_key": "cell_type",
+  "metrics": {
+    "acc": 0.5519618239660657,
+    "nmi": 0.7221466060026094,
+    "ari": 0.43350113428546505,
+    "f1_macro": 0.38935110882960566,
+    "fmi": 0.5787088929455618,
+    "v_measure": 0.7221466060026095,
+    "homogeneity": 0.8563966613909388,
+    "completeness": 0.6242830384842748,
+    "n_pred_clusters": 12,
+    "silhouette": 0.19341972470283508,
+    "resolution": 0.7500000000000001
+  }
+}

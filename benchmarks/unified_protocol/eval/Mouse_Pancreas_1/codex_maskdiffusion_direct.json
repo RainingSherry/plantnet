@@ -1,0 +1,33 @@
+{
+  "dataset": "Mouse_Pancreas_1",
+  "method": "codex_maskdiffusion_direct",
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/benchmarks/unified_protocol/runs/Mouse_Pancreas_1/codex_maskdiffusion/embeddings_direct.npy",
+  "label_key": "cell_type",
+  "metrics": {
+    "kmeans": {
+      "acc": 0.404559915164369,
+      "nmi": 0.550364685321813,
+      "ari": 0.27157859346503405,
+      "f1_macro": 0.2776213116130612,
+      "fmi": 0.4299117675587366,
+      "v_measure": 0.5503646853218132,
+      "homogeneity": 0.6785599561600003,
+      "completeness": 0.4629104643468531,
+      "n_pred_clusters": 13,
+      "silhouette": NaN
+    },
+    "leiden": {
+      "acc": 0.4750795334040297,
+      "nmi": 0.6100769603652576,
+      "ari": 0.3545540690619115,
+      "f1_macro": 0.30838682162910924,
+      "fmi": 0.50537247977715,
+      "v_measure": 0.6100769603652576,
+      "homogeneity": 0.720202996869591,
+      "completeness": 0.5291628228279504,
+      "n_pred_clusters": 11,
+      "silhouette": NaN,
+      "resolution": 1.0
+    }
+  }
+}

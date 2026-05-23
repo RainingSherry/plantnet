@@ -1,0 +1,76 @@
+Using device: cuda:2
+============================================================
+Step 1: Loading and preprocessing data...
+============================================================
+Filtered data: 13514 cells, 2000 genes
+/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/cursor_Doloris/maskdiffusion/data.py:134: FutureWarning: Use `sc.pp.normalize_total` instead.
+  sc.pp.normalize_per_cell(adata, counts_per_cell_after=1e4)
+/data/luolie/conda/base/lib/python3.13/site-packages/anndata/_core/anndata.py:639: FutureWarning: Setting element `.X` of view of `AnnData` object will obey copy-on-write semantics in the next minor release. 
+  if self._handle_view_X_cow(value):
+/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/cursor_Doloris/maskdiffusion/data.py:181: FutureWarning: You are attempting to set `X` to a matrix on a view which has non-unique indices. The resulting `adata.X` will likely not equal the value to which you set it. To avoid this potential issue, please make a copy of the data first. In the future, this operation will throw an error.
+  adata.X = X
+/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/cursor_Doloris/maskdiffusion/data.py:181: ImplicitModificationWarning: Modifying `X` on a view results in data being overridden
+  adata.X = X
+Detected 15 clusters from column 'Celltype'
+Number of cells: 13514
+Number of genes: 2000
+Number of clusters: 15
+Ground truth cell types: 15
+Data sparsity: 0.6728
+
+============================================================
+Step 2: Creating dataloader...
+============================================================
+Number of training batches: 52
+Number of evaluation batches: 53
+
+============================================================
+Step 3: Building ScSpade model...
+============================================================
+Total parameters: 6,993,860
+
+============================================================
+Step 4: Training...
+============================================================
+Epoch 10/150 [WARMUP] | Loss: 0.0884 | NMI: 0.1488 | ARI: 0.0763
+Epoch 20/150 [WARMUP] | Loss: 0.0861 | NMI: 0.1488 | ARI: 0.0763
+Epoch 30/150 [WARMUP] | Loss: 0.0849 | NMI: 0.1488 | ARI: 0.0763
+Epoch 40/150 [JOINT] | Loss: 0.0980 | NMI: 0.1905 | ARI: 0.0926
+Epoch 50/150 [JOINT] | Loss: 0.0966 | NMI: 0.1718 | ARI: 0.0875
+Epoch 60/150 [JOINT] | Loss: 0.0960 | NMI: 0.1472 | ARI: 0.0747
+Epoch 70/150 [JOINT] | Loss: 0.0955 | NMI: 0.1525 | ARI: 0.0742
+Epoch 80/150 [JOINT] | Loss: 0.0952 | NMI: 0.1442 | ARI: 0.0702
+Epoch 90/150 [JOINT] | Loss: 0.0948 | NMI: 0.1270 | ARI: 0.0623
+Epoch 100/150 [JOINT] | Loss: 0.0947 | NMI: 0.1212 | ARI: 0.0574
+Epoch 110/150 [JOINT] | Loss: 0.0945 | NMI: 0.1194 | ARI: 0.0573
+Epoch 120/150 [JOINT] | Loss: 0.0943 | NMI: 0.1159 | ARI: 0.0566
+Epoch 130/150 [JOINT] | Loss: 0.0943 | NMI: 0.1130 | ARI: 0.0544
+Epoch 140/150 [JOINT] | Loss: 0.0942 | NMI: 0.1108 | ARI: 0.0541
+Epoch 150/150 [JOINT] | Loss: 0.0942 | NMI: 0.1109 | ARI: 0.0536
+
+Best NMI: 0.1905 (epoch 40)
+
+============================================================
+Step 5: Final evaluation...
+============================================================
+==================================================
+Clustering Evaluation Results
+==================================================
+NMI:          0.1870
+ARI:          0.0921
+V-Measure:    0.1870
+Homogeneity:  0.1931
+Completeness: 0.1814
+FMI:          0.1708
+ACC:          0.2537
+F1-macro:     0.0467
+Silhouette:   0.0370
+==================================================
+No rare cell types found (threshold: 10)
+
+============================================================
+Step 6: Saving results...
+============================================================
+Results saved to: benchmarks/unified_protocol/runs/SRP182008/cursor_maskdiffusion
+
+Done!

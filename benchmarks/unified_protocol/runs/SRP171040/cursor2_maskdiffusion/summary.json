@@ -1,0 +1,44 @@
+{
+  "method": "ScSpade (cursor2_Doloris maskdiffusion)",
+  "data_path": "benchmarks/unified_protocol/preprocessed/SRP171040_hvg2000.h5ad",
+  "n_cells": 33956,
+  "n_genes": 2000,
+  "n_clusters": 12,
+  "latent_dim": 32,
+  "epochs": 150,
+  "device": "cuda:4",
+  "weights": {
+    "mask": 0.2,
+    "recon": 0.8,
+    "diffusion": 0.05,
+    "cluster": 0.0
+  },
+  "metrics": {
+    "direct": {
+      "best_method": "kmeans",
+      "pred_labels": null,
+      "acc": 0.47163976911296973,
+      "nmi": 0.5153311584416254,
+      "ari": 0.3351310395541968,
+      "f1_macro": 0.4453955603935537,
+      "fmi": 0.4056259095862306,
+      "v_measure": 0.5153311584416255,
+      "homogeneity": 0.5323146205239039,
+      "completeness": 0.49939790204341444,
+      "silhouette": 0.0886763408780098
+    },
+    "diffusion": {
+      "best_method": "kmeans",
+      "pred_labels": null,
+      "acc": 0.33537519142419603,
+      "nmi": 0.2892364308694125,
+      "ari": 0.17732977882120532,
+      "f1_macro": 0.30858534653972275,
+      "fmi": 0.26273097289918607,
+      "v_measure": 0.2892364308694125,
+      "homogeneity": 0.29902627103643636,
+      "completeness": 0.2800672899924767,
+      "silhouette": 0.07630661129951477
+    }
+  }
+}
