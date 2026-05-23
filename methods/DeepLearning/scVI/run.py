@@ -133,6 +133,8 @@ def parse_args():
     # 模型参数
     parser.add_argument('--n_clusters', type=int, required=True,
                        help='聚类数')
+    parser.add_argument('--n_top_genes', type=int, default=2000,
+                       help='Number of genes expected by unified benchmark input')
     parser.add_argument('--latent_dim', type=int, default=10,
                        help='潜在空间维度')
     parser.add_argument('--n_layers', type=int, default=1,
@@ -238,10 +240,14 @@ def main():
     print('='*60)
 
     adata = adata_raw.copy()
+    if 'counts' in adata.layers:
+        adata.X = adata.layers['counts'].copy()
 
     # scVI 的基础过滤：移除表达量极低的基因和细胞
     sc.pp.filter_genes(adata, min_counts=3)
     sc.pp.filter_cells(adata, min_counts=3)
+    if args.n_top_genes and adata.n_vars > args.n_top_genes:
+        sc.pp.highly_variable_genes(adata, flavor='seurat_v3', n_top_genes=args.n_top_genes, subset=True)
 
     n_genes = adata.n_vars
     n_cells_after = adata.n_obs

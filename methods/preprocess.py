@@ -250,7 +250,7 @@ def check_normalization(adata):
     return is_norm, is_log1p, is_scaled
 
 
-def normalize_sc(adata, size_factors=True, filter_min_counts=True, logtrans_input=True, normalize_input=True):
+def normalize_sc(adata, size_factors=True, filter_min_counts=True, logtrans_input=True, normalize_input=True, n_top_genes=2000):
     """
     归一化、log1p 变换和标准化 scRNA-seq 数据（新版本）
 
@@ -327,9 +327,19 @@ def normalize_sc(adata, size_factors=True, filter_min_counts=True, logtrans_inpu
             adata.X = X_arr
 
     # Step 4: 高度可变基因筛选（**必须在 log1p 后执行**）
-    # HVG 筛选会直接修改 adata，只保留 top 1000 个基因
+    # 统一 benchmark 默认保留 top 2000 HVGs；可通过 SCBENCH_N_TOP_GENES 覆盖。
     if filter_min_counts:
-        sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5, n_top_genes=1000, subset=True)
+        env_n_top = os.environ.get("SCBENCH_N_TOP_GENES")
+        if env_n_top:
+            n_top_genes = int(env_n_top)
+        sc.pp.highly_variable_genes(
+            adata,
+            min_mean=0.0125,
+            max_mean=3,
+            min_disp=0.5,
+            n_top_genes=n_top_genes,
+            subset=True,
+        )
 
     # Step 4.5: Clean data after HVG (which may create sparse data)
     # Ensure no inf/nan values remain in the HVG-filtered data
@@ -378,7 +388,7 @@ def normalize_sc(adata, size_factors=True, filter_min_counts=True, logtrans_inpu
     return adata
 
 
-def prepare_data_for_model(file_path, size_factors=True, filter_min_counts=True, logtrans_input=True, normalize_input=True):
+def prepare_data_for_model(file_path, size_factors=True, filter_min_counts=True, logtrans_input=True, normalize_input=True, n_top_genes=2000):
     """
     主入口函数：读取 h5ad 文件并预处理，为模型训练准备数据
 
@@ -409,8 +419,14 @@ def prepare_data_for_model(file_path, size_factors=True, filter_min_counts=True,
     data = sc.read_h5ad(file_path)
 
     # 执行完整的预处理流程
-    data = normalize_sc(data, size_factors=size_factors, filter_min_counts=filter_min_counts,
-                         logtrans_input=logtrans_input, normalize_input=normalize_input)
+    data = normalize_sc(
+        data,
+        size_factors=size_factors,
+        filter_min_counts=filter_min_counts,
+        logtrans_input=logtrans_input,
+        normalize_input=normalize_input,
+        n_top_genes=n_top_genes,
+    )
 
     # 准备模型输入
     X = data.to_df()           # 获取预处理后的 DataFrame（细胞 × 基因）

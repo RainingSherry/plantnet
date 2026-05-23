@@ -57,6 +57,7 @@ def parse_args():
     parser.add_argument('--data_path', type=str, required=True)
     parser.add_argument('--save_dir', type=str, default='./results')
     parser.add_argument('--n_clusters', type=int, required=True)
+    parser.add_argument('--n_top_genes', type=int, default=2000)
     parser.add_argument('--latent_dim', type=int, default=10)
     parser.add_argument('--encode_dim', type=int, nargs=2, default=[1024, 128])
     parser.add_argument('--decode_dim', type=int, nargs=2, default=[128, 1024])
@@ -356,25 +357,12 @@ def main():
 
     adata = adata.copy()
 
-    X_for_hvg = adata.raw.X if adata.raw is not None else adata.X
-    if sp.issparse(X_for_hvg):
-        X_for_hvg = X_for_hvg.tocsr().astype(np.float32)
-    else:
-        X_for_hvg = np.asarray(X_for_hvg, dtype=np.float32)
-    adata.X = X_for_hvg.copy() if not sp.issparse(X_for_hvg) else X_for_hvg.copy()
-
-    sc.pp.filter_genes(adata, min_counts=1)
-    sc.pp.filter_cells(adata, min_counts=1)
-    sc.pp.highly_variable_genes(adata, flavor='seurat_v3', n_top_genes=10000, subset=False)
-    if 'highly_variable_rank' in adata.var.columns:
-        adata = adata[:, adata.var['highly_variable_rank'] < 3000].copy()
-    else:
-        adata = adata[:, adata.var['highly_variable']].copy()
-    sc.pp.normalize_total(adata, target_sum=1000)
-    sc.pp.log1p(adata)
-    sc.pp.scale(adata)
-
-    X = adata.X.toarray().astype(np.float32) if hasattr(adata.X, 'toarray') else np.array(adata.X, dtype=np.float32)
+    # The unified benchmark already provides normalized log1p HVG2000 in X.
+    # Re-running scanpy normalize/HVG here would break the shared protocol and,
+    # in the current environment, can also hit numba-related scanpy bugs.
+    X_source = adata.X
+    X = X_source.toarray().astype(np.float32) if hasattr(X_source, 'toarray') else np.array(X_source, dtype=np.float32)
+    X = np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0)
 
     n_clusters = args.n_clusters if args.n_clusters > 0 else len(np.unique(Y))
     print(f'Number of cells: {X.shape[0]}, Number of genes: {X.shape[1]}')
