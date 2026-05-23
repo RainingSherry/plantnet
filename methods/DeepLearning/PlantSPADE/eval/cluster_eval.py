@@ -1,57 +1,39 @@
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-import scanpy as sc
 
 from methods.evaluation import evaluation as benchmark_evaluation
 
 
-def _rare_cell_preservation(labels, pred_labels):
-    unique, counts = np.unique(labels, return_counts=True)
-    if len(unique) == 0:
-        return float("nan")
-    threshold = max(1, int(0.01 * len(labels)))
-    rare_labels = unique[counts <= threshold]
-    if len(rare_labels) == 0:
-        rare_labels = np.array([unique[np.argmin(counts)]])
-
-    scores = []
-    for rare_label in rare_labels:
-        mask = labels == rare_label
-        rare_pred = pred_labels[mask]
-        if rare_pred.size == 0:
-            continue
-        majority = np.bincount(rare_pred.astype(int)).argmax()
-        scores.append(float((rare_pred == majority).mean()))
-    return float(np.mean(scores)) if scores else float("nan")
+# ---------- 聚类与评估 ----------
+# 在嵌入空间中用KMeans聚类，然后与真实标签对比计算NMI/ARI等指标
 
 
-def cluster_and_evaluate(embedding, labels, n_clusters, method="leiden"):
-    if method == "kmeans":
-        pred_labels = KMeans(n_clusters=n_clusters, n_init=20, random_state=0).fit_predict(embedding)
+def cluster_and_evaluate(embedding: np.ndarray, labels: np.ndarray, n_clusters: int, seed: int = 42) -> dict:
+    """在嵌入上执行KMeans聚类，计算与真实标签间的聚类评价指标.
+
+    评估指标包括：
+    - ACC（分类准确率，需标签对齐）
+    - NMI（归一化互信息）
+    - ARI（调整兰德指数）
+    - F1-macro
+    - FMI（Fowlkes-Mallows Index）
+    - V-measure（同质性+完整性调和平均）
+    - Silhouette Score（簇内紧密度与簇间分离度）
+    """
+    pred_labels = KMeans(n_clusters=n_clusters, n_init=20, random_state=seed).fit_predict(embedding)
+    # benchmark_evaluation 内部做 Hungarian 标签对齐，返回准确率和对齐后的预测标签
+    acc, nmi, ari, f1_macro, fmi, v_measure, hom, com, y_pred_mapped = benchmark_evaluation(labels, pred_labels)
+    if len(np.unique(pred_labels)) > 1 and embedding.shape[0] > len(np.unique(pred_labels)):
+        try:
+            silhouette = float(silhouette_score(embedding, pred_labels))
+        except Exception:
+            silhouette = float("nan")
     else:
-        adata = sc.AnnData(embedding)
-        sc.pp.neighbors(adata, n_neighbors=10, use_rep="X")
-        resolutions = np.linspace(0.1, 2.5, 60)[::-1]
-        best_res = resolutions[0]
-        best_diff = float("inf")
-        for res in resolutions:
-            sc.tl.leiden(adata, random_state=0, resolution=float(res))
-            count = adata.obs["leiden"].nunique()
-            diff = abs(count - n_clusters)
-            if diff < best_diff:
-                best_diff = diff
-                best_res = float(res)
-            if count == n_clusters:
-                break
-        sc.tl.leiden(adata, random_state=0, resolution=best_res)
-        pred_labels = adata.obs["leiden"].astype(int).to_numpy()
-
-    acc, nmi, ari, f1_macro, fmi, v_measure, hom, com, y_pred_ = benchmark_evaluation(labels, pred_labels)
-    sil = float(silhouette_score(embedding, pred_labels)) if len(np.unique(pred_labels)) > 1 else float("nan")
-    rare_preservation = _rare_cell_preservation(labels, pred_labels)
+        silhouette = float("nan")
     return {
-        "pred_labels": pred_labels,
+        "pred_labels": pred_labels.astype(np.int64),
+        "pred_labels_mapped": y_pred_mapped.astype(np.int64),
         "metrics": {
             "acc": float(acc),
             "nmi": float(nmi),
@@ -61,8 +43,15 @@ def cluster_and_evaluate(embedding, labels, n_clusters, method="leiden"):
             "v_measure": float(v_measure),
             "homogeneity": float(hom),
             "completeness": float(com),
-            "silhouette": sil,
-            "rare_cell_preservation": rare_preservation,
+            "silhouette": silhouette,
         },
-        "y_pred_mapped": y_pred_,
     }
+
+
+def evaluate_embedding_set(embeddings: dict, labels: np.ndarray, n_clusters: int, seed: int = 42) -> dict:
+    """对多个嵌入字典中的每个嵌入分别聚类评估（用于对比不同方法的结果）."""
+    return {
+        name: cluster_and_evaluate(embedding, labels, n_clusters=n_clusters, seed=seed)
+        for name, embedding in embeddings.items()
+    }
+

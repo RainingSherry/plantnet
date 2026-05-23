@@ -1,3 +1,4 @@
-from .cluster_eval import cluster_and_evaluate
-from .marker_eval import marker_gene_enrichment
-from .sparsity_eval import evaluate_support_predictions
+from .cluster_eval import cluster_and_evaluate, evaluate_embedding_set
+
+__all__ = ["cluster_and_evaluate", "evaluate_embedding_set"]
+
