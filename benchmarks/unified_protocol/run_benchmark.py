@@ -30,6 +30,7 @@ from common import compute_metrics, ensure_dir, evaluate_embedding, labels_from_
 DATASETS = {
     "Mouse_Pancreas_1": ("benchmarks/unified_protocol/preprocessed/Mouse_Pancreas_1_hvg2000.h5ad", 13),
     "SRP182008": ("benchmarks/unified_protocol/preprocessed/SRP182008_hvg2000.h5ad", 15),
+    "SRP235541": ("data/SRP235541.h5ad", 18),
     "SRP171040": ("benchmarks/unified_protocol/preprocessed/SRP171040_hvg2000.h5ad", 12),
 }
 
@@ -41,7 +42,7 @@ def parse_args():
     parser.add_argument("--datasets", default="Mouse_Pancreas_1,SRP182008,SRP171040")
     parser.add_argument(
         "--methods",
-        default="traditional_pca,traditional_leiden,traditional_louvain,traditional_sc3,codex_maskdiffusion,cursor2_maskdiffusion,doloris_maskdiffusion,cursor_maskdiffusion,scMAE,scVI,PhytoCluster,scCDCG",
+        default="traditional_pca,traditional_leiden,traditional_louvain,traditional_sc3,codex_maskdiffusion,cursor2_maskdiffusion,cursor_maskdiffusion,scMAE,scVI,PhytoCluster,scCDCG",
     )
     parser.add_argument("--root", default="benchmarks/unified_protocol")
     parser.add_argument("--gpus", default="1,2,3,4,5,6")
@@ -64,7 +65,7 @@ def py():
 def build_command(method, data_path, save_dir, n_clusters, gpu, args):
     if method == "codex_maskdiffusion":
         return [
-            py(), "methods/DeepLearning/codex_Doloris/maskdiffusion/run.py",
+            py(), "methods/DeepLearning/PlantSPADE/run_plantspade.py",
             "--data_path", data_path, "--save_dir", save_dir, "--input_mode", "log1p",
             "--n_top_genes", "2000", "--latent_dim", "32", "--epochs", str(args.mask_epochs),
             "--warmup_epochs", "30", "--diffusion_ramp_epochs", "50", "--batch_size", "256",
@@ -85,17 +86,6 @@ def build_command(method, data_path, save_dir, n_clusters, gpu, args):
             "--diffusion_steps", "100", "--hidden_dim", "256", "--diffusion_hidden_dim", "256",
             "--dropout", "0.1", "--gpu", str(gpu), "--seed", str(args.seed),
             "--eval_interval", "10", "--cluster_methods", "kmeans",
-        ]
-    if method == "doloris_maskdiffusion":
-        mask_phase_epochs = max(1, min(30, args.mask_epochs // 5 if args.mask_epochs >= 5 else 1))
-        embedding_phase_epochs = max(1, args.mask_epochs - mask_phase_epochs)
-        return [
-            py(), "methods/DeepLearning/Doloris/maskdiffusion/run.py",
-            "--data_path", data_path, "--save_dir", save_dir, "--input_mode", "log1p",
-            "--n_top_genes", "2000", "--latent_dim", "32", "--mask_epochs", str(mask_phase_epochs),
-            "--embedding_epochs", str(embedding_phase_epochs), "--joint_epochs", "0", "--batch_size", "256",
-            "--lr", "1e-3", "--weight_decay", "1e-5", "--cluster_method", "kmeans",
-            "--gpu", str(gpu), "--seed", str(args.seed),
         ]
     if method == "cursor_maskdiffusion":
         return [
@@ -119,6 +109,18 @@ def build_command(method, data_path, save_dir, n_clusters, gpu, args):
             py(), "methods/GNN/scCDCG/run.py",
             "--data_path", data_path, "--save_dir", save_dir, "--n_clusters", str(n_clusters),
             "--epochs", str(args.deep_epochs), "--gpu", str(gpu), "--seed", str(args.seed),
+        ]
+    if method == "plantspade_lgcl":
+        return [
+            py(), "methods/DeepLearning/PlantSPADE_LGCL/run_plantspade.py",
+            "--data_path", data_path, "--save_dir", save_dir, "--input_mode", "auto",
+            "--n_top_genes", "2000", "--n_clusters", str(n_clusters),
+            "--latent_dim", "32", "--layers", "2", "--epochs", str(args.deep_epochs),
+            "--pairs_per_epoch", "262144", "--contrastive_batch_size", "2048",
+            "--lr", "1e-3", "--weight_decay", "1e-5", "--edge_dropout", "0.1",
+            "--contrastive_weight", "0.05", "--module_weight", "0.001",
+            "--num_modules", "16", "--module_top_k", "30",
+            "--gpu", str(gpu), "--seed", str(args.seed),
         ]
     if method == "PhytoCluster":
         return [
@@ -157,12 +159,12 @@ def find_embeddings(method, save_dir):
             ("cursor2_maskdiffusion_direct", os.path.join(save_dir, "embeddings_direct.npy")),
             ("cursor2_maskdiffusion_diffusion", os.path.join(save_dir, "embeddings_diffusion.npy")),
         ])
-    elif method == "doloris_maskdiffusion":
-        candidates.append(("doloris_maskdiffusion", os.path.join(save_dir, "embedding_final.npy")))
     elif method == "cursor_maskdiffusion":
         candidates.append(("cursor_maskdiffusion", os.path.join(save_dir, "embeddings.npy")))
     elif method in {"scMAE", "scCDCG", "PhytoCluster"}:
         candidates.append((method, os.path.join(save_dir, "embedding.h5")))
+    elif method == "plantspade_lgcl":
+        candidates.append(("plantspade_lgcl", os.path.join(save_dir, "embedding_final.npy")))
     elif method == "scVI":
         hits = sorted(glob.glob(os.path.join(save_dir, "**", "embedding.h5"), recursive=True))
         if hits:
@@ -412,8 +414,8 @@ def main():
     datasets = [item.strip() for item in args.datasets.split(",") if item.strip()]
     methods = [item.strip() for item in args.methods.split(",") if item.strip()]
     gpus = [int(item) for item in args.gpus.split(",") if item.strip()]
-    if any(gpu == 0 for gpu in gpus):
-        raise ValueError("GPU 0 is forbidden by request.")
+    if any(gpu in {0, 7} for gpu in gpus):
+        raise ValueError("GPU 0 and GPU 7 are forbidden by request.")
 
     rows_all = []
     jobs = []
