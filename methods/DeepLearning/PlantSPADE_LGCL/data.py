@@ -73,14 +73,26 @@ def _select_source(adata: sc.AnnData, input_mode: str):
         raise ValueError(f"Unknown input_mode: {input_mode}")
 
     if input_mode in {"auto", "raw"} and adata.raw is not None:
-        return adata.raw.X, np.asarray(adata.raw.var_names), adata.raw.var.copy(), "raw"
+        var = adata.raw.var.copy()
+        gene_names = np.asarray(adata.raw.var_names).astype(str)
+        for name_col in ["features", "gene_name", "gene_symbols", "_index"]:
+            if name_col in var.columns:
+                candidate = var[name_col].astype(str).to_numpy()
+                if len(candidate) == len(gene_names) and len(np.unique(candidate)) == len(candidate):
+                    gene_names = candidate
+                    break
+        var.index = gene_names
+        return adata.raw.X, gene_names, var, "raw"
 
     inferred = "raw" if _looks_like_raw_counts(adata.X) else "log1p"
     if input_mode == "raw" and not _looks_like_raw_counts(adata.X):
         raise ValueError("--input_mode raw was requested, but adata.X does not look like raw counts and adata.raw is absent.")
     if input_mode == "log1p":
         inferred = "log1p"
-    return adata.X, np.asarray(adata.var_names), adata.var.copy(), inferred
+    var = adata.var.copy()
+    gene_names = np.asarray(adata.var_names).astype(str)
+    var.index = gene_names
+    return adata.X, gene_names, var, inferred
 
 
 def _tfidf_svd(
@@ -124,9 +136,9 @@ def load_lgcl_dataset(
 
     work = sc.AnnData(X=counts.copy())
     work.obs_names = adata.obs_names.copy()
-    work.var_names = gene_names.copy()
     work.obs = adata.obs.copy()
     work.var = var.copy()
+    work.var_names = gene_names.copy()
 
     if inferred_mode == "raw":
         sc.pp.normalize_total(work, target_sum=target_sum)
