@@ -1,0 +1,65 @@
+datasets:
+  - dataset_name: SRP182008
+    file_path: /home/luolie/biopipeline/dimension-reduction/plantnet/data/SRP182008.h5ad
+    species: Arabidopsis thaliana
+    tissue: Root tip
+    label_key: Celltype
+    expected_n_clusters: 15
+    group: arabidopsis_root_main
+    note: Main Arabidopsis root reproducibility dataset; infer K from label_key when null.
+  - dataset_name: SRP235541
+    file_path: /home/luolie/biopipeline/dimension-reduction/plantnet/data/SRP235541.h5ad
+    species: Arabidopsis thaliana
+    tissue: Root tip
+    label_key: Celltype
+    expected_n_clusters: 18
+    group: arabidopsis_root_main
+    note: Main Arabidopsis root reproducibility dataset; infer K from label_key when null.
+  - dataset_name: SRP171040
+    file_path: /home/luolie/biopipeline/dimension-reduction/plantnet/data/SRP171040.h5ad
+    species: Arabidopsis thaliana
+    tissue: Root tip
+    label_key: Celltype
+    expected_n_clusters: 12
+    group: arabidopsis_root_main
+    note: Main Arabidopsis root reproducibility dataset; infer K from label_key when null.
+  - dataset_name: SRP309176
+    file_path: /home/luolie/biopipeline/dimension-reduction/plantnet/data/SRP309176.h5ad
+    species: Oryza sativa
+    tissue: Root tip
+    label_key: Celltype
+    expected_n_clusters: 13
+    group: cross_species_root_generalization
+    note: Cross-species root generalization dataset; genotype japonica cv. ZH11.
+  - dataset_name: SRP145013
+    file_path: /home/luolie/biopipeline/dimension-reduction/plantnet/data/SRP145013.h5ad
+    species: Zea mays
+    tissue: Root tip
+    label_key: Celltype
+    expected_n_clusters: 9
+    group: cross_species_root_generalization
+    note: Cross-species root generalization dataset; genotype B73.
+  - dataset_name: CRA002977_1
+    file_path: /home/luolie/biopipeline/dimension-reduction/plantnet/data/CRA002977_1.h5ad
+    species: Arabidopsis thaliana
+    tissue: True leaf
+    label_key: Celltype
+    expected_n_clusters: 7
+    group: leaf_non_root_generalization
+    note: Leaf/non-root tissue generalization dataset; genotype Col-0.
+  - dataset_name: SRP224648
+    file_path: /home/luolie/biopipeline/dimension-reduction/plantnet/data/SRP224648.h5ad
+    species: Zea mays
+    tissue: Leaf
+    label_key: Celltype
+    expected_n_clusters: 4
+    group: leaf_non_root_generalization
+    note: Leaf/non-root tissue generalization dataset; genotype B73.
+  - dataset_name: CRA007122
+    file_path: /home/luolie/biopipeline/dimension-reduction/plantnet/data/CRA007122.h5ad
+    species: Glycine max
+    tissue: Nodule / Root
+    label_key: Celltype
+    expected_n_clusters: 7
+    group: special_tissue_robustness
+    note: Special tissue robustness dataset; genotype Williams 82, mixed nodule/root conditions.

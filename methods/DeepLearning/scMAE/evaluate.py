@@ -11,7 +11,6 @@ import torch
 import numpy as np
 from scipy.optimize import linear_sum_assignment as hungarian
 from sklearn import metrics
-from munkres import Munkres
 
 
 def evaluate(label, pred):
@@ -50,22 +49,12 @@ def get_cluster_labels_from_indices(indices):
 
 
 def get_y_preds(y_true, cluster_assignments, n_clusters):
-    """
-    Computes the predicted labels, where label assignments now
-    correspond to the actual labels in y_true (as estimated by Munkres)
-    cluster_assignments:    array of labels, outputted by kmeans
-    y_true:                 true labels
-    n_clusters:             number of clusters in the dataset
-    returns:    a tuple containing the accuracy and confusion matrix,
-                in that order
-    """
-    confusion_matrix = metrics.confusion_matrix(
-        y_true, cluster_assignments, labels=None
-    )
-    # compute accuracy based on optimal 1:1 assignment of clusters to labels
+    confusion_matrix = metrics.confusion_matrix(y_true, cluster_assignments, labels=None)
     cost_matrix = calculate_cost_matrix(confusion_matrix, n_clusters)
-    indices = Munkres().compute(cost_matrix)
-    kmeans_to_true_cluster_labels = get_cluster_labels_from_indices(indices)
+    rows, cols = hungarian(cost_matrix)
+    kmeans_to_true_cluster_labels = np.zeros(n_clusters)
+    for row, col in zip(rows, cols):
+        kmeans_to_true_cluster_labels[col] = row
 
     if np.min(cluster_assignments) != 0:
         cluster_assignments = cluster_assignments - np.min(cluster_assignments)

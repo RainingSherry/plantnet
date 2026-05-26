@@ -58,7 +58,6 @@ scCluBench 聚类评估指标模块
 """
 
 import numpy as np
-from munkres import Munkres
 from sklearn.metrics.cluster import normalized_mutual_info_score as nmi_score
 from sklearn.metrics import adjusted_rand_score as ari_score
 from sklearn import metrics
@@ -66,68 +65,25 @@ from sklearn import metrics
 
 def cluster_acc(y_true, y_pred):
     """
-    计算聚类准确率（旧版，使用 Munkres 算法）
-
-    【注意】本函数已弃用，建议使用新版 evaluation() 函数
-
-    【算法流程】
-        1. 构建混淆矩阵 G，元素 G[i,j] = 真实标签=i且预测标签=j 的细胞数
-        2. 使用 Munkres 算法找最优指派（最大化匹配数）
-        3. 根据最优指派重新标记预测标签
-        4. 计算标记后的准确率
-
-    【参数】
-        y_true: 真实标签（整数数组）
-        y_pred: 预测标签（整数数组）
-
-    【返回】
-        (acc, f1_macro): 准确率和宏平均 F1
+    Compute clustering accuracy using Hungarian algorithm (linear_sum_assignment).
     """
-    y_true = y_true - np.min(y_true)
-    l1 = list(set(y_true))
-    numclass1 = len(l1)
-    l2 = list(set(y_pred))
-    numclass2 = len(l2)
-
-    ind = 0
-    # 如果类别数不匹配，用缺失类别填补
-    if numclass1 != numclass2:
-        for i in l1:
-            if i in l2:
-                pass
-            else:
-                y_pred[ind] = i
-                ind += 1
-
-    l2 = list(set(y_pred))
-    numclass2 = len(l2)
-
-    if numclass1 != numclass2:
-        print('error')
-        return
-
-    # 构建混淆矩阵：G[i,j] = 真实标签 l1[i] 且预测标签 l2[j] 的细胞数
-    cost = np.zeros((numclass1, numclass2), dtype=int)
-    for i, c1 in enumerate(l1):
-        mps = [i1 for i1, e1 in enumerate(y_true) if e1 == c1]
-        for j, c2 in enumerate(l2):
-            mps_d = [i1 for i1 in mps if y_pred[i1] == c2]
-            cost[i][j] = len(mps_d)
-
-    # Munkres 算法（最大化匹配 → 取负号转为最小化问题）
-    m = Munkres()
-    cost = cost.__neg__().tolist()
-    indexes = m.compute(cost)
-
-    # 根据最优指派重新标记
-    new_predict = np.zeros(len(y_pred))
-    for i, c in enumerate(l1):
-        c2 = l2[indexes[i][1]]
-        ai = [ind for ind, elm in enumerate(y_pred) if elm == c2]
-        new_predict[ai] = c
-
-    acc = metrics.accuracy_score(y_true, new_predict)
-    f1_macro = metrics.f1_score(y_true, new_predict, average='macro')
+    from sklearn.preprocessing import LabelEncoder
+    from scipy.optimize import linear_sum_assignment
+    y_true_arr = np.asarray(y_true).ravel()
+    y_pred_arr = np.asarray(y_pred).ravel()
+    le_true = LabelEncoder()
+    le_pred = LabelEncoder()
+    y_true_enc = le_true.fit_transform(y_true_arr)
+    y_pred_enc = le_pred.fit_transform(y_pred_arr)
+    D = max(int(y_true_enc.max()), int(y_pred_enc.max())) + 1
+    cost = np.zeros((D, D), dtype=np.float64)
+    for i in range(len(y_pred_enc)):
+        cost[int(y_pred_enc[i]), int(y_true_enc[i])] -= 1
+    rows, cols = linear_sum_assignment(cost)
+    y_map = {col: row for row, col in zip(rows, cols)}
+    new_predict = np.array([y_map.get(int(p), int(p)) for p in y_pred_enc])
+    acc = metrics.accuracy_score(y_true_enc, new_predict)
+    f1_macro = metrics.f1_score(y_true_enc, new_predict, average='macro')
     return acc, f1_macro
 
 

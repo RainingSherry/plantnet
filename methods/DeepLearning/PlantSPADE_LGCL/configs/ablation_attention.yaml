@@ -1,0 +1,17 @@
+attention_ablation_methods:
+  - plantspade_lgcl_baseline
+  - plantspade_lgcl_support_attention
+  - plantspade_lgcl_attention_no_idf
+  - plantspade_lgcl_attention_no_amplitude
+  - plantspade_lgcl_attention_topk_64
+  - plantspade_lgcl_attention_topk_128
+  - plantspade_lgcl_attention_topk_256
+defaults:
+  run_attention_ablations: true
+  attention_topk_genes: 128
+  attention_topk_sweep: [64, 128, 256]
+  attention_beta: 0.1
+  attention_gamma: 0.1
+  attention_eta: 0.5
+  attention_dropout: 0.1
+mechanism_note: attention_no_idf tests whether local sparse attention should avoid a second gene-frequency correction after global TF-IDF-SVD.

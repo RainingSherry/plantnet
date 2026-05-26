@@ -7,6 +7,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from ..negative_sampling import NegativeSampler, NegativeSamplerConfig
+
 
 def scipy_to_torch_sparse(matrix: sp.spmatrix, device: torch.device) -> torch.Tensor:
     coo = matrix.tocoo().astype(np.float32)
@@ -43,7 +45,13 @@ def sparse_dropout(matrix: torch.Tensor, p: float) -> torch.Tensor:
 
 
 class PairSampler:
-    def __init__(self, support: sp.csr_matrix, seed: int = 42):
+    def __init__(
+        self,
+        support: sp.csr_matrix,
+        seed: int = 42,
+        negative_sampler: str = "random_zero",
+        neighbor_k: int = 15,
+    ):
         self.support = support.tocsr(copy=True)
         self.support.sort_indices()
         coo = self.support.tocoo()
@@ -53,6 +61,10 @@ class PairSampler:
         self.indices = self.support.indices.astype(np.int64, copy=False)
         self.n_genes = self.support.shape[1]
         self.rng = np.random.default_rng(seed)
+        self.negative_sampler = NegativeSampler(
+            self.support,
+            NegativeSamplerConfig(mode=negative_sampler, seed=seed, neighbor_k=neighbor_k),
+        )
         if self.edge_rows.size == 0:
             raise ValueError("Support matrix has no non-zero cell-gene edges.")
 
@@ -64,13 +76,7 @@ class PairSampler:
         return bool(pos < row_indices.size and row_indices[pos] == col)
 
     def _sample_negatives(self, cells: np.ndarray) -> np.ndarray:
-        neg = self.rng.integers(0, self.n_genes, size=cells.shape[0], dtype=np.int64)
-        for i, row in enumerate(cells):
-            if self.indptr[row + 1] - self.indptr[row] >= self.n_genes:
-                continue
-            while self._row_contains(int(row), int(neg[i])):
-                neg[i] = self.rng.integers(0, self.n_genes, dtype=np.int64)
-        return neg
+        return self.negative_sampler.sample(cells)
 
     def sample(self, n_pairs: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         edge_idx = self.rng.integers(0, self.edge_rows.size, size=n_pairs, dtype=np.int64)
@@ -268,6 +274,8 @@ class LGCLTrainConfig:
     grad_clip: float = 5.0
     log_interval: int = 5
     seed: int = 42
+    negative_sampler: str = "random_zero"
+    negative_neighbor_k: int = 15
 
 
 def train_lgcl(
@@ -276,7 +284,12 @@ def train_lgcl(
     config: LGCLTrainConfig,
     device: torch.device,
 ) -> Dict[str, list]:
-    sampler = PairSampler(support, seed=config.seed)
+    sampler = PairSampler(
+        support,
+        seed=config.seed,
+        negative_sampler=config.negative_sampler,
+        neighbor_k=config.negative_neighbor_k,
+    )
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.lr, weight_decay=config.weight_decay)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max(1, config.epochs))
     rng = np.random.default_rng(config.seed + 1009)

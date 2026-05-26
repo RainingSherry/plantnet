@@ -173,16 +173,18 @@ def main():
     # ========== Step 3: 计算评估指标 ==========
     metrics_path = os.path.join(args.save_dir, 'metrics.json')
 
-    # 使用 Hungarian 算法对齐预测标签和真实标签（最优匹配）
-    from munkres import Munkres
-    m = Munkres()
-    D = max(int(y_pred.max()), int(Y.max())) + 1
-    cost = np.zeros((D, D))
-    for i in range(len(y_pred)):
-        cost[int(y_pred[i]), int(Y[i])] -= 1  # 构建成本矩阵
-    assignment = m.compute(cost)
-    y_map = {row: col for row, col in assignment}
-    y_pred_aligned = np.array([y_map.get(int(p), int(p)) for p in y_pred])
+    # Use Hungarian algorithm (scipy) to align predicted labels with ground truth
+    from sklearn.preprocessing import LabelEncoder
+    le = LabelEncoder()
+    y_enc = le.fit_transform(y_pred)
+    gt_enc = le.fit_transform(Y)
+    D = max(int(y_enc.max()), int(gt_enc.max())) + 1
+    cost = np.zeros((D, D), dtype=np.float64)
+    for i in range(len(y_enc)):
+        cost[int(y_enc[i]), int(gt_enc[i])] -= 1
+    rows, cols = linear_sum_assignment(cost)
+    y_map = {col: row for row, col in zip(rows, cols)}
+    y_pred_aligned = np.array([y_map.get(int(p), int(p)) for p in y_enc])
 
     # 计算各项评估指标
     acc = float(np.mean(y_pred_aligned == Y))
