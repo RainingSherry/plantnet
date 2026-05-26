@@ -11,6 +11,7 @@ from typing import Optional
 import h5py
 import numpy as np
 import pandas as pd
+import scipy.sparse as sp
 import torch
 import torch.nn.functional as F
 
@@ -86,6 +87,8 @@ def parse_args():
     parser.add_argument("--module_top_k", type=int, default=30)
     parser.add_argument("--target_sum", type=float, default=1e4)
     parser.add_argument("--global_blend", type=float, default=0.0)
+    parser.add_argument("--subsample_per_class_max", type=int, default=0)
+    parser.add_argument("--subsample_fallback_max", type=int, default=0)
     parser.add_argument("--negative_sampler", default="random_zero", choices=["random_zero", "idf_weighted_zero", "neighbor_conflict_zero"])
     parser.add_argument("--negative_neighbor_k", type=int, default=15)
     parser.add_argument("--eval_neighbors", type=int, default=15)
@@ -93,7 +96,9 @@ def parse_args():
     parser.add_argument("--louvain_fixed_resolution", type=float, default=1.0)
     parser.add_argument("--leiden_resolutions", default="0.2,0.4,0.6,0.8,1.0,1.2")
     parser.add_argument("--sweep_max_cells", type=int, default=10000)
-    parser.add_argument("--include_louvain", type=str2bool, default=True)
+    parser.add_argument("--include_louvain", type=str2bool, default=False)
+    parser.add_argument("--run_oracle_sweep", type=str2bool, default=False)
+    parser.add_argument("--silhouette_sample_size", type=int, default=3000)
     parser.add_argument("--use_support_attention", type=str2bool, default=False)
     parser.add_argument("--attention_topk_genes", type=int, default=128)
     parser.add_argument("--attention_beta", type=float, default=0.1)
@@ -111,6 +116,7 @@ def parse_args():
     parser.add_argument("--no_cuda", action="store_true")
     parser.add_argument("--no_normalize_embedding", action="store_true")
     parser.add_argument("--no_save_h5ad", action="store_true")
+    parser.add_argument("--train_only", type=str2bool, default=False)
     parser.add_argument("--method_name", default="plantspade_lgcl")
     return parser.parse_args()
 
@@ -118,6 +124,14 @@ def parse_args():
 def get_device(gpu: int, no_cuda: bool) -> torch.device:
     if no_cuda or not torch.cuda.is_available():
         return torch.device("cpu")
+    visible = os.environ.get("CUDA_VISIBLE_DEVICES")
+    if visible:
+        visible_ids = [item.strip() for item in visible.split(",") if item.strip()]
+        if set(visible_ids).intersection({"0", "7"}):
+            raise ValueError("CUDA_VISIBLE_DEVICES includes forbidden physical GPU 0 or 7.")
+        if gpu < 0 or gpu >= len(visible_ids):
+            raise ValueError(f"--gpu {gpu} is outside isolated CUDA_VISIBLE_DEVICES={visible!r}.")
+        return torch.device(f"cuda:{gpu}")
     if gpu in {0, 7}:
         raise ValueError("GPU 0 and GPU 7 are forbidden for this run. Use --gpu 1,2,3,4,5,6 or --no_cuda.")
     return torch.device(f"cuda:{gpu}")
@@ -142,7 +156,7 @@ def sanitize_anndata_for_write(adata) -> None:
                     replacement = f"{reserved}_renamed_{suffix}"
                     suffix += 1
                 frame.rename(columns={reserved: replacement}, inplace=True)
-        if "_index" in frame.index:
+        if frame.index.name == "_index":
             frame.index.name = "cell_name" if frame is adata.obs else "gene_name"
 
 
@@ -150,6 +164,114 @@ def compute_gene_idf(support) -> np.ndarray:
     df = np.diff(support.tocsc().indptr).astype(np.float32)
     n_cells = float(support.shape[0])
     return np.log1p(n_cells / (1.0 + df)).astype(np.float32)
+
+
+def sanitize_csr_matrix(matrix, binary: bool = False) -> sp.csr_matrix:
+    if sp.issparse(matrix):
+        out = matrix.tocsr(copy=True).astype(np.float32)
+    else:
+        out = sp.csr_matrix(np.asarray(matrix, dtype=np.float32))
+    out.sum_duplicates()
+    out.data = np.nan_to_num(out.data, nan=0.0, posinf=0.0, neginf=0.0)
+    out.data[out.data < 0.0] = 0.0
+    if binary:
+        out.data = np.ones_like(out.data, dtype=np.float32)
+    out.eliminate_zeros()
+    out.sort_indices()
+    return out
+
+
+def write_graph_profile(support: sp.csr_matrix, output_dir: str) -> dict:
+    support = support.tocsr()
+    n_cells, n_genes = support.shape
+    n_edges = int(support.nnz)
+    row_degree = np.diff(support.indptr).astype(np.int64)
+    col_degree = np.asarray(support.sum(axis=0)).ravel().astype(np.float64)
+    indices_min = int(support.indices.min()) if support.indices.size else None
+    indices_max = int(support.indices.max()) if support.indices.size else None
+    indptr_ok = bool(support.indptr.shape[0] == n_cells + 1 and np.all(np.diff(support.indptr) >= 0))
+    indices_in_bounds = bool(
+        support.indices.size == 0
+        or (indices_min is not None and indices_min >= 0 and indices_max is not None and indices_max < n_genes)
+    )
+    any_nan_inf = bool(
+        np.any(~np.isfinite(support.data))
+        or np.any(~np.isfinite(support.indices))
+        or np.any(~np.isfinite(support.indptr))
+    )
+    profile = {
+        "n_cells": int(n_cells),
+        "n_genes": int(n_genes),
+        "n_edges": n_edges,
+        "density": float(n_edges / max(1, n_cells * n_genes)),
+        "max_cell_degree": int(row_degree.max()) if row_degree.size else 0,
+        "mean_cell_degree": float(row_degree.mean()) if row_degree.size else 0.0,
+        "max_gene_degree": int(col_degree.max()) if col_degree.size else 0,
+        "mean_gene_degree": float(col_degree.mean()) if col_degree.size else 0.0,
+        "empty_cell_count": int(np.sum(row_degree == 0)),
+        "empty_gene_count": int(np.sum(col_degree == 0)),
+        "support_indices_min": indices_min,
+        "support_indices_max": indices_max,
+        "support.indices_min": indices_min,
+        "support.indices_max": indices_max,
+        "support_has_canonical_format": bool(support.has_canonical_format),
+        "support.has_canonical_format": bool(support.has_canonical_format),
+        "support_indptr_valid": indptr_ok,
+        "support_indices_in_bounds": indices_in_bounds,
+        "any_nan_inf": any_nan_inf,
+    }
+    save_json(profile, os.path.join(output_dir, "graph_profile.json"))
+    if not indptr_ok:
+        raise ValueError("CSR support indptr is invalid or non-monotonic.")
+    if not indices_in_bounds:
+        raise ValueError(f"CSR support indices are out of bounds for n_genes={n_genes}: {indices_min}..{indices_max}")
+    if any_nan_inf:
+        raise ValueError("CSR support contains NaN or Inf values before CUDA graph construction.")
+    return profile
+
+
+def save_training_artifacts(
+    save_dir: str,
+    args,
+    bundle,
+    model: PlantSPADELGCL,
+    history: dict,
+    base_embedding: np.ndarray,
+    gene_embedding: np.ndarray,
+    projected_global: np.ndarray,
+    primary_embedding: np.ndarray,
+    normalize_embedding: bool,
+    primary_variant: str,
+    graph_profile: dict,
+) -> str:
+    embedding_path = os.path.join(save_dir, "embedding_final.npy")
+    np.save(embedding_path, primary_embedding.astype(np.float32))
+    np.save(os.path.join(save_dir, "embeddings_base.npy"), base_embedding.astype(np.float32))
+    np.save(os.path.join(save_dir, "embedding_baseline.npy"), base_embedding.astype(np.float32))
+    np.save(os.path.join(save_dir, "global_embedding_svd_projected.npy"), projected_global.astype(np.float32))
+    np.save(os.path.join(save_dir, "gene_embedding.npy"), gene_embedding.astype(np.float32))
+    np.save(os.path.join(save_dir, "labels.npy"), bundle.labels.astype(np.int64))
+    np.save(os.path.join(save_dir, "gene_names.npy"), bundle.gene_names.astype(str))
+    sp.save_npz(os.path.join(save_dir, "support_matrix.npz"), bundle.support.astype(np.float32))
+    sp.save_npz(os.path.join(save_dir, "amplitude_matrix.npz"), bundle.amplitude.astype(np.float32))
+    save_json(history, os.path.join(save_dir, "training_history.json"))
+
+    module_rows = model.module_top_genes(bundle.gene_names, gene_embedding=gene_embedding, top_k=args.module_top_k)
+    save_json({"top_genes": module_rows}, os.path.join(save_dir, "module_top_genes.json"))
+    pd.DataFrame(module_rows).to_csv(os.path.join(save_dir, "module_top_genes.csv"), index=False)
+
+    torch.save(
+        {
+            "model_state": model.state_dict(),
+            "args": vars(args),
+            "gene_names": bundle.gene_names.astype(str),
+            "primary_variant": primary_variant,
+            "normalize_embedding": bool(normalize_embedding),
+            "graph_profile": graph_profile,
+        },
+        os.path.join(save_dir, "model.pt"),
+    )
+    return embedding_path
 
 
 @torch.no_grad()
@@ -282,8 +404,14 @@ def main():
         svd_iter=args.svd_iter,
         seed=args.seed,
         label_key=args.label_key,
+        subsample_per_class_max=args.subsample_per_class_max,
+        subsample_fallback_max=args.subsample_fallback_max,
     )
     write_dataset_artifacts(bundle, save_dir)
+    bundle.support = sanitize_csr_matrix(bundle.support, binary=True)
+    bundle.amplitude = sanitize_csr_matrix(bundle.amplitude, binary=False)
+    graph_profile = write_graph_profile(bundle.support, save_dir)
+    bundle.support_density = float(graph_profile["density"])
     if bundle.labels is None:
         raise ValueError("No labels found in h5ad obs; fixed benchmark evaluation requires labels.")
     n_clusters = args.n_clusters if args.n_clusters > 0 else int(len(np.unique(bundle.labels)))
@@ -348,6 +476,42 @@ def main():
     gene_idf = compute_gene_idf(bundle.support)
     variant_embeddings = {"baseline": base_embedding}
     attention_weights_for_markers = None
+    primary_variant = "baseline"
+    embedding_path = save_training_artifacts(
+        save_dir=save_dir,
+        args=args,
+        bundle=bundle,
+        model=model,
+        history=history,
+        base_embedding=base_embedding,
+        gene_embedding=gene_embedding,
+        projected_global=projected_global,
+        primary_embedding=base_embedding,
+        normalize_embedding=normalize_embedding,
+        primary_variant=primary_variant,
+        graph_profile=graph_profile,
+    )
+    if args.train_only:
+        summary = {
+            "method": args.method_name,
+            "dataset": dataset_name,
+            "seed": int(args.seed),
+            "train_only": True,
+            "n_cells": int(bundle.support.shape[0]),
+            "n_genes": int(bundle.support.shape[1]),
+            "n_edges": int(bundle.support.nnz),
+            "support_density": float(bundle.support_density),
+            "n_clusters": int(n_clusters),
+            "input_mode": bundle.input_mode,
+            "counts_source": bundle.counts_source,
+            "negative_sampler": args.negative_sampler,
+            "primary_variant": primary_variant,
+            "embedding_path": os.path.abspath(embedding_path),
+            "note": "Training artifacts saved. Evaluation is intentionally delegated to scripts/eval_from_embedding.py.",
+        }
+        save_json(summary, os.path.join(save_dir, "summary.json"))
+        print(f"Training artifacts saved to: {save_dir}")
+        return
 
     should_compute_attention = args.use_support_attention or args.run_attention_ablations or args.use_trainable_attention_refiner
     if should_compute_attention:
@@ -446,35 +610,47 @@ def main():
         "attention_eta": float(args.attention_eta),
     }
 
-    embedding_path = os.path.join(save_dir, "embedding_final.npy")
     np.save(embedding_path, embedding.astype(np.float32))
-    np.save(os.path.join(save_dir, "embeddings_base.npy"), base_embedding.astype(np.float32))
-    np.save(os.path.join(save_dir, "global_embedding_svd_projected.npy"), projected_global.astype(np.float32))
-    np.save(os.path.join(save_dir, "gene_embedding.npy"), gene_embedding.astype(np.float32))
-    np.save(os.path.join(save_dir, "labels.npy"), bundle.labels.astype(np.int64))
 
     variant_eval_results = {}
     for variant_name, variant_embedding in variant_embeddings.items():
         variant_path = os.path.join(save_dir, f"embedding_{variant_name}.npy")
         np.save(variant_path, variant_embedding.astype(np.float32))
         variant_method = f"{args.method_name}_{variant_name}"
-        variant_eval_results[variant_name] = write_evaluation_outputs(
-            output_dir=save_dir,
-            dataset=dataset_name,
-            method=variant_method,
-            seed=args.seed,
-            embedding=variant_embedding,
-            labels=bundle.labels,
-            n_clusters=n_clusters,
-            n_neighbors=args.eval_neighbors,
-            leiden_fixed_resolution=args.leiden_fixed_resolution,
-            louvain_fixed_resolution=args.louvain_fixed_resolution,
-            leiden_sweep_resolutions=resolutions,
-            sweep_max_cells=args.sweep_max_cells,
-            include_louvain=args.include_louvain,
-            prefix=f"eval_{variant_name}",
-            extra={"variant": variant_name, "negative_sampler": args.negative_sampler},
-        )
+        try:
+            variant_eval_results[variant_name] = write_evaluation_outputs(
+                output_dir=save_dir,
+                dataset=dataset_name,
+                method=variant_method,
+                seed=args.seed,
+                embedding=variant_embedding,
+                labels=bundle.labels,
+                n_clusters=n_clusters,
+                n_neighbors=args.eval_neighbors,
+                leiden_fixed_resolution=args.leiden_fixed_resolution,
+                louvain_fixed_resolution=args.louvain_fixed_resolution,
+                leiden_sweep_resolutions=resolutions,
+                sweep_max_cells=args.sweep_max_cells,
+                include_louvain=args.include_louvain,
+                run_oracle_sweep=args.run_oracle_sweep,
+                silhouette_sample_size=args.silhouette_sample_size,
+                prefix=f"eval_{variant_name}",
+                extra={"variant": variant_name, "negative_sampler": args.negative_sampler},
+            )
+        except Exception as exc:
+            save_json(
+                {
+                    "variant": variant_name,
+                    "method": variant_method,
+                    "error": repr(exc),
+                    "note": "This variant failed during evaluation; training artifacts and other variants remain usable.",
+                },
+                os.path.join(save_dir, f"eval_{variant_name}_failure.json"),
+            )
+            print(f"Evaluation failed for variant={variant_name}: {exc}", file=sys.stderr)
+
+    if primary_variant not in variant_eval_results:
+        raise RuntimeError(f"Primary variant evaluation failed: {primary_variant}. Training artifacts are saved in {save_dir}.")
 
     primary_result = variant_eval_results[primary_variant]
     primary_payload = {
@@ -514,18 +690,6 @@ def main():
             top_n_deg=50,
         )
 
-    module_rows = model.module_top_genes(bundle.gene_names, gene_embedding=gene_embedding, top_k=args.module_top_k)
-    save_json({"top_genes": module_rows}, os.path.join(save_dir, "module_top_genes.json"))
-    pd.DataFrame(module_rows).to_csv(os.path.join(save_dir, "module_top_genes.csv"), index=False)
-
-    torch.save(
-        {
-            "model_state": model.state_dict(),
-            "args": vars(args),
-            "gene_names": bundle.gene_names.astype(str),
-        },
-        os.path.join(save_dir, "model.pt"),
-    )
     if not args.no_save_h5ad:
         sanitize_anndata_for_write(bundle.adata)
         bundle.adata.write_h5ad(os.path.join(save_dir, "adata_plantspade_lgcl.h5ad"), compression="gzip")

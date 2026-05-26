@@ -46,7 +46,12 @@ def best_map(y_true, y_pred) -> np.ndarray:
     return mapped
 
 
-def _safe_silhouette(embedding: Optional[np.ndarray], y_pred: np.ndarray, seed: int = 42) -> float:
+def _safe_silhouette(
+    embedding: Optional[np.ndarray],
+    y_pred: np.ndarray,
+    seed: int = 42,
+    sample_size: Optional[int] = 3000,
+) -> float:
     if embedding is None:
         return float("nan")
     embedding = np.asarray(embedding, dtype=np.float32)
@@ -55,9 +60,12 @@ def _safe_silhouette(embedding: Optional[np.ndarray], y_pred: np.ndarray, seed: 
     if embedding.shape[0] < 3 or n_clusters < 2 or n_clusters >= embedding.shape[0]:
         return float("nan")
     try:
-        sample_size = min(10000, embedding.shape[0])
-        kwargs = {"random_state": seed} if sample_size < embedding.shape[0] else {}
-        return float(silhouette_score(embedding, y_pred, sample_size=sample_size, **kwargs))
+        if sample_size is None or int(sample_size) <= 0:
+            size = embedding.shape[0]
+        else:
+            size = min(int(sample_size), embedding.shape[0])
+        kwargs = {"random_state": seed} if size < embedding.shape[0] else {}
+        return float(silhouette_score(embedding, y_pred, sample_size=size, **kwargs))
     except Exception:
         return float("nan")
 
@@ -67,6 +75,7 @@ def compute_metrics(
     y_pred,
     embedding: Optional[np.ndarray] = None,
     seed: int = 42,
+    silhouette_sample_size: Optional[int] = 3000,
 ) -> Tuple[dict, np.ndarray]:
     y_true = np.asarray(y_true)
     y_pred = np.asarray(y_pred)
@@ -81,6 +90,6 @@ def compute_metrics(
         "homogeneity": float(homogeneity_score(y_true, y_pred)),
         "completeness": float(completeness_score(y_true, y_pred)),
         "n_pred_clusters": int(len(np.unique(y_pred))),
-        "silhouette": _safe_silhouette(embedding, y_pred, seed=seed),
+        "silhouette": _safe_silhouette(embedding, y_pred, seed=seed, sample_size=silhouette_sample_size),
     }
     return out, mapped

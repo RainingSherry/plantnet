@@ -82,6 +82,49 @@ def _infer_labels(
     return None, None, None
 
 
+def _subsample_adata(
+    adata: sc.AnnData,
+    label_key: Optional[str],
+    per_class_max: Optional[int],
+    fallback_max: Optional[int],
+    seed: int,
+) -> Tuple[sc.AnnData, Dict]:
+    per_class_max = int(per_class_max or 0)
+    fallback_max = int(fallback_max or 0)
+    if per_class_max <= 0 and (fallback_max <= 0 or adata.n_obs <= fallback_max):
+        return adata, {"enabled": False}
+
+    rng = np.random.default_rng(seed)
+    labels, _, resolved_label_key = _infer_labels(adata, label_key)
+    selected = []
+    mode = "none"
+    if per_class_max > 0 and labels is not None:
+        mode = "per_class"
+        for value in np.unique(labels):
+            idx = np.flatnonzero(labels == value)
+            if idx.size > per_class_max:
+                idx = rng.choice(idx, size=per_class_max, replace=False)
+            selected.append(idx)
+        selected_idx = np.sort(np.concatenate(selected)) if selected else np.arange(adata.n_obs)
+    elif fallback_max > 0 and adata.n_obs > fallback_max:
+        mode = "fallback"
+        selected_idx = np.sort(rng.choice(adata.n_obs, size=fallback_max, replace=False))
+    else:
+        return adata, {"enabled": False}
+
+    out = adata[selected_idx].copy()
+    return out, {
+        "enabled": True,
+        "mode": mode,
+        "label_key": resolved_label_key,
+        "original_n_cells": int(adata.n_obs),
+        "subsampled_n_cells": int(out.n_obs),
+        "per_class_max": int(per_class_max),
+        "fallback_max": int(fallback_max),
+        "seed": int(seed),
+    }
+
+
 def _var_gene_names(var) -> Tuple[np.ndarray, object]:
     var = var.copy()
     gene_names = np.asarray(var.index).astype(str)
@@ -223,8 +266,17 @@ def load_lgcl_dataset(
     svd_iter: int = 7,
     seed: int = 42,
     label_key: Optional[str] = None,
+    subsample_per_class_max: Optional[int] = None,
+    subsample_fallback_max: Optional[int] = None,
 ) -> LGCLDatasetBundle:
     adata = sc.read_h5ad(file_path)
+    adata, subsample_config = _subsample_adata(
+        adata,
+        label_key=label_key,
+        per_class_max=subsample_per_class_max,
+        fallback_max=subsample_fallback_max,
+        seed=seed,
+    )
     dataset_name = Path(file_path).stem
     profile = profile_anndata(adata, dataset_name=dataset_name, label_key=label_key, input_mode=input_mode)
     source_x, gene_names, var, counts_source, inferred_mode = _select_count_source(adata, input_mode)
@@ -278,6 +330,7 @@ def load_lgcl_dataset(
         "svd_iter": int(svd_iter),
         "seed": int(seed),
         "label_key": resolved_label_key,
+        "subsample": subsample_config,
     }
 
     if resolved_label_key is not None:
