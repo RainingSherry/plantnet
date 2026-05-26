@@ -6,10 +6,10 @@ import glob
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 import yaml
 from scipy import sparse
 from sklearn.decomposition import PCA, TruncatedSVD
@@ -22,7 +22,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from methods.DeepLearning.PlantSPADE_LGCL.data import load_lgcl_dataset, write_dataset_artifacts
-from methods.DeepLearning.PlantSPADE_LGCL.eval import write_evaluation_outputs
 from methods.DeepLearning.PlantSPADE_LGCL.utils import ensure_dir, save_json
 
 
@@ -41,6 +40,15 @@ PLANTSPADE_METHODS = {
 
 EXTERNAL_METHODS = {"phytocluster", "scvi", "scmae"}
 TRADITIONAL_METHODS = {"sc3"}
+TRADITIONAL_EMBEDDING_METHODS = {"traditional_pca", "traditional_leiden", "traditional_louvain"}
+
+THREAD_ENV = {
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "NUMBA_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+}
 
 
 def parse_args():
@@ -81,6 +89,14 @@ def infer_n_clusters(entry: dict, bundle) -> int:
 
 
 def guard_gpu(gpu: int | None):
+    visible = os.environ.get("CUDA_VISIBLE_DEVICES")
+    if visible:
+        visible_ids = [item.strip() for item in visible.split(",") if item.strip()]
+        if set(visible_ids).intersection({"0", "7"}):
+            raise ValueError("CUDA_VISIBLE_DEVICES includes forbidden physical GPU 0 or 7.")
+        if gpu is not None and (gpu < 0 or gpu >= len(visible_ids)):
+            raise ValueError(f"--gpu {gpu} is outside isolated CUDA_VISIBLE_DEVICES={visible!r}.")
+        return
     if gpu in {0, 7}:
         raise ValueError("GPU 0 and GPU 7 are forbidden. Use 1-6 or --no_cuda.")
 
@@ -91,24 +107,84 @@ def list_to_csv(values) -> str:
     return ",".join(str(v) for v in values)
 
 
-def run_command(cmd: list[str], dry_run: bool, cwd: Path = ROOT):
-    print(" ".join(cmd))
+def format_command(cmd: list[str], env: dict | None = None) -> str:
+    if not env:
+        return " ".join(cmd)
+    shown = []
+    for key in ["CUDA_VISIBLE_DEVICES", "OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "NUMBA_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"]:
+        if key in env:
+            shown.append(f"{key}={env[key]}")
+    return " ".join(shown + cmd)
+
+
+def run_command(cmd: list[str], dry_run: bool, cwd: Path = ROOT, env: dict | None = None):
+    display_env = dict(THREAD_ENV)
+    if env:
+        display_env.update(env)
+    print(format_command(cmd, display_env))
     if dry_run:
         return
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            subprocess.run(cmd, cwd=str(cwd), check=True)
-            return
-        except subprocess.CalledProcessError as e:
-            if e.returncode == -11 and attempt < max_retries - 1:
-                print(f"  [SIGSEGV] retry {attempt + 1}/{max_retries - 1}")
-                continue
-            raise
+    merged_env = os.environ.copy()
+    merged_env.update(THREAD_ENV)
+    if env:
+        merged_env.update(env)
+    subprocess.run(cmd, cwd=str(cwd), check=True, env=merged_env)
+
+
+def is_cell_embedding_path(path: Path, labels: np.ndarray | None = None) -> bool:
+    name = path.name
+    if name in {"gene_embedding.npy", "global_embedding_svd_projected.npy"}:
+        return False
+    if name.endswith("_mapped.npy"):
+        return False
+    if name.startswith(("eval_", "external_eval_", "pca_", "sc3_eval_")):
+        return False
+    if not (name.startswith("embedding_") or name == "embeddings_base.npy"):
+        return False
+    if labels is None:
+        return True
+    try:
+        arr = np.load(path, mmap_mode="r")
+        return bool(arr.ndim == 2 and arr.shape[0] == labels.shape[0])
+    except Exception:
+        return False
+
+
+def find_existing_cell_embedding(output_dir: Path, labels: np.ndarray | None = None) -> Path | None:
+    preferred = [
+        "embedding_baseline.npy",
+        "embeddings_base.npy",
+        "embedding_primary.npy",
+        "embedding_final.npy",
+    ]
+    for name in preferred:
+        path = output_dir / name
+        if path.exists() and is_cell_embedding_path(path, labels=labels):
+            return path
+    candidates = [Path(p) for p in glob.glob(str(output_dir / "**" / "embedding_*.npy"), recursive=True)]
+    candidates.extend(Path(p) for p in glob.glob(str(output_dir / "**" / "embeddings_base.npy"), recursive=True))
+    candidates = [path for path in candidates if is_cell_embedding_path(path, labels=labels)]
+    if not candidates:
+        return None
+    return max(candidates, key=lambda p: p.stat().st_mtime)
+
+
+def has_complete_plantspade_artifacts(output_dir: Path) -> bool:
+    required = [
+        "embedding_baseline.npy",
+        "training_history.json",
+        "labels.npy",
+        "support_matrix.npz",
+        "amplitude_matrix.npz",
+        "gene_embedding.npy",
+        "global_embedding_svd_projected.npy",
+    ]
+    return all((output_dir / name).exists() for name in required)
 
 
 def canonical_bundle(entry: dict, main_cfg: dict, seed: int, output_dir: Path):
     prep = main_cfg.get("preprocessing", {})
+    subsample = main_cfg.get("subsample", {})
     bundle = load_lgcl_dataset(
         entry["file_path"],
         input_mode=prep.get("input_mode", "auto"),
@@ -118,6 +194,8 @@ def canonical_bundle(entry: dict, main_cfg: dict, seed: int, output_dir: Path):
         svd_iter=int(prep.get("svd_iter", 7)),
         seed=seed,
         label_key=entry.get("label_key", "auto"),
+        subsample_per_class_max=int(subsample.get("per_class_max_cells", 0) or 0),
+        subsample_fallback_max=int(subsample.get("fallback_max_cells", 0) or 0),
     )
     write_dataset_artifacts(bundle, str(output_dir))
     return bundle
@@ -156,31 +234,44 @@ def pca_embedding(matrix, n_components: int, seed: int) -> np.ndarray:
     return normalize(emb, norm="l2", axis=1, copy=False).astype(np.float32)
 
 
-def run_traditional_pca(entry: dict, main_cfg: dict, seed: int, output_dir: Path):
+def run_traditional_embedding(entry: dict, main_cfg: dict, method: str, seed: int, output_dir: Path, dry_run: bool = False):
     bundle = canonical_bundle(entry, main_cfg, seed, output_dir)
     n_clusters = infer_n_clusters(entry, bundle)
     baseline_cfg = load_yaml(str(PKG_DIR / "configs" / "baselines.yaml"))
     n_components = int(baseline_cfg.get("traditional", {}).get("pca_components", 50))
-    embedding = pca_embedding(bundle.amplitude, n_components=n_components, seed=seed)
-    np.save(output_dir / "embedding_pca.npy", embedding)
-    eval_cfg = main_cfg.get("evaluation", {})
-    result = write_evaluation_outputs(
-        output_dir=str(output_dir),
-        dataset=entry["dataset_name"],
-        method="traditional_pca",
+    embedding_path = output_dir / "embedding_final.npy"
+    if not embedding_path.exists():
+        embedding = pca_embedding(bundle.amplitude, n_components=n_components, seed=seed)
+        np.save(output_dir / "embedding_pca.npy", embedding)
+        np.save(embedding_path, embedding)
+    save_labels(output_dir, bundle.labels)
+    if method == "traditional_pca":
+        prefix = "pca"
+        variant_name = "pca"
+        eval_overrides = None
+    elif method == "traditional_leiden":
+        prefix = "eval_traditional_leiden"
+        variant_name = "leiden"
+        eval_overrides = None
+    elif method == "traditional_louvain":
+        prefix = "eval_traditional_louvain"
+        variant_name = "louvain"
+        eval_overrides = {"include_louvain": "true"}
+    else:
+        raise ValueError(f"Unsupported traditional embedding method: {method}")
+    run_eval_from_embedding(
+        entry=entry,
+        main_cfg=main_cfg,
+        method=method,
         seed=seed,
-        embedding=embedding,
-        labels=bundle.labels,
+        output_dir=output_dir,
         n_clusters=n_clusters,
-        n_neighbors=int(eval_cfg.get("n_neighbors", 15)),
-        leiden_fixed_resolution=float(eval_cfg.get("leiden_fixed_resolution", 1.0)),
-        louvain_fixed_resolution=float(eval_cfg.get("louvain_fixed_resolution", 1.0)),
-        leiden_sweep_resolutions=eval_cfg.get("leiden_sweep_resolutions", [0.2, 0.4, 0.6, 0.8, 1.0, 1.2]),
-        sweep_max_cells=int(eval_cfg.get("sweep_max_cells", 10000)),
-        include_louvain=True,
-        prefix="pca",
+        embedding_path=embedding_path,
+        prefix=prefix,
+        variant_name=variant_name,
+        dry_run=dry_run,
+        attention_overrides=eval_overrides,
     )
-    save_json({"method": "traditional_pca", "fixed": result["fixed"], "oracle": result["oracle"]}, str(output_dir / "summary.json"))
 
 
 def plantspade_method_args(method: str) -> tuple[str, list[str]]:
@@ -210,6 +301,8 @@ def run_plantspade(entry: dict, main_cfg: dict, method: str, seed: int, output_d
     eval_cfg = main_cfg.get("evaluation", {})
     attention = main_cfg.get("attention", {})
     method_name, extra_args = plantspade_method_args(method)
+    baseline_embedding_path = output_dir / "embedding_baseline.npy"
+    history_path = output_dir / "training_history.json"
     cmd = [
         sys.executable,
         str(PKG_DIR / "run_plantspade.py"),
@@ -231,6 +324,10 @@ def run_plantspade(entry: dict, main_cfg: dict, method: str, seed: int, output_d
         str(prep.get("n_top_genes", 2000)),
         "--target_sum",
         str(prep.get("target_sum", 10000.0)),
+        "--subsample_per_class_max",
+        str(main_cfg.get("subsample", {}).get("per_class_max_cells", 0) or 0),
+        "--subsample_fallback_max",
+        str(main_cfg.get("subsample", {}).get("fallback_max_cells", 0) or 0),
         "--svd_dim",
         str(prep.get("svd_dim", 32)),
         "--svd_iter",
@@ -273,6 +370,12 @@ def run_plantspade(entry: dict, main_cfg: dict, method: str, seed: int, output_d
         list_to_csv(eval_cfg.get("leiden_sweep_resolutions", [0.2, 0.4, 0.6, 0.8, 1.0, 1.2])),
         "--sweep_max_cells",
         str(eval_cfg.get("sweep_max_cells", 10000)),
+        "--include_louvain",
+        str(bool(eval_cfg.get("include_louvain", False))).lower(),
+        "--run_oracle_sweep",
+        str(bool(eval_cfg.get("run_oracle_sweep", False))).lower(),
+        "--silhouette_sample_size",
+        str(eval_cfg.get("silhouette_sample_size", 3000)),
         "--attention_topk_genes",
         str(attention.get("attention_topk_genes", 128)),
         "--attention_beta",
@@ -283,6 +386,8 @@ def run_plantspade(entry: dict, main_cfg: dict, method: str, seed: int, output_d
         str(attention.get("attention_eta", 0.5)),
         "--attention_dropout",
         str(attention.get("attention_dropout", 0.1)),
+        "--train_only",
+        "true",
     ]
     if entry.get("expected_n_clusters"):
         cmd.extend(["--n_clusters", str(entry["expected_n_clusters"])])
@@ -293,24 +398,189 @@ def run_plantspade(entry: dict, main_cfg: dict, method: str, seed: int, output_d
     if not save_h5ad:
         cmd.append("--no_save_h5ad")
     cmd.extend(extra_args)
-    run_command(cmd, dry_run=dry_run)
+    if has_complete_plantspade_artifacts(output_dir):
+        print(f"[skip train] existing PlantSPADE artifacts found in {output_dir}")
+    else:
+        try:
+            run_command(cmd, dry_run=dry_run)
+        except subprocess.CalledProcessError:
+            if has_complete_plantspade_artifacts(output_dir):
+                print(f"[recover] training command failed after embeddings were saved; continuing to CPU eval: {output_dir}")
+            else:
+                raise
+    if dry_run:
+        return
+    if not has_complete_plantspade_artifacts(output_dir):
+        raise FileNotFoundError(f"Missing PlantSPADE training artifacts in {output_dir}")
+
+    labels = np.load(output_dir / "labels.npy")
+    n_clusters = int(entry.get("expected_n_clusters") or len(np.unique(labels)))
+    prefix, variant_name, use_attention, attention_overrides = plantspade_eval_plan(method, main_cfg)
+    eval_embedding = baseline_embedding_path
+    run_eval_from_embedding(
+        entry=entry,
+        main_cfg=main_cfg,
+        method=method,
+        seed=seed,
+        output_dir=output_dir,
+        n_clusters=n_clusters,
+        embedding_path=eval_embedding,
+        prefix=prefix,
+        variant_name=variant_name,
+        dry_run=dry_run,
+        use_support_attention=use_attention,
+        attention_overrides=attention_overrides,
+    )
 
 
 def latest_embedding(output_dir: Path) -> Path:
-    candidates = [Path(p) for p in glob.glob(str(output_dir / "**" / "embedding_*.npy"), recursive=True)]
-    candidates.extend(Path(p) for p in glob.glob(str(output_dir / "**" / "embedding_final.npy"), recursive=True))
-    if not candidates:
+    candidate = find_existing_cell_embedding(output_dir)
+    if candidate is None:
         raise FileNotFoundError(f"No embedding_*.npy found under {output_dir}")
-    return max(candidates, key=lambda p: p.stat().st_mtime)
+    return candidate
+
+
+def save_labels(output_dir: Path, labels: np.ndarray | None) -> Path:
+    if labels is None:
+        raise ValueError("Labels are required for fixed benchmark evaluation.")
+    labels_path = output_dir / "labels.npy"
+    np.save(labels_path, labels.astype(np.int64))
+    return labels_path
+
+
+def evaluation_done(output_dir: Path, prefix: str) -> bool:
+    path = output_dir / f"{prefix}_fixed.csv"
+    return path.exists() and path.stat().st_size > 0
+
+
+def eval_config_args(main_cfg: dict) -> list[str]:
+    eval_cfg = main_cfg.get("evaluation", {})
+    args = [
+        "--eval_neighbors",
+        str(eval_cfg.get("n_neighbors", 15)),
+        "--leiden_fixed_resolution",
+        str(eval_cfg.get("leiden_fixed_resolution", 1.0)),
+        "--louvain_fixed_resolution",
+        str(eval_cfg.get("louvain_fixed_resolution", 1.0)),
+        "--leiden_resolutions",
+        list_to_csv(eval_cfg.get("leiden_sweep_resolutions", [0.2, 0.4, 0.6, 0.8, 1.0, 1.2])),
+        "--sweep_max_cells",
+        str(eval_cfg.get("sweep_max_cells", 10000)),
+        "--include_louvain",
+        str(bool(eval_cfg.get("include_louvain", False))).lower(),
+        "--run_oracle_sweep",
+        str(bool(eval_cfg.get("run_oracle_sweep", False))).lower(),
+        "--silhouette_sample_size",
+        str(eval_cfg.get("silhouette_sample_size", 3000)),
+    ]
+    return args
+
+
+def run_eval_from_embedding(
+    entry: dict,
+    main_cfg: dict,
+    method: str,
+    seed: int,
+    output_dir: Path,
+    n_clusters: int,
+    embedding_path: Path,
+    prefix: str,
+    variant_name: str,
+    dry_run: bool,
+    use_support_attention: bool = False,
+    attention_overrides: dict | None = None,
+) -> None:
+    if evaluation_done(output_dir, prefix):
+        print(f"[skip eval] {prefix}_fixed.csv already exists")
+        return
+    labels_path = output_dir / "labels.npy"
+    if not labels_path.exists():
+        raise FileNotFoundError(f"Missing labels for evaluation recovery: {labels_path}")
+    cmd = [
+        sys.executable,
+        str(SCRIPT_DIR / "eval_from_embedding.py"),
+        "--run_dir",
+        str(output_dir),
+        "--dataset",
+        entry["dataset_name"],
+        "--method_name",
+        method,
+        "--seed",
+        str(seed),
+        "--n_clusters",
+        str(n_clusters),
+        "--embedding_path",
+        str(embedding_path),
+        "--labels_path",
+        str(labels_path),
+        "--prefix",
+        prefix,
+        "--variant_name",
+        variant_name,
+        "--use_support_attention",
+        str(bool(use_support_attention)).lower(),
+    ]
+    cmd.extend(eval_config_args(main_cfg))
+    if attention_overrides:
+        for key, value in attention_overrides.items():
+            cmd.extend([f"--{key}", str(value)])
+    try:
+        run_command(cmd, dry_run=dry_run, env={"CUDA_VISIBLE_DEVICES": ""})
+    except subprocess.CalledProcessError as exc:
+        save_json(
+            {
+                "dataset": entry["dataset_name"],
+                "method": method,
+                "seed": int(seed),
+                "prefix": prefix,
+                "embedding_path": str(embedding_path),
+                "returncode": int(exc.returncode),
+                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                "note": "Evaluation failed in CPU recovery. Training outputs are left intact and will not be retrained automatically.",
+            },
+            str(output_dir / f"{prefix}_recovery_failure.json"),
+        )
+        raise
+
+
+def plantspade_eval_plan(method: str, main_cfg: dict) -> tuple[str, str, bool, dict]:
+    attention = main_cfg.get("attention", {})
+    common = {
+        "attention_topk_genes": attention.get("attention_topk_genes", 128),
+        "attention_beta": attention.get("attention_beta", 0.1),
+        "attention_gamma": attention.get("attention_gamma", 0.1),
+        "attention_eta": attention.get("attention_eta", 0.5),
+        "attention_dropout": 0.0,
+    }
+    if method == "plantspade_lgcl_baseline":
+        return "eval_baseline", "baseline", False, {}
+    if method == "plantspade_lgcl_support_attention":
+        return "eval_support_attention", "support_attention", True, common
+    if method == "plantspade_lgcl_attention_no_idf":
+        cfg = dict(common)
+        cfg["attention_gamma"] = 0.0
+        return "eval_attention_no_idf", "attention_no_idf", True, cfg
+    if method == "plantspade_lgcl_attention_no_amplitude":
+        cfg = dict(common)
+        cfg["attention_beta"] = 0.0
+        return "eval_attention_no_amplitude", "attention_no_amplitude", True, cfg
+    if method.startswith("plantspade_lgcl_attention_topk_"):
+        cfg = dict(common)
+        cfg["attention_topk_genes"] = int(method.rsplit("_", 1)[-1])
+        return f"eval_attention_topk_{cfg['attention_topk_genes']}", f"attention_topk_{cfg['attention_topk_genes']}", True, cfg
+    return "eval_baseline", "baseline", False, {}
 
 
 def run_external(entry: dict, main_cfg: dict, baselines_cfg: dict, method: str, seed: int, output_dir: Path, gpu: int | None, no_cuda: bool, dry_run: bool):
     bundle = canonical_bundle(entry, main_cfg, seed, output_dir)
     n_clusters = infer_n_clusters(entry, bundle)
+    save_labels(output_dir, bundle.labels)
     canonical_path = write_canonical_h5ad(bundle, output_dir)
     method_cfg = baselines_cfg.get("deep", {}).get(method, {})
     runner = ROOT / method_cfg["runner"]
     data_path = entry["file_path"] if method == "scvi" else str(canonical_path)
+    final_embedding = output_dir / "embedding_final.npy"
+    existing_embedding = find_existing_cell_embedding(output_dir, labels=bundle.labels)
     cmd = [
         sys.executable,
         str(runner),
@@ -329,40 +599,48 @@ def run_external(entry: dict, main_cfg: dict, baselines_cfg: dict, method: str, 
         cmd.extend(["--gpu", str(gpu)])
     if no_cuda and method in {"phytocluster", "scmae"}:
         cmd.append("--no_cuda")
-    run_command(cmd, dry_run=dry_run)
+    if existing_embedding is not None:
+        print(f"[skip train] existing cell embedding found for {method}: {existing_embedding}")
+    else:
+        try:
+            run_command(cmd, dry_run=dry_run)
+        except subprocess.CalledProcessError:
+            existing_embedding = find_existing_cell_embedding(output_dir, labels=bundle.labels)
+            if existing_embedding is not None:
+                print(f"[recover] external runner failed after embedding was saved; continuing to CPU eval: {existing_embedding}")
+            else:
+                raise
     if dry_run:
         return
 
-    embedding_path = latest_embedding(output_dir)
-    embedding = np.load(embedding_path)
-    eval_cfg = main_cfg.get("evaluation", {})
-    result = write_evaluation_outputs(
-        output_dir=str(output_dir),
-        dataset=entry["dataset_name"],
+    embedding_path = find_existing_cell_embedding(output_dir, labels=bundle.labels)
+    if embedding_path is None:
+        raise FileNotFoundError(f"No valid cell embedding found under {output_dir}")
+    if embedding_path != final_embedding:
+        np.save(final_embedding, np.load(embedding_path).astype(np.float32))
+        embedding_path = final_embedding
+    run_eval_from_embedding(
+        entry=entry,
+        main_cfg=main_cfg,
         method=method,
         seed=seed,
-        embedding=embedding,
-        labels=bundle.labels,
+        output_dir=output_dir,
         n_clusters=n_clusters,
-        n_neighbors=int(eval_cfg.get("n_neighbors", 15)),
-        leiden_fixed_resolution=float(eval_cfg.get("leiden_fixed_resolution", 1.0)),
-        louvain_fixed_resolution=float(eval_cfg.get("louvain_fixed_resolution", 1.0)),
-        leiden_sweep_resolutions=eval_cfg.get("leiden_sweep_resolutions", [0.2, 0.4, 0.6, 0.8, 1.0, 1.2]),
-        sweep_max_cells=int(eval_cfg.get("sweep_max_cells", 10000)),
-        include_louvain=True,
+        embedding_path=embedding_path,
         prefix="external_eval",
-    )
-    save_json(
-        {"method": method, "embedding_path": str(embedding_path), "fixed": result["fixed"], "oracle": result["oracle"]},
-        str(output_dir / "summary_unified_eval.json"),
+        variant_name="embedding",
+        dry_run=dry_run,
     )
 
 
 def run_traditional_external(entry: dict, main_cfg: dict, baselines_cfg: dict, method: str, seed: int, output_dir: Path, dry_run: bool):
     bundle = canonical_bundle(entry, main_cfg, seed, output_dir)
     n_clusters = infer_n_clusters(entry, bundle)
+    save_labels(output_dir, bundle.labels)
     method_cfg = baselines_cfg.get("sc3", {})
     runner = ROOT / method_cfg.get("runner", "methods/Traditional/sc3/run.py")
+    final_embedding = output_dir / "embedding_final.npy"
+    existing_embedding = find_existing_cell_embedding(output_dir, labels=bundle.labels)
     cmd = [
         sys.executable,
         str(runner),
@@ -375,31 +653,29 @@ def run_traditional_external(entry: dict, main_cfg: dict, baselines_cfg: dict, m
         "--seed",
         str(seed),
     ]
-    run_command(cmd, dry_run=dry_run)
+    if existing_embedding is not None:
+        print(f"[skip train] existing cell embedding found for {method}: {existing_embedding}")
+    else:
+        run_command(cmd, dry_run=dry_run)
     if dry_run:
         return
-    embedding_path = latest_embedding(output_dir)
-    embedding = np.load(embedding_path)
-    eval_cfg = main_cfg.get("evaluation", {})
-    result = write_evaluation_outputs(
-        output_dir=str(output_dir),
-        dataset=entry["dataset_name"],
+    embedding_path = find_existing_cell_embedding(output_dir, labels=bundle.labels)
+    if embedding_path is None:
+        raise FileNotFoundError(f"No valid cell embedding found under {output_dir}")
+    if embedding_path != final_embedding:
+        np.save(final_embedding, np.load(embedding_path).astype(np.float32))
+        embedding_path = final_embedding
+    run_eval_from_embedding(
+        entry=entry,
+        main_cfg=main_cfg,
         method=method,
         seed=seed,
-        embedding=embedding,
-        labels=bundle.labels,
+        output_dir=output_dir,
         n_clusters=n_clusters,
-        n_neighbors=int(eval_cfg.get("n_neighbors", 15)),
-        leiden_fixed_resolution=float(eval_cfg.get("leiden_fixed_resolution", 1.0)),
-        louvain_fixed_resolution=float(eval_cfg.get("louvain_fixed_resolution", 1.0)),
-        leiden_sweep_resolutions=eval_cfg.get("leiden_sweep_resolutions", [0.2, 0.4, 0.6, 0.8, 1.0, 1.2]),
-        sweep_max_cells=int(eval_cfg.get("sweep_max_cells", 10000)),
-        include_louvain=True,
+        embedding_path=embedding_path,
         prefix="sc3_eval",
-    )
-    save_json(
-        {"method": method, "embedding_path": str(embedding_path), "fixed": result["fixed"], "oracle": result["oracle"]},
-        str(output_dir / "summary_sc3.json"),
+        variant_name="embedding",
+        dry_run=dry_run,
     )
 
 
@@ -421,8 +697,8 @@ def main():
     if not Path(entry["file_path"]).exists() and not args.dry_run:
         raise FileNotFoundError(f"Dataset file is missing: {entry['file_path']}")
 
-    if args.method == "traditional_pca":
-        run_traditional_pca(entry, main_cfg, args.seed, output_dir)
+    if args.method in TRADITIONAL_EMBEDDING_METHODS:
+        run_traditional_embedding(entry, main_cfg, args.method, args.seed, output_dir, dry_run=args.dry_run)
     elif args.method in PLANTSPADE_METHODS:
         run_plantspade(entry, main_cfg, args.method, args.seed, output_dir, gpu, args.no_cuda, args.save_h5ad, args.dry_run)
     elif args.method in EXTERNAL_METHODS:

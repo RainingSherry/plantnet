@@ -93,8 +93,10 @@ def evaluate_embedding_protocol(
     leiden_fixed_resolution: float = 1.0,
     louvain_fixed_resolution: Optional[float] = 1.0,
     leiden_sweep_resolutions: Iterable[float] = (0.2, 0.4, 0.6, 0.8, 1.0, 1.2),
-    include_louvain: bool = True,
+    include_louvain: bool = False,
+    run_oracle_sweep: bool = False,
     sweep_max_cells: Optional[int] = 10000,
+    silhouette_sample_size: Optional[int] = 3000,
 ) -> Dict:
     embedding = np.asarray(embedding, dtype=np.float32)
     labels = np.asarray(labels)
@@ -105,7 +107,13 @@ def evaluate_embedding_protocol(
     mapped_preds = {}
 
     pred_kmeans = KMeans(n_clusters=n_clusters, n_init=20, random_state=seed).fit_predict(embedding)
-    vals, mapped = compute_metrics(labels, pred_kmeans, embedding=embedding, seed=seed)
+    vals, mapped = compute_metrics(
+        labels,
+        pred_kmeans,
+        embedding=embedding,
+        seed=seed,
+        silhouette_sample_size=silhouette_sample_size,
+    )
     vals.update({"protocol": "fixed", "cluster_method": "kmeans_known_k", "uses_known_k": True})
     fixed["kmeans_known_k"] = vals
     preds["kmeans_known_k"] = pred_kmeans.astype(np.int64)
@@ -113,7 +121,13 @@ def evaluate_embedding_protocol(
 
     adata = _neighbors(embedding, n_neighbors=n_neighbors)
     pred_leiden_fixed = _leiden(adata, leiden_fixed_resolution, seed=seed, key="leiden_fixed")
-    vals, mapped = compute_metrics(labels, pred_leiden_fixed, embedding=embedding, seed=seed)
+    vals, mapped = compute_metrics(
+        labels,
+        pred_leiden_fixed,
+        embedding=embedding,
+        seed=seed,
+        silhouette_sample_size=silhouette_sample_size,
+    )
     vals.update(
         {
             "protocol": "fixed",
@@ -140,7 +154,13 @@ def evaluate_embedding_protocol(
             )
             fixed["louvain_fixed"] = vals
         else:
-            vals, mapped = compute_metrics(labels, pred_louvain, embedding=embedding, seed=seed)
+            vals, mapped = compute_metrics(
+                labels,
+                pred_louvain,
+                embedding=embedding,
+                seed=seed,
+                silhouette_sample_size=silhouette_sample_size,
+            )
             vals.update(
                 {
                     "protocol": "fixed",
@@ -153,53 +173,61 @@ def evaluate_embedding_protocol(
             preds["louvain_fixed"] = pred_louvain.astype(np.int64)
             mapped_preds["louvain_fixed"] = mapped.astype(np.int64)
 
-    best_key = None
-    best_nmi = -np.inf
-    best_pred = None
-    best_mapped = None
-    if sweep_max_cells is not None and embedding.shape[0] > sweep_max_cells:
-        rng = np.random.default_rng(seed)
-        subsample_idx = rng.choice(embedding.shape[0], sweep_max_cells, replace=False)
-        sweep_embedding = embedding[subsample_idx]
-        sweep_labels = labels[subsample_idx]
-        sweep_adata = _neighbors(sweep_embedding, n_neighbors=n_neighbors)
-    else:
-        sweep_adata = adata
-        sweep_labels = labels
-    for resolution in leiden_sweep_resolutions:
-        key = f"leiden_res_{_format_resolution(float(resolution))}"
-        pred = _leiden(sweep_adata, float(resolution), seed=seed, key=key)
-        vals, mapped = compute_metrics(sweep_labels, pred, embedding=sweep_embedding if sweep_max_cells else embedding, seed=seed)
-        vals.update(
-            {
-                "protocol": "full_sweep",
-                "cluster_method": key,
-                "resolution": float(resolution),
-                "uses_known_k": False,
-            }
-        )
-        sweep_rows.append(vals)
-        preds[key] = pred.astype(np.int64)
-        mapped_preds[key] = mapped.astype(np.int64)
-        if vals["nmi"] > best_nmi:
-            best_nmi = vals["nmi"]
-            best_key = key
-            best_pred = pred
-            best_mapped = mapped
+    if run_oracle_sweep:
+        best_key = None
+        best_nmi = -np.inf
+        best_pred = None
+        best_mapped = None
+        if sweep_max_cells is not None and embedding.shape[0] > sweep_max_cells:
+            rng = np.random.default_rng(seed)
+            subsample_idx = rng.choice(embedding.shape[0], sweep_max_cells, replace=False)
+            sweep_embedding = embedding[subsample_idx]
+            sweep_labels = labels[subsample_idx]
+            sweep_adata = _neighbors(sweep_embedding, n_neighbors=n_neighbors)
+        else:
+            sweep_embedding = embedding
+            sweep_adata = adata
+            sweep_labels = labels
+        for resolution in leiden_sweep_resolutions:
+            key = f"leiden_res_{_format_resolution(float(resolution))}"
+            pred = _leiden(sweep_adata, float(resolution), seed=seed, key=key)
+            vals, mapped = compute_metrics(
+                sweep_labels,
+                pred,
+                embedding=sweep_embedding,
+                seed=seed,
+                silhouette_sample_size=silhouette_sample_size,
+            )
+            vals.update(
+                {
+                    "protocol": "full_sweep",
+                    "cluster_method": key,
+                    "resolution": float(resolution),
+                    "uses_known_k": False,
+                }
+            )
+            sweep_rows.append(vals)
+            preds[key] = pred.astype(np.int64)
+            mapped_preds[key] = mapped.astype(np.int64)
+            if vals["nmi"] > best_nmi:
+                best_nmi = vals["nmi"]
+                best_key = key
+                best_pred = pred
+                best_mapped = mapped
 
-    if best_key is not None:
-        best_vals = dict([row for row in sweep_rows if row["cluster_method"] == best_key][0])
-        best_vals.update(
-            {
-                "protocol": "oracle",
-                "cluster_method": "leiden_oracle_best",
-                "selected_from": best_key,
-                "oracle_selection_metric": "nmi",
-            }
-        )
-        oracle["leiden_oracle_best"] = best_vals
-        preds["leiden_oracle_best"] = best_pred.astype(np.int64)
-        mapped_preds["leiden_oracle_best"] = best_mapped.astype(np.int64)
+        if best_key is not None:
+            best_vals = dict([row for row in sweep_rows if row["cluster_method"] == best_key][0])
+            best_vals.update(
+                {
+                    "protocol": "oracle",
+                    "cluster_method": "leiden_oracle_best",
+                    "selected_from": best_key,
+                    "oracle_selection_metric": "nmi",
+                }
+            )
+            oracle["leiden_oracle_best"] = best_vals
+            preds["leiden_oracle_best"] = best_pred.astype(np.int64)
+            mapped_preds["leiden_oracle_best"] = best_mapped.astype(np.int64)
 
     return {
         "fixed": fixed,
@@ -233,8 +261,10 @@ def write_evaluation_outputs(
     leiden_fixed_resolution: float = 1.0,
     louvain_fixed_resolution: Optional[float] = 1.0,
     leiden_sweep_resolutions: Iterable[float] = (0.2, 0.4, 0.6, 0.8, 1.0, 1.2),
-    include_louvain: bool = True,
+    include_louvain: bool = False,
+    run_oracle_sweep: bool = False,
     sweep_max_cells: Optional[int] = 10000,
+    silhouette_sample_size: Optional[int] = 3000,
     prefix: str = "eval",
     extra: Optional[dict] = None,
 ) -> Dict:
@@ -250,7 +280,9 @@ def write_evaluation_outputs(
         louvain_fixed_resolution=louvain_fixed_resolution,
         leiden_sweep_resolutions=leiden_sweep_resolutions,
         include_louvain=include_louvain,
+        run_oracle_sweep=run_oracle_sweep,
         sweep_max_cells=sweep_max_cells,
+        silhouette_sample_size=silhouette_sample_size,
     )
 
     fixed_rows = _rows_from_payload(dataset, method, seed, result["fixed"], extra=extra)
@@ -264,8 +296,15 @@ def write_evaluation_outputs(
         sweep_rows.append(row)
 
     pd.DataFrame(fixed_rows).to_csv(output / f"{prefix}_fixed.csv", index=False)
-    pd.DataFrame(oracle_rows).to_csv(output / f"{prefix}_oracle.csv", index=False)
-    pd.DataFrame(sweep_rows).to_csv(output / f"{prefix}_sweep.csv", index=False)
+    if run_oracle_sweep:
+        pd.DataFrame(oracle_rows).to_csv(output / f"{prefix}_oracle.csv", index=False)
+        pd.DataFrame(sweep_rows).to_csv(output / f"{prefix}_sweep.csv", index=False)
+    else:
+        for stale_name in (f"{prefix}_oracle.csv", f"{prefix}_sweep.csv"):
+            try:
+                (output / stale_name).unlink()
+            except FileNotFoundError:
+                pass
 
     payload = {
         "dataset": dataset,

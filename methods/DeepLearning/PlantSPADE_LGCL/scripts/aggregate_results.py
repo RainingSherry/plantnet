@@ -48,7 +48,7 @@ def read_metric_csvs(results_dir: Path) -> pd.DataFrame:
         for path in sorted(results_dir.glob(pattern)):
             if path.name.startswith("table_") or path.name.startswith("all_results"):
                 continue
-            if not path.name.startswith(("eval_", "pca_", "external_eval_", "plantspade_lgcl_")):
+            if not path.name.startswith(("eval_", "pca_", "external_eval_", "sc3_eval_", "plantspade_lgcl_")):
                 continue
             try:
                 df = pd.read_csv(path)

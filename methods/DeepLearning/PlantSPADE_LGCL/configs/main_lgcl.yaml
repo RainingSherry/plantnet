@@ -4,7 +4,10 @@ seeds: [1, 2, 3, 4, 5]
 avoid_gpus: [0, 7]
 gpu: 1
 gpus: [1, 2, 3, 4, 5, 6]
+jobs: 1
 jobs_per_gpu: 1
+max_parallel_datasets: 1
+exclude_from_full_suite: [CRA007122, SRP309176]
 preprocessing:
   input_mode: auto
   n_top_genes: 2000
@@ -17,11 +20,14 @@ evaluation:
   louvain_fixed_resolution: 1.0
   leiden_sweep_resolutions: [0.2, 0.4, 0.6, 0.8, 1.0, 1.2]
   sweep_max_cells: 10000
+  include_louvain: false
+  run_oracle_sweep: false
+  silhouette_sample_size: 3000
 training:
   latent_dim: 32
   layers: 2
   epochs: 80
-  pairs_per_epoch: 262144
+  pairs_per_epoch: 65536
   contrastive_batch_size: 2048
   lr: 0.001
   weight_decay: 0.00001

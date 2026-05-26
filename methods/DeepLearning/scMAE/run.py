@@ -404,23 +404,16 @@ def main():
             embedding, true_labels = inference(model, test_loader, device)
 
             # 聚类
-            if embedding.shape[0] < 10000:
-                # 小数据集：直接使用KMeans
-                kmeans = KMeans(
-                    n_clusters=n_clusters,
-                    random_state=args.seed,
-                    n_init=20
-                )
-                pred_labels = kmeans.fit_predict(embedding)
-            else:
-                # 大数据集：使用Leiden聚类
-                adata_emb = sc.AnnData(embedding)
-                sc.pp.neighbors(adata_emb, n_neighbors=10, use_rep="X")
-                reso = res_search_fixed_clus(adata_emb, n_clusters)
-                sc.tl.leiden(adata_emb, resolution=reso)
-                pred_labels = np.array([
-                    int(x) for x in adata_emb.obs['leiden'].to_list()
-                ])
+            # Keep the method runner lightweight. The unified PlantSPADE-LGCL
+            # protocol performs fixed KMeans/Leiden evaluation from the saved
+            # embedding, so this internal checkpoint step only needs a stable
+            # clustering label to write the legacy output files.
+            kmeans = KMeans(
+                n_clusters=n_clusters,
+                random_state=args.seed,
+                n_init=20
+            )
+            pred_labels = kmeans.fit_predict(embedding)
 
             # 评估并追踪最优模型
             from evaluation import evaluation as eval_fn
