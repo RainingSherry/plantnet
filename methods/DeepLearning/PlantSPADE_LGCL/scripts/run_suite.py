@@ -145,6 +145,21 @@ def build_command(args, task: dict, gpu: int | None):
     return cmd
 
 
+def command_for_log(cmd: list[str], env: dict | None = None) -> str:
+    if not env:
+        return " ".join(cmd)
+    keys = [
+        "CUDA_VISIBLE_DEVICES",
+        "OMP_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "NUMBA_NUM_THREADS",
+        "VECLIB_MAXIMUM_THREADS",
+    ]
+    prefix = [f"{key}={env[key]}" for key in keys if key in env]
+    return " ".join(prefix + cmd)
+
+
 def make_slots(args, main_cfg: dict, gpus: list[int]):
     if args.no_cuda:
         jobs = int(args.jobs or main_cfg.get("jobs", 1))
@@ -256,9 +271,9 @@ def write_failure_report(base_output: Path, task: dict, gpu: int | None, returnc
 
 def has_training_artifacts(base_output: Path, task: dict) -> bool:
     run_dir = task_output_dir(base_output, task)
-    return (run_dir / "embedding_final.npy").exists() and (
-        (run_dir / "training_history.json").exists() or task["method"] in {"traditional_pca", "phytocluster", "scvi", "scmae", "sc3"}
-    )
+    if task["method"].startswith("plantspade_lgcl"):
+        return (run_dir / "embedding_baseline.npy").exists() and (run_dir / "training_history.json").exists()
+    return (run_dir / "embedding_final.npy").exists()
 
 
 def run_parallel(args, tasks: list[dict], slots: list[int | None], main_cfg: dict):
@@ -293,11 +308,12 @@ def run_parallel(args, tasks: list[dict], slots: list[int | None], main_cfg: dic
                 free_slots.append((slot_id, slot_gpu))
                 break
             cmd = build_command(args, task, slot_gpu)
+            env = thread_limited_env(slot_gpu)
             run_dir = task_output_dir(base_output, task)
             log_dir = run_dir / "logs"
             log_dir.mkdir(parents=True, exist_ok=True)
             log_path = log_dir / "run_suite.log"
-            command_text = " ".join(cmd)
+            command_text = command_for_log(cmd, env)
             print(
                 f"[launch] slot={slot_id} gpu={slot_gpu if slot_gpu is not None else 'cpu'} "
                 f"{task['dataset']} {task['method']} seed={task['seed']}"
@@ -312,7 +328,6 @@ def run_parallel(args, tasks: list[dict], slots: list[int | None], main_cfg: dic
             log_handle.write(f"\n\n===== run_suite launch {time.strftime('%Y-%m-%d %H:%M:%S')} =====\n")
             log_handle.write(command_text + "\n")
             log_handle.flush()
-            env = thread_limited_env(slot_gpu)
             proc = subprocess.Popen(
                 cmd,
                 cwd=str(ROOT),

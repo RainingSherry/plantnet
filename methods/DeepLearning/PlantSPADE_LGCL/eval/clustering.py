@@ -296,8 +296,15 @@ def write_evaluation_outputs(
         sweep_rows.append(row)
 
     pd.DataFrame(fixed_rows).to_csv(output / f"{prefix}_fixed.csv", index=False)
-    pd.DataFrame(oracle_rows).to_csv(output / f"{prefix}_oracle.csv", index=False)
-    pd.DataFrame(sweep_rows).to_csv(output / f"{prefix}_sweep.csv", index=False)
+    if run_oracle_sweep:
+        pd.DataFrame(oracle_rows).to_csv(output / f"{prefix}_oracle.csv", index=False)
+        pd.DataFrame(sweep_rows).to_csv(output / f"{prefix}_sweep.csv", index=False)
+    else:
+        for stale_name in (f"{prefix}_oracle.csv", f"{prefix}_sweep.csv"):
+            try:
+                (output / stale_name).unlink()
+            except FileNotFoundError:
+                pass
 
     payload = {
         "dataset": dataset,

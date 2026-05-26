@@ -239,15 +239,12 @@ def save_training_artifacts(
     base_embedding: np.ndarray,
     gene_embedding: np.ndarray,
     projected_global: np.ndarray,
-    primary_embedding: np.ndarray,
     normalize_embedding: bool,
-    primary_variant: str,
     graph_profile: dict,
 ) -> str:
-    embedding_path = os.path.join(save_dir, "embedding_final.npy")
-    np.save(embedding_path, primary_embedding.astype(np.float32))
+    baseline_path = os.path.join(save_dir, "embedding_baseline.npy")
+    np.save(baseline_path, base_embedding.astype(np.float32))
     np.save(os.path.join(save_dir, "embeddings_base.npy"), base_embedding.astype(np.float32))
-    np.save(os.path.join(save_dir, "embedding_baseline.npy"), base_embedding.astype(np.float32))
     np.save(os.path.join(save_dir, "global_embedding_svd_projected.npy"), projected_global.astype(np.float32))
     np.save(os.path.join(save_dir, "gene_embedding.npy"), gene_embedding.astype(np.float32))
     np.save(os.path.join(save_dir, "labels.npy"), bundle.labels.astype(np.int64))
@@ -265,13 +262,13 @@ def save_training_artifacts(
             "model_state": model.state_dict(),
             "args": vars(args),
             "gene_names": bundle.gene_names.astype(str),
-            "primary_variant": primary_variant,
+            "primary_variant": "baseline",
             "normalize_embedding": bool(normalize_embedding),
             "graph_profile": graph_profile,
         },
         os.path.join(save_dir, "model.pt"),
     )
-    return embedding_path
+    return baseline_path
 
 
 @torch.no_grad()
@@ -477,7 +474,7 @@ def main():
     variant_embeddings = {"baseline": base_embedding}
     attention_weights_for_markers = None
     primary_variant = "baseline"
-    embedding_path = save_training_artifacts(
+    baseline_embedding_path = save_training_artifacts(
         save_dir=save_dir,
         args=args,
         bundle=bundle,
@@ -486,9 +483,7 @@ def main():
         base_embedding=base_embedding,
         gene_embedding=gene_embedding,
         projected_global=projected_global,
-        primary_embedding=base_embedding,
         normalize_embedding=normalize_embedding,
-        primary_variant=primary_variant,
         graph_profile=graph_profile,
     )
     if args.train_only:
@@ -506,7 +501,8 @@ def main():
             "counts_source": bundle.counts_source,
             "negative_sampler": args.negative_sampler,
             "primary_variant": primary_variant,
-            "embedding_path": os.path.abspath(embedding_path),
+            "baseline_embedding_path": os.path.abspath(baseline_embedding_path),
+            "primary_embedding_path": os.path.abspath(baseline_embedding_path),
             "note": "Training artifacts saved. Evaluation is intentionally delegated to scripts/eval_from_embedding.py.",
         }
         save_json(summary, os.path.join(save_dir, "summary.json"))
@@ -610,7 +606,8 @@ def main():
         "attention_eta": float(args.attention_eta),
     }
 
-    np.save(embedding_path, embedding.astype(np.float32))
+    primary_embedding_path = os.path.join(save_dir, "embedding_primary.npy")
+    np.save(primary_embedding_path, embedding.astype(np.float32))
 
     variant_eval_results = {}
     for variant_name, variant_embedding in variant_embeddings.items():
@@ -658,7 +655,8 @@ def main():
         "method": args.method_name,
         "seed": int(args.seed),
         "primary_variant": primary_variant,
-        "embedding_path": os.path.abspath(embedding_path),
+        "primary_embedding_path": os.path.abspath(primary_embedding_path),
+        "baseline_embedding_path": os.path.abspath(baseline_embedding_path),
         "fixed": primary_result["fixed"],
         "oracle": primary_result["oracle"],
         "note": "Main results use only fixed protocol. leiden_oracle_best is supplementary upper bound.",
@@ -706,6 +704,8 @@ def main():
         "counts_source": bundle.counts_source,
         "negative_sampler": args.negative_sampler,
         "primary_variant": primary_variant,
+        "primary_embedding_path": os.path.abspath(primary_embedding_path),
+        "baseline_embedding_path": os.path.abspath(baseline_embedding_path),
         "fixed_metrics": primary_result["fixed"],
         "oracle_metrics": primary_result["oracle"],
         "variant_names": sorted(variant_embeddings.keys()),

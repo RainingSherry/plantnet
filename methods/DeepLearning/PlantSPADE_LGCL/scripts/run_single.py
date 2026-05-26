@@ -106,8 +106,21 @@ def list_to_csv(values) -> str:
     return ",".join(str(v) for v in values)
 
 
+def format_command(cmd: list[str], env: dict | None = None) -> str:
+    if not env:
+        return " ".join(cmd)
+    shown = []
+    for key in ["CUDA_VISIBLE_DEVICES", "OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "NUMBA_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"]:
+        if key in env:
+            shown.append(f"{key}={env[key]}")
+    return " ".join(shown + cmd)
+
+
 def run_command(cmd: list[str], dry_run: bool, cwd: Path = ROOT, env: dict | None = None):
-    print(" ".join(cmd))
+    display_env = dict(THREAD_ENV)
+    if env:
+        display_env.update(env)
+    print(format_command(cmd, display_env))
     if dry_run:
         return
     merged_env = os.environ.copy()
@@ -115,6 +128,44 @@ def run_command(cmd: list[str], dry_run: bool, cwd: Path = ROOT, env: dict | Non
     if env:
         merged_env.update(env)
     subprocess.run(cmd, cwd=str(cwd), check=True, env=merged_env)
+
+
+def is_cell_embedding_path(path: Path, labels: np.ndarray | None = None) -> bool:
+    name = path.name
+    if name in {"gene_embedding.npy", "global_embedding_svd_projected.npy"}:
+        return False
+    if name.endswith("_mapped.npy"):
+        return False
+    if name.startswith(("eval_", "external_eval_", "pca_", "sc3_eval_")):
+        return False
+    if not (name.startswith("embedding_") or name == "embeddings_base.npy"):
+        return False
+    if labels is None:
+        return True
+    try:
+        arr = np.load(path, mmap_mode="r")
+        return bool(arr.ndim == 2 and arr.shape[0] == labels.shape[0])
+    except Exception:
+        return False
+
+
+def find_existing_cell_embedding(output_dir: Path, labels: np.ndarray | None = None) -> Path | None:
+    preferred = [
+        "embedding_baseline.npy",
+        "embeddings_base.npy",
+        "embedding_primary.npy",
+        "embedding_final.npy",
+    ]
+    for name in preferred:
+        path = output_dir / name
+        if path.exists() and is_cell_embedding_path(path, labels=labels):
+            return path
+    candidates = [Path(p) for p in glob.glob(str(output_dir / "**" / "embedding_*.npy"), recursive=True)]
+    candidates.extend(Path(p) for p in glob.glob(str(output_dir / "**" / "embeddings_base.npy"), recursive=True))
+    candidates = [path for path in candidates if is_cell_embedding_path(path, labels=labels)]
+    if not candidates:
+        return None
+    return max(candidates, key=lambda p: p.stat().st_mtime)
 
 
 def canonical_bundle(entry: dict, main_cfg: dict, seed: int, output_dir: Path):
@@ -221,7 +272,7 @@ def run_plantspade(entry: dict, main_cfg: dict, method: str, seed: int, output_d
     eval_cfg = main_cfg.get("evaluation", {})
     attention = main_cfg.get("attention", {})
     method_name, extra_args = plantspade_method_args(method)
-    embedding_path = output_dir / "embedding_final.npy"
+    baseline_embedding_path = output_dir / "embedding_baseline.npy"
     history_path = output_dir / "training_history.json"
     cmd = [
         sys.executable,
@@ -318,25 +369,25 @@ def run_plantspade(entry: dict, main_cfg: dict, method: str, seed: int, output_d
     if not save_h5ad:
         cmd.append("--no_save_h5ad")
     cmd.extend(extra_args)
-    if embedding_path.exists() and history_path.exists():
+    if baseline_embedding_path.exists() and history_path.exists():
         print(f"[skip train] existing PlantSPADE artifacts found in {output_dir}")
     else:
         try:
             run_command(cmd, dry_run=dry_run)
         except subprocess.CalledProcessError:
-            if embedding_path.exists() and history_path.exists():
+            if baseline_embedding_path.exists() and history_path.exists():
                 print(f"[recover] training command failed after embeddings were saved; continuing to CPU eval: {output_dir}")
             else:
                 raise
     if dry_run:
         return
-    if not embedding_path.exists() or not history_path.exists():
+    if not baseline_embedding_path.exists() or not history_path.exists():
         raise FileNotFoundError(f"Missing PlantSPADE training artifacts in {output_dir}")
 
     labels = np.load(output_dir / "labels.npy")
     n_clusters = int(entry.get("expected_n_clusters") or len(np.unique(labels)))
     prefix, variant_name, use_attention, attention_overrides = plantspade_eval_plan(method, main_cfg)
-    eval_embedding = output_dir / "embeddings_base.npy" if use_attention else embedding_path
+    eval_embedding = baseline_embedding_path
     run_eval_from_embedding(
         entry=entry,
         main_cfg=main_cfg,
@@ -354,11 +405,10 @@ def run_plantspade(entry: dict, main_cfg: dict, method: str, seed: int, output_d
 
 
 def latest_embedding(output_dir: Path) -> Path:
-    candidates = [Path(p) for p in glob.glob(str(output_dir / "**" / "embedding_*.npy"), recursive=True)]
-    candidates.extend(Path(p) for p in glob.glob(str(output_dir / "**" / "embedding_final.npy"), recursive=True))
-    if not candidates:
+    candidate = find_existing_cell_embedding(output_dir)
+    if candidate is None:
         raise FileNotFoundError(f"No embedding_*.npy found under {output_dir}")
-    return max(candidates, key=lambda p: p.stat().st_mtime)
+    return candidate
 
 
 def save_labels(output_dir: Path, labels: np.ndarray | None) -> Path:
@@ -501,6 +551,7 @@ def run_external(entry: dict, main_cfg: dict, baselines_cfg: dict, method: str, 
     runner = ROOT / method_cfg["runner"]
     data_path = entry["file_path"] if method == "scvi" else str(canonical_path)
     final_embedding = output_dir / "embedding_final.npy"
+    existing_embedding = find_existing_cell_embedding(output_dir, labels=bundle.labels)
     cmd = [
         sys.executable,
         str(runner),
@@ -519,20 +570,23 @@ def run_external(entry: dict, main_cfg: dict, baselines_cfg: dict, method: str, 
         cmd.extend(["--gpu", str(gpu)])
     if no_cuda and method in {"phytocluster", "scmae"}:
         cmd.append("--no_cuda")
-    if final_embedding.exists():
-        print(f"[skip train] existing embedding_final.npy found for {method}: {final_embedding}")
+    if existing_embedding is not None:
+        print(f"[skip train] existing cell embedding found for {method}: {existing_embedding}")
     else:
         try:
             run_command(cmd, dry_run=dry_run)
         except subprocess.CalledProcessError:
-            if final_embedding.exists():
-                print(f"[recover] external runner failed after embedding was saved; continuing to CPU eval: {final_embedding}")
+            existing_embedding = find_existing_cell_embedding(output_dir, labels=bundle.labels)
+            if existing_embedding is not None:
+                print(f"[recover] external runner failed after embedding was saved; continuing to CPU eval: {existing_embedding}")
             else:
                 raise
     if dry_run:
         return
 
-    embedding_path = latest_embedding(output_dir)
+    embedding_path = find_existing_cell_embedding(output_dir, labels=bundle.labels)
+    if embedding_path is None:
+        raise FileNotFoundError(f"No valid cell embedding found under {output_dir}")
     if embedding_path != final_embedding:
         np.save(final_embedding, np.load(embedding_path).astype(np.float32))
         embedding_path = final_embedding
@@ -557,6 +611,7 @@ def run_traditional_external(entry: dict, main_cfg: dict, baselines_cfg: dict, m
     method_cfg = baselines_cfg.get("sc3", {})
     runner = ROOT / method_cfg.get("runner", "methods/Traditional/sc3/run.py")
     final_embedding = output_dir / "embedding_final.npy"
+    existing_embedding = find_existing_cell_embedding(output_dir, labels=bundle.labels)
     cmd = [
         sys.executable,
         str(runner),
@@ -569,13 +624,15 @@ def run_traditional_external(entry: dict, main_cfg: dict, baselines_cfg: dict, m
         "--seed",
         str(seed),
     ]
-    if final_embedding.exists():
-        print(f"[skip train] existing embedding_final.npy found for {method}: {final_embedding}")
+    if existing_embedding is not None:
+        print(f"[skip train] existing cell embedding found for {method}: {existing_embedding}")
     else:
         run_command(cmd, dry_run=dry_run)
     if dry_run:
         return
-    embedding_path = latest_embedding(output_dir)
+    embedding_path = find_existing_cell_embedding(output_dir, labels=bundle.labels)
+    if embedding_path is None:
+        raise FileNotFoundError(f"No valid cell embedding found under {output_dir}")
     if embedding_path != final_embedding:
         np.save(final_embedding, np.load(embedding_path).astype(np.float32))
         embedding_path = final_embedding

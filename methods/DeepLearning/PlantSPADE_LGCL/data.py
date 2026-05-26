@@ -30,6 +30,7 @@ class LGCLDatasetBundle:
     support_density: float
     profile: Dict
     preprocess_config: Dict
+    subsample_indices: Optional[np.ndarray] = None
 
 
 def _ensure_csr(matrix) -> sp.csr_matrix:
@@ -88,11 +89,11 @@ def _subsample_adata(
     per_class_max: Optional[int],
     fallback_max: Optional[int],
     seed: int,
-) -> Tuple[sc.AnnData, Dict]:
+) -> Tuple[sc.AnnData, Dict, Optional[np.ndarray]]:
     per_class_max = int(per_class_max or 0)
     fallback_max = int(fallback_max or 0)
     if per_class_max <= 0 and (fallback_max <= 0 or adata.n_obs <= fallback_max):
-        return adata, {"enabled": False}
+        return adata, {"enabled": False}, None
 
     rng = np.random.default_rng(seed)
     labels, _, resolved_label_key = _infer_labels(adata, label_key)
@@ -110,7 +111,7 @@ def _subsample_adata(
         mode = "fallback"
         selected_idx = np.sort(rng.choice(adata.n_obs, size=fallback_max, replace=False))
     else:
-        return adata, {"enabled": False}
+        return adata, {"enabled": False}, None
 
     out = adata[selected_idx].copy()
     return out, {
@@ -122,7 +123,7 @@ def _subsample_adata(
         "per_class_max": int(per_class_max),
         "fallback_max": int(fallback_max),
         "seed": int(seed),
-    }
+    }, selected_idx.astype(np.int64)
 
 
 def _var_gene_names(var) -> Tuple[np.ndarray, object]:
@@ -270,7 +271,7 @@ def load_lgcl_dataset(
     subsample_fallback_max: Optional[int] = None,
 ) -> LGCLDatasetBundle:
     adata = sc.read_h5ad(file_path)
-    adata, subsample_config = _subsample_adata(
+    adata, subsample_config, subsample_indices = _subsample_adata(
         adata,
         label_key=label_key,
         per_class_max=subsample_per_class_max,
@@ -352,6 +353,7 @@ def load_lgcl_dataset(
         support_density=support_density,
         profile=profile,
         preprocess_config=preprocess_config,
+        subsample_indices=subsample_indices,
     )
 
 
@@ -359,6 +361,8 @@ def write_dataset_artifacts(bundle: LGCLDatasetBundle, output_dir: str) -> None:
     output = Path(ensure_dir(output_dir))
     save_json(bundle.profile, str(output / "dataset_profile.json"))
     save_json(bundle.preprocess_config, str(output / "preprocess_config.json"))
+    if bundle.subsample_indices is not None:
+        np.save(output / "subsample_indices.npy", bundle.subsample_indices.astype(np.int64))
     with open(output / "selected_genes.txt", "w", encoding="utf-8") as handle:
         for gene in bundle.gene_names:
             handle.write(f"{gene}\n")
