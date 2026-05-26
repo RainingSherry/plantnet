@@ -272,7 +272,16 @@ def write_failure_report(base_output: Path, task: dict, gpu: int | None, returnc
 def has_training_artifacts(base_output: Path, task: dict) -> bool:
     run_dir = task_output_dir(base_output, task)
     if task["method"].startswith("plantspade_lgcl"):
-        return (run_dir / "embedding_baseline.npy").exists() and (run_dir / "training_history.json").exists()
+        required = [
+            "embedding_baseline.npy",
+            "training_history.json",
+            "labels.npy",
+            "support_matrix.npz",
+            "amplitude_matrix.npz",
+            "gene_embedding.npy",
+            "global_embedding_svd_projected.npy",
+        ]
+        return all((run_dir / name).exists() for name in required)
     return (run_dir / "embedding_final.npy").exists()
 
 

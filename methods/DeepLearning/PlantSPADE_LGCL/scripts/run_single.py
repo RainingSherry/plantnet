@@ -40,6 +40,7 @@ PLANTSPADE_METHODS = {
 
 EXTERNAL_METHODS = {"phytocluster", "scvi", "scmae"}
 TRADITIONAL_METHODS = {"sc3"}
+TRADITIONAL_EMBEDDING_METHODS = {"traditional_pca", "traditional_leiden", "traditional_louvain"}
 
 THREAD_ENV = {
     "OMP_NUM_THREADS": "1",
@@ -168,6 +169,19 @@ def find_existing_cell_embedding(output_dir: Path, labels: np.ndarray | None = N
     return max(candidates, key=lambda p: p.stat().st_mtime)
 
 
+def has_complete_plantspade_artifacts(output_dir: Path) -> bool:
+    required = [
+        "embedding_baseline.npy",
+        "training_history.json",
+        "labels.npy",
+        "support_matrix.npz",
+        "amplitude_matrix.npz",
+        "gene_embedding.npy",
+        "global_embedding_svd_projected.npy",
+    ]
+    return all((output_dir / name).exists() for name in required)
+
+
 def canonical_bundle(entry: dict, main_cfg: dict, seed: int, output_dir: Path):
     prep = main_cfg.get("preprocessing", {})
     subsample = main_cfg.get("subsample", {})
@@ -220,7 +234,7 @@ def pca_embedding(matrix, n_components: int, seed: int) -> np.ndarray:
     return normalize(emb, norm="l2", axis=1, copy=False).astype(np.float32)
 
 
-def run_traditional_pca(entry: dict, main_cfg: dict, seed: int, output_dir: Path, dry_run: bool = False):
+def run_traditional_embedding(entry: dict, main_cfg: dict, method: str, seed: int, output_dir: Path, dry_run: bool = False):
     bundle = canonical_bundle(entry, main_cfg, seed, output_dir)
     n_clusters = infer_n_clusters(entry, bundle)
     baseline_cfg = load_yaml(str(PKG_DIR / "configs" / "baselines.yaml"))
@@ -231,17 +245,32 @@ def run_traditional_pca(entry: dict, main_cfg: dict, seed: int, output_dir: Path
         np.save(output_dir / "embedding_pca.npy", embedding)
         np.save(embedding_path, embedding)
     save_labels(output_dir, bundle.labels)
+    if method == "traditional_pca":
+        prefix = "pca"
+        variant_name = "pca"
+        eval_overrides = None
+    elif method == "traditional_leiden":
+        prefix = "eval_traditional_leiden"
+        variant_name = "leiden"
+        eval_overrides = None
+    elif method == "traditional_louvain":
+        prefix = "eval_traditional_louvain"
+        variant_name = "louvain"
+        eval_overrides = {"include_louvain": "true"}
+    else:
+        raise ValueError(f"Unsupported traditional embedding method: {method}")
     run_eval_from_embedding(
         entry=entry,
         main_cfg=main_cfg,
-        method="traditional_pca",
+        method=method,
         seed=seed,
         output_dir=output_dir,
         n_clusters=n_clusters,
         embedding_path=embedding_path,
-        prefix="pca",
-        variant_name="pca",
+        prefix=prefix,
+        variant_name=variant_name,
         dry_run=dry_run,
+        attention_overrides=eval_overrides,
     )
 
 
@@ -369,19 +398,19 @@ def run_plantspade(entry: dict, main_cfg: dict, method: str, seed: int, output_d
     if not save_h5ad:
         cmd.append("--no_save_h5ad")
     cmd.extend(extra_args)
-    if baseline_embedding_path.exists() and history_path.exists():
+    if has_complete_plantspade_artifacts(output_dir):
         print(f"[skip train] existing PlantSPADE artifacts found in {output_dir}")
     else:
         try:
             run_command(cmd, dry_run=dry_run)
         except subprocess.CalledProcessError:
-            if baseline_embedding_path.exists() and history_path.exists():
+            if has_complete_plantspade_artifacts(output_dir):
                 print(f"[recover] training command failed after embeddings were saved; continuing to CPU eval: {output_dir}")
             else:
                 raise
     if dry_run:
         return
-    if not baseline_embedding_path.exists() or not history_path.exists():
+    if not has_complete_plantspade_artifacts(output_dir):
         raise FileNotFoundError(f"Missing PlantSPADE training artifacts in {output_dir}")
 
     labels = np.load(output_dir / "labels.npy")
@@ -668,8 +697,8 @@ def main():
     if not Path(entry["file_path"]).exists() and not args.dry_run:
         raise FileNotFoundError(f"Dataset file is missing: {entry['file_path']}")
 
-    if args.method == "traditional_pca":
-        run_traditional_pca(entry, main_cfg, args.seed, output_dir, dry_run=args.dry_run)
+    if args.method in TRADITIONAL_EMBEDDING_METHODS:
+        run_traditional_embedding(entry, main_cfg, args.method, args.seed, output_dir, dry_run=args.dry_run)
     elif args.method in PLANTSPADE_METHODS:
         run_plantspade(entry, main_cfg, args.method, args.seed, output_dir, gpu, args.no_cuda, args.save_h5ad, args.dry_run)
     elif args.method in EXTERNAL_METHODS:
