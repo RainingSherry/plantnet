@@ -34,6 +34,7 @@ class SupportGeneAttention(nn.Module):
         gamma: float = 0.1,
         eta: float = 0.5,
         dropout: float = 0.1,
+        trainable: bool = False,
     ):
         super().__init__()
         self.support = self._as_csr_support(support)
@@ -45,6 +46,15 @@ class SupportGeneAttention(nn.Module):
         self.gamma = float(gamma)
         self.eta = float(eta)
         self.dropout = float(dropout)
+        self.trainable = bool(trainable)
+        if self.trainable:
+            self.beta_param = nn.Parameter(torch.tensor(float(beta), dtype=torch.float32))
+            self.gamma_param = nn.Parameter(torch.tensor(float(gamma), dtype=torch.float32))
+            self.eta_param = nn.Parameter(torch.tensor(float(eta), dtype=torch.float32))
+        else:
+            self.register_parameter("beta_param", None)
+            self.register_parameter("gamma_param", None)
+            self.register_parameter("eta_param", None)
         self.register_buffer("gene_idf", gene_idf.detach().float().clone(), persistent=False)
 
         indptr, indices, values = self._build_truncated_edges()
@@ -123,6 +133,12 @@ class SupportGeneAttention(nn.Module):
             amplitudes = np.empty(0, dtype=np.float32)
         return indptr, indices, amplitudes
 
+    def _coef(self, name: str, device: torch.device) -> torch.Tensor:
+        param = getattr(self, f"{name}_param")
+        if param is not None:
+            return param.to(device=device)
+        return torch.tensor(getattr(self, name), dtype=torch.float32, device=device)
+
     def _batch_edges(self, batch_cells: Optional[torch.Tensor], device: torch.device):
         n_cells = self.support.shape[0]
         if batch_cells is None:
@@ -191,10 +207,13 @@ class SupportGeneAttention(nn.Module):
         query = base[edge_pos]
         key_value = gene_emb[edge_genes]
         logits = (query * key_value).sum(dim=1) / np.sqrt(float(dim))
-        if self.beta != 0.0:
-            logits = logits + self.beta * torch.log1p(edge_amp)
-        if self.gamma != 0.0:
-            logits = logits + self.gamma * self.gene_idf.to(device=device)[edge_genes]
+        beta = self._coef("beta", device)
+        gamma = self._coef("gamma", device)
+        eta = self._coef("eta", device)
+        if self.trainable or self.beta != 0.0:
+            logits = logits + beta * torch.log1p(edge_amp)
+        if self.trainable or self.gamma != 0.0:
+            logits = logits + gamma * self.gene_idf.to(device=device)[edge_genes]
 
         n_batch = base.shape[0]
         max_logits = torch.full((n_batch,), -torch.inf, dtype=logits.dtype, device=device)
@@ -208,7 +227,7 @@ class SupportGeneAttention(nn.Module):
 
         attended = torch.zeros_like(base)
         attended.index_add_(0, edge_pos, alpha.unsqueeze(1) * key_value)
-        refined = base + self.eta * attended
+        refined = base + eta * attended
 
         if return_attention:
             weights = SparseAttentionWeights(
@@ -219,3 +238,44 @@ class SupportGeneAttention(nn.Module):
             )
             return refined, weights
         return refined
+
+
+class TrainableSupportGeneAttentionRefiner(nn.Module):
+    """Lightweight trainable sparse refiner over observed support sets.
+
+    Only beta, gamma, and eta are optimized by default. Cell and gene
+    embeddings are supplied by PlantSPADE-LGCL and remain external tensors.
+    """
+
+    def __init__(
+        self,
+        support,
+        amplitude: sp.csr_matrix,
+        gene_idf: torch.Tensor,
+        top_k_genes: int = 128,
+        beta: float = 0.1,
+        gamma: float = 0.1,
+        eta: float = 0.5,
+        dropout: float = 0.1,
+    ):
+        super().__init__()
+        self.attention = SupportGeneAttention(
+            support=support,
+            amplitude=amplitude,
+            gene_idf=gene_idf,
+            top_k_genes=top_k_genes,
+            beta=beta,
+            gamma=gamma,
+            eta=eta,
+            dropout=dropout,
+            trainable=True,
+        )
+
+    def forward(
+        self,
+        cell_emb: torch.Tensor,
+        gene_emb: torch.Tensor,
+        batch_cells: Optional[torch.Tensor] = None,
+        return_attention: bool = False,
+    ):
+        return self.attention(cell_emb, gene_emb, batch_cells=batch_cells, return_attention=return_attention)

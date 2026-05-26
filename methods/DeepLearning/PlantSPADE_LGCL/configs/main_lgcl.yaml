@@ -1,0 +1,50 @@
+experiment_name: plantspade_lgcl_8plant_fixed_protocol
+output_dir: /home/luolie/biopipeline/dimension-reduction/plantnet/results/PlantSPADE_LGCL_protocol
+seeds: [1, 2, 3, 4, 5]
+avoid_gpus: [0, 7]
+gpu: 1
+gpus: [1, 2, 3, 4, 5, 6]
+jobs_per_gpu: 1
+preprocessing:
+  input_mode: auto
+  n_top_genes: 2000
+  target_sum: 10000.0
+  svd_dim: 32
+  svd_iter: 7
+evaluation:
+  n_neighbors: 15
+  leiden_fixed_resolution: 1.0
+  louvain_fixed_resolution: 1.0
+  leiden_sweep_resolutions: [0.2, 0.4, 0.6, 0.8, 1.0, 1.2]
+  sweep_max_cells: 10000
+training:
+  latent_dim: 32
+  layers: 2
+  epochs: 80
+  pairs_per_epoch: 262144
+  contrastive_batch_size: 2048
+  lr: 0.001
+  weight_decay: 0.00001
+  edge_dropout: 0.1
+  temperature: 0.2
+  contrastive_weight: 0.05
+  module_weight: 0.001
+  num_modules: 16
+  module_top_k: 30
+  negative_sampler: random_zero
+attention:
+  use_support_attention: false
+  attention_topk_genes: 128
+  attention_beta: 0.1
+  attention_gamma: 0.1
+  attention_eta: 0.5
+  attention_dropout: 0.1
+  run_attention_ablations: false
+  attention_topk_sweep: [64, 128, 256]
+suite_methods:
+  - traditional_pca
+  - phytocluster
+  - scvi
+  - scmae
+  - plantspade_lgcl_baseline
+  - plantspade_lgcl_support_attention

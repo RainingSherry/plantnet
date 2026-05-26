@@ -1,40 +1,40 @@
 #!/usr/bin/env python
+from __future__ import annotations
+
 import argparse
+import json
 import os
 import sys
-import warnings
 from pathlib import Path
 from typing import Optional
 
 import h5py
 import numpy as np
 import pandas as pd
-import scanpy as sc
 import torch
 import torch.nn.functional as F
-from sklearn.cluster import KMeans
 
 CURRENT_DIR = Path(__file__).resolve().parent
 ROOT = CURRENT_DIR.parents[2]
-BENCHMARK_DIR = ROOT / "benchmarks" / "unified_protocol"
-for path in [str(ROOT), str(BENCHMARK_DIR)]:
-    if path not in sys.path:
-        sys.path.insert(0, path)
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
-from common import compute_metrics, save_json as save_benchmark_json  # noqa: E402
-from methods.DeepLearning.PlantSPADE_LGCL.data import load_lgcl_dataset  # noqa: E402
-from methods.DeepLearning.PlantSPADE_LGCL.support_gene_attention import (  # noqa: E402
+from methods.DeepLearning.PlantSPADE_LGCL.data import load_lgcl_dataset, write_dataset_artifacts
+from methods.DeepLearning.PlantSPADE_LGCL.eval import write_evaluation_outputs
+from methods.DeepLearning.PlantSPADE_LGCL.eval.marker_analysis import write_marker_outputs
+from methods.DeepLearning.PlantSPADE_LGCL.support_gene_attention import (
     SparseAttentionWeights,
     SupportGeneAttention,
+    TrainableSupportGeneAttentionRefiner,
 )
-from methods.DeepLearning.PlantSPADE_LGCL.train import (  # noqa: E402
+from methods.DeepLearning.PlantSPADE_LGCL.train import (
     LGCLTrainConfig,
     PlantSPADELGCL,
     normalized_bipartite_support,
     scipy_to_torch_sparse,
     train_lgcl,
 )
-from methods.DeepLearning.PlantSPADE_LGCL.utils import ensure_dir, save_json, set_seed  # noqa: E402
+from methods.DeepLearning.PlantSPADE_LGCL.utils import ensure_dir, save_json, set_seed
 
 
 def str2bool(value):
@@ -49,17 +49,23 @@ def str2bool(value):
 
 
 def parse_float_list(value: str):
+    if value is None or str(value).strip() == "":
+        return []
     return [float(item) for item in str(value).split(",") if item.strip()]
 
 
 def parse_int_list(value: str):
+    if value is None or str(value).strip() == "":
+        return []
     return [int(item) for item in str(value).split(",") if item.strip()]
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="PlantSPADE-LGCL: LightGCN and SVD contrastive cell-gene clustering")
+    parser = argparse.ArgumentParser(description="PlantSPADE-LGCL fixed-protocol runner")
     parser.add_argument("--data_path", required=True)
     parser.add_argument("--save_dir", required=True)
+    parser.add_argument("--dataset_name", default=None)
+    parser.add_argument("--label_key", default="auto")
     parser.add_argument("--input_mode", default="auto", choices=["auto", "raw", "log1p"])
     parser.add_argument("--n_top_genes", type=int, default=2000)
     parser.add_argument("--n_clusters", type=int, default=0)
@@ -80,8 +86,14 @@ def parse_args():
     parser.add_argument("--module_top_k", type=int, default=30)
     parser.add_argument("--target_sum", type=float, default=1e4)
     parser.add_argument("--global_blend", type=float, default=0.0)
+    parser.add_argument("--negative_sampler", default="random_zero", choices=["random_zero", "idf_weighted_zero", "neighbor_conflict_zero"])
+    parser.add_argument("--negative_neighbor_k", type=int, default=15)
     parser.add_argument("--eval_neighbors", type=int, default=15)
+    parser.add_argument("--leiden_fixed_resolution", type=float, default=1.0)
+    parser.add_argument("--louvain_fixed_resolution", type=float, default=1.0)
     parser.add_argument("--leiden_resolutions", default="0.2,0.4,0.6,0.8,1.0,1.2")
+    parser.add_argument("--sweep_max_cells", type=int, default=10000)
+    parser.add_argument("--include_louvain", type=str2bool, default=True)
     parser.add_argument("--use_support_attention", type=str2bool, default=False)
     parser.add_argument("--attention_topk_genes", type=int, default=128)
     parser.add_argument("--attention_beta", type=float, default=0.1)
@@ -90,6 +102,10 @@ def parse_args():
     parser.add_argument("--attention_dropout", type=float, default=0.1)
     parser.add_argument("--run_attention_ablations", type=str2bool, default=False)
     parser.add_argument("--attention_topk_sweep", default="64,128,256")
+    parser.add_argument("--use_trainable_attention_refiner", type=str2bool, default=False)
+    parser.add_argument("--attention_refiner_epochs", type=int, default=20)
+    parser.add_argument("--attention_refiner_lr", type=float, default=1e-2)
+    parser.add_argument("--attention_refiner_batch_size", type=int, default=2048)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--gpu", type=int, default=1)
     parser.add_argument("--no_cuda", action="store_true")
@@ -118,135 +134,22 @@ def save_embedding_h5(path: str, embedding: np.ndarray, labels: np.ndarray = Non
 
 def sanitize_anndata_for_write(adata) -> None:
     for frame in (adata.obs, adata.var):
-        if "_index" in frame.columns:
-            replacement = "reserved_index"
-            suffix = 1
-            while replacement in frame.columns:
-                replacement = f"reserved_index_{suffix}"
-                suffix += 1
-            frame.rename(columns={"_index": replacement}, inplace=True)
-
-
-def format_resolution(resolution: float) -> str:
-    return str(float(resolution)).replace(".", "p")
-
-
-def evaluate_embedding_with_leiden_sweep(
-    embedding: np.ndarray,
-    labels: np.ndarray,
-    n_clusters: int,
-    seed: int,
-    n_neighbors: int,
-    resolutions,
-) -> dict:
-    embedding = np.asarray(embedding, dtype=np.float32)
-    metrics = {}
-    preds = {}
-    mapped_preds = {}
-
-    pred_kmeans = KMeans(n_clusters=n_clusters, n_init=1, random_state=seed).fit_predict(embedding)
-    metrics["kmeans"], mapped = compute_metrics(labels, pred_kmeans, embedding=embedding)
-    preds["kmeans"] = pred_kmeans.astype(np.int64)
-    mapped_preds["kmeans"] = mapped.astype(np.int64)
-
-    adata = sc.AnnData(embedding)
-    sc.pp.neighbors(adata, n_neighbors=n_neighbors, use_rep="X")
-    best_key = None
-    best_nmi = -np.inf
-    for resolution in resolutions:
-        key = f"leiden_res_{format_resolution(resolution)}"
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", FutureWarning)
-            try:
-                sc.tl.leiden(
-                    adata,
-                    random_state=seed,
-                    resolution=float(resolution),
-                    key_added=key,
-                    flavor="igraph",
-                    n_iterations=2,
-                    directed=False,
-                )
-            except TypeError:
-                sc.tl.leiden(adata, random_state=seed, resolution=float(resolution), key_added=key)
-        pred = adata.obs[key].astype(int).to_numpy()
-        vals, mapped = compute_metrics(labels, pred, embedding=embedding)
-        vals["resolution"] = float(resolution)
-        metrics[key] = vals
-        preds[key] = pred.astype(np.int64)
-        mapped_preds[key] = mapped.astype(np.int64)
-        if vals["nmi"] > best_nmi:
-            best_nmi = vals["nmi"]
-            best_key = key
-
-    if best_key is not None:
-        best_vals = dict(metrics[best_key])
-        best_vals["selected_from"] = best_key
-        metrics["leiden_best"] = best_vals
-        metrics["leiden"] = dict(best_vals)
-        preds["leiden_best"] = preds[best_key]
-        preds["leiden"] = preds[best_key]
-        mapped_preds["leiden_best"] = mapped_preds[best_key]
-        mapped_preds["leiden"] = mapped_preds[best_key]
-    return {"metrics": metrics, "preds": preds, "mapped_preds": mapped_preds, "best_leiden_key": best_key}
-
-
-def write_eval_outputs(
-    save_dir: str,
-    dataset_name: str,
-    method_name: str,
-    data_path: str,
-    embedding_path: str,
-    embedding: np.ndarray,
-    labels: np.ndarray,
-    label_key: str,
-    n_clusters: int,
-    seed: int,
-    n_neighbors: int,
-    resolutions,
-    file_prefix: Optional[str] = None,
-) -> dict:
-    result = evaluate_embedding_with_leiden_sweep(
-        embedding,
-        labels,
-        n_clusters=n_clusters,
-        seed=seed,
-        n_neighbors=n_neighbors,
-        resolutions=resolutions,
-    )
-    metrics = result["metrics"]
-    preds = result["preds"]
-    mapped_preds = result["mapped_preds"]
-    prefix = file_prefix or method_name
-    payload = {
-        "dataset": dataset_name,
-        "method": method_name,
-        "data_path": os.path.abspath(data_path),
-        "embedding_path": os.path.abspath(embedding_path),
-        "label_key": label_key,
-        "n_cells": int(embedding.shape[0]),
-        "embedding_dim": int(embedding.shape[1]),
-        "best_leiden_key": result["best_leiden_key"],
-        "metrics": metrics,
-    }
-    save_benchmark_json(payload, os.path.join(save_dir, f"{prefix}.json"))
-    rows = []
-    for cluster_method, vals in metrics.items():
-        row = {"dataset": dataset_name, "method": method_name, "cluster_method": cluster_method}
-        row.update(vals)
-        rows.append(row)
-    pd.DataFrame(rows).to_csv(os.path.join(save_dir, f"{prefix}.csv"), index=False)
-    for name, pred in preds.items():
-        np.save(os.path.join(save_dir, f"{prefix}_{name}.npy"), pred.astype(np.int64))
-        np.save(os.path.join(save_dir, f"{prefix}_{name}_mapped.npy"), mapped_preds[name].astype(np.int64))
-    result["payload"] = payload
-    return result
+        for reserved in ("_index", "reserved_index"):
+            if reserved in frame.columns:
+                replacement = reserved + "_renamed"
+                suffix = 1
+                while replacement in frame.columns:
+                    replacement = f"{reserved}_renamed_{suffix}"
+                    suffix += 1
+                frame.rename(columns={reserved: replacement}, inplace=True)
+        if "_index" in frame.index:
+            frame.index.name = "cell_name" if frame is adata.obs else "gene_name"
 
 
 def compute_gene_idf(support) -> np.ndarray:
     df = np.diff(support.tocsc().indptr).astype(np.float32)
     n_cells = float(support.shape[0])
-    return np.log(n_cells / (1.0 + df)).astype(np.float32)
+    return np.log1p(n_cells / (1.0 + df)).astype(np.float32)
 
 
 @torch.no_grad()
@@ -288,47 +191,73 @@ def make_support_attention_embedding(
     return refined_t.detach().cpu().numpy().astype(np.float32), weights
 
 
-def attention_top_genes_per_cluster(
-    attention_weights: SparseAttentionWeights,
-    cluster_labels: np.ndarray,
+def train_attention_refiner(
+    base_embedding: np.ndarray,
+    gene_embedding: np.ndarray,
+    projected_global: np.ndarray,
     support,
     amplitude,
-    gene_names: np.ndarray,
-    top_n: int = 20,
-) -> pd.DataFrame:
-    rows = []
-    n_genes = support.shape[1]
-    labels = np.asarray(cluster_labels, dtype=np.int64)
-    for cluster_id in sorted(np.unique(labels)):
-        cluster_cells = np.flatnonzero(labels == cluster_id)
-        if cluster_cells.size == 0:
-            continue
-        edge_mask = labels[attention_weights.cells] == cluster_id
-        if np.any(edge_mask):
-            mean_attention = np.bincount(
-                attention_weights.genes[edge_mask],
-                weights=attention_weights.weights[edge_mask],
-                minlength=n_genes,
-            ).astype(np.float64)
-            mean_attention /= float(cluster_cells.size)
-        else:
-            mean_attention = np.zeros(n_genes, dtype=np.float64)
-        top_genes = np.argsort(-mean_attention, kind="stable")[:top_n]
-        support_block = support[cluster_cells][:, top_genes]
-        amplitude_block = amplitude[cluster_cells][:, top_genes]
-        support_rate = np.asarray(support_block.mean(axis=0)).ravel()
-        mean_expression = np.asarray(amplitude_block.mean(axis=0)).ravel()
-        for local_idx, gene_idx in enumerate(top_genes):
-            rows.append(
-                {
-                    "cluster_id": int(cluster_id),
-                    "gene_name": str(gene_names[gene_idx]),
-                    "mean_attention": float(mean_attention[gene_idx]),
-                    "support_rate": float(support_rate[local_idx]),
-                    "mean_expression": float(mean_expression[local_idx]),
-                }
-            )
-    return pd.DataFrame(rows)
+    gene_idf: np.ndarray,
+    device: torch.device,
+    top_k: int,
+    beta: float,
+    gamma: float,
+    eta: float,
+    dropout: float,
+    epochs: int,
+    lr: float,
+    batch_size: int,
+    temperature: float,
+    seed: int,
+    normalize_output: bool,
+) -> tuple[np.ndarray, Optional[SparseAttentionWeights], dict]:
+    refiner = TrainableSupportGeneAttentionRefiner(
+        support=support,
+        amplitude=amplitude,
+        gene_idf=torch.as_tensor(gene_idf, dtype=torch.float32, device=device),
+        top_k_genes=top_k,
+        beta=beta,
+        gamma=gamma,
+        eta=eta,
+        dropout=dropout,
+    ).to(device)
+    cell_t = torch.as_tensor(base_embedding, dtype=torch.float32, device=device)
+    gene_t = torch.as_tensor(gene_embedding, dtype=torch.float32, device=device)
+    global_t = F.normalize(torch.as_tensor(projected_global, dtype=torch.float32, device=device), dim=1)
+    optimizer = torch.optim.AdamW(refiner.parameters(), lr=lr, weight_decay=0.0)
+    rng = np.random.default_rng(seed + 777)
+    n_cells = cell_t.shape[0]
+    history = {"loss": [], "contrastive": [], "consistency": [], "beta": [], "gamma": [], "eta": []}
+
+    for epoch in range(1, max(1, epochs) + 1):
+        refiner.train()
+        csz = min(batch_size, n_cells)
+        batch = torch.as_tensor(rng.choice(n_cells, size=csz, replace=False), dtype=torch.long, device=device)
+        refined = refiner(cell_t, gene_t, batch_cells=batch, return_attention=False)
+        refined_norm = F.normalize(refined, dim=1)
+        target = global_t[batch]
+        logits = refined_norm @ target.T / temperature
+        labels = torch.arange(logits.shape[0], device=device)
+        contrastive = 0.5 * (F.cross_entropy(logits, labels) + F.cross_entropy(logits.T, labels))
+        consistency = (1.0 - F.cosine_similarity(refined_norm, F.normalize(cell_t[batch], dim=1), dim=1)).mean()
+        loss = contrastive + 0.05 * consistency
+        optimizer.zero_grad(set_to_none=True)
+        loss.backward()
+        optimizer.step()
+        attn = refiner.attention
+        history["loss"].append(float(loss.detach().cpu()))
+        history["contrastive"].append(float(contrastive.detach().cpu()))
+        history["consistency"].append(float(consistency.detach().cpu()))
+        history["beta"].append(float(attn.beta_param.detach().cpu()))
+        history["gamma"].append(float(attn.gamma_param.detach().cpu()))
+        history["eta"].append(float(attn.eta_param.detach().cpu()))
+
+    refiner.eval()
+    with torch.no_grad():
+        refined_t, weights = refiner(cell_t, gene_t, return_attention=True)
+        if normalize_output:
+            refined_t = F.normalize(refined_t, dim=1)
+    return refined_t.detach().cpu().numpy().astype(np.float32), weights, history
 
 
 def main():
@@ -352,11 +281,13 @@ def main():
         svd_dim=svd_dim,
         svd_iter=args.svd_iter,
         seed=args.seed,
+        label_key=args.label_key,
     )
+    write_dataset_artifacts(bundle, save_dir)
     if bundle.labels is None:
-        raise ValueError("No labels found in h5ad obs; requested benchmark evaluation requires labels.")
+        raise ValueError("No labels found in h5ad obs; fixed benchmark evaluation requires labels.")
     n_clusters = args.n_clusters if args.n_clusters > 0 else int(len(np.unique(bundle.labels)))
-    dataset_name = Path(args.data_path).stem
+    dataset_name = args.dataset_name or Path(args.data_path).stem
     print(
         f"Cells={bundle.support.shape[0]} genes={bundle.support.shape[1]} "
         f"edges={bundle.support.nnz} density={bundle.support_density:.4f} clusters={n_clusters}"
@@ -382,7 +313,7 @@ def main():
     print(f"Parameters: {sum(p.numel() for p in model.parameters()):,}")
 
     print("=" * 72)
-    print("Step 3: train with BPR ranking loss plus SVD InfoNCE alignment")
+    print(f"Step 3: train with BPR + SVD InfoNCE, negative_sampler={args.negative_sampler}")
     print("=" * 72)
     train_config = LGCLTrainConfig(
         epochs=args.epochs,
@@ -393,19 +324,19 @@ def main():
         contrastive_weight=args.contrastive_weight,
         module_weight=args.module_weight,
         seed=args.seed,
+        negative_sampler=args.negative_sampler,
+        negative_neighbor_k=args.negative_neighbor_k,
     )
     history = train_lgcl(model, bundle.support, train_config, device)
     save_json(history, os.path.join(save_dir, "training_history.json"))
 
     print("=" * 72)
-    print("Step 4: extract base/attention embeddings and run unified KMeans/Leiden evaluation")
+    print("Step 4: extract embeddings and evaluate fixed/oracle/sweep protocols")
     print("=" * 72)
     normalize_embedding = not args.no_normalize_embedding
     local_embedding, gene_embedding, projected_global = model.get_embeddings(normalize_output=normalize_embedding)
     if args.global_blend != 0.0:
-        local_t = torch.as_tensor(local_embedding)
-        global_t = torch.as_tensor(projected_global)
-        blended = local_t + float(args.global_blend) * global_t
+        blended = torch.as_tensor(local_embedding) + float(args.global_blend) * torch.as_tensor(projected_global)
         if normalize_embedding:
             blended = F.normalize(blended, dim=1)
         base_embedding = blended.numpy().astype(np.float32)
@@ -418,7 +349,7 @@ def main():
     variant_embeddings = {"baseline": base_embedding}
     attention_weights_for_markers = None
 
-    should_compute_attention = args.use_support_attention or args.run_attention_ablations
+    should_compute_attention = args.use_support_attention or args.run_attention_ablations or args.use_trainable_attention_refiner
     if should_compute_attention:
         print("Computing sparse SupportGeneAttention variants")
         attn_embedding, attention_weights_for_markers = make_support_attention_embedding(
@@ -437,6 +368,31 @@ def main():
             return_attention=True,
         )
         variant_embeddings["support_attention"] = attn_embedding
+
+    if args.use_trainable_attention_refiner:
+        trainable_embedding, trainable_weights, refiner_history = train_attention_refiner(
+            base_embedding,
+            gene_embedding,
+            projected_global,
+            bundle.support,
+            bundle.amplitude,
+            gene_idf,
+            device,
+            top_k=args.attention_topk_genes,
+            beta=args.attention_beta,
+            gamma=args.attention_gamma,
+            eta=args.attention_eta,
+            dropout=args.attention_dropout,
+            epochs=args.attention_refiner_epochs,
+            lr=args.attention_refiner_lr,
+            batch_size=args.attention_refiner_batch_size,
+            temperature=args.temperature,
+            seed=args.seed,
+            normalize_output=normalize_embedding,
+        )
+        variant_embeddings["support_attention_trainable"] = trainable_embedding
+        attention_weights_for_markers = trainable_weights
+        save_json(refiner_history, os.path.join(save_dir, "attention_refiner_history.json"))
 
     if args.run_attention_ablations:
         ablation_configs = [
@@ -463,7 +419,10 @@ def main():
             )
             variant_embeddings[name] = emb
 
-    primary_variant = "support_attention" if args.use_support_attention else "baseline"
+    if args.use_trainable_attention_refiner:
+        primary_variant = "support_attention_trainable"
+    else:
+        primary_variant = "support_attention" if args.use_support_attention else "baseline"
     embedding = variant_embeddings[primary_variant]
 
     bundle.adata.obsm["X_plantspade_lgcl_base"] = base_embedding
@@ -473,11 +432,14 @@ def main():
     bundle.adata.uns["plantspade_lgcl"] = {
         "method": args.method_name,
         "input_mode": bundle.input_mode,
+        "counts_source": bundle.counts_source,
         "support_density": bundle.support_density,
         "n_edges": int(bundle.support.nnz),
         "n_top_genes": int(bundle.support.shape[1]),
+        "negative_sampler": args.negative_sampler,
         "primary_variant": primary_variant,
         "use_support_attention": bool(args.use_support_attention),
+        "use_trainable_attention_refiner": bool(args.use_trainable_attention_refiner),
         "attention_topk_genes": int(args.attention_topk_genes),
         "attention_beta": float(args.attention_beta),
         "attention_gamma": float(args.attention_gamma),
@@ -487,9 +449,6 @@ def main():
     embedding_path = os.path.join(save_dir, "embedding_final.npy")
     np.save(embedding_path, embedding.astype(np.float32))
     np.save(os.path.join(save_dir, "embeddings_base.npy"), base_embedding.astype(np.float32))
-    np.save(os.path.join(save_dir, "embeddings_direct.npy"), base_embedding.astype(np.float32))
-    if "support_attention" in variant_embeddings:
-        np.save(os.path.join(save_dir, "embeddings_attn.npy"), variant_embeddings["support_attention"].astype(np.float32))
     np.save(os.path.join(save_dir, "global_embedding_svd_projected.npy"), projected_global.astype(np.float32))
     np.save(os.path.join(save_dir, "gene_embedding.npy"), gene_embedding.astype(np.float32))
     np.save(os.path.join(save_dir, "labels.npy"), bundle.labels.astype(np.int64))
@@ -498,66 +457,62 @@ def main():
     for variant_name, variant_embedding in variant_embeddings.items():
         variant_path = os.path.join(save_dir, f"embedding_{variant_name}.npy")
         np.save(variant_path, variant_embedding.astype(np.float32))
-        variant_eval_results[variant_name] = write_eval_outputs(
-            save_dir=save_dir,
-            dataset_name=dataset_name,
-            method_name=f"{args.method_name}_{variant_name}",
-            data_path=args.data_path,
-            embedding_path=variant_path,
+        variant_method = f"{args.method_name}_{variant_name}"
+        variant_eval_results[variant_name] = write_evaluation_outputs(
+            output_dir=save_dir,
+            dataset=dataset_name,
+            method=variant_method,
+            seed=args.seed,
             embedding=variant_embedding,
             labels=bundle.labels,
-            label_key=bundle.label_key,
             n_clusters=n_clusters,
-            seed=args.seed,
             n_neighbors=args.eval_neighbors,
-            resolutions=resolutions,
-            file_prefix=f"eval_{variant_name}",
+            leiden_fixed_resolution=args.leiden_fixed_resolution,
+            louvain_fixed_resolution=args.louvain_fixed_resolution,
+            leiden_sweep_resolutions=resolutions,
+            sweep_max_cells=args.sweep_max_cells,
+            include_louvain=args.include_louvain,
+            prefix=f"eval_{variant_name}",
+            extra={"variant": variant_name, "negative_sampler": args.negative_sampler},
         )
 
-    eval_result = variant_eval_results[primary_variant]
-    primary_payload = dict(eval_result["payload"])
-    primary_payload["method"] = args.method_name
-    primary_payload["primary_variant"] = primary_variant
-    primary_payload["embedding_path"] = os.path.abspath(embedding_path)
-    save_benchmark_json(primary_payload, os.path.join(save_dir, f"{args.method_name}.json"))
-    save_benchmark_json(eval_result["metrics"], os.path.join(save_dir, "metrics.json"))
-    primary_rows = []
-    for cluster_method, vals in eval_result["metrics"].items():
-        row = {"dataset": dataset_name, "method": args.method_name, "cluster_method": cluster_method}
-        row.update(vals)
-        primary_rows.append(row)
-    pd.DataFrame(primary_rows).to_csv(os.path.join(save_dir, f"{args.method_name}.csv"), index=False)
-    for name, pred in eval_result["preds"].items():
-        np.save(os.path.join(save_dir, f"{args.method_name}_{name}.npy"), pred.astype(np.int64))
-        np.save(os.path.join(save_dir, f"pred_labels_{name}.npy"), pred.astype(np.int64))
-        np.save(os.path.join(save_dir, f"{args.method_name}_{name}_mapped.npy"), eval_result["mapped_preds"][name].astype(np.int64))
-        np.save(os.path.join(save_dir, f"pred_labels_{name}_mapped.npy"), eval_result["mapped_preds"][name].astype(np.int64))
+    primary_result = variant_eval_results[primary_variant]
+    primary_payload = {
+        "dataset": dataset_name,
+        "method": args.method_name,
+        "seed": int(args.seed),
+        "primary_variant": primary_variant,
+        "embedding_path": os.path.abspath(embedding_path),
+        "fixed": primary_result["fixed"],
+        "oracle": primary_result["oracle"],
+        "note": "Main results use only fixed protocol. leiden_oracle_best is supplementary upper bound.",
+    }
+    save_json(primary_payload, os.path.join(save_dir, f"{args.method_name}.json"))
+    save_json(primary_result["fixed"], os.path.join(save_dir, "metrics.json"))
+    pd.DataFrame(
+        [
+            {"dataset": dataset_name, "method": args.method_name, "seed": args.seed, "cluster_method": key, **vals}
+            for key, vals in primary_result["fixed"].items()
+        ]
+    ).to_csv(os.path.join(save_dir, f"{args.method_name}_fixed.csv"), index=False)
 
-    ablation_rows = []
-    for variant_name, result in variant_eval_results.items():
-        for cluster_method, vals in result["metrics"].items():
-            row = {"dataset": dataset_name, "variant": variant_name, "cluster_method": cluster_method}
-            row.update(vals)
-            ablation_rows.append(row)
-    pd.DataFrame(ablation_rows).to_csv(os.path.join(save_dir, "attention_ablation_metrics.csv"), index=False)
-    save_json(
-        {name: result["metrics"] for name, result in variant_eval_results.items()},
-        os.path.join(save_dir, "attention_ablation_metrics.json"),
-    )
-
-    pred_for_h5 = eval_result["preds"].get("kmeans")
+    pred_for_h5 = primary_result["preds"].get("kmeans_known_k")
     save_embedding_h5(os.path.join(save_dir, "embedding.h5"), embedding, labels=bundle.labels, pred_labels=pred_for_h5)
 
-    if attention_weights_for_markers is not None and "leiden_best" in eval_result["preds"]:
-        top_gene_df = attention_top_genes_per_cluster(
+    if attention_weights_for_markers is not None:
+        cluster_for_markers = primary_result["preds"].get("leiden_fixed")
+        if cluster_for_markers is None:
+            cluster_for_markers = primary_result["preds"].get("kmeans_known_k")
+        write_marker_outputs(
+            save_dir,
             attention_weights_for_markers,
-            eval_result["preds"]["leiden_best"],
+            cluster_for_markers,
             bundle.support,
             bundle.amplitude,
             bundle.gene_names,
-            top_n=20,
+            top_n_attention=20,
+            top_n_deg=50,
         )
-        top_gene_df.to_csv(os.path.join(save_dir, "attention_top_genes_per_cluster.csv"), index=False)
 
     module_rows = model.module_top_genes(bundle.gene_names, gene_embedding=gene_embedding, top_k=args.module_top_k)
     save_json({"top_genes": module_rows}, os.path.join(save_dir, "module_top_genes.json"))
@@ -584,12 +539,15 @@ def main():
         "support_density": float(bundle.support_density),
         "n_clusters": int(n_clusters),
         "input_mode": bundle.input_mode,
+        "counts_source": bundle.counts_source,
+        "negative_sampler": args.negative_sampler,
         "primary_variant": primary_variant,
-        "metrics": eval_result["metrics"],
-        "ablation_metrics": {name: result["metrics"] for name, result in variant_eval_results.items()},
+        "fixed_metrics": primary_result["fixed"],
+        "oracle_metrics": primary_result["oracle"],
+        "variant_names": sorted(variant_embeddings.keys()),
     }
     save_json(summary, os.path.join(save_dir, "summary.json"))
-    print("Final metrics:", eval_result["metrics"])
+    print("Fixed-protocol metrics:", primary_result["fixed"])
     print(f"Results saved to: {save_dir}")
 
 

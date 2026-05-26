@@ -58,77 +58,36 @@ scCluBench 聚类评估指标模块
 """
 
 import numpy as np
-from munkres import Munkres
-from sklearn.metrics.cluster import normalized_mutual_info_score as nmi_score
-from sklearn.metrics import adjusted_rand_score as ari_score
+from scipy.optimize import linear_sum_assignment
+from sklearn.metrics import (
+    f1_score, accuracy_score, adjusted_rand_score,
+    fowlkes_mallows_score, v_measure_score, silhouette_score,
+)
+from sklearn.metrics.cluster import (
+    normalized_mutual_info_score as nmi_score,
+    homogeneity_score, completeness_score,
+)
 from sklearn import metrics
+from sklearn.preprocessing import LabelEncoder
 
 
 def cluster_acc(y_true, y_pred):
-    """
-    计算聚类准确率（旧版，使用 Munkres 算法）
-
-    【注意】本函数已弃用，建议使用新版 evaluation() 函数
-
-    【算法流程】
-        1. 构建混淆矩阵 G，元素 G[i,j] = 真实标签=i且预测标签=j 的细胞数
-        2. 使用 Munkres 算法找最优指派（最大化匹配数）
-        3. 根据最优指派重新标记预测标签
-        4. 计算标记后的准确率
-
-    【参数】
-        y_true: 真实标签（整数数组）
-        y_pred: 预测标签（整数数组）
-
-    【返回】
-        (acc, f1_macro): 准确率和宏平均 F1
-    """
-    y_true = y_true - np.min(y_true)
-    l1 = list(set(y_true))
-    numclass1 = len(l1)
-    l2 = list(set(y_pred))
-    numclass2 = len(l2)
-
-    ind = 0
-    # 如果类别数不匹配，用缺失类别填补
-    if numclass1 != numclass2:
-        for i in l1:
-            if i in l2:
-                pass
-            else:
-                y_pred[ind] = i
-                ind += 1
-
-    l2 = list(set(y_pred))
-    numclass2 = len(l2)
-
-    if numclass1 != numclass2:
-        print('error')
-        return
-
-    # 构建混淆矩阵：G[i,j] = 真实标签 l1[i] 且预测标签 l2[j] 的细胞数
-    cost = np.zeros((numclass1, numclass2), dtype=int)
-    for i, c1 in enumerate(l1):
-        mps = [i1 for i1, e1 in enumerate(y_true) if e1 == c1]
-        for j, c2 in enumerate(l2):
-            mps_d = [i1 for i1 in mps if y_pred[i1] == c2]
-            cost[i][j] = len(mps_d)
-
-    # Munkres 算法（最大化匹配 → 取负号转为最小化问题）
-    m = Munkres()
-    cost = cost.__neg__().tolist()
-    indexes = m.compute(cost)
-
-    # 根据最优指派重新标记
-    new_predict = np.zeros(len(y_pred))
-    for i, c in enumerate(l1):
-        c2 = l2[indexes[i][1]]
-        ai = [ind for ind, elm in enumerate(y_pred) if elm == c2]
-        new_predict[ai] = c
-
-    acc = metrics.accuracy_score(y_true, new_predict)
-    f1_macro = metrics.f1_score(y_true, new_predict, average='macro')
-    return acc, f1_macro
+    """Compute clustering accuracy using Hungarian algorithm (scipy)."""
+    from scipy.optimize import linear_sum_assignment
+    y_true = np.asarray(y_true).ravel()
+    y_pred = np.asarray(y_pred).ravel()
+    le_true = LabelEncoder()
+    le_pred = LabelEncoder()
+    y_true_enc = le_true.fit_transform(y_true)
+    y_pred_enc = le_pred.fit_transform(y_pred)
+    D = max(int(y_true_enc.max()), int(y_pred_enc.max())) + 1
+    cost = np.zeros((D, D), dtype=np.float64)
+    for i in range(len(y_pred_enc)):
+        cost[int(y_pred_enc[i]), int(y_true_enc[i])] -= 1
+    rows, cols = linear_sum_assignment(cost)
+    y_map = {col: row for row, col in zip(rows, cols)}
+    new_predict = np.array([y_map.get(int(p), int(p)) for p in y_pred_enc])
+    return metrics.accuracy_score(y_true_enc, new_predict), metrics.f1_score(y_true_enc, new_predict, average='macro')
 
 
 def eva(y_true, y_pred, epoch=0):
@@ -141,7 +100,7 @@ def eva(y_true, y_pred, epoch=0):
     """
     acc, f1 = cluster_acc(y_true, y_pred)
     nmi = nmi_score(y_true, y_pred)
-    ari = ari_score(y_true, y_pred)
+    ari = adjusted_rand_score(y_true, y_pred)
     print(epoch, ':acc {:.4f}'.format(acc), ', nmi {:.4f}'.format(nmi), ', ari {:.4f}'.format(ari),
           ', f1 {:.4f}'.format(f1))
 
@@ -150,10 +109,6 @@ def eva(y_true, y_pred, epoch=0):
 # 新版评估函数（2024年重写）
 # =============================================================================
 
-from scipy.optimize import linear_sum_assignment as linear_assignment
-from sklearn.metrics import f1_score
-from sklearn.metrics.cluster import normalized_mutual_info_score as nmi_score
-from sklearn.metrics import adjusted_rand_score as ari_score
 from sklearn.metrics import fowlkes_mallows_score, v_measure_score, silhouette_score, accuracy_score
 from sklearn.metrics.cluster import homogeneity_score, completeness_score
 
@@ -213,15 +168,15 @@ def best_map(y_true, y_pred):
             G[i, j] = np.count_nonzero(s & t)
 
     # Hungarian 算法：最大化 G → 最小化 -G
-    A = linear_assignment(-G)
+    rows, cols = linear_sum_assignment(-G)
 
     # 根据指派结果重排预测标签
     new_y_pred = np.zeros(y_pred.shape)
     for i in range(0, num_class):
-        # 将预测标签 label_set[A[1][i]] 映射到真实标签 label_set[A[0][i]]
-        new_y_pred[y_pred == label_set[A[1][i]]] = label_set[A[0][i]]
+        # 将预测标签 label_set[cols[i]] 映射到真实标签 label_set[rows[i]]
+        new_y_pred[y_pred == label_set[cols[i]]] = label_set[rows[i]]
 
-    return new_y_pred.astype(int), A[1], A[0]
+    return new_y_pred.astype(int), cols, rows
 
 
 def evaluation(y_true, y_pred):
@@ -284,8 +239,8 @@ def evaluation(y_true, y_pred):
     # Step 2: 计算各指标
     acc = accuracy_score(y_true, y_pred_)           # 准确率
     f1_macro = f1_score(y_true, y_pred_, average='macro')  # 宏平均 F1
-    nmi = nmi_score(y_true, y_pred_, average_method='arithmetic')  # 标准化互信息
-    ari = ari_score(y_true, y_pred_)               # 调整兰德指数
+    nmi = nmi_score(y_true, y_pred_)  # 标准化互信息
+    ari = adjusted_rand_score(y_true, y_pred_)               # 调整兰德指数
     fmi = fowlkes_mallows_score(y_true, y_pred_)    # 福克斯-马洛斯指数
     v_measure = v_measure_score(y_true, y_pred_)   # V 度量
     hom = homogeneity_score(y_true, y_pred_)        # 同质性
