@@ -23,6 +23,7 @@ if str(ROOT) not in sys.path:
 from methods.DeepLearning.PlantSPADE_LGCL.data import load_lgcl_dataset, write_dataset_artifacts
 from methods.DeepLearning.PlantSPADE_LGCL.eval import write_evaluation_outputs
 from methods.DeepLearning.PlantSPADE_LGCL.eval.marker_analysis import write_marker_outputs
+from methods.DeepLearning.PlantSPADE_LGCL.gated_fusion import GatedFusionConfig, train_gated_fusion
 from methods.DeepLearning.PlantSPADE_LGCL.support_gene_attention import (
     SparseAttentionWeights,
     SupportGeneAttention,
@@ -111,6 +112,17 @@ def parse_args():
     parser.add_argument("--attention_refiner_epochs", type=int, default=20)
     parser.add_argument("--attention_refiner_lr", type=float, default=1e-2)
     parser.add_argument("--attention_refiner_batch_size", type=int, default=2048)
+    parser.add_argument("--use_gated_fusion", type=str2bool, default=False)
+    parser.add_argument("--fusion_epochs", type=int, default=20)
+    parser.add_argument("--fusion_lr", type=float, default=5e-3)
+    parser.add_argument("--fusion_weight_decay", type=float, default=1e-4)
+    parser.add_argument("--fusion_batch_size", type=int, default=2048)
+    parser.add_argument("--fusion_pairs_per_epoch", type=int, default=0)
+    parser.add_argument("--fusion_hidden_dim", type=int, default=0)
+    parser.add_argument("--fusion_dropout", type=float, default=0.05)
+    parser.add_argument("--fusion_contrastive_weight", type=float, default=0.05)
+    parser.add_argument("--fusion_consistency_weight", type=float, default=0.05)
+    parser.add_argument("--fusion_bpr_weight", type=float, default=1.0)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--gpu", type=int, default=1)
     parser.add_argument("--no_cuda", action="store_true")
@@ -486,30 +498,13 @@ def main():
         normalize_embedding=normalize_embedding,
         graph_profile=graph_profile,
     )
-    if args.train_only:
-        summary = {
-            "method": args.method_name,
-            "dataset": dataset_name,
-            "seed": int(args.seed),
-            "train_only": True,
-            "n_cells": int(bundle.support.shape[0]),
-            "n_genes": int(bundle.support.shape[1]),
-            "n_edges": int(bundle.support.nnz),
-            "support_density": float(bundle.support_density),
-            "n_clusters": int(n_clusters),
-            "input_mode": bundle.input_mode,
-            "counts_source": bundle.counts_source,
-            "negative_sampler": args.negative_sampler,
-            "primary_variant": primary_variant,
-            "baseline_embedding_path": os.path.abspath(baseline_embedding_path),
-            "primary_embedding_path": os.path.abspath(baseline_embedding_path),
-            "note": "Training artifacts saved. Evaluation is intentionally delegated to scripts/eval_from_embedding.py.",
-        }
-        save_json(summary, os.path.join(save_dir, "summary.json"))
-        print(f"Training artifacts saved to: {save_dir}")
-        return
 
-    should_compute_attention = args.use_support_attention or args.run_attention_ablations or args.use_trainable_attention_refiner
+    should_compute_attention = (
+        args.use_support_attention
+        or args.run_attention_ablations
+        or args.use_trainable_attention_refiner
+        or args.use_gated_fusion
+    )
     if should_compute_attention:
         print("Computing sparse SupportGeneAttention variants")
         attn_embedding, attention_weights_for_markers = make_support_attention_embedding(
@@ -579,7 +574,76 @@ def main():
             )
             variant_embeddings[name] = emb
 
-    if args.use_trainable_attention_refiner:
+    if args.use_gated_fusion:
+        fusion_support_embedding = local_embedding.astype(np.float32)
+        if args.global_blend == 0.0 and "support_attention" in variant_embeddings:
+            fusion_attention_embedding = variant_embeddings["support_attention"]
+        else:
+            fusion_attention_embedding, _ = make_support_attention_embedding(
+                fusion_support_embedding,
+                gene_embedding,
+                bundle.support,
+                bundle.amplitude,
+                gene_idf,
+                device,
+                top_k=args.attention_topk_genes,
+                beta=args.attention_beta,
+                gamma=args.attention_gamma,
+                eta=args.attention_eta,
+                dropout=args.attention_dropout,
+                normalize_output=normalize_embedding,
+                return_attention=False,
+            )
+        print("Training lightweight gated fusion over support/global/attention views")
+        fusion_pairs_per_epoch = (
+            int(args.fusion_pairs_per_epoch)
+            if args.fusion_pairs_per_epoch and args.fusion_pairs_per_epoch > 0
+            else min(int(args.pairs_per_epoch), 65536)
+        )
+        gated_embedding, gate_weights, fusion_history = train_gated_fusion(
+            z_support=fusion_support_embedding,
+            z_global=projected_global.astype(np.float32),
+            z_attention=fusion_attention_embedding.astype(np.float32),
+            gene_embedding=gene_embedding,
+            support=bundle.support,
+            device=device,
+            config=GatedFusionConfig(
+                epochs=args.fusion_epochs,
+                batch_size=args.fusion_batch_size,
+                pairs_per_epoch=fusion_pairs_per_epoch,
+                lr=args.fusion_lr,
+                weight_decay=args.fusion_weight_decay,
+                hidden_dim=args.fusion_hidden_dim,
+                dropout=args.fusion_dropout,
+                temperature=args.temperature,
+                bpr_weight=args.fusion_bpr_weight,
+                contrastive_weight=args.fusion_contrastive_weight,
+                consistency_weight=args.fusion_consistency_weight,
+                seed=args.seed,
+                negative_sampler=args.negative_sampler,
+                negative_neighbor_k=args.negative_neighbor_k,
+            ),
+        )
+        variant_embeddings["gated_fusion"] = gated_embedding
+        np.save(os.path.join(save_dir, "gated_fusion_gate_weights.npy"), gate_weights.astype(np.float32))
+        save_json(fusion_history, os.path.join(save_dir, "gated_fusion_history.json"))
+        save_json(
+            {
+                "gate_support_mean": float(np.mean(gate_weights[:, 0])),
+                "gate_global_mean": float(np.mean(gate_weights[:, 1])),
+                "gate_attention_mean": float(np.mean(gate_weights[:, 2])),
+                "gate_support_std": float(np.std(gate_weights[:, 0])),
+                "gate_global_std": float(np.std(gate_weights[:, 1])),
+                "gate_attention_std": float(np.std(gate_weights[:, 2])),
+                "fusion_pairs_per_epoch": int(fusion_pairs_per_epoch),
+                "fusion_epochs": int(args.fusion_epochs),
+            },
+            os.path.join(save_dir, "gated_fusion_gate_summary.json"),
+        )
+
+    if args.use_gated_fusion:
+        primary_variant = "gated_fusion"
+    elif args.use_trainable_attention_refiner:
         primary_variant = "support_attention_trainable"
     else:
         primary_variant = "support_attention" if args.use_support_attention else "baseline"
@@ -588,6 +652,8 @@ def main():
     bundle.adata.obsm["X_plantspade_lgcl_base"] = base_embedding
     if "support_attention" in variant_embeddings:
         bundle.adata.obsm["X_plantspade_lgcl_attn"] = variant_embeddings["support_attention"]
+    if "gated_fusion" in variant_embeddings:
+        bundle.adata.obsm["X_plantspade_lgcl_gated_fusion"] = variant_embeddings["gated_fusion"]
     bundle.adata.obsm["X_plantspade_lgcl"] = embedding
     bundle.adata.uns["plantspade_lgcl"] = {
         "method": args.method_name,
@@ -600,14 +666,44 @@ def main():
         "primary_variant": primary_variant,
         "use_support_attention": bool(args.use_support_attention),
         "use_trainable_attention_refiner": bool(args.use_trainable_attention_refiner),
+        "use_gated_fusion": bool(args.use_gated_fusion),
         "attention_topk_genes": int(args.attention_topk_genes),
         "attention_beta": float(args.attention_beta),
         "attention_gamma": float(args.attention_gamma),
         "attention_eta": float(args.attention_eta),
+        "fusion_epochs": int(args.fusion_epochs),
+        "fusion_lr": float(args.fusion_lr),
     }
 
     primary_embedding_path = os.path.join(save_dir, "embedding_primary.npy")
     np.save(primary_embedding_path, embedding.astype(np.float32))
+    for variant_name, variant_embedding in variant_embeddings.items():
+        variant_path = os.path.join(save_dir, f"embedding_{variant_name}.npy")
+        np.save(variant_path, variant_embedding.astype(np.float32))
+
+    if args.train_only:
+        summary = {
+            "method": args.method_name,
+            "dataset": dataset_name,
+            "seed": int(args.seed),
+            "train_only": True,
+            "n_cells": int(bundle.support.shape[0]),
+            "n_genes": int(bundle.support.shape[1]),
+            "n_edges": int(bundle.support.nnz),
+            "support_density": float(bundle.support_density),
+            "n_clusters": int(n_clusters),
+            "input_mode": bundle.input_mode,
+            "counts_source": bundle.counts_source,
+            "negative_sampler": args.negative_sampler,
+            "primary_variant": primary_variant,
+            "baseline_embedding_path": os.path.abspath(baseline_embedding_path),
+            "primary_embedding_path": os.path.abspath(primary_embedding_path),
+            "variant_names": sorted(variant_embeddings.keys()),
+            "note": "Training and post-training embedding artifacts saved. Evaluation is intentionally delegated to scripts/eval_from_embedding.py.",
+        }
+        save_json(summary, os.path.join(save_dir, "summary.json"))
+        print(f"Training artifacts saved to: {save_dir}")
+        return
 
     variant_eval_results = {}
     for variant_name, variant_embedding in variant_embeddings.items():

@@ -28,6 +28,7 @@ from methods.DeepLearning.PlantSPADE_LGCL.utils import ensure_dir, save_json
 PLANTSPADE_METHODS = {
     "plantspade_lgcl_baseline",
     "plantspade_lgcl_support_attention",
+    "plantspade_lgcl_gated_fusion",
     "plantspade_lgcl_attention_no_idf",
     "plantspade_lgcl_attention_no_amplitude",
     "plantspade_lgcl_attention_topk_64",
@@ -279,6 +280,8 @@ def plantspade_method_args(method: str) -> tuple[str, list[str]]:
         return "plantspade_lgcl", ["--use_support_attention", "false"]
     if method == "plantspade_lgcl_support_attention":
         return "plantspade_lgcl_sga", ["--use_support_attention", "true"]
+    if method == "plantspade_lgcl_gated_fusion":
+        return "plantspade_lgcl_gated_fusion", ["--use_gated_fusion", "true", "--use_support_attention", "true"]
     if method == "plantspade_lgcl_attention_no_idf":
         return "plantspade_lgcl_attention_no_idf", ["--use_support_attention", "true", "--attention_gamma", "0.0"]
     if method == "plantspade_lgcl_attention_no_amplitude":
@@ -416,7 +419,7 @@ def run_plantspade(entry: dict, main_cfg: dict, method: str, seed: int, output_d
     labels = np.load(output_dir / "labels.npy")
     n_clusters = int(entry.get("expected_n_clusters") or len(np.unique(labels)))
     prefix, variant_name, use_attention, attention_overrides = plantspade_eval_plan(method, main_cfg)
-    eval_embedding = baseline_embedding_path
+    eval_embedding = output_dir / "embedding_gated_fusion.npy" if method == "plantspade_lgcl_gated_fusion" else baseline_embedding_path
     run_eval_from_embedding(
         entry=entry,
         main_cfg=main_cfg,
@@ -556,6 +559,8 @@ def plantspade_eval_plan(method: str, main_cfg: dict) -> tuple[str, str, bool, d
         return "eval_baseline", "baseline", False, {}
     if method == "plantspade_lgcl_support_attention":
         return "eval_support_attention", "support_attention", True, common
+    if method == "plantspade_lgcl_gated_fusion":
+        return "eval_gated_fusion", "gated_fusion", False, {}
     if method == "plantspade_lgcl_attention_no_idf":
         cfg = dict(common)
         cfg["attention_gamma"] = 0.0
