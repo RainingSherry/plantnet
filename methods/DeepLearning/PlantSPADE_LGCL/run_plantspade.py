@@ -23,6 +23,11 @@ if str(ROOT) not in sys.path:
 from methods.DeepLearning.PlantSPADE_LGCL.data import load_lgcl_dataset, write_dataset_artifacts
 from methods.DeepLearning.PlantSPADE_LGCL.eval import write_evaluation_outputs
 from methods.DeepLearning.PlantSPADE_LGCL.eval.marker_analysis import write_marker_outputs
+from methods.DeepLearning.PlantSPADE_LGCL.gated_fusion import GatedFusionConfig, train_gated_fusion
+from methods.DeepLearning.PlantSPADE_LGCL.experiments.learned_topk_attention import (
+    LearnedTopKConfig,
+    LearnedTopKSupportAttention,
+)
 from methods.DeepLearning.PlantSPADE_LGCL.support_gene_attention import (
     SparseAttentionWeights,
     SupportGeneAttention,
@@ -111,6 +116,41 @@ def parse_args():
     parser.add_argument("--attention_refiner_epochs", type=int, default=20)
     parser.add_argument("--attention_refiner_lr", type=float, default=1e-2)
     parser.add_argument("--attention_refiner_batch_size", type=int, default=2048)
+    parser.add_argument("--use_gated_fusion", type=str2bool, default=False)
+    parser.add_argument("--fusion_use_cell_stats", type=str2bool, default=True)
+    parser.add_argument("--fusion_gate_entropy_weight", type=float, default=0.0)
+    parser.add_argument("--fusion_gate_balance_weight", type=float, default=0.0)
+    parser.add_argument("--fusion_epochs", type=int, default=20)
+    parser.add_argument("--fusion_lr", type=float, default=5e-3)
+    parser.add_argument("--fusion_weight_decay", type=float, default=1e-4)
+    parser.add_argument("--fusion_batch_size", type=int, default=2048)
+    parser.add_argument("--fusion_pairs_per_epoch", type=int, default=0)
+    parser.add_argument("--fusion_hidden_dim", type=int, default=0)
+    parser.add_argument("--fusion_dropout", type=float, default=0.05)
+    parser.add_argument("--fusion_contrastive_weight", type=float, default=0.05)
+    parser.add_argument("--fusion_consistency_weight", type=float, default=0.05)
+    parser.add_argument("--fusion_bpr_weight", type=float, default=1.0)
+
+    # Experimental: learned routing top-k attention
+    parser.add_argument("--use_learned_topk_attention", type=str2bool, default=False)
+    parser.add_argument("--learned_topk_genes", type=int, default=128)
+    parser.add_argument("--learned_topk_beta", type=float, default=0.1)
+    parser.add_argument("--learned_topk_gamma", type=float, default=0.1)
+    parser.add_argument("--learned_topk_sim_scale", type=float, default=1.0)
+    parser.add_argument("--learned_topk_eta", type=float, default=0.5)
+    parser.add_argument("--learned_topk_dropout", type=float, default=0.1)
+    # Plugin arguments for enhanced PlantSPADE-LGCL
+    parser.add_argument("--use_fcr", type=str2bool, default=False, help="Enable FCR (Frequency Contrastive Regularization)")
+    parser.add_argument("--fcr_weight", type=float, default=0.05, help="Weight for FCR loss")
+    parser.add_argument("--use_pola_attention", type=str2bool, default=False, help="Enable PolaLinearAttention")
+    parser.add_argument("--pola_num_heads", type=int, default=8, help="Number of heads for PolaLinearAttention")
+    parser.add_argument("--pola_alpha", type=float, default=4.0, help="Alpha for PolaLinearAttention power function")
+    parser.add_argument("--pola_attention_weight", type=float, default=0.05, help="Weight for PolaAttention loss")
+    parser.add_argument("--use_mamba", type=str2bool, default=False, help="Enable BiSSM1D propagation branch")
+    parser.add_argument("--mamba_d_state", type=int, default=64, help="SSM state dimension")
+    parser.add_argument("--ssm_alpha", type=float, default=0.05, help="Learnable SSM residual scaling factor")
+    parser.add_argument("--use_ctr_gc", type=str2bool, default=False, help="Enable CTR-GC gene topology refinement")
+    parser.add_argument("--ctr_gc_rel_reduction", type=int, default=8, help="CTR-GC relative channel reduction ratio")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--gpu", type=int, default=1)
     parser.add_argument("--no_cuda", action="store_true")
@@ -434,11 +474,34 @@ def main():
         temperature=args.temperature,
         num_modules=args.num_modules,
         module_top_k=args.module_top_k,
+        # Plugin: FCR
+        use_fcr=args.use_fcr,
+        # Plugin: PolaLinearAttention
+        use_pola_attention=args.use_pola_attention,
+        pola_num_heads=args.pola_num_heads,
+        pola_alpha=args.pola_alpha,
+        # Plugin: BiSSM1D
+        use_mamba=args.use_mamba,
+        mamba_d_state=args.mamba_d_state,
+        ssm_alpha=args.ssm_alpha,
+        # Plugin: CTR-GC
+        use_ctr_gc=args.use_ctr_gc,
+        ctr_gc_rel_reduction=args.ctr_gc_rel_reduction,
     ).to(device)
     print(f"Parameters: {sum(p.numel() for p in model.parameters()):,}")
 
     print("=" * 72)
-    print(f"Step 3: train with BPR + SVD InfoNCE, negative_sampler={args.negative_sampler}")
+    plugin_info = []
+    if args.use_fcr:
+        plugin_info.append(f"FCR(w={args.fcr_weight})")
+    if args.use_pola_attention:
+        plugin_info.append(f"PolaLinearAtt(heads={args.pola_num_heads},a={args.pola_alpha},w={args.pola_attention_weight})")
+    if args.use_mamba:
+        plugin_info.append(f"BiSSM1D(d_state={args.mamba_d_state})")
+    if args.use_ctr_gc:
+        plugin_info.append(f"CTRGC(rel_red={args.ctr_gc_rel_reduction})")
+    plugin_str = " + ".join(plugin_info) if plugin_info else "baseline"
+    print(f"Step 3: train with BPR + SVD InfoNCE, negative_sampler={args.negative_sampler}, plugins={plugin_str}")
     print("=" * 72)
     train_config = LGCLTrainConfig(
         epochs=args.epochs,
@@ -451,6 +514,20 @@ def main():
         seed=args.seed,
         negative_sampler=args.negative_sampler,
         negative_neighbor_k=args.negative_neighbor_k,
+        # Plugin: FCR
+        use_fcr=args.use_fcr,
+        fcr_weight=args.fcr_weight,
+        # Plugin: PolaLinearAttention
+        use_pola_attention=args.use_pola_attention,
+        pola_num_heads=args.pola_num_heads,
+        pola_alpha=args.pola_alpha,
+        pola_attention_weight=args.pola_attention_weight,
+        # Plugin: BiSSM1D
+        use_mamba=args.use_mamba,
+        mamba_d_state=args.mamba_d_state,
+        # Plugin: CTR-GC
+        use_ctr_gc=args.use_ctr_gc,
+        ctr_gc_rel_reduction=args.ctr_gc_rel_reduction,
     )
     history = train_lgcl(model, bundle.support, train_config, device)
     save_json(history, os.path.join(save_dir, "training_history.json"))
@@ -486,30 +563,14 @@ def main():
         normalize_embedding=normalize_embedding,
         graph_profile=graph_profile,
     )
-    if args.train_only:
-        summary = {
-            "method": args.method_name,
-            "dataset": dataset_name,
-            "seed": int(args.seed),
-            "train_only": True,
-            "n_cells": int(bundle.support.shape[0]),
-            "n_genes": int(bundle.support.shape[1]),
-            "n_edges": int(bundle.support.nnz),
-            "support_density": float(bundle.support_density),
-            "n_clusters": int(n_clusters),
-            "input_mode": bundle.input_mode,
-            "counts_source": bundle.counts_source,
-            "negative_sampler": args.negative_sampler,
-            "primary_variant": primary_variant,
-            "baseline_embedding_path": os.path.abspath(baseline_embedding_path),
-            "primary_embedding_path": os.path.abspath(baseline_embedding_path),
-            "note": "Training artifacts saved. Evaluation is intentionally delegated to scripts/eval_from_embedding.py.",
-        }
-        save_json(summary, os.path.join(save_dir, "summary.json"))
-        print(f"Training artifacts saved to: {save_dir}")
-        return
 
-    should_compute_attention = args.use_support_attention or args.run_attention_ablations or args.use_trainable_attention_refiner
+    should_compute_attention = (
+        args.use_support_attention
+        or args.run_attention_ablations
+        or args.use_trainable_attention_refiner
+        or args.use_gated_fusion
+        or args.use_learned_topk_attention
+    )
     if should_compute_attention:
         print("Computing sparse SupportGeneAttention variants")
         attn_embedding, attention_weights_for_markers = make_support_attention_embedding(
@@ -528,6 +589,30 @@ def main():
             return_attention=True,
         )
         variant_embeddings["support_attention"] = attn_embedding
+
+    if args.use_learned_topk_attention:
+        print("Computing experimental LearnedTopKSupportAttention variant")
+        learned_attn = LearnedTopKSupportAttention(
+            support=bundle.support,
+            amplitude=bundle.amplitude,
+            gene_idf=torch.as_tensor(gene_idf, dtype=torch.float32, device=device),
+            config=LearnedTopKConfig(
+                top_k_genes=args.learned_topk_genes,
+                beta_amplitude=args.learned_topk_beta,
+                gamma_idf=args.learned_topk_gamma,
+                sim_scale=args.learned_topk_sim_scale,
+                eta=args.learned_topk_eta,
+                dropout=args.learned_topk_dropout,
+            ),
+        ).to(device)
+        learned_attn.eval()
+        cell_t = torch.as_tensor(base_embedding, dtype=torch.float32, device=device)
+        gene_t = torch.as_tensor(gene_embedding, dtype=torch.float32, device=device)
+        learned_emb_t, learned_weights = learned_attn(cell_t, gene_t, return_attention=True)
+        if normalize_embedding:
+            learned_emb_t = F.normalize(learned_emb_t, dim=1)
+        variant_embeddings["learned_topk_attention"] = learned_emb_t.detach().cpu().numpy().astype(np.float32)
+        attention_weights_for_markers = learned_weights
 
     if args.use_trainable_attention_refiner:
         trainable_embedding, trainable_weights, refiner_history = train_attention_refiner(
@@ -579,7 +664,79 @@ def main():
             )
             variant_embeddings[name] = emb
 
-    if args.use_trainable_attention_refiner:
+    if args.use_gated_fusion:
+        fusion_support_embedding = local_embedding.astype(np.float32)
+        if args.global_blend == 0.0 and "support_attention" in variant_embeddings:
+            fusion_attention_embedding = variant_embeddings["support_attention"]
+        else:
+            fusion_attention_embedding, _ = make_support_attention_embedding(
+                fusion_support_embedding,
+                gene_embedding,
+                bundle.support,
+                bundle.amplitude,
+                gene_idf,
+                device,
+                top_k=args.attention_topk_genes,
+                beta=args.attention_beta,
+                gamma=args.attention_gamma,
+                eta=args.attention_eta,
+                dropout=args.attention_dropout,
+                normalize_output=normalize_embedding,
+                return_attention=False,
+            )
+        print("Training lightweight gated fusion over support/global/attention views")
+        fusion_pairs_per_epoch = (
+            int(args.fusion_pairs_per_epoch)
+            if args.fusion_pairs_per_epoch and args.fusion_pairs_per_epoch > 0
+            else min(int(args.pairs_per_epoch), 65536)
+        )
+        gated_embedding, gate_weights, fusion_history = train_gated_fusion(
+            z_support=fusion_support_embedding,
+            z_global=projected_global.astype(np.float32),
+            z_attention=fusion_attention_embedding.astype(np.float32),
+            gene_embedding=gene_embedding,
+            support=bundle.support,
+            device=device,
+            config=GatedFusionConfig(
+                epochs=args.fusion_epochs,
+                batch_size=args.fusion_batch_size,
+                pairs_per_epoch=fusion_pairs_per_epoch,
+                lr=args.fusion_lr,
+                weight_decay=args.fusion_weight_decay,
+                hidden_dim=args.fusion_hidden_dim,
+                dropout=args.fusion_dropout,
+                temperature=args.temperature,
+                bpr_weight=args.fusion_bpr_weight,
+                contrastive_weight=args.fusion_contrastive_weight,
+                consistency_weight=args.fusion_consistency_weight,
+                use_cell_stats=bool(args.fusion_use_cell_stats),
+                gate_entropy_weight=float(args.fusion_gate_entropy_weight),
+                gate_balance_weight=float(args.fusion_gate_balance_weight),
+                seed=args.seed,
+                negative_sampler=args.negative_sampler,
+                negative_neighbor_k=args.negative_neighbor_k,
+            ),
+        )
+        variant_embeddings["gated_fusion"] = gated_embedding
+        np.save(os.path.join(save_dir, "gated_fusion_gate_weights.npy"), gate_weights.astype(np.float32))
+        save_json(fusion_history, os.path.join(save_dir, "gated_fusion_history.json"))
+        save_json(
+            {
+                "gate_support_mean": float(np.mean(gate_weights[:, 0])),
+                "gate_global_mean": float(np.mean(gate_weights[:, 1])),
+                "gate_attention_mean": float(np.mean(gate_weights[:, 2])),
+                "gate_support_std": float(np.std(gate_weights[:, 0])),
+                "gate_global_std": float(np.std(gate_weights[:, 1])),
+                "gate_attention_std": float(np.std(gate_weights[:, 2])),
+                "fusion_pairs_per_epoch": int(fusion_pairs_per_epoch),
+                "fusion_epochs": int(args.fusion_epochs),
+            },
+            os.path.join(save_dir, "gated_fusion_gate_summary.json"),
+        )
+
+    if args.use_gated_fusion:
+        primary_variant = "gated_fusion"
+    elif args.use_trainable_attention_refiner:
         primary_variant = "support_attention_trainable"
     else:
         primary_variant = "support_attention" if args.use_support_attention else "baseline"
@@ -588,6 +745,8 @@ def main():
     bundle.adata.obsm["X_plantspade_lgcl_base"] = base_embedding
     if "support_attention" in variant_embeddings:
         bundle.adata.obsm["X_plantspade_lgcl_attn"] = variant_embeddings["support_attention"]
+    if "gated_fusion" in variant_embeddings:
+        bundle.adata.obsm["X_plantspade_lgcl_gated_fusion"] = variant_embeddings["gated_fusion"]
     bundle.adata.obsm["X_plantspade_lgcl"] = embedding
     bundle.adata.uns["plantspade_lgcl"] = {
         "method": args.method_name,
@@ -600,14 +759,68 @@ def main():
         "primary_variant": primary_variant,
         "use_support_attention": bool(args.use_support_attention),
         "use_trainable_attention_refiner": bool(args.use_trainable_attention_refiner),
+        "use_gated_fusion": bool(args.use_gated_fusion),
         "attention_topk_genes": int(args.attention_topk_genes),
         "attention_beta": float(args.attention_beta),
         "attention_gamma": float(args.attention_gamma),
         "attention_eta": float(args.attention_eta),
+        "fusion_epochs": int(args.fusion_epochs),
+        "fusion_lr": float(args.fusion_lr),
+        "plugins": {
+            "use_fcr": args.use_fcr,
+            "fcr_weight": args.fcr_weight,
+            "use_pola_attention": args.use_pola_attention,
+            "pola_num_heads": args.pola_num_heads,
+            "pola_alpha": args.pola_alpha,
+            "pola_attention_weight": args.pola_attention_weight,
+            "use_mamba": args.use_mamba,
+            "mamba_d_state": args.mamba_d_state,
+            "use_ctr_gc": args.use_ctr_gc,
+            "ctr_gc_rel_reduction": args.ctr_gc_rel_reduction,
+        },
     }
 
     primary_embedding_path = os.path.join(save_dir, "embedding_primary.npy")
     np.save(primary_embedding_path, embedding.astype(np.float32))
+    for variant_name, variant_embedding in variant_embeddings.items():
+        variant_path = os.path.join(save_dir, f"embedding_{variant_name}.npy")
+        np.save(variant_path, variant_embedding.astype(np.float32))
+
+    if args.train_only:
+        summary = {
+            "method": args.method_name,
+            "dataset": dataset_name,
+            "seed": int(args.seed),
+            "train_only": True,
+            "n_cells": int(bundle.support.shape[0]),
+            "n_genes": int(bundle.support.shape[1]),
+            "n_edges": int(bundle.support.nnz),
+            "support_density": float(bundle.support_density),
+            "n_clusters": int(n_clusters),
+            "input_mode": bundle.input_mode,
+            "counts_source": bundle.counts_source,
+            "negative_sampler": args.negative_sampler,
+            "primary_variant": primary_variant,
+            "baseline_embedding_path": os.path.abspath(baseline_embedding_path),
+            "primary_embedding_path": os.path.abspath(primary_embedding_path),
+            "variant_names": sorted(variant_embeddings.keys()),
+            "plugins": {
+                "use_fcr": args.use_fcr,
+                "fcr_weight": args.fcr_weight,
+                "use_pola_attention": args.use_pola_attention,
+                "pola_num_heads": args.pola_num_heads,
+                "pola_alpha": args.pola_alpha,
+                "pola_attention_weight": args.pola_attention_weight,
+                "use_mamba": args.use_mamba,
+                "mamba_d_state": args.mamba_d_state,
+                "use_ctr_gc": args.use_ctr_gc,
+                "ctr_gc_rel_reduction": args.ctr_gc_rel_reduction,
+            },
+            "note": "Training and post-training embedding artifacts saved. Evaluation is intentionally delegated to scripts/eval_from_embedding.py.",
+        }
+        save_json(summary, os.path.join(save_dir, "summary.json"))
+        print(f"Training artifacts saved to: {save_dir}")
+        return
 
     variant_eval_results = {}
     for variant_name, variant_embedding in variant_embeddings.items():
@@ -709,6 +922,18 @@ def main():
         "fixed_metrics": primary_result["fixed"],
         "oracle_metrics": primary_result["oracle"],
         "variant_names": sorted(variant_embeddings.keys()),
+        "plugins": {
+            "use_fcr": args.use_fcr,
+            "fcr_weight": args.fcr_weight,
+            "use_pola_attention": args.use_pola_attention,
+            "pola_num_heads": args.pola_num_heads,
+            "pola_alpha": args.pola_alpha,
+            "pola_attention_weight": args.pola_attention_weight,
+            "use_mamba": args.use_mamba,
+            "mamba_d_state": args.mamba_d_state,
+            "use_ctr_gc": args.use_ctr_gc,
+            "ctr_gc_rel_reduction": args.ctr_gc_rel_reduction,
+        },
     }
     save_json(summary, os.path.join(save_dir, "summary.json"))
     print("Fixed-protocol metrics:", primary_result["fixed"])

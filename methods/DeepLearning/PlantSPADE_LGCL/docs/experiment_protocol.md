@@ -81,7 +81,7 @@ Ablations:
 - `plantspade_lgcl_neg_idf_weighted_zero`
 - `plantspade_lgcl_neg_neighbor_conflict_zero`
 
-Diffusion, maskdiffusion, DOLORIS, GraphDiffusion, unstable GNNs, and foundation-model experiments are archive/exploratory only.
+Diffusion, maskdiffusion, DOLORIS, and GraphDiffusion experiments have been removed from the active working tree. Unstable GNNs and foundation-model experiments remain excluded from the main tables.
 
 ## Commands
 

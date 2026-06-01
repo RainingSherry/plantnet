@@ -1,0 +1,42 @@
+============================================
+Running BiSSM1D-only on SRP182008 (seed=1)
+Plugins: BiSSM1D only
+============================================
+Using device: cuda:0
+========================================================================
+Step 1: load h5ad, build raw-count support M and log1p amplitude A
+========================================================================
+Detected labels from 'Celltype' with 15 classes
+Cells=13514 genes=2000 edges=954885 density=0.0353 clusters=15
+========================================================================
+Step 2: build normalized bipartite graph and PlantSPADE-LGCL model
+========================================================================
+Parameters: 2,563,969
+========================================================================
+Step 3: train with BPR + SVD InfoNCE, negative_sampler=random_zero, plugins=BiSSM1D(d_state=64)
+========================================================================
+Epoch 001/80 loss=1.0802 bpr=0.6931 cl=7.7215 module=0.9699
+Epoch 005/80 loss=1.0448 bpr=0.6881 cl=7.1175 module=0.7774
+Epoch 010/80 loss=0.9213 bpr=0.5761 cl=6.8997 module=0.2646
+Epoch 015/80 loss=0.6648 bpr=0.3002 cl=7.2907 module=0.0690
+Epoch 020/80 loss=0.6484 bpr=0.2802 cl=7.3623 module=0.0502
+Epoch 025/80 loss=0.6196 bpr=0.2545 cl=7.3016 module=0.0450
+Epoch 030/80 loss=0.6016 bpr=0.2428 cl=7.1754 module=0.0610
+Epoch 035/80 loss=0.5897 bpr=0.2375 cl=7.0412 module=0.0801
+Epoch 040/80 loss=0.5775 bpr=0.2323 cl=6.9009 module=0.0915
+Epoch 045/80 loss=0.5660 bpr=0.2272 cl=6.7723 module=0.1030
+Epoch 050/80 loss=0.5495 bpr=0.2225 cl=6.5362 module=0.1458
+Epoch 055/80 loss=0.5416 bpr=0.2224 cl=6.3804 module=0.1724
+Epoch 060/80 loss=0.5322 bpr=0.2194 cl=6.2520 module=0.1981
+Epoch 065/80 loss=0.5240 bpr=0.2150 cl=6.1743 module=0.2112
+Epoch 070/80 loss=0.5218 bpr=0.2145 cl=6.1415 module=0.2211
+Epoch 075/80 loss=0.5206 bpr=0.2144 cl=6.1193 module=0.2212
+Epoch 080/80 loss=0.5225 bpr=0.2157 cl=6.1310 module=0.2204
+========================================================================
+Step 4: extract embeddings and evaluate fixed/oracle/sweep protocols
+========================================================================
+Fixed-protocol metrics: {'kmeans_known_k': {'acc': 0.37065265650436585, 'nmi': 0.32350694693611115, 'ari': 0.15974219865650272, 'f1_macro': 0.43093012106813106, 'fmi': 0.23419107606986952, 'v_measure': 0.32350694693611115, 'homogeneity': 0.3321530214021955, 'completeness': 0.3152995743596701, 'n_pred_clusters': 15, 'silhouette': 0.10811051726341248, 'protocol': 'fixed', 'cluster_method': 'kmeans_known_k', 'uses_known_k': True}, 'leiden_fixed': {'acc': 0.39573775344087614, 'nmi': 0.34375176053290707, 'ari': 0.1768493744484772, 'f1_macro': 0.429644928322907, 'fmi': 0.25401829711731927, 'v_measure': 0.3437517605329072, 'homogeneity': 0.3450489541390214, 'completeness': 0.34246428386034444, 'n_pred_clusters': 14, 'silhouette': 0.09496427327394485, 'protocol': 'fixed', 'cluster_method': 'leiden_fixed', 'resolution': 1.0, 'uses_known_k': False}}
+Results saved to: /home/luolie/biopipeline/dimension-reduction/plantnet/results/PlantSPADE_LGCL_protocol_plugins/SRP182008_mamba_alpha05_only_seed1
+============================================
+BiSSM1D-only run complete!
+============================================
