@@ -29,12 +29,10 @@ Deep baselines:
 
 The new runner re-evaluates their embeddings with the fixed protocol.
 
-## Archive / Exploratory Entrypoints
+## Excluded / Supplementary Entrypoints
 
 These are not part of the main table:
 
-- `methods/DeepLearning/PlantSPADE/run_plantspade.py`
-- `methods/DeepLearning/_archive/**`
 - `methods/GNN/scCDCG/run.py`
 - `methods/GNN/scDSC/run.py`
 - `methods/GNN/scGNN/run.py`
@@ -42,9 +40,5 @@ These are not part of the main table:
 - `methods/Foundation/scGPT/run.py`
 - `methods/Foundation/GeneFormer/run.py`
 - `methods/Foundation/GeneCompass/run.py`
-- root-level `infer_graphdiffusion.py`
-- root-level `infer_graphdiffusion_ckpt.py`
-- root-level `launch_doloris_eval.sh`
-- root-level `run_infer.py`
 
-Rationale: these entries are diffusion, graph-diffusion, unstable dependency, or foundation-model explorations. They can remain in the repository for history, but they should not be invoked by PlantSPADE-LGCL paper runs.
+Rationale: these entries have unstable dependencies or are outside the current plant-focused fixed-protocol comparison. Diffusion, maskdiffusion, DOLORIS, GraphDiffusion, and the old non-LGCL PlantSPADE implementation were removed during cleanup and should not be invoked by PlantSPADE-LGCL paper runs.

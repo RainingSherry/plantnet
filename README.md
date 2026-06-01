@@ -14,6 +14,7 @@ PlantSPADE-LGCL decomposes expression as `X = M o A`:
 - Interpretation: sparse `SupportGeneAttention` over each cell support set `S_c`, with candidate explanation genes compared against DEG markers.
 
 Full method notes are in `methods/DeepLearning/PlantSPADE_LGCL/docs/method_note.md`.
+Current run coverage and important result tables are summarized in `methods/DeepLearning/PlantSPADE_LGCL/docs/current_status.md`.
 
 ## Data
 
@@ -120,6 +121,6 @@ Aggregation writes:
 - `table_negative_sampling_ablation.csv`
 - `dataset_profiles_summary.csv`
 
-## Archive
+## Cleanup Note
 
-Diffusion, maskdiffusion, DOLORIS, GraphDiffusion, unstable GNN entries, and foundation-model experiments are retained as archive/exploratory code. They are not part of the main PlantSPADE-LGCL runner or main result tables. See `methods/DeepLearning/PlantSPADE_LGCL/docs/archive_note.md`.
+Diffusion, maskdiffusion, DOLORIS, and GraphDiffusion code/results have been removed from the working tree because they are not part of the current PlantSPADE-LGCL paper protocol. Unstable GNN entries and foundation-model experiments remain excluded from the main runner and tables. See `methods/DeepLearning/PlantSPADE_LGCL/docs/archive_note.md`.

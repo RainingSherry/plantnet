@@ -42,13 +42,12 @@ def parse_args():
     parser.add_argument("--datasets", default="Mouse_Pancreas_1,SRP182008,SRP171040")
     parser.add_argument(
         "--methods",
-        default="traditional_pca,traditional_leiden,traditional_louvain,traditional_sc3,codex_maskdiffusion,cursor2_maskdiffusion,cursor_maskdiffusion,scMAE,scVI,PhytoCluster,scCDCG",
+        default="traditional_pca,traditional_leiden,traditional_louvain,traditional_sc3,scMAE,scVI,PhytoCluster,scCDCG,plantspade_lgcl",
     )
     parser.add_argument("--root", default="benchmarks/unified_protocol")
     parser.add_argument("--gpus", default="1,2,3,4,5,6")
     parser.add_argument("--max_parallel", type=int, default=6)
     parser.add_argument("--deep_epochs", type=int, default=100)
-    parser.add_argument("--mask_epochs", type=int, default=150)
     parser.add_argument("--phyto_pretrain_iter", type=int, default=8000)
     parser.add_argument("--phyto_cluster_iter", type=int, default=1000)
     parser.add_argument("--seed", type=int, default=42)
@@ -63,40 +62,6 @@ def py():
 
 
 def build_command(method, data_path, save_dir, n_clusters, gpu, args):
-    if method == "codex_maskdiffusion":
-        return [
-            py(), "methods/DeepLearning/PlantSPADE/run_plantspade.py",
-            "--data_path", data_path, "--save_dir", save_dir, "--input_mode", "log1p",
-            "--n_top_genes", "2000", "--latent_dim", "32", "--epochs", str(args.mask_epochs),
-            "--warmup_epochs", "30", "--diffusion_ramp_epochs", "50", "--batch_size", "256",
-            "--lr", "1e-3", "--weight_decay", "1e-4", "--mask_loss_weight", "0.2",
-            "--recon_loss_weight", "0.8", "--diffusion_loss_weight", "0.05",
-            "--cluster_loss_weight", "0.0", "--eval_interval", "10", "--gpu", str(gpu),
-            "--seed", str(args.seed),
-        ]
-    if method == "cursor2_maskdiffusion":
-        return [
-            py(), "methods/DeepLearning/cursor2_Doloris/maskdiffusion/run.py",
-            "--data_path", data_path, "--save_dir", save_dir, "--input_mode", "log1p",
-            "--min_genes", "0", "--min_cells", "0", "--n_top_genes", "2000",
-            "--latent_dim", "32", "--epochs", str(args.mask_epochs), "--warmup_epochs", "30",
-            "--batch_size", "256", "--lr", "1e-3", "--weight_decay", "1e-4",
-            "--mask_loss_weight", "0.2", "--recon_loss_weight", "0.8",
-            "--diffusion_loss_weight", "0.05", "--cluster_loss_weight", "0.0",
-            "--diffusion_steps", "100", "--hidden_dim", "256", "--diffusion_hidden_dim", "256",
-            "--dropout", "0.1", "--gpu", str(gpu), "--seed", str(args.seed),
-            "--eval_interval", "10", "--cluster_methods", "kmeans",
-        ]
-    if method == "cursor_maskdiffusion":
-        return [
-            py(), "methods/DeepLearning/cursor_Doloris/maskdiffusion/run.py",
-            "--data_path", data_path, "--save_dir", save_dir, "--n_top_genes", "2000",
-            "--latent_dim", "32", "--epochs", str(args.mask_epochs), "--warmup_epochs", "30",
-            "--batch_size", "256", "--lr", "1e-3", "--weight_decay", "1e-4",
-            "--mask_loss_weight", "0.2", "--recon_loss_weight", "0.8",
-            "--diffusion_loss_weight", "0.05", "--cluster_loss_weight", "0.0",
-            "--eval_interval", "10", "--gpu", str(gpu), "--seed", str(args.seed),
-        ]
     if method == "scMAE":
         return [
             py(), "methods/DeepLearning/scMAE/run.py",
@@ -149,19 +114,7 @@ def load_embedding(path):
 
 def find_embeddings(method, save_dir):
     candidates = []
-    if method == "codex_maskdiffusion":
-        candidates.extend([
-            ("codex_maskdiffusion_direct", os.path.join(save_dir, "embeddings_direct.npy")),
-            ("codex_maskdiffusion_diffusion", os.path.join(save_dir, "embeddings_diffusion.npy")),
-        ])
-    elif method == "cursor2_maskdiffusion":
-        candidates.extend([
-            ("cursor2_maskdiffusion_direct", os.path.join(save_dir, "embeddings_direct.npy")),
-            ("cursor2_maskdiffusion_diffusion", os.path.join(save_dir, "embeddings_diffusion.npy")),
-        ])
-    elif method == "cursor_maskdiffusion":
-        candidates.append(("cursor_maskdiffusion", os.path.join(save_dir, "embeddings.npy")))
-    elif method in {"scMAE", "scCDCG", "PhytoCluster"}:
+    if method in {"scMAE", "scCDCG", "PhytoCluster"}:
         candidates.append((method, os.path.join(save_dir, "embedding.h5")))
     elif method == "plantspade_lgcl":
         candidates.append(("plantspade_lgcl", os.path.join(save_dir, "embedding_final.npy")))

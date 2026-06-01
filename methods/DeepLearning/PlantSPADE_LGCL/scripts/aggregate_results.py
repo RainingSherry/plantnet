@@ -44,11 +44,18 @@ def load_default_results_dir(main_config: str) -> Path:
 def read_metric_csvs(results_dir: Path) -> pd.DataFrame:
     patterns = ["**/*_fixed.csv", "**/*_oracle.csv", "**/*_sweep.csv"]
     frames = []
+    legacy_replacements = {
+        "plantspade_lgcl_fixed.csv": "eval_baseline_fixed.csv",
+        "plantspade_lgcl_sga_fixed.csv": "eval_support_attention_fixed.csv",
+    }
     for pattern in patterns:
         for path in sorted(results_dir.glob(pattern)):
             if path.name.startswith("table_") or path.name.startswith("all_results"):
                 continue
             if not path.name.startswith(("eval_", "pca_", "external_eval_", "sc3_eval_", "plantspade_lgcl_")):
+                continue
+            replacement = legacy_replacements.get(path.name)
+            if replacement and (path.parent / replacement).exists():
                 continue
             try:
                 df = pd.read_csv(path)
@@ -93,6 +100,10 @@ def mean_std_table(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def text_col(df: pd.DataFrame, column: str) -> pd.Series:
+    return df.get(column, pd.Series("", index=df.index)).fillna("").astype(str)
+
+
 def collect_profiles(results_dir: Path) -> pd.DataFrame:
     rows = []
     for path in sorted(results_dir.glob("**/dataset_profile.json")):
@@ -125,13 +136,44 @@ def main():
 
     fixed_all = long_df[long_df.get("protocol", pd.Series(dtype=str)).eq("fixed")].copy() if not long_df.empty else pd.DataFrame()
     if not fixed_all.empty:
-        method_text = fixed_all.get("method", pd.Series("", index=fixed_all.index)).astype(str)
-        variant_text = fixed_all.get("variant", pd.Series("", index=fixed_all.index)).astype(str)
+        method_text = text_col(fixed_all, "method")
+        variant_text = text_col(fixed_all, "variant")
         is_ablation = (
             method_text.str.contains("attention_no|topk_|neg_|neighbor_conflict|idf_weighted", case=False, na=False)
             | variant_text.str.contains("attention_no|topk_|neg_|neighbor_conflict|idf_weighted", case=False, na=False)
         )
         fixed_long = fixed_all[~is_ablation].copy()
+        fixed_long["method"] = fixed_long["method"].replace(
+            {
+                "plantspade_lgcl": "plantspade_lgcl_baseline",
+                "plantspade_lgcl_sga": "plantspade_lgcl_support_attention",
+                "plantspade_lgcl_sga_support_attention": "plantspade_lgcl_support_attention",
+            }
+        )
+        if "variant" in fixed_long.columns:
+            variant_defaults = {
+                "phytocluster": "embedding",
+                "scmae": "embedding",
+                "scvi": "embedding",
+                "traditional_pca": "pca",
+                "traditional_leiden": "leiden",
+                "traditional_louvain": "louvain",
+                "plantspade_lgcl_baseline": "baseline",
+                "plantspade_lgcl_support_attention": "support_attention",
+                "plantspade_lgcl_gated_fusion": "gated_fusion",
+            }
+            missing_variant = fixed_long["variant"].isna() | fixed_long["variant"].astype(str).eq("")
+            fixed_long.loc[missing_variant, "variant"] = fixed_long.loc[missing_variant, "method"].map(variant_defaults)
+        fixed_long = fixed_long[fixed_long["method"].astype(str).ne("plantspade_lgcl_sga_baseline")]
+        if "negative_sampler" in fixed_long.columns:
+            fixed_long["negative_sampler"] = ""
+        dedup_cols = [
+            col
+            for col in ["dataset", "method", "seed", "variant", "cluster_method", "protocol"]
+            if col in fixed_long.columns
+        ]
+        if dedup_cols:
+            fixed_long = fixed_long.drop_duplicates(subset=dedup_cols, keep="last")
         fixed = mean_std_table(fixed_long)
     else:
         fixed = pd.DataFrame()
@@ -141,20 +183,19 @@ def main():
     oracle.to_csv(output_dir / "table_oracle_supplement.csv", index=False)
 
     if not long_df.empty:
-        method_text = long_df.get("method", pd.Series("", index=long_df.index)).astype(str)
-        variant_text = long_df.get("variant", pd.Series("", index=long_df.index)).astype(str)
         att_fixed = long_df[long_df.get("protocol", pd.Series(dtype=str)).eq("fixed")].copy()
-        att_fixed_text = att_fixed.get("method", pd.Series("", index=att_fixed.index)).astype(str)
-        att_fixed_variant = att_fixed.get("variant", pd.Series("", index=att_fixed.index)).astype(str)
+        att_fixed_text = text_col(att_fixed, "method")
+        att_fixed_variant = text_col(att_fixed, "variant")
         attention = mean_std_table(att_fixed[
             att_fixed_text.str.contains("attention|sga|support_attention", case=False, na=False)
             | att_fixed_variant.str.contains("attention|support_attention", case=False, na=False)
         ])
         neg_fixed = long_df[long_df.get("protocol", pd.Series(dtype=str)).eq("fixed")].copy()
-        neg_fixed_text = neg_fixed.get("method", pd.Series("", index=neg_fixed.index)).astype(str)
+        neg_fixed_text = text_col(neg_fixed, "method")
+        neg_sampler = text_col(neg_fixed, "negative_sampler")
         negative = mean_std_table(neg_fixed[
             neg_fixed_text.str.contains("neg_|negative", case=False, na=False)
-            | neg_fixed.get("negative_sampler", pd.Series("", index=neg_fixed.index)).astype(str).ne("")
+            | neg_sampler.isin(["idf_weighted_zero", "neighbor_conflict_zero"])
         ])
     else:
         attention = pd.DataFrame()

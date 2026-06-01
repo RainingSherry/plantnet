@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional
 
 import numpy as np
 import scipy.sparse as sp
@@ -15,12 +15,19 @@ from .negative_sampling import NegativeSampler, NegativeSamplerConfig
 class GatedFusion(nn.Module):
     """Lightweight adaptive fusion for frozen cell-level LGCL views."""
 
-    def __init__(self, latent_dim: int, hidden_dim: int | None = None, dropout: float = 0.05):
+    def __init__(
+        self,
+        latent_dim: int,
+        hidden_dim: int | None = None,
+        dropout: float = 0.05,
+        extra_dim: int = 0,
+    ):
         super().__init__()
         self.latent_dim = int(latent_dim)
+        self.extra_dim = int(extra_dim)
         hidden = int(hidden_dim) if hidden_dim and hidden_dim > 0 else max(8, self.latent_dim)
         self.gate_mlp = nn.Sequential(
-            nn.Linear(3 * self.latent_dim, hidden),
+            nn.Linear(3 * self.latent_dim + self.extra_dim, hidden),
             nn.GELU(),
             nn.Dropout(float(dropout)),
             nn.Linear(hidden, 3),
@@ -35,17 +42,24 @@ class GatedFusion(nn.Module):
         z_global: torch.Tensor,
         z_attention: torch.Tensor,
         batch_cells: torch.Tensor | None = None,
+        extra: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         if batch_cells is not None:
             support = z_support[batch_cells]
             global_view = z_global[batch_cells]
             attention = z_attention[batch_cells]
+            extra_batch = extra[batch_cells] if extra is not None else None
         else:
             support = z_support
             global_view = z_global
             attention = z_attention
+            extra_batch = extra
+
         stacked = torch.stack((support, global_view, attention), dim=1)
-        gate_logits = self.gate_mlp(torch.cat((support, global_view, attention), dim=1))
+        gate_in = torch.cat((support, global_view, attention), dim=1)
+        if extra_batch is not None:
+            gate_in = torch.cat((gate_in, extra_batch), dim=1)
+        gate_logits = self.gate_mlp(gate_in)
         gate = torch.softmax(gate_logits, dim=1)
         fused = torch.sum(gate.unsqueeze(-1) * stacked, dim=1)
         return F.normalize(fused, dim=1), gate
@@ -67,6 +81,11 @@ class GatedFusionConfig:
     seed: int = 42
     negative_sampler: str = "random_zero"
     negative_neighbor_k: int = 15
+
+    # Optional enhancements inspired by dynamic fusion literature
+    use_cell_stats: bool = True
+    gate_entropy_weight: float = 0.0
+    gate_balance_weight: float = 0.0
 
 
 class FrozenSupportPairSampler:
@@ -132,7 +151,25 @@ def train_gated_fusion(
         raise ValueError(f"Cell embeddings must be 2-D, got {z_support.shape}")
 
     latent_dim = int(z_support.shape[1])
-    model = GatedFusion(latent_dim=latent_dim, hidden_dim=config.hidden_dim, dropout=config.dropout).to(device)
+
+    # Optional per-cell statistics as extra gating input (helps robustness across datasets)
+    cell_stats_t: Optional[torch.Tensor] = None
+    extra_dim = 0
+    if config.use_cell_stats:
+        deg = np.diff(support.tocsr().indptr).astype(np.float32)
+        lib = np.asarray(support.sum(axis=1)).ravel().astype(np.float32)
+        # log-scale then standardize
+        stats = np.stack((np.log1p(deg), np.log1p(lib)), axis=1)
+        stats = (stats - stats.mean(axis=0, keepdims=True)) / (stats.std(axis=0, keepdims=True) + 1e-6)
+        cell_stats_t = _as_float_tensor(stats, device)
+        extra_dim = int(cell_stats_t.shape[1])
+
+    model = GatedFusion(
+        latent_dim=latent_dim,
+        hidden_dim=config.hidden_dim,
+        dropout=config.dropout,
+        extra_dim=extra_dim,
+    ).to(device)
     z_support_t = _as_float_tensor(z_support, device)
     z_global_t = _as_float_tensor(z_global, device)
     z_attention_t = _as_float_tensor(z_attention, device)
@@ -170,7 +207,7 @@ def train_gated_fusion(
         cells = torch.as_tensor(cells_np, dtype=torch.long, device=device)
         pos = torch.as_tensor(pos_np, dtype=torch.long, device=device)
         neg = torch.as_tensor(neg_np, dtype=torch.long, device=device)
-        fused_pairs, gate_pairs = model(z_support_t, z_global_t, z_attention_t, batch_cells=cells)
+        fused_pairs, gate_pairs = model(z_support_t, z_global_t, z_attention_t, batch_cells=cells, extra=cell_stats_t)
         pos_scores = torch.sum(fused_pairs * gene_t[pos], dim=1)
         neg_scores = torch.sum(fused_pairs * gene_t[neg], dim=1)
         bpr = F.softplus(-(pos_scores - neg_scores)).mean()
@@ -180,7 +217,13 @@ def train_gated_fusion(
             dtype=torch.long,
             device=device,
         )
-        fused_batch, _ = model(z_support_t, z_global_t, z_attention_t, batch_cells=contrastive_cells)
+        fused_batch, _ = model(
+            z_support_t,
+            z_global_t,
+            z_attention_t,
+            batch_cells=contrastive_cells,
+            extra=cell_stats_t,
+        )
         contrastive = (
             _symmetric_infonce(fused_batch, support_target_t[contrastive_cells], config.temperature)
             + _symmetric_infonce(fused_batch, global_target_t[contrastive_cells], config.temperature)
@@ -195,6 +238,16 @@ def train_gated_fusion(
             + float(config.contrastive_weight) * contrastive
             + float(config.consistency_weight) * consistency
         )
+
+        # Optional gate regularization to reduce view collapse
+        if config.gate_entropy_weight and config.gate_entropy_weight > 0.0:
+            gate_entropy = -(gate_pairs * torch.log(gate_pairs.clamp_min(1e-12))).sum(dim=1).mean()
+            loss = loss - float(config.gate_entropy_weight) * gate_entropy
+        if config.gate_balance_weight and config.gate_balance_weight > 0.0:
+            gate_mean_t = gate_pairs.mean(dim=0)
+            target = torch.full_like(gate_mean_t, 1.0 / 3.0)
+            gate_balance = torch.sum((gate_mean_t - target) ** 2)
+            loss = loss + float(config.gate_balance_weight) * gate_balance
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         optimizer.step()
@@ -210,7 +263,7 @@ def train_gated_fusion(
 
     model.eval()
     with torch.no_grad():
-        fused, gate = model(z_support_t, z_global_t, z_attention_t, batch_cells=None)
+        fused, gate = model(z_support_t, z_global_t, z_attention_t, batch_cells=None, extra=cell_stats_t)
     return (
         fused.detach().cpu().numpy().astype(np.float32),
         gate.detach().cpu().numpy().astype(np.float32),

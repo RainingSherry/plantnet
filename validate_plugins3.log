@@ -1,0 +1,84 @@
+============================================
+Running BASELINE on SRP182008 (seed=1)
+============================================
+Using device: cuda:0
+========================================================================
+Step 1: load h5ad, build raw-count support M and log1p amplitude A
+========================================================================
+Detected labels from 'Celltype' with 15 classes
+Cells=13514 genes=2000 edges=954885 density=0.0353 clusters=15
+========================================================================
+Step 2: build normalized bipartite graph and PlantSPADE-LGCL model
+========================================================================
+Parameters: 497,984
+========================================================================
+Step 3: train with BPR + SVD InfoNCE, negative_sampler=random_zero, plugins=baseline
+========================================================================
+Epoch 001/80 loss=1.0954 bpr=0.6931 cl=8.0280 module=0.8680
+Epoch 005/80 loss=1.0386 bpr=0.6931 cl=6.8942 module=0.7803
+Epoch 010/80 loss=0.9989 bpr=0.6931 cl=6.1033 module=0.6883
+Epoch 015/80 loss=0.9726 bpr=0.6930 cl=5.5810 module=0.5151
+Epoch 020/80 loss=0.9546 bpr=0.6930 cl=5.2229 module=0.4833
+Epoch 025/80 loss=0.9409 bpr=0.6929 cl=4.9503 module=0.4441
+Epoch 030/80 loss=0.9312 bpr=0.6929 cl=4.7587 module=0.4121
+Epoch 035/80 loss=0.9244 bpr=0.6929 cl=4.6225 module=0.3861
+Epoch 040/80 loss=0.9188 bpr=0.6928 cl=4.5128 module=0.3732
+Epoch 045/80 loss=0.9149 bpr=0.6928 cl=4.4343 module=0.3836
+Epoch 050/80 loss=0.9117 bpr=0.6928 cl=4.3702 module=0.3594
+Epoch 055/80 loss=0.9103 bpr=0.6928 cl=4.3421 module=0.3459
+Epoch 060/80 loss=0.9080 bpr=0.6928 cl=4.2967 module=0.3465
+Epoch 065/80 loss=0.9074 bpr=0.6928 cl=4.2847 module=0.3437
+Epoch 070/80 loss=0.9068 bpr=0.6928 cl=4.2730 module=0.3405
+Epoch 075/80 loss=0.9061 bpr=0.6928 cl=4.2590 module=0.3420
+Epoch 080/80 loss=0.9065 bpr=0.6928 cl=4.2667 module=0.3398
+========================================================================
+Step 4: extract embeddings and evaluate fixed/oracle/sweep protocols
+========================================================================
+Fixed-protocol metrics: {'kmeans_known_k': {'acc': 0.5951605742193281, 'nmi': 0.5741501363487657, 'ari': 0.3983328355545149, 'f1_macro': 0.5785898933629186, 'fmi': 0.45422074870644985, 'v_measure': 0.5741501363487655, 'homogeneity': 0.5962244635609486, 'completeness': 0.5536519918144145, 'n_pred_clusters': 15, 'silhouette': 0.11222321540117264, 'protocol': 'fixed', 'cluster_method': 'kmeans_known_k', 'uses_known_k': True}, 'leiden_fixed': {'acc': 0.7798579251146959, 'nmi': 0.6363083531913284, 'ari': 0.4323260500443534, 'f1_macro': 0.7755448407608205, 'fmi': 0.4958667185948702, 'v_measure': 0.6363083531913285, 'homogeneity': 0.7108939756913529, 'completeness': 0.5758873636022679, 'n_pred_clusters': 25, 'silhouette': 0.11387123912572861, 'protocol': 'fixed', 'cluster_method': 'leiden_fixed', 'resolution': 1.0, 'uses_known_k': False}}
+Results saved to: /home/luolie/biopipeline/dimension-reduction/plantnet/results/PlantSPADE_LGCL_protocol_plugins/SRP182008_baseline_seed1
+============================================
+Running PLUGIN-ENHANCED on SRP182008 (seed=1)
+Plugins: FCR + PolaLinearAttention + BiMamba2 + CTRGC
+============================================
+Using device: cuda:0
+========================================================================
+Step 1: load h5ad, build raw-count support M and log1p amplitude A
+========================================================================
+Detected labels from 'Celltype' with 15 classes
+Cells=13514 genes=2000 edges=954885 density=0.0353 clusters=15
+========================================================================
+Step 2: build normalized bipartite graph and PlantSPADE-LGCL model
+========================================================================
+Parameters: 541,192
+========================================================================
+Step 3: train with BPR + SVD InfoNCE, negative_sampler=random_zero, plugins=BiSSM1D(d_state=64) + CTRGC(rel_red=8)
+========================================================================
+Epoch 001/80 loss=1.1016 bpr=0.7010 cl=7.9932 module=0.9042
+Epoch 005/80 loss=1.0061 bpr=0.6295 cl=7.5181 module=0.6982
+Epoch 010/80 loss=0.8611 bpr=0.4898 cl=7.4171 module=0.3900
+Epoch 015/80 loss=0.7897 bpr=0.4208 cl=7.3740 module=0.2083
+Epoch 020/80 loss=0.7481 bpr=0.3830 cl=7.3000 module=0.1703
+Epoch 025/80 loss=0.7303 bpr=0.3706 cl=7.1901 module=0.1463
+Epoch 030/80 loss=0.7158 bpr=0.3634 cl=7.0449 module=0.1407
+Epoch 035/80 loss=0.7050 bpr=0.3604 cl=6.8909 module=0.1378
+Epoch 040/80 loss=0.6971 bpr=0.3617 cl=6.7050 module=0.1567
+Epoch 045/80 loss=0.6907 bpr=0.3629 cl=6.5531 module=0.1810
+Epoch 050/80 loss=0.6817 bpr=0.3626 cl=6.3781 module=0.1930
+Epoch 055/80 loss=0.6787 bpr=0.3640 cl=6.2897 module=0.1909
+Epoch 060/80 loss=0.6749 bpr=0.3648 cl=6.1973 module=0.2037
+Epoch 065/80 loss=0.6709 bpr=0.3633 cl=6.1474 module=0.2061
+Epoch 070/80 loss=0.6704 bpr=0.3643 cl=6.1183 module=0.2078
+Epoch 075/80 loss=0.6710 bpr=0.3639 cl=6.1388 module=0.2048
+Epoch 080/80 loss=0.6701 bpr=0.3644 cl=6.1100 module=0.2054
+========================================================================
+Step 4: extract embeddings and evaluate fixed/oracle/sweep protocols
+========================================================================
+Fixed-protocol metrics: {'kmeans_known_k': {'acc': 0.4727689803167086, 'nmi': 0.42418746159227655, 'ari': 0.244346652808403, 'f1_macro': 0.494203571708419, 'fmi': 0.3136083564168913, 'v_measure': 0.42418746159227655, 'homogeneity': 0.432447381635788, 'completeness': 0.41623716328121757, 'n_pred_clusters': 15, 'silhouette': 0.11325571686029434, 'protocol': 'fixed', 'cluster_method': 'kmeans_known_k', 'uses_known_k': True}, 'leiden_fixed': {'acc': 0.4840905727393814, 'nmi': 0.44646371586798467, 'ari': 0.27400853722933094, 'f1_macro': 0.49675317380745115, 'fmi': 0.3392544614693549, 'v_measure': 0.4464637158679846, 'homogeneity': 0.45977824602678974, 'completeness': 0.43389862312303756, 'n_pred_clusters': 16, 'silhouette': 0.08134721219539642, 'protocol': 'fixed', 'cluster_method': 'leiden_fixed', 'resolution': 1.0, 'uses_known_k': False}}
+Results saved to: /home/luolie/biopipeline/dimension-reduction/plantnet/results/PlantSPADE_LGCL_protocol_plugins/SRP182008_plugins_seed1
+============================================
+Running BASELINE on SRP171040 (seed=1)
+============================================
+OpenBLAS warning: precompiled NUM_THREADS exceeded, adding auxiliary array for thread metadata.
+To avoid this warning, please rebuild your copy of OpenBLAS with a larger NUM_THREADS setting
+or set the environment variable OPENBLAS_NUM_THREADS to 64 or lower
+validate_plugins.sh: line 18: 2627842 Segmentation fault      (core dumped) python "$ROOT/methods/DeepLearning/PlantSPADE_LGCL/run_plantspade.py" --data_path "$DATA_DIR/${dataset}.h5ad" --save_dir "$save_dir" --dataset_name "$name" --seed "$SEED" --gpu 0 --latent_dim "$LATENT_DIM" --epochs "$EPOCHS" --n_top_genes 2000 --layers 2 --temperature 0.2 --contrastive_weight 0.05 --module_weight 0.001 --num_modules 16 --module_top_k 30 --negative_sampler random_zero --n_clusters 0 --leiden_fixed_resolution 1.0 --eval_neighbors 15 --use_support_attention false --use_trainable_attention_refiner false --use_gated_fusion false

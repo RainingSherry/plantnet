@@ -41,8 +41,6 @@ sc3:
   include_in_main: false
   skipped_reason: Use as supplementary only when cell-count limit is satisfied.
 archive_excluded_from_main:
-  - methods/DeepLearning/PlantSPADE
-  - methods/DeepLearning/_archive
   - methods/Foundation/scGPT
   - methods/Foundation/GeneFormer
   - methods/Foundation/GeneCompass

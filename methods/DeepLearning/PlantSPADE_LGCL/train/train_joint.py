@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ..negative_sampling import NegativeSampler, NegativeSamplerConfig
+from ..plugins import FCRLoss, PolaContrastiveLoss, BiSSM1D, CTRGC
 
 
 def scipy_to_torch_sparse(matrix: sp.spmatrix, device: torch.device) -> torch.Tensor:
@@ -125,6 +126,18 @@ class PlantSPADELGCL(nn.Module):
         temperature: float = 0.2,
         num_modules: int = 16,
         module_top_k: int = 30,
+        # Plugin flags
+        use_fcr: bool = False,
+        use_pola_attention: bool = False,
+        pola_num_heads: int = 8,
+        pola_alpha: float = 4.0,
+        use_mamba: bool = False,
+        mamba_d_state: int = 128,
+        mamba_headdim: int = 64,
+        mamba_chunk_size: int = 64,
+        use_ctr_gc: bool = False,
+        ctr_gc_rel_reduction: int = 8,
+        ssm_alpha: float = 0.05,
     ):
         super().__init__()
         self.n_cells = int(n_cells)
@@ -133,6 +146,11 @@ class PlantSPADELGCL(nn.Module):
         self.num_layers = int(num_layers)
         self.edge_dropout = float(edge_dropout)
         self.temperature = float(temperature)
+        # Plugin flags
+        self.use_fcr = use_fcr
+        self.use_pola_attention = use_pola_attention
+        self.use_mamba = use_mamba
+        self.use_ctr_gc = use_ctr_gc
 
         self.cell_embedding = nn.Embedding(self.n_cells, self.latent_dim)
         self.gene_embedding = nn.Embedding(self.n_genes, self.latent_dim)
@@ -150,6 +168,48 @@ class PlantSPADELGCL(nn.Module):
         else:
             self.module_layer = None
 
+        # Plugin: PolaContrastiveLoss — polarity-aware contrastive loss
+        if self.use_pola_attention:
+            self.pola_loss = PolaContrastiveLoss(
+                dim=self.latent_dim,
+                num_heads=pola_num_heads,
+                alpha=pola_alpha,
+            )
+
+        # Plugin: BiSSM1D — bidirectional state space model for long-range dependencies
+        if self.use_mamba:
+            self.ssm_cell = BiSSM1D(
+                cin=self.latent_dim,
+                cout=self.latent_dim,
+                d_state=mamba_d_state,
+                expand=2,
+            )
+            self.ssm_gene = BiSSM1D(
+                cin=self.latent_dim,
+                cout=self.latent_dim,
+                d_state=mamba_d_state,
+                expand=2,
+            )
+            # Learnable scaling factor for SSM residual contribution.
+            # Initialized to a small value so SSM starts as a gentle perturbation to LightGCN.
+            self.ssm_alpha = nn.Parameter(torch.tensor(float(ssm_alpha)))
+
+        # Plugin: CTR-GC — channel-wise topology refinement for gene co-expression
+        # CTR-GC treats each gene as a "channel" and learns gene-gene topology via
+        # learned channel affinity + einsum-based aggregation.
+        # We apply it to a capped subset of genes (cap=64) to keep O(g^2) tractable.
+        if self.use_ctr_gc:
+            self.ctr_gc_max_genes = min(n_genes, 64)  # cap at 64 to keep (64, latent_dim, 64) ~ 8K elements
+            self.ctr_gc = CTRGC(
+                in_channels=self.latent_dim,
+                out_channels=self.latent_dim,
+                rel_reduction=ctr_gc_rel_reduction,
+            )
+
+        # Plugin: FCR — frequency contrastive regularization loss (applied in forward)
+        if self.use_fcr:
+            self.fcr_loss = FCRLoss(seq_len=1, emb_dim=self.latent_dim)
+
     def propagate(self, edge_dropout: Optional[float] = None) -> Tuple[torch.Tensor, torch.Tensor]:
         adj = self.adj_norm
         if self.training:
@@ -160,12 +220,42 @@ class PlantSPADELGCL(nn.Module):
         gene_emb = self.gene_embedding.weight
         cell_layers = [cell_emb]
         gene_layers = [gene_emb]
+
+        # Standard LightGCN bipartite propagation
         for _ in range(self.num_layers):
             next_cell = torch.sparse.mm(adj, gene_layers[-1])
             next_gene = torch.sparse.mm(adj_t, cell_layers[-1])
             cell_layers.append(next_cell)
             gene_layers.append(next_gene)
-        return torch.stack(cell_layers, dim=0).mean(dim=0), torch.stack(gene_layers, dim=0).mean(dim=0)
+
+        local_cells = torch.stack(cell_layers, dim=0).mean(dim=0)
+        local_genes = torch.stack(gene_layers, dim=0).mean(dim=0)
+
+        # Plugin: BiSSM1D — bidirectional SSM for long-range cell/gene dependencies
+        if self.use_mamba:
+            ssm_cell_in = local_cells.T.unsqueeze(0)  # (1, latent_dim, n_cells)
+            ssm_gene_in = local_genes.T.unsqueeze(0)  # (1, latent_dim, n_genes)
+            ssm_cell_out = self.ssm_cell(ssm_cell_in).squeeze(0).T  # (n_cells, latent_dim)
+            ssm_gene_out = self.ssm_gene(ssm_gene_in).squeeze(0).T  # (n_genes, latent_dim)
+            # Residual with learnable scaling — avoid F.normalize which distorts SSM contribution.
+            # ssm_alpha: small initial (0.01-0.1) to keep SSM perturbation gentle.
+            local_cells = local_cells + self.ssm_alpha * ssm_cell_out
+            local_genes = local_genes + self.ssm_alpha * ssm_gene_out
+
+        # Plugin: CTR-GC — channel-wise topology refinement on projected gene embeddings
+        if self.use_ctr_gc:
+            # CTRGC's conv/mean operations create view tensors that conflict with autograd.
+            # Solution: run CTRGC in eval mode (non-trainable refiner), detach its output,
+            # and train only the residual scaling via gradient flow through the addition.
+            capped_n = self.ctr_gc_max_genes
+            with torch.no_grad():
+                ctr_input = local_genes[:capped_n].T.unsqueeze(0).unsqueeze(-1)  # (1, latent_dim, capped_n, 1)
+                ctr_out = self.ctr_gc(ctr_input)  # (1, latent_dim, capped_n, capped_n)
+                ctr_per_gene = ctr_out.mean(dim=-1).squeeze(0).T  # (capped_n, latent_dim)
+            # Gradient flows only through the residual connection
+            local_genes[:capped_n] = F.normalize(local_genes[:capped_n] + ctr_per_gene, dim=1)
+
+        return local_cells, local_genes
 
     def projected_global(self) -> torch.Tensor:
         return self.global_projection(self.global_cell_embedding)
@@ -194,6 +284,29 @@ class PlantSPADELGCL(nn.Module):
             labels = torch.arange(logits.shape[0], device=logits.device)
             contrastive = 0.5 * (F.cross_entropy(logits, labels) + F.cross_entropy(logits.T, labels))
 
+        # Plugin: PolaContrastiveLoss — polarity-aware contrastive loss between local and global views
+        # NOTE: PolaLoss has a very different scale (~5-7) from BPR (~0.5-0.7).
+        # To use it, set pola_attention_weight very low (e.g. 0.001) or replace it with
+        # a properly normalized version. Currently disabled by default.
+        pola_loss = torch.zeros((), dtype=torch.float32, device=cells.device)
+        if self.use_pola_attention and contrastive_cells is not None and contrastive_cells.numel() > 4:
+            batch = contrastive_cells[: min(512, contrastive_cells.numel())]
+            local_batch = F.normalize(local_cells[batch], dim=1)  # (B, latent_dim)
+            global_batch = F.normalize(self.projected_global()[batch], dim=1)  # (B, latent_dim)
+            # PolaLoss is ~5-7 scale; scaled by 0.001 to be below BPR contribution
+            pola_loss = self.pola_loss(local_batch, global_batch, self.temperature) * 0.001
+
+        # Plugin: FCR — frequency contrastive regularization over embedding batches
+        fcr = torch.zeros((), dtype=torch.float32, device=cells.device)
+        if self.use_fcr and contrastive_cells is not None and contrastive_cells.numel() > 4:
+            fcr_batch = contrastive_cells[: min(256, contrastive_cells.numel())]
+            anchor_emb = F.normalize(local_cells[fcr_batch], dim=1)
+            positive_emb = F.normalize(self.projected_global()[fcr_batch], dim=1)
+            with torch.no_grad():
+                neg_idx = torch.randperm(anchor_emb.shape[0], device=anchor_emb.device)[:anchor_emb.shape[0]]
+            negative_emb = F.normalize(local_cells[fcr_batch[neg_idx]], dim=1)
+            fcr = self.fcr_loss(anchor_emb, positive_emb, negative_emb)
+
         module_loss = torch.zeros((), dtype=torch.float32, device=cells.device)
         if self.module_layer is not None and module_cells is not None and module_cells.numel() > 0:
             module_out = self.module_layer(F.normalize(local_cells, dim=1), F.normalize(local_genes, dim=1))
@@ -204,6 +317,8 @@ class PlantSPADELGCL(nn.Module):
         return {
             "bpr": bpr,
             "contrastive": contrastive,
+            "pola_loss": pola_loss,
+            "fcr": fcr,
             "module": module_loss,
             "local_cells": local_cells,
             "local_genes": local_genes,
@@ -276,6 +391,21 @@ class LGCLTrainConfig:
     seed: int = 42
     negative_sampler: str = "random_zero"
     negative_neighbor_k: int = 15
+    # Plugin: FCR (Frequency Contrastive Regularization)
+    use_fcr: bool = False
+    fcr_weight: float = 0.05
+    # Plugin: PolaLinearAttention
+    use_pola_attention: bool = False
+    pola_num_heads: int = 8
+    pola_alpha: float = 4.0
+    pola_attention_weight: float = 0.05
+    # Plugin: BiSSM1D
+    use_mamba: bool = False
+    mamba_d_state: int = 64
+    # Plugin: CTR-GC
+    use_ctr_gc: bool = False
+    ctr_gc_rel_reduction: int = 8
+    ctr_gc_weight: float = 0.05
 
 
 def train_lgcl(
@@ -293,7 +423,7 @@ def train_lgcl(
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.lr, weight_decay=config.weight_decay)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max(1, config.epochs))
     rng = np.random.default_rng(config.seed + 1009)
-    history = {"loss": [], "bpr": [], "contrastive": [], "module": []}
+    history = {"loss": [], "bpr": [], "contrastive": [], "module": [], "pola_loss": [], "fcr": []}
 
     for epoch in range(1, config.epochs + 1):
         model.train()
@@ -308,7 +438,18 @@ def train_lgcl(
 
         optimizer.zero_grad(set_to_none=True)
         out = model(cells, pos, neg, contrastive_cells=contrastive_cells, module_cells=module_cells)
-        loss = out["bpr"] + config.contrastive_weight * out["contrastive"] + config.module_weight * out["module"]
+        loss = out["bpr"]
+        loss = loss + config.contrastive_weight * out["contrastive"]
+        loss = loss + config.module_weight * out["module"]
+
+        # Plugin: PolaLinearAttention loss
+        if model.use_pola_attention and "pola_loss" in out:
+            loss = loss + float(config.pola_attention_weight) * out["pola_loss"]
+
+        # Plugin: FCR loss
+        if model.use_fcr and "fcr" in out:
+            loss = loss + float(config.fcr_weight) * out["fcr"]
+
         loss.backward()
         if config.grad_clip and config.grad_clip > 0:
             torch.nn.utils.clip_grad_norm_(model.parameters(), config.grad_clip)
@@ -320,13 +461,20 @@ def train_lgcl(
             "bpr": float(out["bpr"].detach().cpu()),
             "contrastive": float(out["contrastive"].detach().cpu()),
             "module": float(out["module"].detach().cpu()),
+            "pola_loss": float(out["pola_loss"].detach().cpu()) if "pola_loss" in out else 0.0,
+            "fcr": float(out["fcr"].detach().cpu()) if "fcr" in out else 0.0,
         }
         for key, value in metrics.items():
             history[key].append(value)
         if epoch == 1 or epoch == config.epochs or epoch % max(1, config.log_interval) == 0:
+            extra = ""
+            if model.use_pola_attention:
+                extra += f" pola={metrics['pola_loss']:.4f}"
+            if model.use_fcr:
+                extra += f" fcr={metrics['fcr']:.4f}"
             print(
                 f"Epoch {epoch:03d}/{config.epochs} "
                 f"loss={metrics['loss']:.4f} bpr={metrics['bpr']:.4f} "
-                f"cl={metrics['contrastive']:.4f} module={metrics['module']:.4f}"
+                f"cl={metrics['contrastive']:.4f} module={metrics['module']:.4f}{extra}"
             )
     return history
