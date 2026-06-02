@@ -268,6 +268,8 @@ def main():
 
     # Set device
     args.cuda = not args.no_cuda and torch.cuda.is_available()
+    if args.cuda:
+        torch.cuda.set_device(args.gpu)
     device = torch.device(f'cuda:{args.gpu}' if args.cuda else 'cpu')
     print(f'Using device: {device}')
 
@@ -316,7 +318,7 @@ def main():
     print('Building KNN graph...')
     adj = build_graph(X, k=args.k_neighbors)
     if args.cuda:
-        adj = adj.cuda()
+        adj = adj.to(device)
 
     # Initialize model
     print('Initializing scDSC model...')

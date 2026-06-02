@@ -1,0 +1,33 @@
+{
+  "dataset": "SRP171040",
+  "method": "scDCC",
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/benchmarks/unified_protocol/runs/SRP171040/scDCC/embedding.h5",
+  "label_key": "Celltype",
+  "metrics": {
+    "kmeans": {
+      "acc": 0.4030510071857698,
+      "nmi": 0.46861981919061196,
+      "ari": 0.2594675636810664,
+      "f1_macro": 0.3685967048711607,
+      "fmi": 0.33956460012558837,
+      "v_measure": 0.46861981919061196,
+      "homogeneity": 0.48075364065035253,
+      "completeness": 0.4570834145228772,
+      "n_pred_clusters": 12,
+      "silhouette": NaN
+    },
+    "leiden": {
+      "acc": 0.3918895040640829,
+      "nmi": 0.4059959437123594,
+      "ari": 0.19867847187775078,
+      "f1_macro": 0.32959333989746925,
+      "fmi": 0.2816383141812633,
+      "v_measure": 0.40599594371235936,
+      "homogeneity": 0.5101907079057728,
+      "completeness": 0.33714234358725376,
+      "n_pred_clusters": 44,
+      "silhouette": NaN,
+      "resolution": 1.0
+    }
+  }
+}

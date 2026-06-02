@@ -22,6 +22,14 @@ from benchmark_util import *
 from gae_embedding import GAEembedding, measure_clustering_results, test_clustering_benchmark_results
 import torch.multiprocessing as mp
 
+def sparse_to_dense_array(matrix):
+    if hasattr(matrix, 'toarray'):
+        return np.asarray(matrix.toarray())
+    if hasattr(matrix, 'todense'):
+        return np.asarray(matrix.todense())
+    return np.asarray(matrix)
+
+
 parser = argparse.ArgumentParser(description='Main entrance of scGNN')
 parser.add_argument('--datasetName', type=str, default='481193cb-c021-4e04-b477-0b7cfef4614b.mtx',
                     help='For 10X: folder name of 10X dataset; For CSV: csv file name')
@@ -251,7 +259,7 @@ def train(epoch, train_loader=train_loader, EMFlag=False, taskType='celltype', s
                 # print('celltype Mem consumption: '+str(mem))
 
                 adjsampleBatch = adj[dataindex, :][:, dataindex]
-                adjsampleBatch = sp.csr_matrix.todense(adjsampleBatch)
+                adjsampleBatch = sparse_to_dense_array(adjsampleBatch)
                 adjsampleBatch = torch.from_numpy(adjsampleBatch)
                 if args.precisionModel == 'Float':
                     adjsampleBatch = adjsampleBatch.float()
@@ -754,7 +762,7 @@ if __name__ == "__main__":
     # Better option: use torch.sparse
     if args.sparseImputation == 'nonsparse':
         # generate adj from edgeList
-        adjdense = sp.csr_matrix.todense(adj)
+        adjdense = sparse_to_dense_array(adj)
         adjsample = torch.from_numpy(adjdense)
         if args.precisionModel == 'Float':
             adjsample = adjsample.float()

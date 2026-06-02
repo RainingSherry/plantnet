@@ -10,7 +10,12 @@ class ZINBLoss(nn.Module):
 
     def forward(self, x, mean, disp, pi, scale_factor=1.0,    ridge_lambda=0.0):
         eps = 1e-10
-        scale_factor = scale_factor[:, None]
+        if not torch.is_tensor(scale_factor):
+            scale_factor = torch.as_tensor(scale_factor, dtype=mean.dtype, device=mean.device)
+        else:
+            scale_factor = scale_factor.to(device=mean.device, dtype=mean.dtype)
+        if scale_factor.dim() == 1:
+            scale_factor = scale_factor[:, None]
         mean = mean * scale_factor
         
         t1 = torch.lgamma(disp+eps) + torch.lgamma(x+1.0) - torch.lgamma(x+disp+eps)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import glob
+import importlib.util
 import os
 import subprocess
 import sys
@@ -35,6 +36,12 @@ DATASETS = {
 }
 
 _PCA_CACHE = {}
+METHOD_DEPS = {
+    "desc": ("tensorflow",),
+    "scDeepCluster": ("tensorflow", "keras"),
+    "scNAME": ("tensorflow", "keras"),
+    "scziDesk": ("tensorflow", "keras"),
+}
 
 
 def parse_args():
@@ -42,7 +49,12 @@ def parse_args():
     parser.add_argument("--datasets", default="Mouse_Pancreas_1,SRP182008,SRP171040")
     parser.add_argument(
         "--methods",
-        default="traditional_pca,traditional_leiden,traditional_louvain,traditional_sc3,scMAE,scVI,PhytoCluster,scCDCG,plantspade_lgcl",
+        default=(
+            "traditional_pca,traditional_leiden,traditional_louvain,traditional_sc3,"
+            "scMAE,scVI,PhytoCluster,scCDCG,plantspade_lgcl,"
+            "dec,scDCC,desc,scDeepCluster,scNAME,scziDesk,"
+            "scDSC,AttentionAE-sc,scGNN"
+        ),
     )
     parser.add_argument("--root", default="benchmarks/unified_protocol")
     parser.add_argument("--gpus", default="1,2,3,4,5,6")
@@ -61,7 +73,47 @@ def py():
     return sys.executable
 
 
+def missing_dependencies(method):
+    return [dep for dep in METHOD_DEPS.get(method, ()) if importlib.util.find_spec(dep) is None]
+
+
 def build_command(method, data_path, save_dir, n_clusters, gpu, args):
+    standard_h5_methods = {
+        "dec": ("methods/DeepLearning/dec/run.py", ["--pretrain_epochs", str(args.deep_epochs)]),
+        "scDCC": ("methods/DeepLearning/scDCC/run.py", ["--pretrain_epochs", str(args.deep_epochs)]),
+        "desc": ("methods/DeepLearning/desc/run.py", ["--pretrain_epochs", str(args.deep_epochs), "--max_iter", str(args.deep_epochs)]),
+        "scDeepCluster": ("methods/DeepLearning/scDeepCluster/run.py", ["--pretrain_epochs", str(args.deep_epochs), "--maxiter", str(args.deep_epochs)]),
+        "scNAME": ("methods/DeepLearning/scNAME/run.py", ["--pretrain_epochs", str(args.deep_epochs)]),
+        "scziDesk": ("methods/DeepLearning/scziDesk/run.py", ["--pretrain_epochs", str(args.deep_epochs)]),
+    }
+    if method in standard_h5_methods:
+        script, extra = standard_h5_methods[method]
+        return [
+            py(), script,
+            "--data_path", data_path, "--save_dir", save_dir, "--n_clusters", str(n_clusters),
+            "--epochs", str(args.deep_epochs), "--batch_size", "256", "--gpu", str(gpu),
+            "--seed", str(args.seed), *extra,
+        ]
+    if method in {"scDSC", "AttentionAE-sc"}:
+        script = {
+            "scDSC": "methods/GNN/scDSC/run.py",
+            "AttentionAE-sc": "methods/GNN/AttentionAE-sc/run.py",
+        }[method]
+        return [
+            py(), script,
+            "--data_path", data_path, "--save_dir", save_dir, "--n_clusters", str(n_clusters),
+            "--epochs", str(args.deep_epochs), "--pretrain_epochs", str(args.deep_epochs),
+            "--gpu", str(gpu), "--seed", str(args.seed),
+        ]
+    if method == "scGNN":
+        return [
+            py(), "methods/GNN/scGNN/run.py",
+            "--data_path", data_path, "--save_dir", save_dir, "--n_clusters", str(n_clusters),
+            "--Regu_epochs", str(args.deep_epochs), "--EM_epochs", str(args.deep_epochs),
+            "--cluster_epochs", str(args.deep_epochs), "--EM_iteration", "1",
+            "--quickmode", "--batch_size", "4096", "--cores_usage", "1",
+            "--gpu", str(gpu), "--seed", str(args.seed),
+        ]
     if method == "scMAE":
         return [
             py(), "methods/DeepLearning/scMAE/run.py",
@@ -114,7 +166,20 @@ def load_embedding(path):
 
 def find_embeddings(method, save_dir):
     candidates = []
-    if method in {"scMAE", "scCDCG", "PhytoCluster"}:
+    if method in {
+        "scMAE",
+        "scCDCG",
+        "PhytoCluster",
+        "dec",
+        "scDCC",
+        "desc",
+        "scDeepCluster",
+        "scNAME",
+        "scziDesk",
+        "scDSC",
+        "AttentionAE-sc",
+        "scGNN",
+    }:
         candidates.append((method, os.path.join(save_dir, "embedding.h5")))
     elif method == "plantspade_lgcl":
         candidates.append(("plantspade_lgcl", os.path.join(save_dir, "embedding_final.npy")))
@@ -391,6 +456,23 @@ def main():
             if method in direct_methods:
                 continue
             save_dir = str(runs_root / dataset / method)
+            missing = missing_dependencies(method)
+            if missing:
+                ensure_dir(save_dir)
+                payload = {
+                    "dataset": dataset,
+                    "method": method,
+                    "status": "skipped_missing_dependencies",
+                    "missing_dependencies": missing,
+                }
+                save_json(payload, os.path.join(save_dir, "SKIPPED.json"))
+                rows_all.append({
+                    "dataset": dataset,
+                    "method": method,
+                    "cluster_method": "skipped",
+                    "status": "missing_dependencies:" + ",".join(missing),
+                })
+                continue
             done_marker = os.path.join(save_dir, "UNIFIED_DONE")
             if args.skip_existing and os.path.exists(done_marker):
                 dataset_eval_dir = str(eval_root / dataset)

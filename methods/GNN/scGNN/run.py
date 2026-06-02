@@ -88,26 +88,51 @@ def decode_vector(values):
     return decoded
 
 
+def make_10x_names(values, prefix):
+    names = []
+    for idx, value in enumerate(values):
+        text = str(value)
+        if text == '' or text.isdigit():
+            text = f'{prefix}_{text if text else idx}'
+        names.append(text)
+    return names
+
+
 def read_csr(group):
     shape = tuple(group.attrs['shape'])
     return sp.csr_matrix((group['data'][...], group['indices'][...], group['indptr'][...]), shape=shape)
 
 
-def load_labels_from_h5ad(data_path, label_col='Celltype'):
-    with h5py.File(data_path, 'r') as handle:
-        obs = handle['obs']
-        cell_ids = decode_vector(obs['_index'][...])
-        if label_col not in obs:
-            raise KeyError(f'Label column {label_col!r} not found in h5ad obs. Available columns: {list(obs.keys())}')
-        labels = decode_vector(obs[label_col][...])
-    return dict(zip(cell_ids, labels)), len(set(labels))
+LABEL_CANDIDATES = [
+    'cell_type',
+    'Celltype',
+    'celltype',
+    'cell_label',
+    'label',
+    'Cluster',
+    'cluster',
+    'clusters',
+    'Seurat_clusters',
+]
+
+
+def load_labels_from_h5ad(data_path, label_col='auto'):
+    import scanpy as sc
+    adata = sc.read_h5ad(data_path)
+    if label_col == 'auto':
+        label_col = next((key for key in LABEL_CANDIDATES if key in adata.obs.columns), None)
+    if label_col is None or label_col not in adata.obs.columns:
+        raise KeyError(f'Label column not found in h5ad obs. Available columns: {list(adata.obs.columns)}')
+    cell_ids = adata.obs_names.astype(str).tolist()
+    labels = adata.obs[label_col].astype(str).tolist()
+    return dict(zip(cell_ids, labels)), len(set(labels)), cell_ids
 
 
 def export_h5ad_to_10x(data_path, output_root):
     with h5py.File(data_path, 'r') as handle:
         matrix = read_csr(handle['X']).transpose().tocoo().astype(np.int32)
-        cell_ids = decode_vector(handle['obs']['_index'][...])
-        gene_ids = decode_vector(handle['var']['_index'][...])
+        cell_ids = make_10x_names(decode_vector(handle['obs']['_index'][...]), 'cell')
+        gene_ids = make_10x_names(decode_vector(handle['var']['_index'][...]), 'gene')
 
     ensure_dir(output_root)
 
@@ -224,7 +249,7 @@ def train_with_original_scgnn(args, dataset_alias, work_root, original_output_di
 
 
 def collect_and_save_results(data_path, dataset_alias, save_dir, original_output_dir):
-    label_map, inferred_clusters = load_labels_from_h5ad(data_path)
+    label_map, inferred_clusters, all_cell_ids = load_labels_from_h5ad(data_path)
     embedding_path = os.path.join(original_output_dir, f'{dataset_alias}_embedding.csv')
     result_path = os.path.join(original_output_dir, f'{dataset_alias}_results.txt')
 
@@ -236,24 +261,36 @@ def collect_and_save_results(data_path, dataset_alias, save_dir, original_output
     embedding_df = pd.read_csv(embedding_path, index_col=0)
     result_df = pd.read_csv(result_path, index_col=0)
 
-    cell_ids = embedding_df.index.tolist()
-    missing = [cell_id for cell_id in cell_ids if cell_id not in label_map]
+    output_cell_ids = embedding_df.index.tolist()
+    missing = [cell_id for cell_id in output_cell_ids if cell_id not in label_map]
     if missing:
         raise KeyError(f'{len(missing)} output cells are missing from h5ad labels, first example: {missing[0]}')
 
-    y_true = np.array([label_map[cell_id] for cell_id in cell_ids])
+    embedding_df = embedding_df.reindex(all_cell_ids)
+    filtered_count = int(embedding_df.isna().any(axis=1).sum())
+    fill_values = embedding_df.mean(axis=0).fillna(0.0)
+    embedding_df = embedding_df.fillna(fill_values)
+
+    pred_series = result_df.iloc[:, 0].astype(str).reindex(all_cell_ids).fillna('filtered_out')
+
+    y_true = np.array([label_map[cell_id] for cell_id in all_cell_ids])
     y_true = pd.factorize(y_true)[0]
-    y_pred = pd.factorize(result_df.iloc[:, 0].astype(str))[0]
+    y_pred = pd.factorize(pred_series)[0]
     embedding = embedding_df.to_numpy()
 
     save(save_dir, y_true, y_pred, 0, embedding)
     print(f'Original scGNN output clusters: {len(np.unique(y_pred))}')
     print(f'H5AD reference cell types: {inferred_clusters}')
+    print(f'Cells filtered by original scGNN preprocessing and filled for unified evaluation: {filtered_count}')
 
 
 def main():
     args = parse_args()
     maybe_check_ltmg(args)
+    if args.no_cuda:
+        os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+    else:
+        os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 
     save_dir = ensure_dir(os.path.abspath(args.save_dir))
     dataset_alias = build_dataset_alias(args)
