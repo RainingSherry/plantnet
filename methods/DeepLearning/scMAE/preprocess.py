@@ -285,10 +285,9 @@ def normalize_sc(adata, size_factors=True, filter_min_counts=True, logtrans_inpu
     if not is_norm:
         print("数据未归一化，进行 normalize_per_cell 处理")
         # 确保 X 是浮点数（归一化操作的必要条件）
-        if hasattr(adata.X, 'toarray'):
-            import scipy.sparse as sp
-            # 稀疏矩阵转密集数组后转为 float32
-            adata.X = sp.csr_matrix(adata.X.toarray().astype(np.float32))
+        import scipy.sparse as sp
+        if sp.issparse(adata.X):
+            adata.X = adata.X.astype(np.float32)
         elif adata.X.dtype.kind in ['i', 'u']:
             # 整数类型直接转为 float32
             adata.X = adata.X.astype(np.float32)
@@ -352,10 +351,16 @@ def normalize_sc(adata, size_factors=True, filter_min_counts=True, logtrans_inpu
             if c in adata.obs.columns:
                 count_column = c
                 break
-        if count_column is None:
-            raise KeyError(f"No count column found for size factors. Available obs columns: {list(adata.obs.columns)}")
+        if count_column is not None:
+            counts = np.asarray(adata.obs[count_column], dtype=np.float64)
+        else:
+            raw_x = adata.raw.X if adata.raw is not None else adata.X
+            counts = np.asarray(raw_x.sum(axis=1)).ravel().astype(np.float64)
+        counts = np.nan_to_num(counts, nan=0.0, posinf=0.0, neginf=0.0)
+        positive = counts[counts > 0.0]
+        median_count = float(np.median(positive)) if positive.size else 1.0
         # Size factor = 细胞总 counts / 中位数总 counts
-        adata.obs['size_factors'] = adata.obs[count_column] / np.median(adata.obs[count_column])
+        adata.obs['size_factors'] = counts / max(median_count, 1e-12)
 
     # Step 5.5: 保存 HVG 的 normalized+log1p 数据（用于 ZINB 损失）
     # ZINB 模型需要 normalized+log1p counts（不是 Z-score 标准化数据）
@@ -414,7 +419,7 @@ def prepare_data_for_model(file_path, size_factors=True, filter_min_counts=True,
     X = data.to_df()           # 获取预处理后的 DataFrame（细胞 × 基因）
     # 尝试多种常见的细胞类型列名
     label_col = None
-    for candidate in ['cell_type', 'Celltype', 'celltype', 'cell_label', 'label']:
+    for candidate in ['maintype', 'cell_type', 'Celltype', 'celltype', 'cell_label', 'label', 'labels', 'true_label']:
         if candidate in data.obs.columns:
             label_col = candidate
             break

@@ -23,11 +23,13 @@ from sklearn.preprocessing import LabelEncoder
 
 
 LABEL_CANDIDATES = [
+    "maintype",
     "cell_type",
     "Celltype",
     "celltype",
     "cell_label",
     "label",
+    "labels",
     "Cluster",
     "cluster",
     "clusters",

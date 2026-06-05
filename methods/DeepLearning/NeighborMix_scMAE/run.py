@@ -44,6 +44,8 @@ except ImportError:
     from model import AutoEncoder
 
 from methods.DeepLearning.PlantSPADE_LGCL.utils import ensure_dir, save_json
+from methods.DeepLearning.PlantSPADE_LGCL.run_plantspade import sanitize_anndata_for_write
+from methods.DeepLearning import scMAE_family as family
 
 
 LABEL_CANDIDATES = [
@@ -525,13 +527,13 @@ def write_kmeans_known_k_outputs(
 
 def main():
     args = parse_args()
-    set_seed(args.seed)
+    family.set_seed(args.seed)
     save_dir = Path(ensure_dir(args.save_dir))
     save_json(vars(args), str(save_dir / "args.json"))
-    device = get_device(args.gpu, args.no_cuda)
+    device = family.get_device(args.gpu, args.no_cuda)
     print(f"Using device: {device}")
 
-    bundle = load_scmae_dataset(
+    bundle = family.load_scmae_dataset(
         file_path=args.data_path,
         input_mode=args.input_mode,
         n_top_genes=args.n_top_genes,
@@ -561,7 +563,7 @@ def main():
     )
     save_json(neighbor_profile, str(save_dir / "neighbor_graph_profile.json"))
 
-    dataset = IndexedExpressionDataset(data_np, labels)
+    dataset = family.IndexedExpressionDataset(data_np, labels)
     generator = torch.Generator()
     generator.manual_seed(args.seed)
     train_loader = DataLoader(
@@ -597,7 +599,7 @@ def main():
             idx_np = idx_t.numpy().astype(np.int64, copy=False)
             x = x_cpu.to(device)
 
-            x_corrupt, self_mask = apply_scmae_noise(x, args.mask_ratio)
+            x_corrupt, self_mask = family.apply_scmae_noise(x, args.mask_ratio)
             z_self, loss_self = model.loss_mask(x_corrupt, x, self_mask)
 
             x_mix = sample_mix(
@@ -610,7 +612,7 @@ def main():
                 neighbor_indices=neighbor_indices,
                 neighbor_probs=neighbor_probs,
             )
-            x_mix_corrupt, mix_mask = apply_scmae_noise(x_mix, args.mask_ratio)
+            x_mix_corrupt, mix_mask = family.apply_scmae_noise(x_mix, args.mask_ratio)
             target = x if args.target_mode == "original" else x_mix
             z_mix, loss_mix = model.loss_mask(x_mix_corrupt, target, mix_mask)
             consistency_loss = (
@@ -637,12 +639,12 @@ def main():
                 f"cons={history['consistency_loss'][-1]:.4f}"
             )
 
-    embedding, labels_out = extract_embedding(model, eval_loader, device)
+    embedding, labels_out = family.extract_embedding(model, eval_loader, device)
     np.save(save_dir / "embedding_final.npy", embedding.astype(np.float32))
     np.save(save_dir / "embeddings_base.npy", embedding.astype(np.float32))
     np.save(save_dir / "labels.npy", labels_out.astype(np.int64))
     np.save(save_dir / "gene_names.npy", bundle.gene_names.astype(str))
-    save_embedding_h5(save_dir / "embedding.h5", embedding, labels_out)
+    family.save_embedding_h5(save_dir / "embedding.h5", embedding, labels_out)
     save_json(history, str(save_dir / "training_history.json"))
     torch.save(
         {
@@ -666,7 +668,7 @@ def main():
         "mask_ratio": float(args.mask_ratio),
     }
     if not args.skip_eval:
-        result = write_kmeans_known_k_outputs(
+        result = family.write_kmeans_known_k_outputs(
             output_dir=save_dir,
             dataset=dataset_name,
             method=args.method_name,
@@ -691,6 +693,7 @@ def main():
             "target_mode": args.target_mode,
             "mask_ratio": float(args.mask_ratio),
         }
+        sanitize_anndata_for_write(bundle.adata)
         bundle.adata.write_h5ad(save_dir / "adata_neighbormix_scmae.h5ad", compression="gzip")
 
     summary = {

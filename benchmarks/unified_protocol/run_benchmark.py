@@ -19,9 +19,10 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 import scanpy as sc
+import scipy.sparse as sp
 from scipy.sparse import coo_matrix
 from sklearn.cluster import AgglomerativeClustering, KMeans
-from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA, TruncatedSVD
 from sklearn.neighbors import kneighbors_graph
 
 from common import compute_metrics, ensure_dir, evaluate_embedding, labels_from_adata, leiden_labels, save_json
@@ -32,6 +33,10 @@ DATASETS = {
     "SRP182008": ("benchmarks/unified_protocol/preprocessed/SRP182008_hvg2000.h5ad", 15),
     "SRP235541": ("data/SRP235541.h5ad", 18),
     "SRP171040": ("benchmarks/unified_protocol/preprocessed/SRP171040_hvg2000.h5ad", 12),
+    "Hrvatin_GSE102827": (
+        "OtherMode/scMAE-main/res/NeighborMix_hrvatin/data/hrvatin_geo_maintype_counts.h5ad",
+        8,
+    ),
 }
 
 _PCA_CACHE = {}
@@ -62,13 +67,37 @@ def py():
 
 
 def build_command(method, data_path, save_dir, n_clusters, gpu, args):
+    if method == "NeighborMix_scMAE":
+        cmd = [
+            py(), "methods/DeepLearning/NeighborMix_scMAE/run.py",
+            "--data_path", data_path, "--save_dir", save_dir,
+            "--dataset_name", Path(data_path).stem if "hrvatin" not in data_path.lower() else "Hrvatin_GSE102827",
+            "--method_name", "NeighborMix_scMAE", "--variant_name", "nm_scmae_mid",
+            "--n_clusters", str(n_clusters), "--epochs", str(args.deep_epochs),
+            "--batch_size", "256", "--gpu", str(gpu), "--seed", str(args.seed),
+            "--input_mode", "auto", "--n_top_genes", "1000", "--scale_input", "true",
+            "--alpha", "0.9", "--neighbor_k", "5", "--mix_neighbors", "4",
+            "--mix_weight", "0.5", "--consistency_weight", "0.02",
+            "--target_mode", "original", "--mask_ratio", "0.4",
+            "--no_save_h5ad",
+        ]
+        if "hrvatin" in data_path.lower():
+            cmd.extend(["--label_key", "maintype"])
+        return cmd
     if method == "scMAE":
-        return [
+        cmd = [
             py(), "methods/DeepLearning/scMAE/run.py",
             "--data_path", data_path, "--save_dir", save_dir, "--n_clusters", str(n_clusters),
+            "--dataset_name", Path(data_path).stem if "hrvatin" not in data_path.lower() else "Hrvatin_GSE102827",
+            "--method_name", "scMAE", "--variant_name", "scmae_original_self_only",
             "--epochs", str(args.deep_epochs), "--batch_size", "256", "--gpu", str(gpu),
             "--seed", str(args.seed), "--eval_interval", str(args.deep_epochs),
+            "--input_mode", "auto", "--n_top_genes", "1000", "--scale_input", "true",
+            "--mask_prob", "0.4", "--no_save_h5ad",
         ]
+        if "hrvatin" in data_path.lower():
+            cmd.extend(["--label_key", "maintype"])
+        return cmd
     if method == "scCDCG":
         return [
             py(), "methods/GNN/scCDCG/run.py",
@@ -114,7 +143,7 @@ def load_embedding(path):
 
 def find_embeddings(method, save_dir):
     candidates = []
-    if method in {"scMAE", "scCDCG", "PhytoCluster"}:
+    if method in {"scMAE", "scCDCG", "PhytoCluster", "NeighborMix_scMAE"}:
         candidates.append((method, os.path.join(save_dir, "embedding.h5")))
     elif method == "plantspade_lgcl":
         candidates.append(("plantspade_lgcl", os.path.join(save_dir, "embedding_final.npy")))
@@ -125,13 +154,23 @@ def find_embeddings(method, save_dir):
     return [(name, path) for name, path in candidates if os.path.exists(path)]
 
 
-def evaluate_and_write(dataset, method_name, embedding_path, data_path, out_dir, seed):
+def evaluate_and_write(dataset, method_name, embedding_path, data_path, out_dir, seed, kmeans_only=False):
     adata = sc.read_h5ad(data_path)
     labels, label_key = labels_from_adata(adata)
     embedding = load_embedding(embedding_path)
     if embedding.shape[0] != labels.shape[0]:
         raise ValueError(f"{method_name}: embedding cells {embedding.shape[0]} != labels {labels.shape[0]}")
-    metrics, preds = evaluate_embedding(embedding, labels, n_clusters=len(np.unique(labels)), seed=seed)
+    if kmeans_only:
+        pred = KMeans(n_clusters=len(np.unique(labels)), n_init=20, random_state=seed).fit_predict(embedding)
+        vals, mapped = compute_metrics(labels, pred, embedding=embedding)
+        vals.update({"cluster_method": "kmeans_known_k", "uses_known_k": True})
+        metrics = {"kmeans_known_k": vals}
+        preds = {
+            "kmeans_known_k": pred.astype(np.int64),
+            "kmeans_known_k_mapped": mapped.astype(np.int64),
+        }
+    else:
+        metrics, preds = evaluate_embedding(embedding, labels, n_clusters=len(np.unique(labels)), seed=seed)
     ensure_dir(out_dir)
     payload = {
         "dataset": dataset,
@@ -157,9 +196,12 @@ def get_pca_embedding(data_path, seed, n_components=50):
     if cache_key in _PCA_CACHE:
         return _PCA_CACHE[cache_key]
     adata = sc.read_h5ad(data_path)
-    x = adata.X.toarray() if hasattr(adata.X, "toarray") else np.asarray(adata.X)
+    x = adata.X.to_memory() if hasattr(adata.X, "to_memory") else adata.X
     n_components = min(n_components, x.shape[0] - 1, x.shape[1])
-    emb = PCA(n_components=n_components, random_state=seed).fit_transform(x)
+    if sp.issparse(x):
+        emb = TruncatedSVD(n_components=n_components, random_state=seed).fit_transform(x)
+    else:
+        emb = PCA(n_components=n_components, random_state=seed).fit_transform(np.asarray(x))
     _PCA_CACHE[cache_key] = emb
     return emb
 
@@ -255,9 +297,9 @@ def louvain_labels(embedding, n_clusters, seed=42, n_neighbors=15):
     return best_pred, best_res
 
 
-def run_traditional_louvain(dataset, data_path, out_dir, n_clusters, seed, max_cells=8000):
+def run_traditional_louvain(dataset, data_path, out_dir, n_clusters, seed, max_cells=0):
     emb = get_pca_embedding(data_path, seed)
-    if emb.shape[0] > max_cells:
+    if max_cells and emb.shape[0] > max_cells:
         row = {
             "dataset": dataset,
             "method": "traditional_louvain",
@@ -408,7 +450,17 @@ def main():
                                 "embedding_path": os.path.abspath(emb_path),
                             })
                         else:
-                            rows_all.extend(evaluate_and_write(dataset, name, emb_path, data_path, dataset_eval_dir, args.seed))
+                            rows_all.extend(
+                                evaluate_and_write(
+                                    dataset,
+                                    name,
+                                    emb_path,
+                                    data_path,
+                                    dataset_eval_dir,
+                                    args.seed,
+                                    kmeans_only=(name in {"NeighborMix_scMAE", "scMAE"}),
+                                )
+                            )
                 continue
             jobs.append({
                 "dataset": dataset,
@@ -472,7 +524,15 @@ def main():
             try:
                 for name, emb_path in find_embeddings(job["method"], job["save_dir"]):
                     rows_all.extend(
-                        evaluate_and_write(job["dataset"], name, emb_path, job["data_path"], str(eval_root / job["dataset"]), args.seed)
+                        evaluate_and_write(
+                            job["dataset"],
+                            name,
+                            emb_path,
+                            job["data_path"],
+                            str(eval_root / job["dataset"]),
+                            args.seed,
+                            kmeans_only=(name in {"NeighborMix_scMAE", "scMAE"}),
+                        )
                     )
             except Exception as exc:
                 failed.append(job)
@@ -491,6 +551,21 @@ def main():
         out = out.drop_duplicates(subset=["dataset", "method", "cluster_method"], keep="last")
         out = out.sort_values(["dataset", "method", "cluster_method"])
         out.to_csv(root / "metrics_long.csv", index=False)
+        metric_cols = [
+            "dataset",
+            "method",
+            "cluster_method",
+            "acc",
+            "nmi",
+            "ari",
+            "f1_macro",
+            "fmi",
+            "v_measure",
+            "homogeneity",
+            "completeness",
+        ]
+        present_cols = [col for col in metric_cols if col in out.columns]
+        out[present_cols].to_csv(root / "summary_metrics.csv", index=False)
         print(out.to_string(index=False))
     if failed:
         print("FAILED JOBS:")

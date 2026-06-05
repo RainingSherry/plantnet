@@ -79,6 +79,7 @@ scMAE — 基于掩码自编码器的单细胞 RNA 聚类方法
 import os
 import sys
 import argparse
+from pathlib import Path
 import numpy as np
 import torch
 import random
@@ -87,11 +88,15 @@ import scanpy as sc
 from sklearn.cluster import KMeans
 from torch.utils.data import DataLoader, Dataset
 
-# 添加父目录到路径（用于导入benchmark通用模块）
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+# 添加项目根目录到路径（用于导入benchmark通用模块）
+CURRENT_DIR = Path(__file__).resolve().parent
+ROOT = CURRENT_DIR.parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
-from preprocess import prepare_data_for_model
-from utils import save
+from methods.DeepLearning import scMAE_family as family
+from methods.DeepLearning.PlantSPADE_LGCL.utils import ensure_dir, save_json
+from methods.DeepLearning.PlantSPADE_LGCL.run_plantspade import sanitize_anndata_for_write
 
 # 导入模型组件
 from model import AutoEncoder
@@ -256,6 +261,22 @@ def parse_args():
                        help='输入 h5ad 文件路径')
     parser.add_argument('--save_dir', type=str, default='./results',
                        help='结果保存目录')
+    parser.add_argument('--dataset_name', type=str, default=None,
+                       help='数据集名称（用于输出记录）')
+    parser.add_argument('--method_name', type=str, default='scMAE',
+                       help='方法名称（用于输出记录）')
+    parser.add_argument('--variant_name', type=str, default='scmae_original_self_only',
+                       help='变体名称（用于输出记录）')
+    parser.add_argument('--label_key', type=str, default='auto',
+                       help='标签列名；auto 时使用 scMAE-family 统一候选')
+    parser.add_argument('--input_mode', type=str, default='auto', choices=['auto', 'raw', 'log1p'],
+                       help='输入矩阵模式')
+    parser.add_argument('--n_top_genes', type=int, default=1000,
+                       help='scMAE-family 统一 HVG 数量，源码默认 data_dim=1000')
+    parser.add_argument('--target_sum', type=float, default=10000.0,
+                       help='raw counts normalize_total 目标总量')
+    parser.add_argument('--scale_input', type=family.str2bool, default=True,
+                       help='是否对输入做 Z-score scale')
 
     # 模型参数
     parser.add_argument('--n_clusters', type=int, required=True,
@@ -268,9 +289,11 @@ def parse_args():
                        help='被掩码数据的损失权重')
     parser.add_argument('--mask_loss_weight', type=float, default=0.7,
                        help='掩码预测损失权重')
+    parser.add_argument('--dropout', type=float, default=0.0,
+                       help='Dropout率；源码默认0')
 
     # 训练参数
-    parser.add_argument('--epochs', type=int, default=100,
+    parser.add_argument('--epochs', type=int, default=80,
                        help='训练轮次')
     parser.add_argument('--batch_size', type=int, default=256,
                        help='批大小')
@@ -285,170 +308,159 @@ def parse_args():
     parser.add_argument('--no_cuda', action='store_true',
                        help='禁用CUDA')
     parser.add_argument('--eval_interval', type=int, default=10,
-                       help='评估间隔（轮次）')
+                       help='兼容旧参数；公平对照时最终统一 kmeans_known_k 评估')
+    parser.add_argument('--skip_eval', type=family.str2bool, default=False,
+                       help='是否跳过 runner 内部 kmeans_known_k 输出')
+    parser.add_argument('--no_save_h5ad', action='store_true',
+                       help='不保存带 embedding 的 h5ad')
 
     return parser.parse_args()
 
 
 def main():
-    """主函数"""
     args = parse_args()
-
-    # 设备设置
-    args.cuda = not args.no_cuda and torch.cuda.is_available()
-    device = torch.device(f'cuda:{args.gpu}' if args.cuda else 'cpu')
+    family.set_seed(args.seed)
+    save_dir = Path(ensure_dir(args.save_dir))
+    save_json(vars(args), str(save_dir / "args.json"))
+    device = family.get_device(args.gpu, args.no_cuda)
     print(f'Using device: {device}')
 
-    # 随机种子
-    set_seed(args.seed)
-
-    # 创建保存目录
-    os.makedirs(args.save_dir, exist_ok=True)
-
-    # =========================================================================
-    # Step 1: 数据加载与预处理
-    # =========================================================================
     print('Loading data...')
-    X, Y, sf, adata = prepare_data_for_model(
-        args.data_path,
-        size_factors=True,
-        filter_min_counts=True,
-        logtrans_input=True,
-        normalize_input=True
+    bundle = family.load_scmae_dataset(
+        file_path=args.data_path,
+        input_mode=args.input_mode,
+        n_top_genes=args.n_top_genes,
+        target_sum=args.target_sum,
+        scale_input=args.scale_input,
+        label_key=args.label_key,
+        seed=args.seed,
     )
+    save_json(bundle.profile, str(save_dir / "dataset_profile.json"))
+    save_json(bundle.preprocess_config, str(save_dir / "preprocess_config.json"))
+    with open(save_dir / "selected_genes.txt", "w", encoding="utf-8") as handle:
+        for gene in bundle.gene_names:
+            handle.write(f"{gene}\n")
 
-    # 转换为NumPy数组
-    X = np.array(X).astype(np.float32)
-    Y = np.array(Y)
-
-    # 标签编码
-    from sklearn.preprocessing import LabelEncoder
-    if Y.dtype.kind not in ['i', 'u']:
-        le = LabelEncoder()
-        Y = le.fit_transform(Y)
-
-    # 获取聚类数
-    n_clusters = args.n_clusters if args.n_clusters > 0 else len(np.unique(Y))
-    print(f'Number of cells: {X.shape[0]}, Number of genes: {X.shape[1]}')
+    data_np = bundle.data
+    labels = bundle.labels
+    n_clusters = args.n_clusters if args.n_clusters > 0 else len(np.unique(labels))
+    dataset_name = args.dataset_name or Path(args.data_path).stem
+    print(f'Number of cells: {data_np.shape[0]}, Number of genes: {data_np.shape[1]}')
     print(f'Number of clusters: {n_clusters}')
+    print(f'Variant: {args.variant_name}; preprocessing: scMAE_family')
 
-    # =========================================================================
-    # Step 2: 创建数据集和数据加载器
-    # =========================================================================
-    dataset = scRNADataset(X, Y)
+    dataset = family.IndexedExpressionDataset(data_np, labels)
+    generator = torch.Generator()
+    generator.manual_seed(args.seed)
     train_loader = DataLoader(
         dataset,
         batch_size=args.batch_size,
         shuffle=True,
-        drop_last=True
+        drop_last=True,
+        generator=generator,
     )
     test_loader = DataLoader(
         dataset,
-        batch_size=args.batch_size * 5,
+        batch_size=max(args.batch_size * 4, 512),
         shuffle=False,
-        drop_last=False
+        drop_last=False,
     )
 
-    # =========================================================================
-    # Step 3: 初始化模型
-    # =========================================================================
     model = AutoEncoder(
-        num_genes=X.shape[1],
+        num_genes=data_np.shape[1],
         hidden_size=args.hidden_size,
+        dropout=args.dropout,
         masked_data_weight=args.masked_data_weight,
-        mask_loss_weight=args.mask_loss_weight
+        mask_loss_weight=args.mask_loss_weight,
     ).to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-
-    # 掩码概率（每个基因独立）
-    mask_probas = [args.mask_prob] * X.shape[1]
-
-    # =========================================================================
-    # Step 4: 训练循环
-    # =========================================================================
+    history = {"loss": []}
     print('Starting training...')
 
-    best_acc = 0
-    best_epoch = 0
-    best_embedding = None
-    best_pred = None
-
-    for epoch in range(args.epochs):
+    for epoch in range(1, max(1, args.epochs) + 1):
         model.train()
-        total_loss = 0
+        total_loss = 0.0
+        n_batches = 0
 
-        for x, y in train_loader:
-            x = x.to(device)
-
-            # 应用掩码
-            x_corrupted, mask = apply_noise(x, mask_probas)
-
-            # 前向传播
+        for _, x_cpu, _ in train_loader:
+            x = x_cpu.to(device)
+            x_corrupted, mask = family.apply_scmae_noise(x, args.mask_prob)
             optimizer.zero_grad()
             _, loss = model.loss_mask(x_corrupted, x, mask)
-
-            # 反向传播
             loss.backward()
             optimizer.step()
 
-            total_loss += loss.item()
+            total_loss += float(loss.detach().cpu())
+            n_batches += 1
 
-        avg_loss = total_loss / len(train_loader)
+        avg_loss = total_loss / max(1, n_batches)
+        history["loss"].append(avg_loss)
+        if epoch == 1 or epoch == args.epochs or epoch % 10 == 0:
+            print(f'Epoch {epoch:03d}/{args.epochs} loss={avg_loss:.4f}')
 
-        # =========================================================================
-        # Step 5: 周期性评估
-        # =========================================================================
-        if (epoch + 1) % args.eval_interval == 0 or epoch == args.epochs - 1:
-            # 提取嵌入向量
-            embedding, true_labels = inference(model, test_loader, device)
+    embedding, labels_out = family.extract_embedding(model, test_loader, device)
+    np.save(save_dir / "embedding_final.npy", embedding.astype(np.float32))
+    np.save(save_dir / "embeddings_base.npy", embedding.astype(np.float32))
+    np.save(save_dir / "labels.npy", labels_out.astype(np.int64))
+    np.save(save_dir / "gene_names.npy", bundle.gene_names.astype(str))
+    family.save_embedding_h5(save_dir / "embedding.h5", embedding, labels_out)
+    save_json(history, str(save_dir / "training_history.json"))
+    torch.save(
+        {
+            "model": model.state_dict(),
+            "optimizer": optimizer.state_dict(),
+            "args": vars(args),
+            "gene_names": bundle.gene_names.astype(str),
+        },
+        save_dir / "model_checkpoint.pth",
+    )
 
-            # 聚类
-            # Keep the method runner lightweight. The unified PlantSPADE-LGCL
-            # protocol performs fixed KMeans/Leiden evaluation from the saved
-            # embedding, so this internal checkpoint step only needs a stable
-            # clustering label to write the legacy output files.
-            kmeans = KMeans(
-                n_clusters=n_clusters,
-                random_state=args.seed,
-                n_init=20
-            )
-            pred_labels = kmeans.fit_predict(embedding)
+    result = None
+    eval_extra = {
+        "variant": args.variant_name,
+        "baseline": "original_scmae_self_branch_only",
+        "mask_ratio": float(args.mask_prob),
+        "preprocessing": "scMAE_family",
+    }
+    if not args.skip_eval:
+        result = family.write_kmeans_known_k_outputs(
+            output_dir=save_dir,
+            dataset=dataset_name,
+            method=args.method_name,
+            seed=args.seed,
+            embedding=embedding,
+            labels=labels_out,
+            n_clusters=n_clusters,
+            extra=eval_extra,
+        )
+        save_json(result["fixed"], str(save_dir / "metrics.json"))
 
-            # 评估并追踪最优模型
-            from evaluation import evaluation as eval_fn
-            acc, nmi, ari, f1_macro, fmi, v_measure, hom, com, _ = eval_fn(
-                np.array(true_labels), np.array(pred_labels))
+    if not args.no_save_h5ad:
+        bundle.adata.obsm["X_scmae"] = embedding
+        bundle.adata.uns["scmae"] = {
+            "method": args.method_name,
+            "variant": args.variant_name,
+            "mask_ratio": float(args.mask_prob),
+            "preprocessing": "scMAE_family",
+        }
+        sanitize_anndata_for_write(bundle.adata)
+        bundle.adata.write_h5ad(save_dir / "adata_scmae.h5ad", compression="gzip")
 
-            if acc > best_acc:
-                best_acc = acc
-                best_epoch = epoch + 1
-                best_embedding = embedding.copy()
-                best_pred = pred_labels.copy()
-                # 保存最优模型检查点
-                torch.save({
-                    'model': model.state_dict(),
-                    'optimizer': optimizer.state_dict(),
-                    'args': vars(args),
-                    'best_epoch': best_epoch,
-                    'best_acc': best_acc,
-                }, os.path.join(args.save_dir, 'model_checkpoint.pth'))
-
-            # 保存结果
-            save(args.save_dir, true_labels, pred_labels, epoch + 1, embedding)
-
-            print(f'Epoch {epoch + 1}/{args.epochs}, Loss: {avg_loss:.4f}, ACC: {acc:.4f}, Best: {best_acc:.4f}')
-
-    print(f'Best epoch: {best_epoch}, Best ACC: {best_acc:.4f}')
-
-    # =========================================================================
-    # Step 6: 保存最终结果（最优 epoch）
-    # =========================================================================
-    if best_embedding is not None:
-        true_labels_arr = np.array(true_labels)
-        save(args.save_dir, true_labels_arr, best_pred, best_epoch, best_embedding)
-
-    print(f'Training completed. Results saved to: {args.save_dir}')
+    summary = {
+        "dataset": dataset_name,
+        "method": args.method_name,
+        "variant": args.variant_name,
+        "seed": int(args.seed),
+        "n_cells": int(data_np.shape[0]),
+        "n_genes": int(data_np.shape[1]),
+        "n_clusters": int(n_clusters),
+        "embedding_path": str((save_dir / "embedding_final.npy").resolve()),
+        "fixed_metrics": result["fixed"] if result is not None else {},
+        "note": "Original scMAE AutoEncoder and self masked branch; preprocessing/evaluation are shared with NeighborMix_scMAE.",
+    }
+    save_json(summary, str(save_dir / "summary.json"))
+    print(f'Training completed. Results saved to: {save_dir}')
 
 
 if __name__ == '__main__':
