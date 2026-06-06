@@ -1,7 +1,0 @@
-{
-  "dataset": "SRP182008",
-  "method": "traditional_louvain",
-  "cluster_method": "louvain",
-  "status": "skipped_n_cells_gt_8000",
-  "n_cells": 13514
-}
