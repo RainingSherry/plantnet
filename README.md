@@ -1,126 +1,134 @@
-# PlantSPADE-LGCL
+# PlantNet Single-Cell Benchmark
 
-PlantSPADE-LGCL is the main paper-facing method in this repository. The goal is a clean, reproducible protocol for plant single-cell sparse support geometry, not a collection of unrelated model entries.
+This repository contains a multi-baseline benchmark for single-cell clustering on plant datasets. The benchmark provides an isolated `methods/` directory with standardized data interfaces, evaluation metrics, and unified result formats.
 
-## Method Summary
+## Project Structure
 
-PlantSPADE-LGCL decomposes expression as `X = M o A`:
+```
+methods/
+├── shared_utils.py          # Shared utilities
+├── preprocess.py            # Standard data preprocessing (h5ad → normalized/scaled)
+├── evaluation.py           # 8 clustering metrics (ACC, NMI, ARI, F1-macro, FMI, V-measure, Homogeneity, Completeness)
+├── utils.py               # save() interface and helpers
+├── DeepLearning/
+│   ├── NeighborMix_scMAE/  # [PROPOSED] NeighborMix-scMAE
+│   ├── NeighborMix_MAE/    # NeighborMix-MAE (MAE variant)
+│   ├── scMAE/             # scMAE baseline
+│   ├── dec/               # DEC (Deep Embedded Clustering)
+│   ├── scDCC/             # scDCC (Deep Constrained Clustering)
+│   ├── scDeepCluster/     # scDeepCluster [TensorFlow, env-blocked if TF not installed]
+│   ├── scNAME/             # scNAME [env-blocked: requires TensorFlow]
+│   ├── scziDesk/           # scziDesk [env-blocked: requires TensorFlow]
+│   ├── desc/               # DESC [env-blocked: requires TensorFlow]
+│   ├── scVI/              # scVI baseline
+│   ├── PhytoCluster/       # PhytoCluster
+│   └── PlantSPADE_LGCL/    # [LEGACY] Retained for reference
+├── GNN/
+│   ├── scDSC/             # scDSC (Structural Deep Clustering Network)
+│   ├── scGNN/             # scGNN [env-blocked]
+│   ├── scCDCG/            # scCDCG [env-blocked]
+│   └── AttentionAE_sc/    # AttentionAE [env-blocked]
+├── Foundation/
+│   ├── scGPT/             # scGPT [placeholder: requires checkpoint download]
+│   ├── GeneFormer/        # GeneFormer [placeholder]
+│   ├── GeneCompass/       # GeneCompass [placeholder]
+│   └── scPlantLLM/        # scPlantLLM [placeholder]
+└── Traditional/
+    ├── ScanpyStandard/    # Scanpy standard pipeline
+    ├── Leiden/            # Leiden clustering
+    ├── Louvain/           # Louvain clustering
+    └── sc3/              # SC3 clustering
 
-- `M`: support matrix, indicating whether a cell-gene expression event is observed as non-zero.
-- `A`: amplitude matrix, using shared normalization and `log1p`.
-- Local view: cell-gene bipartite support graph with LightGCN-style propagation.
-- Global view: TF-IDF + SVD low-rank embedding.
-- Training: BPR ranking loss plus InfoNCE local-global alignment.
-- Interpretation: sparse `SupportGeneAttention` over each cell support set `S_c`, with candidate explanation genes compared against DEG markers.
-
-Full method notes are in `methods/DeepLearning/PlantSPADE_LGCL/docs/method_note.md`.
-Current run coverage and important result tables are summarized in `methods/DeepLearning/PlantSPADE_LGCL/docs/current_status.md`.
-
-## Data
-
-The configured 8 h5ad datasets are listed in:
-
-```text
-methods/DeepLearning/PlantSPADE_LGCL/configs/datasets_8plant.yaml
+OtherMode/
+└── scCluBench-main/      # [REFERENCE ONLY] Original scCluBench repository.
+                           # Kept as-is for historical reference. Not imported by runnable methods.
 ```
 
-Expected file paths:
+## Method Roles
 
-```text
-data/CRA002977_1.h5ad
-data/CRA007122.h5ad
-data/SRP145013.h5ad
-data/SRP171040.h5ad
-data/SRP182008.h5ad
-data/SRP224648.h5ad
-data/SRP235541.h5ad
-data/SRP309176.h5ad
-```
+| Role | Methods | Notes |
+|---|---|---|
+| **Proposed** | NeighborMix-scMAE | Main method in this benchmark |
+| **Ablation** | NM-scMAE-noMix | NeighborMix-scMAE without neighbor mixing |
+| **First baselines** | DEC, scDCC, scDeepCluster, scDSC, scMAE | Priority A PyTorch baselines, smoke-tested |
+| **TF baselines** | scNAME, scziDesk, DESC, scDeepCluster | TensorFlow/Keras; env-blocked if TF not installed |
+| **GNN baselines** | scGNN, scCDCG, AttentionAE_sc | GNN methods; env-blocked pending dependency check |
+| **Foundation** | scGPT, GeneFormer, GeneCompass | Large model placeholders; not auto-run |
+| **Reference** | OtherMode/scCluBench-main | Original scCluBench repository; read-only reference |
 
-Every run writes `dataset_profile.json`, `preprocess_config.json`, and `selected_genes.txt`.
+## Standard Outputs
 
-## Main Methods and Baselines
+Every runnable model emits the following files to its `--save_dir`:
 
-Main controls:
+| File | Description |
+|---|---|
+| `embedding_final.npy` | Final embedding (n_cells × n_z), float32 |
+| `labels.npy` | Ground truth labels, int64 |
+| `metrics.json` | 8 evaluation metrics |
+| `args.json` | Running arguments |
+| `embedding_{epoch}.npy` | Per-epoch embeddings |
+| `metrics_{epoch}.json` | Per-epoch metrics |
+| `embedding.h5` | HDF5 bundle of embeddings and predictions |
+| `types_{epoch}_pred.csv` | Ground truth vs predicted labels |
 
-- `traditional_pca`
-- `phytocluster`
-- `scvi`
-- `scmae`
-- `plantspade_lgcl_baseline`
-- `plantspade_lgcl_support_attention`
+## Quick Start
 
-Ablations:
-
-- `plantspade_lgcl_attention_no_idf`
-- `plantspade_lgcl_attention_no_amplitude`
-- `plantspade_lgcl_attention_topk_64/128/256`
-- `plantspade_lgcl_neg_random_zero`
-- `plantspade_lgcl_neg_idf_weighted_zero`
-- `plantspade_lgcl_neg_neighbor_conflict_zero`
-
-## Run
-
-Do not use GPU `0` or `7`. The new runners reject those IDs.
-
-Profile datasets:
+### Smoke Test (1 epoch, CPU)
 
 ```bash
-python methods/DeepLearning/PlantSPADE_LGCL/scripts/profile_datasets.py
+# DEC
+python methods/DeepLearning/dec/run.py \
+  --data_path data/SRP182008.h5ad \
+  --save_dir results/smoke_dec \
+  --n_clusters 15 --pretrain_epochs 1 --epochs 1 --no_cuda
+
+# scDCC
+python methods/DeepLearning/scDCC/run.py \
+  --data_path data/SRP182008.h5ad \
+  --save_dir results/smoke_scdcc \
+  --n_clusters 15 --pretrain_epochs 1 --epochs 1 --no_cuda
+
+# scDSC (use smaller dataset for CPU)
+python methods/GNN/scDSC/run.py \
+  --data_path data/subsample_2k.h5ad \
+  --save_dir results/smoke_scdsc \
+  --n_clusters 7 --pretrain_epochs 1 --epochs 1 --no_cuda
 ```
 
-Run the Arabidopsis root main group with five seeds:
+### Standard Preprocessing
 
-```bash
-python methods/DeepLearning/PlantSPADE_LGCL/scripts/run_suite.py \
-  --groups arabidopsis_root_main \
-  --seeds 1,2,3,4,5 \
-  --methods traditional_pca,phytocluster,scvi,scmae,plantspade_lgcl_baseline,plantspade_lgcl_support_attention \
-  --gpus 1,2,3,4,5,6
+All models use `methods/preprocess.py::prepare_data_for_model()`:
+
+```python
+from preprocess import prepare_data_for_model
+X, Y, sf, adata = prepare_data_for_model(
+    'data/my_data.h5ad',
+    size_factors=True,
+    filter_min_counts=True,
+    logtrans_input=True,
+    normalize_input=True
+)
+# X: (n_cells, n_hvg) — scaled and normalized
+# Y: cell type labels
+# sf: size factors
+# adata: full AnnData with layers['norm_log'] for ZINB loss
 ```
 
-Run the full configured suite:
+## Migration Status
 
-```bash
-python methods/DeepLearning/PlantSPADE_LGCL/scripts/run_suite.py --gpus 1,2,3,4,5,6
-```
+See [docs/migration_status.md](docs/migration_status.md) for detailed migration status of all baselines.
 
-Each dataset/method/seed is a separate process. By default the suite uses one concurrent run per GPU. To increase concurrency on large-memory GPUs:
+## Dependencies
 
-```bash
-python methods/DeepLearning/PlantSPADE_LGCL/scripts/run_suite.py \
-  --gpus 1,2,3,4,5,6 \
-  --jobs_per_gpu 2
-```
+| Package | Required By |
+|---|---|
+| PyTorch | DEC, scDCC, scDSC, NeighborMix_scMAE, scMAE |
+| TensorFlow/Keras | scDeepCluster, scNAME, scziDesk, DESC |
+| scanpy | All models (preprocessing) |
+| scipy, scikit-learn | All models (evaluation, clustering) |
 
-Aggregate tables:
+## Notes
 
-```bash
-python methods/DeepLearning/PlantSPADE_LGCL/scripts/aggregate_results.py
-```
-
-## Evaluation Protocol
-
-Main tables use fixed protocol only:
-
-- `kmeans_known_k`
-- `leiden_fixed`, default resolution `1.0`
-- `louvain_fixed`, default resolution `1.0` when available
-
-`leiden_oracle_best` is written only as a supplementary upper bound. It is selected by NMI over a resolution sweep and must not be reported as the main result.
-
-## Outputs
-
-Aggregation writes:
-
-- `all_results_long.csv`
-- `all_results_mean_std.csv`
-- `table_main_fixed_protocol.csv`
-- `table_oracle_supplement.csv`
-- `table_attention_ablation.csv`
-- `table_negative_sampling_ablation.csv`
-- `dataset_profiles_summary.csv`
-
-## Cleanup Note
-
-Diffusion, maskdiffusion, DOLORIS, and GraphDiffusion code/results have been removed from the working tree because they are not part of the current PlantSPADE-LGCL paper protocol. Unstable GNN entries and foundation-model experiments remain excluded from the main runner and tables. See `methods/DeepLearning/PlantSPADE_LGCL/docs/archive_note.md`.
+- `OtherMode/scCluBench-main/` is reference-only. No runnable code in `methods/` imports from it.
+- Foundation models (scGPT, GeneFormer, GeneCompass) are placeholders and are not included in default benchmark runs.
+- GNN models (scDSC, scGNN, scCDCG) require sufficient memory for the k-NN adjacency matrix.

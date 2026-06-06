@@ -28,7 +28,7 @@ import pandas as pd
 import torch
 
 
-def save(embedding_path, y, y_pred, epoch, embedding):
+def save(embedding_path, y, y_pred, epoch, embedding, args=None, preprocess_config=None):
     """
     保存聚类模型的训练结果（统一接口）
 
@@ -40,6 +40,10 @@ def save(embedding_path, y, y_pred, epoch, embedding):
         2. embedding_{epoch}.npy — 降维后的嵌入向量（NumPy 数组）
         3. embedding.h5 — HDF5 格式的嵌入向量和预测标签
         4. types_{epoch}_pred.csv — 真实标签和预测标签的对照表
+        5. embedding_final.npy — 最终嵌入向量（用于后续聚合分析）
+        6. labels.npy — 真实标签（用于后续聚合分析）
+        7. args.json — 运行参数（可选）
+        8. preprocess_config.json — 预处理配置（可选）
 
     【参数详解】
         embedding_path: 保存目录路径
@@ -49,20 +53,34 @@ def save(embedding_path, y, y_pred, epoch, embedding):
         embedding: 降维后的嵌入向量
             - PyTorch tensor: 自动转为 NumPy
             - NumPy array: 直接保存
+        args: argparse.Namespace 或字典，运行参数（可选）
+        preprocess_config: 字典，预处理配置（可选）
 
     【嵌入向量格式】
         embedding.shape = (n_cells, embedding_dim)
         例如：(2544, 16) 表示 2544 个细胞，每个细胞 16 维嵌入向量
 
     【使用示例】
-        embedding = model.encode(X)  # shape: (2544, 16)
         save('./results/Leiden/Arabidopsis', y_true, y_pred, epoch=200, embedding=embedding)
         # 生成文件：
         #   ./results/Leiden/Arabidopsis/metrics_200.json
         #   ./results/Leiden/Arabidopsis/embedding_200.npy
         #   ./results/Leiden/Arabidopsis/embedding.h5
         #   ./results/Leiden/Arabidopsis/types_200_pred.csv
+        #   ./results/Leiden/Arabidopsis/embedding_final.npy
+        #   ./results/Leiden/Arabidopsis/labels.npy
     """
+    os.makedirs(embedding_path, exist_ok=True)
+
+    # Convert embedding to numpy if needed
+    if isinstance(embedding, torch.Tensor):
+        emb_np = embedding.cpu().detach().numpy()
+    else:
+        emb_np = np.asarray(embedding, dtype=np.float32)
+
+    # Convert labels to numpy arrays
+    y_np = np.asarray(y, dtype=np.int64)
+
     # Step 1: 调用 evaluation 计算所有 8 个指标
     acc, nmi, ari, f1_macro, fmi, v_measure, hom, com, y_pred_ = evaluation(y, y_pred)
 
@@ -100,23 +118,46 @@ def save(embedding_path, y, y_pred, epoch, embedding):
 
     # Step 5: 保存嵌入向量（HDF5 和 NumPy 两种格式）
     with h5py.File(os.path.join(embedding_path, 'embedding.h5'), 'w') as f:
-        if isinstance(embedding, torch.Tensor):
-            # PyTorch tensor → 转为 NumPy 后保存
-            emb_np = embedding.cpu().detach().numpy()
-            f.create_dataset('X', data=emb_np)
-            np.save(os.path.join(embedding_path, f'embedding_{epoch}.npy'), emb_np)
-        else:
-            # NumPy array → 直接保存
-            f.create_dataset('X', data=embedding)
-            np.save(os.path.join(embedding_path, f'embedding_{epoch}.npy'), embedding)
-        # 保存预测标签（HDF5 格式）
+        f.create_dataset('X', data=emb_np)
+        np.save(os.path.join(embedding_path, f'embedding_{epoch}.npy'), emb_np)
         f.create_dataset('Y', data=y_pred_)
 
-    # Step 6: 保存标签对照表（CSV 格式，方便查看）
+    # Step 6: 保存标准化输出文件（用于后续聚合分析）
+    np.save(os.path.join(embedding_path, 'embedding_final.npy'), emb_np.astype(np.float32))
+    np.save(os.path.join(embedding_path, 'labels.npy'), y_np.astype(np.int64))
+
+    # 保存运行参数
+    if args is not None:
+        if hasattr(args, '__dict__'):
+            save_json(vars(args), os.path.join(embedding_path, 'args.json'))
+        else:
+            save_json(args, os.path.join(embedding_path, 'args.json'))
+
+    # 保存预处理配置
+    if preprocess_config is not None:
+        save_json(preprocess_config, os.path.join(embedding_path, 'preprocess_config.json'))
+
+    # Step 7: 保存标签对照表（CSV 格式，方便查看）
     pd.DataFrame({
         "pred": y_pred_,  # 重排后的预测标签
         "true": y,        # 真实标签
     }).to_csv(os.path.join(embedding_path, f'types_{epoch}_pred.csv'), index=False)
+
+
+def save_json(obj, path):
+    """Save an object as JSON. Handles numpy types."""
+    def convert(o):
+        if isinstance(o, np.integer):
+            return int(o)
+        elif isinstance(o, np.floating):
+            return float(o)
+        elif isinstance(o, np.ndarray):
+            return o.tolist()
+        elif isinstance(o, np.bool_):
+            return bool(o)
+        return o
+    with open(path, 'w') as f:
+        json.dump(obj, f, indent=4, default=convert)
 
 
 # =============================================================================

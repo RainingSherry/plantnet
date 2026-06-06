@@ -26,7 +26,7 @@ from sklearn.neighbors import kneighbors_graph
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from preprocess import prepare_data_for_model
-from utils import save
+from utils import save, save_json
 
 # Import model components
 from GNN.scDSC.GNN import GNNLayer
@@ -276,6 +276,7 @@ def main():
 
     # Create save directory
     os.makedirs(args.save_dir, exist_ok=True)
+    save_json(vars(args), os.path.join(args.save_dir, 'run_config.json'))
 
     # Load and preprocess data using standard interface
     print('Loading data...')
@@ -387,7 +388,8 @@ def main():
             print(f'Epoch {epoch + 1}/{args.epochs}, Loss: {loss.item():.6f}')
 
     # Save results using standard interface
-    save(args.save_dir, Y, best_y_pred, args.epochs, best_embedding)
+    save(args.save_dir, Y, best_y_pred, args.epochs, best_embedding,
+         args=vars(args))
 
     print(f'Training completed.')
     print(f'Results saved to: {args.save_dir}')
