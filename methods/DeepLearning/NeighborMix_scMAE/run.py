@@ -1,4 +1,16 @@
 #!/usr/bin/env python
+"""
+NeighborMix-scMAE：用于单细胞 RNA-seq 降维与聚类的方法。
+
+整体流程（main）：
+    1. 加载 AnnData，提取基因表达矩阵与细胞标签
+    2. 构建 KNN 图（PCA + 余弦距离），作为 pseudo-cell 邻域增强的邻居来源
+    3. 训练 scMAE 掩码自编码器，包含两个分支：
+         - real_loss：对原始真实细胞进行掩码重建
+         - pseudo_loss：对邻域仿细胞增强视图进行掩码重建，但目标仍为原始真实细胞
+    4. 提取编码器潜在向量，并使用 KMeans 评估聚类表现
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -16,7 +28,6 @@ import pandas as pd
 import scanpy as sc
 import scipy.sparse as sp
 import torch
-import torch.nn.functional as F
 from scipy.optimize import linear_sum_assignment
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA, TruncatedSVD
@@ -30,7 +41,7 @@ from sklearn.metrics import (
     v_measure_score,
 )
 from sklearn.neighbors import NearestNeighbors
-from sklearn.preprocessing import LabelEncoder, StandardScaler, normalize
+from sklearn.preprocessing import LabelEncoder, normalize
 from torch.utils.data import DataLoader, Dataset
 
 CURRENT_DIR = Path(__file__).resolve().parent
@@ -48,6 +59,7 @@ from methods.DeepLearning.PlantSPADE_LGCL.run_plantspade import sanitize_anndata
 from methods.DeepLearning import scMAE_family as family
 
 
+# 按优先级排序的候选标签列名，用于自动检测细胞标签列
 LABEL_CANDIDATES = [
     "maintype",
     "cell_type",
@@ -65,6 +77,19 @@ LABEL_CANDIDATES = [
 
 @dataclass
 class DataBundle:
+    """
+    打包单个数据集在训练与评估过程中需要用到的全部信息。
+
+    属性：
+        adata: 处理后的 AnnData 对象（用于写回 h5ad）
+        data: float32 的 numpy 数组，形状为 [n_cells, n_genes]
+        labels: 整数编码后的细胞类型标签
+        label_names: 原始细胞类型名称
+        label_key: obs 中的标签列名
+        gene_names: 基因名列表
+        profile: 数据集元信息（用于日志记录 / 可复现性）
+        preprocess_config: 预处理参数配置
+    """
     adata: sc.AnnData
     data: np.ndarray
     labels: np.ndarray
@@ -76,6 +101,12 @@ class DataBundle:
 
 
 class IndexedExpressionDataset(Dataset):
+    """
+    PyTorch 数据集：返回 `(index, expression, label)` 三元组。
+
+    其中 index 用于在训练时查找预先计算好的 KNN 邻居。
+    """
+
     def __init__(self, data: np.ndarray, labels: np.ndarray):
         self.data = torch.as_tensor(data, dtype=torch.float32)
         self.labels = torch.as_tensor(labels, dtype=torch.long)
@@ -88,6 +119,7 @@ class IndexedExpressionDataset(Dataset):
 
 
 def str2bool(value):
+    """为 CLI 的 --flag / --no-flag 参数解析布尔值。接受 true/false/1/0/t/f/yes/no/y/n。"""
     if isinstance(value, bool):
         return value
     value = str(value).strip().lower()
@@ -99,12 +131,20 @@ def str2bool(value):
 
 
 def parse_float_list(value: str):
+    """将逗号分隔的浮点数字符串解析为列表，用于 --leiden_resolutions 等参数。"""
     if value is None or str(value).strip() == "":
         return []
     return [float(item) for item in str(value).split(",") if item.strip()]
 
 
 def parse_args():
+    """
+    解析命令行参数并返回配置对象。
+
+    该函数集中定义 NeighborMix-scMAE 运行所需的全部超参数、
+    数据路径、训练设置、评估开关以及输出控制选项。
+    返回值为 argparse.Namespace，可直接在主流程中使用。
+    """
     parser = argparse.ArgumentParser(description="NeighborMix-scMAE fixed-protocol runner")
     parser.add_argument("--data_path", required=True)
     parser.add_argument("--save_dir", required=True)
@@ -125,12 +165,35 @@ def parse_args():
     parser.add_argument("--batch_size", type=int, default=256)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--mask_ratio", type=float, default=0.4)
+    parser.add_argument("--use_pseudo", type=str2bool, default=True)
+    parser.add_argument("--pseudo_weight", type=float, default=0.3)
     parser.add_argument("--alpha", type=float, default=0.9)
     parser.add_argument("--neighbor_k", type=int, default=5)
     parser.add_argument("--mix_neighbors", type=int, default=4)
-    parser.add_argument("--mix_weight", type=float, default=0.5)
-    parser.add_argument("--consistency_weight", type=float, default=0.02)
-    parser.add_argument("--target_mode", default="original", choices=["original", "mixed"])
+    parser.add_argument(
+        "--warmup_epochs",
+        type=int,
+        default=0,
+        help="Deprecated in pseudo-anchor-recovery variant; retained for CLI compatibility but unused.",
+    )
+    parser.add_argument(
+        "--mix_weight",
+        type=float,
+        default=0.0,
+        help="Deprecated in pseudo-anchor-recovery variant; retained for CLI compatibility but unused.",
+    )
+    parser.add_argument(
+        "--consistency_weight",
+        type=float,
+        default=0.0,
+        help="Deprecated in pseudo-anchor-recovery variant; retained for CLI compatibility but unused.",
+    )
+    parser.add_argument(
+        "--target_mode",
+        default="original",
+        choices=["original", "mixed"],
+        help="Deprecated in pseudo-anchor-recovery variant; retained for CLI compatibility but unused.",
+    )
     parser.add_argument("--tau", type=float, default=0.2)
     parser.add_argument("--knn_pca_dim", type=int, default=50)
     parser.add_argument("--eval_neighbors", type=int, default=15)
@@ -150,6 +213,13 @@ def parse_args():
 
 
 def set_seed(seed: int) -> None:
+    """
+    为所有随机数生成器设置种子，以尽量保证结果可复现。
+
+    包括 Python、NumPy、PyTorch 以及 CUDA 相关随机状态。
+    若 CUDA 可用，还会启用 cudnn.deterministic 并关闭
+    cudnn.benchmark，以减少非确定性行为。
+    """
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -161,6 +231,13 @@ def set_seed(seed: int) -> None:
 
 
 def get_device(gpu: int, no_cuda: bool) -> torch.device:
+    """
+    根据配置与当前环境选择计算设备。
+
+    当 no_cuda 为 True 或当前不可用 CUDA 时，返回 CPU。
+    否则会结合 CUDA_VISIBLE_DEVICES 与传入的 gpu 编号，
+    解析出实际应使用的 torch.device，同时避开被禁止的物理 GPU。
+    """
     if no_cuda or not torch.cuda.is_available():
         return torch.device("cpu")
     visible = os.environ.get("CUDA_VISIBLE_DEVICES")
@@ -181,6 +258,12 @@ def get_device(gpu: int, no_cuda: bool) -> torch.device:
 
 
 def _ensure_csr(matrix) -> sp.csr_matrix:
+    """
+    将输入矩阵转换为 float32 的 CSR 稀疏矩阵。
+
+    该函数同时处理稠密矩阵与稀疏矩阵，并将 NaN、正负无穷替换为 0，
+    同时把负值截断为 0，以得到适合后续单细胞表达处理流程的规范化矩阵。
+    """
     if sp.issparse(matrix):
         out = matrix.tocsr().astype(np.float32)
     else:
@@ -193,6 +276,12 @@ def _ensure_csr(matrix) -> sp.csr_matrix:
 
 
 def _sample_values(matrix, max_rows: int = 256) -> np.ndarray:
+    """
+    从矩阵前若干行采样数值，并展平成 float32 数组。
+
+    该函数用于快速观察数据的大致分布，而不必物化整个矩阵。
+    对于稀疏矩阵，仅返回采样部分中的非零元素。
+    """
     sample = matrix[: min(max_rows, matrix.shape[0])]
     if sp.issparse(sample):
         return sample.data.astype(np.float32, copy=False) if sample.nnz else np.array([], dtype=np.float32)
@@ -200,6 +289,12 @@ def _sample_values(matrix, max_rows: int = 256) -> np.ndarray:
 
 
 def _looks_like_raw_counts(matrix) -> bool:
+    """
+    启发式判断矩阵是否像原始计数数据。
+
+    若采样值均为非负且近似整数，则视为原始 counts；
+    否则更可能是已归一化或已对数变换后的表达矩阵。
+    """
     values = _sample_values(matrix)
     values = values[np.isfinite(values)]
     if values.size == 0:
@@ -209,6 +304,12 @@ def _looks_like_raw_counts(matrix) -> bool:
 
 
 def _var_gene_names(var) -> tuple[np.ndarray, object]:
+    """
+    从 var 表中提取基因名，并尽量使用更标准的基因名列。
+
+    会依次尝试多个常见列名；若找到长度匹配且元素唯一的候选列，
+    则用其作为基因名，并同步更新返回副本的索引。
+    """
     var = var.copy()
     gene_names = np.asarray(var.index).astype(str)
     for name_col in ["gene_name", "features", "gene_symbols", "symbol", "_index"]:
@@ -222,6 +323,13 @@ def _var_gene_names(var) -> tuple[np.ndarray, object]:
 
 
 def _select_count_source(adata: sc.AnnData, input_mode: str):
+    """
+    为当前 AnnData 选择合适的表达矩阵来源。
+
+    优先使用原始计数来源，如 layers['counts'] 或 adata.raw.X；
+    若不可用，则根据 adata.X 的数值特征判断其更像 raw 还是 log1p 数据。
+    返回表达矩阵、基因名、var、来源描述以及推断出的输入模式。
+    """
     if input_mode in {"auto", "raw"} and "counts" in adata.layers:
         gene_names, var = _var_gene_names(adata.var)
         return adata.layers["counts"], gene_names, var, "layers[counts]", "raw"
@@ -239,6 +347,12 @@ def _select_count_source(adata: sc.AnnData, input_mode: str):
 
 
 def _resolve_labels(adata: sc.AnnData, label_key: str):
+    """
+    解析并编码细胞标签列。
+
+    若用户显式指定 label_key，则直接使用该列；否则按候选列名顺序自动检测。
+    返回整数编码后的标签、原始类别名以及最终使用的标签列名。
+    """
     if label_key and label_key != "auto":
         if label_key not in adata.obs.columns:
             raise KeyError(f"Configured label_key={label_key!r} is absent. Available obs columns: {list(adata.obs.columns)}")
@@ -254,6 +368,12 @@ def _resolve_labels(adata: sc.AnnData, label_key: str):
 
 
 def _dense_float32(matrix) -> np.ndarray:
+    """
+    将矩阵转换为 float32 的稠密 NumPy 数组。
+
+    无论输入是稀疏还是稠密格式，都会统一转换，
+    并将 NaN、正无穷和负无穷替换为 0，以便后续送入模型。
+    """
     if sp.issparse(matrix):
         arr = matrix.toarray()
     else:
@@ -262,135 +382,138 @@ def _dense_float32(matrix) -> np.ndarray:
     return np.nan_to_num(arr, nan=0.0, posinf=0.0, neginf=0.0)
 
 
-def _normalize_total_log1p(matrix, target_sum: float) -> sp.csr_matrix:
-    x = _ensure_csr(matrix).astype(np.float32)
-    row_sum = np.asarray(x.sum(axis=1)).ravel().astype(np.float32)
-    scale = np.divide(
-        float(target_sum),
-        row_sum,
-        out=np.zeros_like(row_sum, dtype=np.float32),
-        where=row_sum > 0.0,
-    )
-    x = x.multiply(scale[:, None]).tocsr()
-    x.data = np.log1p(x.data).astype(np.float32, copy=False)
-    x.eliminate_zeros()
-    return x
+def _manual_dense_scale(matrix) -> np.ndarray:
+    """
+    将表达矩阵转为 float32 稠密数组，并进行稳定的按基因 Z-score 标准化。
+
+    该实现避免调用 scanpy/sklearn 对稀疏矩阵的内部 zero-centering 路径，
+    从而降低大数据集上触发底层 BLAS/稀疏实现段错误的风险。
+    """
+    dense = _dense_float32(matrix)
+    mean = dense.mean(axis=0, dtype=np.float64)
+    std = dense.std(axis=0, dtype=np.float64)
+    std[std < 1e-12] = 1.0
+    dense = ((dense - mean) / std).astype(np.float32, copy=False)
+    return np.nan_to_num(dense, nan=0.0, posinf=0.0, neginf=0.0)
 
 
-def load_scmae_dataset(
-    file_path: str,
-    input_mode: str,
-    n_top_genes: int,
-    target_sum: float,
-    scale_input: bool,
-    label_key: str,
-    seed: int,
-) -> DataBundle:
+def load_dataset(file_path: str, input_mode: str, n_top_genes: int, target_sum: float,
+                 scale_input: bool, label_key: str, seed: int) -> DataBundle:
+    """
+    读取并预处理输入数据集，返回可直接供模型训练的数据包。
+
+    主要步骤包括：
+        1. 读取 h5ad 文件
+        2. 选择表达矩阵来源（raw / log1p / auto）
+        3. 过滤全零基因并保留高变基因
+        4. 根据需要执行总量归一化、log1p 和标准化
+        5. 自动解析标签列并编码
+    """
     adata = sc.read_h5ad(file_path)
-    source_x, gene_names, var, counts_source, inferred_mode = _select_count_source(adata, input_mode)
-    counts = _ensure_csr(source_x)
-    work = sc.AnnData(X=counts.copy(), obs=adata.obs.copy(), var=var.copy())
-    work.obs_names = adata.obs_names.copy()
-    work.var_names = gene_names.copy()
+    matrix, gene_names, var, source_desc, inferred_mode = _select_count_source(adata, input_mode)
+    X = _ensure_csr(matrix)
+    keep_genes = np.asarray(X.sum(axis=0)).ravel() > 0
+    X = X[:, keep_genes]
+    gene_names = gene_names[keep_genes]
+    var = var.iloc[keep_genes].copy()
+
+    tmp = sc.AnnData(X=X, obs=adata.obs.copy(), var=var.copy())
+    if 0 < n_top_genes < tmp.n_vars:
+        sc.pp.highly_variable_genes(tmp, n_top_genes=n_top_genes, flavor="seurat_v3", subset=True)
+        gene_names = np.asarray(tmp.var.index).astype(str)
+
+    preprocess_config = {
+        "input_mode_requested": input_mode,
+        "input_mode_used": inferred_mode,
+        "source": source_desc,
+        "n_top_genes": int(n_top_genes),
+        "target_sum": float(target_sum),
+        "scale_input": bool(scale_input),
+        "seed": int(seed),
+    }
 
     if inferred_mode == "raw":
-        work.X = _normalize_total_log1p(work.X, target_sum=target_sum)
-    elif _sample_values(work.X).size and float(np.nanmax(_sample_values(work.X))) > 30.0:
-        work.X = _normalize_total_log1p(work.X, target_sum=target_sum)
-
-    if n_top_genes and n_top_genes > 0 and work.n_vars > n_top_genes:
-        sc.pp.highly_variable_genes(work, flavor="seurat", n_top_genes=n_top_genes, subset=True)
-
+        sc.pp.normalize_total(tmp, target_sum=float(target_sum))
+        sc.pp.log1p(tmp)
     if scale_input:
-        sc.pp.scale(work)
+        tmp.X = _manual_dense_scale(tmp.X)
+    else:
+        tmp.X = _dense_float32(tmp.X)
 
-    data = _dense_float32(work.X)
-    labels, label_names, resolved_label_key = _resolve_labels(work, label_key)
-    gene_names = np.asarray(work.var_names).astype(str)
-
-    label_counts = {
-        str(key): int(value)
-        for key, value in work.obs[resolved_label_key].astype(str).value_counts(dropna=False).sort_index().items()
-    }
+    labels, label_names, resolved_label_key = _resolve_labels(tmp, label_key)
     profile = {
-        "dataset_name": Path(file_path).stem,
-        "n_cells": int(work.n_obs),
-        "n_genes_original": int(adata.n_vars),
-        "n_genes": int(work.n_vars),
+        "file_path": str(Path(file_path).resolve()),
+        "n_cells": int(tmp.n_obs),
+        "n_genes": int(tmp.n_vars),
         "label_key": resolved_label_key,
-        "n_cell_types": int(len(label_names)),
-        "cell_type_counts": label_counts,
-        "counts_source": counts_source,
-        "input_mode": inferred_mode,
-        "has_raw": bool(adata.raw is not None),
-        "has_layers_counts": bool("counts" in adata.layers),
-        "scale_input": bool(scale_input),
+        "label_classes": [str(item) for item in label_names.tolist()],
+        "input_source": source_desc,
+        "input_mode_used": inferred_mode,
     }
-    preprocess_config = {
-        "file_path": str(file_path),
-        "counts_source": counts_source,
-        "input_mode": inferred_mode,
-        "normalization": f"normalize_total(target_sum={target_sum}) + log1p when raw",
-        "hvg": {"n_top_genes": int(n_top_genes), "flavor": "seurat"},
-        "scale_input": bool(scale_input),
-        "selected_n_genes": int(work.n_vars),
-        "seed": int(seed),
-        "label_key": resolved_label_key,
-    }
+
+    tmp.var_names = pd.Index(np.asarray(gene_names).astype(str))
     return DataBundle(
-        adata=work,
-        data=data,
+        adata=tmp,
+        data=np.asarray(tmp.X, dtype=np.float32),
         labels=labels,
         label_names=label_names,
         label_key=resolved_label_key,
-        gene_names=gene_names,
+        gene_names=np.asarray(tmp.var_names).astype(str),
         profile=profile,
         preprocess_config=preprocess_config,
     )
 
 
-def build_knn_distribution(
-    data: np.ndarray,
-    k: int,
-    pca_dim: int,
-    tau: float,
-    seed: int,
-) -> tuple[np.ndarray, np.ndarray, dict]:
-    n_cells, n_genes = data.shape
-    k = max(1, min(int(k), n_cells - 1))
-    n_components = max(2, min(int(pca_dim), n_cells - 1, n_genes - 1))
-    if n_cells < 3:
-        indices = np.zeros((n_cells, 1), dtype=np.int64)
-        probs = np.ones((n_cells, 1), dtype=np.float32)
-        return indices, probs, {"neighbor_k": 1, "pca_dim": 0, "note": "too_few_cells"}
+def build_knn_distribution(data_np: np.ndarray, k: int, pca_dim: int, tau: float, seed: int):
+    """
+    在 PCA + L2 归一化后的空间中构建 KNN 分布。
 
-    if n_genes > n_components:
-        reducer = PCA(n_components=n_components, random_state=seed, svd_solver="randomized")
-        emb = reducer.fit_transform(data).astype(np.float32)
+    返回：
+        neighbor_indices: 每个细胞对应的邻居索引，形状 [n_cells, k]
+        neighbor_probs: 归一化后的邻居采样概率，形状 [n_cells, k]
+        profile: 便于记录的统计信息
+    """
+    n_cells = int(data_np.shape[0])
+    if k <= 0 or n_cells <= 1:
+        return None, None, {
+            "neighbor_k": 0,
+            "tau": float(tau),
+            "mean_max_neighbor_prob": 0.0,
+            "mean_neighbor_similarity": 0.0,
+        }
+
+    max_neighbors = min(int(k), max(1, n_cells - 1))
+    pca_dim = max(1, min(int(pca_dim), data_np.shape[1], n_cells - 1 if n_cells > 1 else 1))
+
+    if sp.issparse(data_np):
+        data_dense = data_np.toarray().astype(np.float32)
     else:
-        emb = data.astype(np.float32, copy=False)
-    if emb.shape[1] > 1:
-        emb = StandardScaler().fit_transform(emb).astype(np.float32)
-    emb = normalize(emb, norm="l2", axis=1, copy=False).astype(np.float32)
+        data_dense = np.asarray(data_np, dtype=np.float32)
 
-    nn = NearestNeighbors(n_neighbors=k + 1, metric="cosine")
-    nn.fit(emb)
-    distances, neighbors = nn.kneighbors(emb, return_distance=True)
-    neighbors = neighbors[:, 1:].astype(np.int64, copy=False)
-    distances = distances[:, 1:].astype(np.float32, copy=False)
-    sim = np.clip(1.0 - distances, a_min=0.0, a_max=None)
-    logits = sim / max(float(tau), 1e-6)
-    logits = logits - logits.max(axis=1, keepdims=True)
-    probs = np.exp(logits).astype(np.float64)
-    probs = probs / probs.sum(axis=1, keepdims=True).clip(min=1e-12)
-    return neighbors, probs.astype(np.float32), {
-        "enabled": True,
-        "neighbor_k": int(k),
-        "pca_dim": int(n_components),
+    if min(data_dense.shape) > 1 and pca_dim < min(data_dense.shape):
+        embedding = PCA(n_components=pca_dim, random_state=seed).fit_transform(data_dense)
+    else:
+        embedding = data_dense
+    embedding = normalize(embedding, axis=1)
+
+    nn = NearestNeighbors(n_neighbors=max_neighbors + 1, metric="cosine")
+    nn.fit(embedding)
+    distances, indices = nn.kneighbors(embedding)
+
+    neighbor_indices = indices[:, 1: max_neighbors + 1].astype(np.int64, copy=False)
+    cosine_similarity = (1.0 - distances[:, 1: max_neighbors + 1]).astype(np.float32, copy=False)
+    scaled = cosine_similarity / max(float(tau), 1e-8)
+    scaled = scaled - scaled.max(axis=1, keepdims=True)
+    exp_scaled = np.exp(scaled, dtype=np.float32)
+    probs = exp_scaled / np.clip(exp_scaled.sum(axis=1, keepdims=True), 1e-12, None)
+
+    profile = {
+        "neighbor_k": int(max_neighbors),
         "tau": float(tau),
         "mean_max_neighbor_prob": float(probs.max(axis=1).mean()),
-        "mean_neighbor_similarity": float(sim.mean()),
+        "mean_neighbor_similarity": float(cosine_similarity.mean()),
     }
+    return neighbor_indices, probs.astype(np.float32), profile
 
 
 def sample_mix(
@@ -400,9 +523,20 @@ def sample_mix(
     alpha: float,
     mix_neighbors: int,
     rng: np.random.Generator,
-    neighbor_indices: np.ndarray,
-    neighbor_probs: np.ndarray,
+    neighbor_indices: np.ndarray | None,
+    neighbor_probs: np.ndarray | None,
 ) -> torch.Tensor:
+    """
+    为当前 batch 生成 pseudo-cell 邻域增强视图。
+
+    对 batch 中的每个细胞，函数都会从预先计算好的 KNN 图中采样
+    `mix_neighbors` 个邻居，按相似度概率加权后求邻居表达的加权平均。
+    最终视图采用凸组合：
+        x_prime = alpha * x + (1 - alpha) * neighbor_mean
+    """
+    if int(mix_neighbors) <= 0 or neighbor_indices is None or neighbor_probs is None:
+        return batch_x
+
     bsz = int(batch_indices.shape[0])
     mix_neighbors = max(1, int(mix_neighbors))
     sampled = np.empty((bsz, mix_neighbors), dtype=np.int64)
@@ -422,6 +556,13 @@ def sample_mix(
 
 
 def apply_scmae_noise(x: torch.Tensor, mask_ratio: float) -> tuple[torch.Tensor, torch.Tensor]:
+    """
+    应用 scMAE 风格的掩码扰动：将一部分位置替换为其他细胞对应位置的值。
+
+    对于 x 中的每个元素，都会以 `mask_ratio` 的概率被独立替换为
+    随机打乱后的 x 中对应位置的值。返回的 mask 张量用于标记哪些位置被修改：
+    1.0 表示发生了替换，0.0 表示保持不变。
+    """
     should_swap = torch.bernoulli(float(mask_ratio) * torch.ones_like(x))
     if x.shape[0] <= 1:
         replacement = x
@@ -434,6 +575,13 @@ def apply_scmae_noise(x: torch.Tensor, mask_ratio: float) -> tuple[torch.Tensor,
 
 @torch.no_grad()
 def extract_embedding(model: AutoEncoder, loader: DataLoader, device: torch.device) -> tuple[np.ndarray, np.ndarray]:
+    """
+    在推理模式下提取全部样本的潜在表示与标签。
+
+    函数会关闭梯度计算，并调用模型的 feature() 接口获取 embedding。
+    所有 batch 的结果最终会在 CPU 上拼接为完整矩阵，
+    同时对 NaN/Inf 做安全替换。
+    """
     model.eval()
     embeddings = []
     labels = []
@@ -448,12 +596,14 @@ def extract_embedding(model: AutoEncoder, loader: DataLoader, device: torch.devi
 
 
 def save_embedding_h5(path: Path, embedding: np.ndarray, labels: np.ndarray) -> None:
+    """将 embedding 与标签保存为 HDF5 文件。"""
     with h5py.File(path, "w") as handle:
         handle.create_dataset("X", data=embedding.astype(np.float32))
         handle.create_dataset("labels", data=labels.astype(np.int64))
 
 
 def best_map(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
+    """使用最优一一映射将预测聚类标签对齐到真实标签空间。"""
     true_values = np.unique(y_true)
     pred_values = np.unique(y_pred)
     n = max(len(true_values), len(pred_values))
@@ -470,6 +620,7 @@ def best_map(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
 
 
 def compute_kmeans_metrics(labels: np.ndarray, pred: np.ndarray) -> tuple[dict, np.ndarray]:
+    """计算 K-Means 聚类结果的一组标准评估指标。"""
     mapped = best_map(labels, pred)
     metrics = {
         "acc": float(np.mean(mapped == labels)),
@@ -499,6 +650,7 @@ def write_kmeans_known_k_outputs(
     n_clusters: int,
     extra: dict,
 ) -> dict:
+    """在已知聚类数的前提下运行 K-Means，并写出评估结果与预测文件。"""
     pred = KMeans(n_clusters=n_clusters, n_init=20, random_state=seed).fit_predict(embedding)
     metrics, mapped = compute_kmeans_metrics(labels, pred.astype(np.int64))
     fixed = {"kmeans_known_k": metrics}
@@ -526,10 +678,12 @@ def write_kmeans_known_k_outputs(
 
 
 def main():
+    """完整的 NeighborMix-scMAE 流程：加载数据、构建 KNN 图、训练、评估并保存输出。"""
     args = parse_args()
     family.set_seed(args.seed)
     save_dir = Path(ensure_dir(args.save_dir))
     save_json(vars(args), str(save_dir / "args.json"))
+
     device = family.get_device(args.gpu, args.no_cuda)
     print(f"Using device: {device}")
 
@@ -562,6 +716,12 @@ def main():
         seed=args.seed,
     )
     save_json(neighbor_profile, str(save_dir / "neighbor_graph_profile.json"))
+    pseudo_branch_enabled = (
+        bool(args.use_pseudo)
+        and int(args.neighbor_k) > 0
+        and int(args.mix_neighbors) > 0
+        and float(args.pseudo_weight) > 0.0
+    )
 
     dataset = family.IndexedExpressionDataset(data_np, labels)
     generator = torch.Generator()
@@ -583,60 +743,74 @@ def main():
         mask_loss_weight=args.mask_loss_weight,
     ).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+
     rng = np.random.default_rng(args.seed + 2027)
+
     history = {
         "loss": [],
-        "self_loss": [],
-        "mix_loss": [],
-        "consistency_loss": [],
+        "real_loss": [],
+        "pseudo_loss": [],
+        "pseudo_weight": [],
+        "real_mask_rate": [],
+        "pseudo_mask_rate": [],
     }
 
     for epoch in range(1, max(1, args.epochs) + 1):
         model.train()
         totals = {key: 0.0 for key in history}
         n_batches = 0
+
         for idx_t, x_cpu, _ in train_loader:
             idx_np = idx_t.numpy().astype(np.int64, copy=False)
             x = x_cpu.to(device)
 
-            x_corrupt, self_mask = family.apply_scmae_noise(x, args.mask_ratio)
-            z_self, loss_self = model.loss_mask(x_corrupt, x, self_mask)
+            x_corrupt, real_mask = family.apply_scmae_noise(x, args.mask_ratio)
+            _, loss_real = model.loss_mask(x_corrupt, x, real_mask)
 
-            x_mix = sample_mix(
-                data_np=data_np,
-                batch_indices=idx_np,
-                batch_x=x,
-                alpha=args.alpha,
-                mix_neighbors=args.mix_neighbors,
-                rng=rng,
-                neighbor_indices=neighbor_indices,
-                neighbor_probs=neighbor_probs,
-            )
-            x_mix_corrupt, mix_mask = family.apply_scmae_noise(x_mix, args.mask_ratio)
-            target = x if args.target_mode == "original" else x_mix
-            z_mix, loss_mix = model.loss_mask(x_mix_corrupt, target, mix_mask)
-            consistency_loss = (
-                1.0 - F.cosine_similarity(F.normalize(z_mix, dim=1), F.normalize(z_self.detach(), dim=1), dim=1)
-            ).mean()
+            loss = loss_real
+            loss_pseudo = torch.zeros((), device=device, dtype=loss_real.dtype)
+            pseudo_mask_rate = torch.zeros((), device=device, dtype=loss_real.dtype)
 
-            loss = loss_self + float(args.mix_weight) * loss_mix + float(args.consistency_weight) * consistency_loss
+            if pseudo_branch_enabled:
+                x_prime = sample_mix(
+                    data_np=data_np,
+                    batch_indices=idx_np,
+                    batch_x=x,
+                    alpha=args.alpha,
+                    mix_neighbors=args.mix_neighbors,
+                    rng=rng,
+                    neighbor_indices=neighbor_indices,
+                    neighbor_probs=neighbor_probs,
+                )
+                x_prime = x_prime.detach()
+
+                xp_corrupt, pseudo_mask = family.apply_scmae_noise(x_prime, args.mask_ratio)
+                _, loss_pseudo = model.loss_mask(xp_corrupt, x, pseudo_mask)
+                pseudo_mask_rate = pseudo_mask.mean()
+                loss = loss + float(args.pseudo_weight) * loss_pseudo
+
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
             optimizer.step()
 
             totals["loss"] += float(loss.detach().cpu())
-            totals["self_loss"] += float(loss_self.detach().cpu())
-            totals["mix_loss"] += float(loss_mix.detach().cpu())
-            totals["consistency_loss"] += float(consistency_loss.detach().cpu())
+            totals["real_loss"] += float(loss_real.detach().cpu())
+            totals["pseudo_loss"] += float(loss_pseudo.detach().cpu())
+            totals["real_mask_rate"] += float(real_mask.mean().detach().cpu())
+            totals["pseudo_mask_rate"] += float(pseudo_mask_rate.detach().cpu())
             n_batches += 1
 
         for key in totals:
             history[key].append(totals[key] / max(1, n_batches))
+        history["pseudo_weight"].append(float(args.pseudo_weight) if pseudo_branch_enabled else 0.0)
+
         if epoch == 1 or epoch == args.epochs or epoch % 10 == 0:
             print(
-                f"Epoch {epoch:03d}/{args.epochs} loss={history['loss'][-1]:.4f} "
-                f"self={history['self_loss'][-1]:.4f} mix={history['mix_loss'][-1]:.4f} "
-                f"cons={history['consistency_loss'][-1]:.4f}"
+                f"Epoch {epoch:03d}/{args.epochs} "
+                f"loss={history['loss'][-1]:.4f} "
+                f"real={history['real_loss'][-1]:.4f} "
+                f"pseudo={history['pseudo_loss'][-1]:.4f} "
+                f"pseudo_w={history['pseudo_weight'][-1]:.4f}"
             )
 
     embedding, labels_out = family.extract_embedding(model, eval_loader, device)
@@ -659,12 +833,11 @@ def main():
     result = None
     eval_extra = {
         "variant": args.variant_name,
+        "use_pseudo": bool(args.use_pseudo),
+        "pseudo_weight": float(args.pseudo_weight),
         "alpha": float(args.alpha),
         "neighbor_k": int(args.neighbor_k),
         "mix_neighbors": int(args.mix_neighbors),
-        "mix_weight": float(args.mix_weight),
-        "consistency_weight": float(args.consistency_weight),
-        "target_mode": args.target_mode,
         "mask_ratio": float(args.mask_ratio),
     }
     if not args.skip_eval:
@@ -685,12 +858,11 @@ def main():
         bundle.adata.uns["neighbormix_scmae"] = {
             "method": args.method_name,
             "variant": args.variant_name,
+            "use_pseudo": bool(args.use_pseudo),
+            "pseudo_weight": float(args.pseudo_weight),
             "alpha": float(args.alpha),
             "neighbor_k": int(args.neighbor_k),
             "mix_neighbors": int(args.mix_neighbors),
-            "mix_weight": float(args.mix_weight),
-            "consistency_weight": float(args.consistency_weight),
-            "target_mode": args.target_mode,
             "mask_ratio": float(args.mask_ratio),
         }
         sanitize_anndata_for_write(bundle.adata)
@@ -706,7 +878,7 @@ def main():
         "n_clusters": int(n_clusters),
         "embedding_path": str((save_dir / "embedding_final.npy").resolve()),
         "fixed_metrics": result["fixed"] if result is not None else {},
-        "note": "scMAE AutoEncoder is the base model; NeighborMix is used only as an auxiliary training branch.",
+        "note": "Pseudo-cell branch is used only as an anchor-recovery training view; final embeddings are extracted from clean real cells.",
     }
     save_json(summary, str(save_dir / "summary.json"))
     print(f"Results saved to: {save_dir}")

@@ -69,7 +69,7 @@ class AutoEncoder(torch.nn.Module):
         self.masked_data_weight = masked_data_weight
         self.mask_loss_weight = mask_loss_weight
 
-        # 编码器：多层全连接网络
+        # 编码器：两层全连接网络，固定为 num_genes -> 512 -> 128
         self.encoder = nn.Sequential(
             nn.Dropout(p=dropout),
             nn.Linear(self.num_genes, 256),

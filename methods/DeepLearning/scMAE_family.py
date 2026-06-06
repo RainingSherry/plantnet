@@ -29,6 +29,8 @@ from torch.utils.data import DataLoader, Dataset
 from methods.DeepLearning.PlantSPADE_LGCL.utils import save_json
 
 
+# AnnData.obs 中常见的细胞类型标签列名列表。
+# 自动检测时会按出现顺序依次搜索这些键。
 LABEL_CANDIDATES = [
     "maintype",
     "cell_type",
@@ -47,6 +49,8 @@ LABEL_CANDIDATES = [
 
 @dataclass
 class DataBundle:
+    """用于存放已预处理、可直接用于模型训练/推理的 scRNA-seq 数据集。"""
+
     adata: sc.AnnData
     data: np.ndarray
     labels: np.ndarray
@@ -58,6 +62,13 @@ class DataBundle:
 
 
 class IndexedExpressionDataset(Dataset):
+    """
+    PyTorch 数据集，返回 `(index, expression_vector, label)` 元组。
+
+    每个样本对应一个细胞的基因表达谱及其标签。
+    同时返回整数索引，便于下游代码追踪每个 batch 元素对应的原始细胞。
+    """
+
     def __init__(self, data: np.ndarray, labels: np.ndarray):
         self.data = torch.as_tensor(data, dtype=torch.float32)
         self.labels = torch.as_tensor(labels, dtype=torch.long)
@@ -70,6 +81,14 @@ class IndexedExpressionDataset(Dataset):
 
 
 def str2bool(value):
+    """
+    将布尔值的字符串表示转换为 Python 的 bool。
+
+    对于 True，接受 'true'、't'、'yes'、'y'、'1'；
+    对于 False，接受 'false'、'f'、'no'、'n'、'0'。
+    若输入无法识别，则抛出 ArgumentTypeError，
+    以便 argparse 生成更友好的错误提示。
+    """
     if isinstance(value, bool):
         return value
     value = str(value).strip().lower()
@@ -81,6 +100,15 @@ def str2bool(value):
 
 
 def set_seed(seed: int) -> None:
+    """
+    为所有随机数生成器设置种子（Python、NumPy、PyTorch、CUDA）。
+
+    这样可以尽量保证多次运行结果可复现。若 CUDA 可用，函数会同时调用
+    torch.cuda.manual_seed 和 torch.cuda.manual_seed_all，并开启
+    cudnn.deterministic 以避免使用非确定性的卷积算法。
+    同时关闭 cudnn.benchmark，因为即使开启了 deterministic，
+    benchmark 仍可能引入非确定性。
+    """
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -92,6 +120,14 @@ def set_seed(seed: int) -> None:
 
 
 def get_device(gpu: int, no_cuda: bool) -> torch.device:
+    """
+    根据 GPU 可用性与隔离约束，解析合适的 torch.device。
+
+    若设置了 CUDA_VISIBLE_DEVICES，本函数会将 --gpu 指定的逻辑 GPU 索引
+    映射到当前可见的物理 GPU。根据使用策略，物理 GPU 0 和 7 被禁止使用，
+    以避免与其他任务发生冲突。若 CUDA 不可用或 no_cuda 为 True，
+    则返回 CPU 设备。
+    """
     if no_cuda or not torch.cuda.is_available():
         return torch.device("cpu")
     visible = os.environ.get("CUDA_VISIBLE_DEVICES")
@@ -112,6 +148,12 @@ def get_device(gpu: int, no_cuda: bool) -> torch.device:
 
 
 def ensure_csr(matrix) -> sp.csr_matrix:
+    """
+    将矩阵转换为 float32 的 CSR 格式，并将无效值替换为 0。
+
+    同时兼容稀疏与稠密输入。负值会被截断为 0，NaN/Inf 会被替换为 0，
+    并按列索引排序，以确保得到规范化的 CSR 表示。
+    """
     if sp.issparse(matrix):
         out = matrix.tocsr().astype(np.float32)
     else:
@@ -124,6 +166,13 @@ def ensure_csr(matrix) -> sp.csr_matrix:
 
 
 def sample_values(matrix, max_rows: int = 256) -> np.ndarray:
+    """
+    从矩阵前几行采样并展平成 float32 数组。
+
+    该函数用于在不物化整个矩阵的前提下，快速检查数值范围与分布。
+    对于稀疏矩阵，仅采样行中的非零值会被纳入结果。
+    返回值统一转换为 float32，便于后续启发式判断。
+    """
     sample = matrix[: min(max_rows, matrix.shape[0])]
     if sp.issparse(sample):
         return sample.data.astype(np.float32, copy=False) if sample.nnz else np.array([], dtype=np.float32)
@@ -131,6 +180,13 @@ def sample_values(matrix, max_rows: int = 256) -> np.ndarray:
 
 
 def looks_like_raw_counts(matrix) -> bool:
+    """
+    启发式判断矩阵是否像原始（未归一化）计数数据。
+
+    若采样到的所有值都非负，且都与其四舍五入后的整数值近似相等
+    （误差不超过 1e-4），则返回 True，这通常是整数计数数据的特征。
+    空矩阵，或仅包含 NaN/Inf 的矩阵，会返回 False。
+    """
     values = sample_values(matrix)
     values = values[np.isfinite(values)]
     if values.size == 0:
@@ -140,6 +196,12 @@ def looks_like_raw_counts(matrix) -> bool:
 
 
 def var_gene_names(var) -> tuple[np.ndarray, object]:
+    """
+    从 AnnData 的 var DataFrame 中提取基因名，并尝试多个常见列名。
+
+    会按顺序检查 'gene_name'、'features'、'gene_symbols'、'symbol' 和 '_index'。
+    返回提取到的基因名数组，以及一个将索引设置为这些基因名的 var 副本。
+    """
     var = var.copy()
     gene_names = np.asarray(var.index).astype(str)
     for name_col in ["gene_name", "features", "gene_symbols", "symbol", "_index"]:
@@ -153,6 +215,20 @@ def var_gene_names(var) -> tuple[np.ndarray, object]:
 
 
 def select_count_source(adata: sc.AnnData, input_mode: str):
+    """
+    从 AnnData 对象中选择合适的表达矩阵来源。
+
+    原始计数数据的优先级顺序为：
+        1. adata.layers["counts"]
+        2. adata.raw.X
+        3. adata.X（若看起来像原始计数）
+
+    对于 log1p 数据，函数会回退到 adata.X。
+    当 input_mode 为 "auto" 时，会根据数据本身自动推断来源。
+    若 input_mode 为 "raw" 但不存在合适的原始计数来源，则抛出 ValueError。
+    返回一个五元组：
+    (matrix, gene_names, var, source_description, inferred_mode)。
+    """
     if input_mode in {"auto", "raw"} and "counts" in adata.layers:
         gene_names, var = var_gene_names(adata.var)
         return adata.layers["counts"], gene_names, var, "layers[counts]", "raw"
@@ -170,6 +246,16 @@ def select_count_source(adata: sc.AnnData, input_mode: str):
 
 
 def resolve_labels(adata: sc.AnnData, label_key: str):
+    """
+    从 AnnData 对象中解析细胞类型标签列。
+
+    若显式提供了 label_key，则该列必须存在于 adata.obs.columns 中；
+    否则函数会按顺序搜索 LABEL_CANDIDATES。
+    所有标签都会通过 LabelEncoder 编码为连续整数。
+    返回一个三元组：
+    (encoded_labels, label_class_names, resolved_key)。
+    若找不到匹配列，则抛出 KeyError。
+    """
     if label_key and label_key != "auto":
         if label_key not in adata.obs.columns:
             raise KeyError(f"Configured label_key={label_key!r} is absent. Available obs columns: {list(adata.obs.columns)}")
@@ -185,6 +271,13 @@ def resolve_labels(adata: sc.AnnData, label_key: str):
 
 
 def dense_float32(matrix) -> np.ndarray:
+    """
+    将矩阵转换为连续存储的 float32 NumPy 数组，并将 NaN/Inf 替换为 0。
+
+    该函数统一处理稀疏与稠密输入。
+    这是将数据送入 PyTorch 模型之前的最后一步，
+    以确保数据类型和内存布局一致。
+    """
     if sp.issparse(matrix):
         arr = matrix.toarray()
     else:
@@ -194,6 +287,14 @@ def dense_float32(matrix) -> np.ndarray:
 
 
 def normalize_total_log1p(matrix, target_sum: float) -> sp.csr_matrix:
+    """
+    将每个细胞的表达归一化到固定总计数后，再进行 log1p 变换。
+
+    每个细胞的表达向量都会被缩放，使其总和等于 target_sum，
+    随后逐元素应用 log1p(x) = log(1 + x)。
+    这模拟了 scanpy 中常见的标准化 + 对数变换流程，
+    但这里直接在稀疏矩阵上操作，以提高效率。
+    """
     x = ensure_csr(matrix).astype(np.float32)
     row_sum = np.asarray(x.sum(axis=1)).ravel().astype(np.float32)
     scale = np.divide(
@@ -217,6 +318,17 @@ def load_scmae_dataset(
     label_key: str,
     seed: int,
 ) -> DataBundle:
+    """
+    从 .h5ad 文件加载并预处理单细胞数据集。
+
+    处理流程如下：
+        1. 加载 AnnData，并解析表达矩阵来源（原始计数 / log1p / 等）
+        2. 若数据看起来像原始计数，则进行总计数归一化并做 log1p 变换
+        3. 若 n_top_genes > 0，则选择高变基因（HVG）
+        4. 可选地将基因缩放为零均值、单位方差
+        5. 提取并编码细胞类型标签
+        6. 构建并返回包含 profile 与预处理元信息的 DataBundle
+    """
     adata = sc.read_h5ad(file_path)
     source_x, gene_names, var, counts_source, inferred_mode = select_count_source(adata, input_mode)
     counts = ensure_csr(source_x)
@@ -281,6 +393,14 @@ def load_scmae_dataset(
 
 
 def apply_scmae_noise(x: torch.Tensor, mask_ratio: float) -> tuple[torch.Tensor, torch.Tensor]:
+    """
+    应用 scMAE 风格的掩码扰动：将一部分位置替换为其他细胞对应位置的值。
+
+    对于 x 中的每个元素，都会以 `mask_ratio` 的概率被独立替换为
+    随机打乱后的 x 中对应位置的值。返回的 mask 张量用于标记哪些位置被修改：
+    1.0 表示发生了替换，0.0 表示保持不变。
+    这模拟了 scMAE 预训练阶段所使用的扰动策略。
+    """
     should_swap = torch.bernoulli(float(mask_ratio) * torch.ones_like(x))
     if x.shape[0] <= 1:
         replacement = x
@@ -293,6 +413,16 @@ def apply_scmae_noise(x: torch.Tensor, mask_ratio: float) -> tuple[torch.Tensor,
 
 @torch.no_grad()
 def extract_embedding(model, loader: DataLoader, device: torch.device) -> tuple[np.ndarray, np.ndarray]:
+    """
+    以推理模式运行模型，并收集所有细胞的潜在 embedding。
+
+    函数会将模型切换到 eval 模式，并通过 torch.no_grad() 禁用梯度跟踪。
+    每个 batch 都会通过 model.feature() 提取 embedding，随后移动到 CPU，
+    追加到列表中，最后再统一拼接。
+    结果 embedding 矩阵中的 NaN/Inf 会被替换为 0。
+    返回一个二元组：
+    (embeddings [N x D], labels [N])。
+    """
     model.eval()
     embeddings = []
     labels = []
@@ -307,12 +437,28 @@ def extract_embedding(model, loader: DataLoader, device: torch.device) -> tuple[
 
 
 def save_embedding_h5(path: Path, embedding: np.ndarray, labels: np.ndarray) -> None:
+    """
+    将 embedding 与标签写入 HDF5 文件。
+
+    根组下会创建两个数据集：
+        - 'X'：embedding 矩阵（float32）
+        - 'labels'：整数标签数组
+    """
     with h5py.File(path, "w") as handle:
         handle.create_dataset("X", data=embedding.astype(np.float32))
         handle.create_dataset("labels", data=labels.astype(np.int64))
 
 
 def best_map(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
+    """
+    寻找从预测聚类 ID 到真实标签的一一最优映射。
+
+    该函数在混淆矩阵（行表示真实标签，列表示预测聚类）上使用匈牙利算法
+    （scipy.linear_sum_assignment），以最大化正确匹配数量。
+    返回的数组是重新映射后的预测结果：
+    每个预测聚类 ID 都会被替换为与其匹配的真实标签。
+    这样即使聚类标签只是任意整数编号，也能公平地评估聚类准确率。
+    """
     true_values = np.unique(y_true)
     pred_values = np.unique(y_pred)
     n = max(len(true_values), len(pred_values))
@@ -329,6 +475,17 @@ def best_map(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
 
 
 def compute_kmeans_metrics(labels: np.ndarray, pred: np.ndarray) -> tuple[dict, np.ndarray]:
+    """
+    在最优标签重映射后，计算完整的聚类评估指标。
+
+    指标包括 Accuracy（ACC）、Normalized Mutual Information（NMI）、
+    Adjusted Rand Index（ARI）、F1-macro、Fowlkes-Mallows Index（FMI）、
+    V-measure、Homogeneity 和 Completeness。
+    Silhouette 被设为 NaN，因为其通常需要完整的两两距离矩阵，
+    对高维 embedding 来说计算代价较高。
+    返回的 mapped predictions 会通过 best_map 与真实标签对齐，
+    因而 ACC 表示最佳可能的标签分配结果。
+    """
     mapped = best_map(labels, pred)
     metrics = {
         "acc": float(np.mean(mapped == labels)),
@@ -358,6 +515,16 @@ def write_kmeans_known_k_outputs(
     n_clusters: int,
     extra: dict,
 ) -> dict:
+    """
+    在已知细胞类型数量的前提下运行 K-Means 聚类，并保存全部结果。
+
+    为提高稳定性，K-Means 使用 n_init=20。
+    指标通过 compute_kmeans_metrics 计算，并写入两个文件：
+        - eval_fixed.csv：一行汇总所有指标
+        - eval_metrics.json：包含 method/dataset/seed 等字段的结构化 JSON
+    此外，原始聚类分配结果以及最优重映射后的标签也会保存为 .npy 文件。
+    函数返回一个字典，其中包含 fixed-protocol 指标和预测结果数组。
+    """
     pred = KMeans(n_clusters=n_clusters, n_init=20, random_state=seed).fit_predict(embedding)
     metrics, mapped = compute_kmeans_metrics(labels, pred.astype(np.int64))
     fixed = {"kmeans_known_k": metrics}
