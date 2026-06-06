@@ -114,6 +114,69 @@ X, Y, sf, adata = prepare_data_for_model(
 # adata: full AnnData with layers['norm_log'] for ZINB loss
 ```
 
+## Model Authenticity Policy
+
+This benchmark **does not allow simplified replacement implementations**. Migrated methods must preserve the original scCluBench model architecture, losses, and training procedure unless explicitly documented as environment-gated or excluded.
+
+### 本项目严禁为了跑通而使用简化模型、替代算法或伪实现。所有进入正式表格的方法必须通过模型真实性审计。
+
+**Key principles:**
+- No replacing deep models with KMeans, PCA, or plain AE
+- No removing core losses (ZINB, KL divergence, clustering loss)
+- No skipping training phases (pretrain, clustering)
+- All formal benchmark results include `authenticity.json` with `substitute_model_used: false`
+
+### Authenticity Status
+
+| Status | Meaning | Eligible for Formal Table |
+|--------|---------|------------------------|
+| `VERIFIED` | Core architecture, losses, and training preserved | Yes (default) |
+| `ENV-GATED` | Blocked by missing env (TensorFlow, etc.) | No |
+| `PENDING` | Code migrated, audit not yet complete | No |
+| `PLACEHOLDER` | Stub only | No |
+| `FAILED` | Known issues | No |
+
+Run `python scripts/audit_model_authenticity.py` to check all models.
+
+See [docs/migration_status.md](docs/migration_status.md) and [docs/model_authenticity.md](docs/model_authenticity.md) for detailed checklists.
+
+## Formal Benchmark
+
+### Quick Run
+
+```bash
+# Run all VERIFIED methods on a dataset (GPU enabled)
+python scripts/run_formal_benchmark.py \
+  --data_path data/subsample_2k.h5ad \
+  --out_dir results/formal/subsample_2k \
+  --n_clusters 7 \
+  --seeds 42 43 44 \
+  --pretrain_epochs 200 \
+  --epochs 200
+
+# Run specific methods
+python scripts/run_formal_benchmark.py \
+  --data_path data/SRP182008.h5ad \
+  --methods dec scdcc scanpy_standard \
+  --n_clusters 15 --seeds 42
+
+# Include pending models (output flagged as unverified)
+python scripts/run_formal_benchmark.py \
+  --data_path data/subsample_2k.h5ad \
+  --methods scgnn sccdcg \
+  --n_clusters 7 --allow_unverified
+```
+
+### Formal Results
+
+Output files per method:
+- `embedding_final.npy`, `labels.npy`, `metrics.json`, `args.json`, `authenticity.json`
+- `benchmark_summary.csv` and `benchmark_summary_mean_std.csv` in the output root
+
+### GPU Policy
+
+GPU 0 and GPU 7 are **forbidden** (occupied by other users). Default `--gpu` is `1` for all models that support CUDA. Use `--no_cuda` for CPU-only execution.
+
 ## Migration Status
 
 See [docs/migration_status.md](docs/migration_status.md) for detailed migration status of all baselines.

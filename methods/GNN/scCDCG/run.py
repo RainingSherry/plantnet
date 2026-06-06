@@ -219,7 +219,7 @@ def parse_args():
     # 其他参数
     parser.add_argument('--seed', type=int, default=3047,
                         help='随机种子')
-    parser.add_argument('--gpu', type=int, default=0,
+    parser.add_argument('--gpu', type=int, default=1,
                         help='GPU设备号')
     parser.add_argument('--no_cuda', action='store_true',
                         help='禁用CUDA')

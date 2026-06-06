@@ -341,7 +341,7 @@ def main():
     embedding = adata.obsm['X_pca']
 
     # 保存聚类结果
-    save(args.save_dir, Y, pred_labels, epoch=1, embedding=embedding)
+    save(args.save_dir, Y, pred_labels, epoch=1, embedding=embedding, args=vars(args))
 
     # 额外保存 UMAP embedding
     if 'X_umap' in adata.obsm:

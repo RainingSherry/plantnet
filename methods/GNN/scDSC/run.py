@@ -232,7 +232,7 @@ def parse_args():
     # Other arguments
     parser.add_argument('--seed', type=int, default=42,
                         help='Random seed')
-    parser.add_argument('--gpu', type=int, default=0,
+    parser.add_argument('--gpu', type=int, default=1,
                         help='GPU device ID')
     parser.add_argument('--no_cuda', action='store_true',
                         help='Disable CUDA')
@@ -317,7 +317,7 @@ def main():
     print('Building KNN graph...')
     adj = build_graph(X, k=args.k_neighbors)
     if args.cuda:
-        adj = adj.cuda()
+        adj = adj.to(device)
 
     # Initialize model
     print('Initializing scDSC model...')
@@ -353,6 +353,9 @@ def main():
     X_raw_tensor = torch.tensor(raw_counts).to(device)
     sf_tensor = torch.tensor(sf).to(device)
 
+    # Batch size for ZINB loss computation (prevents OOM on large datasets)
+    batch_size = 256
+
     best_embedding = None
     best_y_pred = None
 
@@ -368,11 +371,22 @@ def main():
 
         x_bar, q, pred, z, meanbatch, dispbatch, pibatch = model(X_tensor, adj)
 
-        # Compute losses
+        # Compute losses (batched for ZINB to prevent OOM)
         bce_loss = F.binary_cross_entropy(q, p)
         ce_loss = F.kl_div(pred.log(), p, reduction='batchmean')
         re_loss = F.mse_loss(x_bar, X_tensor)
-        zinb_loss = model.zinb_loss(X_raw_tensor, meanbatch, dispbatch, pibatch, sf_tensor)
+
+        # Batch ZINB loss to avoid GPU OOM
+        zinb_loss = 0.0
+        for start in range(0, X_raw_tensor.shape[0], batch_size):
+            end = min(start + batch_size, X_raw_tensor.shape[0])
+            xb = X_raw_tensor[start:end]
+            mb = meanbatch[start:end]
+            db = dispbatch[start:end]
+            pb = pibatch[start:end]
+            sf_b = sf_tensor[start:end]
+            zinb_loss += model.zinb_loss(xb, mb, db, pb, sf_b)
+        zinb_loss = zinb_loss / ((X_raw_tensor.shape[0] + batch_size - 1) // batch_size)
 
         loss = args.w_bce * bce_loss + args.w_ce * ce_loss + args.w_re * re_loss + args.w_zinb * zinb_loss
 

@@ -79,7 +79,7 @@ def parse_args():
                         help='Update interval for target distribution')
     parser.add_argument('--seed', type=int, default=42,
                         help='Random seed')
-    parser.add_argument('--gpu', type=int, default=0,
+    parser.add_argument('--gpu', type=int, default=1,
                         help='GPU device ID')
     parser.add_argument('--no_cuda', action='store_true',
                         help='Disable CUDA')

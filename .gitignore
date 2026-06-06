@@ -11,7 +11,11 @@ __pycache__/
 data
 
 # Results / outputs (generated, not needed in repo)
+# Raw results are excluded:
 results/
+# But formal benchmark summary tables are committed:
+!results/formal/*/benchmark_summary*.csv
+!results/formal/*/*/benchmark_summary*.csv
 
 # Large data/model files (track these with Git LFS instead)
 # These patterns are here as a fallback for files not tracked by LFS:

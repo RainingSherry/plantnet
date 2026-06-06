@@ -186,7 +186,7 @@ def main():
     embedding = pca.fit_transform(X)
 
     # 保存结果
-    save(args.save_dir, Y, best_labels, 1, embedding)
+    save(args.save_dir, Y, best_labels, 1, embedding, args=vars(args))
     print(f'Leiden completed. Results saved to: {args.save_dir}')
 
 

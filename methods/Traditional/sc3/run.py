@@ -37,6 +37,7 @@ from sklearn.metrics import v_measure_score, homogeneity_score, completeness_sco
 from sklearn.preprocessing import LabelEncoder
 from sklearn.decomposition import PCA
 from scipy.spatial.distance import pdist, squareform
+from scipy.optimize import linear_sum_assignment
 import json
 import warnings
 warnings.filterwarnings('ignore')
@@ -168,13 +169,12 @@ def main():
     print(f'Number of clusters found: {len(np.unique(y_pred))}')
 
     # 保存结果
-    save(args.save_dir, Y, y_pred, 0, X_pca)
+    save(args.save_dir, Y, y_pred, 0, X_pca, args=vars(args))
 
     # ========== Step 3: 计算评估指标 ==========
     metrics_path = os.path.join(args.save_dir, 'metrics.json')
 
     # Use Hungarian algorithm (scipy) to align predicted labels with ground truth
-    from sklearn.preprocessing import LabelEncoder
     le = LabelEncoder()
     y_enc = le.fit_transform(y_pred)
     gt_enc = le.fit_transform(Y)

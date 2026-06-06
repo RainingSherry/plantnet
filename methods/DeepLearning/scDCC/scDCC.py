@@ -111,7 +111,7 @@ class scDCC(nn.Module):
             xbatch = X[batch_idx*batch_size : min((batch_idx+1)*batch_size, num)]
             inputs = Variable(xbatch.to(device))
             z,_, _, _, _ = self.forward(inputs)
-            encoded.append(z.data.cpu())
+            encoded.append(z.data.to(device))
 
         encoded = torch.cat(encoded, dim=0)
         return encoded
@@ -146,7 +146,8 @@ class scDCC(nn.Module):
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-                print('Pretrain epoch [{}/{}], ZINB loss:{:.4f}'.format(batch_idx+1, epoch+1, loss.item()))
+                if (epoch + 1) % 5 == 0 or batch_idx == 0:
+                    print('Pretrain epoch [{}/{}], ZINB loss:{:.4f}'.format(batch_idx+1, epoch+1, loss.item()))
 
         if ae_save:
             torch.save({'ae_state_dict': self.state_dict(),

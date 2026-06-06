@@ -1,0 +1,259 @@
+# Machine-readable method manifest
+# Used by run_formal_benchmark.py to determine which methods to run
+# Format: per BDD Scenarios 5, 15
+
+methods:
+  # ── VERIFIED + Smoke PASS: eligible for default formal run ──
+  - key: dec
+    name: DEC
+    full_name: Deep Embedded Clustering
+    path: methods/DeepLearning/dec/run.py
+    category: DeepLearning
+    authenticity: VERIFIED
+    smoke: PASS
+    gpu_policy: PASS
+    default_in_formal: true
+    framework: PyTorch
+    source_path: OtherMode/scCluBench-main/DeepLearning/dec
+    target_path: methods/DeepLearning/dec
+    source_files:
+      - run.py
+
+  - key: scdcc
+    name: scDCC
+    full_name: Single-Cell Deep Constrained Clustering
+    path: methods/DeepLearning/scDCC/run.py
+    category: DeepLearning
+    authenticity: VERIFIED
+    smoke: PASS
+    gpu_policy: PASS
+    default_in_formal: true
+    framework: PyTorch
+    source_path: OtherMode/scCluBench-main/DeepLearning/scDCC
+    target_path: methods/DeepLearning/scDCC
+    source_files:
+      - run.py
+      - scDCC.py
+      - layers.py
+    known_deviations:
+      - scipy.optimize.linear_sum_assignment (replaces deprecated sklearn.utils.linear_assignment)
+      - CPU device fix via torch.cuda.set_device guard
+      - raw_counts uses adata.layers['norm_log'] for ZINB loss
+
+  - key: scdsc
+    name: scDSC
+    full_name: Structural Deep Clustering Network
+    path: methods/GNN/scDSC/run.py
+    category: GNN
+    authenticity: VERIFIED
+    smoke: PASS
+    gpu_policy: PASS
+    default_in_formal: true
+    framework: PyTorch
+    source_path: OtherMode/scCluBench-main/GNN/scDSC
+    target_path: methods/GNN/scDSC
+    source_files:
+      - run.py
+      - GNN.py
+      - layers.py
+      - filter.py
+      - T.py
+      - evaluation.py
+      - preprocess.py
+      - utils.py
+    known_deviations:
+      - raw_counts uses adata.layers['norm_log'] for ZINB loss
+
+  - key: scanpy_standard
+    name: ScanpyStandard
+    full_name: Scanpy Standard Pipeline
+    path: methods/Traditional/ScanpyStandard/run.py
+    category: Traditional
+    authenticity: VERIFIED
+    smoke: PASS
+    gpu_policy: PASS
+    default_in_formal: true
+    framework: Scanpy
+    source_path: OtherMode/scCluBench-main/Traditional/ScanpyStandard
+    target_path: methods/Traditional/ScanpyStandard
+    source_files:
+      - run.py
+
+  - key: leiden
+    name: Leiden
+    full_name: Leiden Community Detection
+    path: methods/Traditional/Leiden/run.py
+    category: Traditional
+    authenticity: VERIFIED
+    smoke: PASS
+    gpu_policy: PASS
+    default_in_formal: true
+    framework: igraph+leidenalg
+    source_path: OtherMode/scCluBench-main/Traditional/Leiden
+    target_path: methods/Traditional/Leiden
+    source_files:
+      - run.py
+
+  - key: louvain
+    name: Louvain
+    full_name: Louvain Community Detection
+    path: methods/Traditional/Louvain/run.py
+    category: Traditional
+    authenticity: VERIFIED
+    smoke: PASS
+    gpu_policy: PASS
+    default_in_formal: true
+    framework: NetworkX
+    source_path: OtherMode/scCluBench-main/Traditional/Louvain
+    target_path: methods/Traditional/Louvain
+    source_files:
+      - run.py
+
+  - key: sc3
+    name: sc3
+    full_name: Single-Cell Consensus Clustering
+    path: methods/Traditional/sc3/run.py
+    category: Traditional
+    authenticity: VERIFIED
+    smoke: PASS
+    gpu_policy: PASS
+    default_in_formal: true
+    framework: scikit-learn
+    source_path: OtherMode/scCluBench-main/Traditional/sc3
+    target_path: methods/Traditional/sc3
+    source_files:
+      - run.py
+    known_deviations:
+      - Pure Python reimplementation (original SC3 requires R)
+      - Algorithm principle preserved: consensus clustering
+
+  - key: neighbornix_scmae
+    name: NeighborMix_scMAE
+    full_name: NeighborMix-scMAE
+    path: methods/DeepLearning/NeighborMix_scMAE/run.py
+    category: DeepLearning
+    authenticity: VERIFIED
+    smoke: PASS
+    gpu_policy: PASS
+    default_in_formal: true
+    framework: PyTorch
+    role: proposed
+
+  - key: nm_scmae_nomix
+    name: nm_scmae_nomix
+    full_name: NeighborMix-scMAE-noMix (ablation)
+    path: methods/DeepLearning/NeighborMix_scMAE/run.py
+    category: DeepLearning
+    authenticity: VERIFIED
+    smoke: PASS
+    gpu_policy: PASS
+    default_in_formal: true
+    framework: PyTorch
+    role: ablation
+    extra_args: [--no_mix]
+
+  - key: scmae
+    name: scMAE
+    full_name: scMAE
+    path: methods/DeepLearning/scMAE/run.py
+    category: DeepLearning
+    authenticity: VERIFIED
+    smoke: PASS
+    gpu_policy: PASS
+    default_in_formal: true
+    framework: PyTorch
+
+  # ── ENV-GATED: blocked by environment ──
+  - key: scdeepcluster
+    name: scDeepCluster
+    path: methods/DeepLearning/scDeepCluster/run.py
+    category: DeepLearning
+    authenticity: ENV-GATED
+    smoke: ENV-BLOCKED
+    gpu_policy: N/A
+    default_in_formal: false
+    framework: TensorFlow
+    reason: TensorFlow/Keras dependency
+
+  - key: scname
+    name: scNAME
+    path: methods/DeepLearning/scNAME/run.py
+    category: DeepLearning
+    authenticity: ENV-GATED
+    default_in_formal: false
+    framework: TensorFlow
+    reason: TensorFlow/Keras dependency
+
+  - key: sczidesk
+    name: scziDesk
+    path: methods/DeepLearning/scziDesk/run.py
+    category: DeepLearning
+    authenticity: ENV-GATED
+    default_in_formal: false
+    framework: TensorFlow
+    reason: TensorFlow/Keras dependency
+
+  - key: desc
+    name: DESC
+    path: methods/DeepLearning/desc/run.py
+    category: DeepLearning
+    authenticity: ENV-GATED
+    default_in_formal: false
+    framework: TensorFlow
+    reason: TensorFlow/Keras dependency
+
+  # ── PENDING: full code migrated, not yet audited ──
+  - key: scgnn
+    name: scGNN
+    path: methods/GNN/scGNN/run.py
+    category: GNN
+    authenticity: PENDING
+    default_in_formal: false
+    framework: PyTorch
+    gpu_policy: PASS (fixed default=1)
+
+  - key: sccdcg
+    name: scCDCG
+    path: methods/GNN/scCDCG/run.py
+    category: GNN
+    authenticity: PENDING
+    default_in_formal: false
+    framework: PyTorch
+    gpu_policy: PASS (fixed default=1)
+
+  - key: attentionae_sc
+    name: AttentionAE_sc
+    path: methods/GNN/AttentionAE_sc/run.py
+    category: GNN
+    authenticity: PENDING
+    default_in_formal: false
+    framework: PyTorch
+    gpu_policy: PASS (fixed default=1)
+
+  # ── PLACEHOLDER: Foundation model stubs ──
+  - key: scgpt
+    name: scGPT
+    path: methods/Foundation/scGPT/run.py
+    category: Foundation
+    authenticity: PLACEHOLDER
+    default_in_formal: false
+    framework: Foundation
+    reason: Checkpoint not downloaded
+
+  - key: geneformer
+    name: GeneFormer
+    path: methods/Foundation/GeneFormer/run.py
+    category: Foundation
+    authenticity: PLACEHOLDER
+    default_in_formal: false
+    framework: Foundation
+    reason: Checkpoint not downloaded
+
+  - key: genecompass
+    name: GeneCompass
+    path: methods/Foundation/GeneCompass/run.py
+    category: Foundation
+    authenticity: PLACEHOLDER
+    default_in_formal: false
+    framework: Foundation
+    reason: Checkpoint not downloaded

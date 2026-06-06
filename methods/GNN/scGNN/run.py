@@ -27,7 +27,7 @@ def parse_args():
     parser.add_argument('--dataset_name', type=str, default=None, help='Optional dataset alias used for working files')
 
     parser.add_argument('--seed', type=int, default=1, help='Random seed passed to original scGNN')
-    parser.add_argument('--gpu', type=int, default=0, help='GPU device ID')
+    parser.add_argument('--gpu', type=int, default=1, help='GPU device ID')
     parser.add_argument('--no_cuda', action='store_true', help='Disable CUDA')
     parser.add_argument('--cores_usage', type=str, default='1', help='Number of CPU cores used by original scGNN')
 
