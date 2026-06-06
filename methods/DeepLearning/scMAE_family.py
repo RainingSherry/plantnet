@@ -26,7 +26,7 @@ from sklearn.metrics import (
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import DataLoader, Dataset
 
-from methods.DeepLearning.PlantSPADE_LGCL.utils import save_json
+from methods.shared_utils import save_json
 
 
 # AnnData.obs 中常见的细胞类型标签列名列表。

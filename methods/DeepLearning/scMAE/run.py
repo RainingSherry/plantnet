@@ -95,8 +95,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from methods.DeepLearning import scMAE_family as family
-from methods.DeepLearning.PlantSPADE_LGCL.utils import ensure_dir, save_json
-from methods.DeepLearning.PlantSPADE_LGCL.run_plantspade import sanitize_anndata_for_write
+from methods.shared_utils import ensure_dir, save_json, sanitize_anndata_for_write
 
 # 导入模型组件
 from model import AutoEncoder

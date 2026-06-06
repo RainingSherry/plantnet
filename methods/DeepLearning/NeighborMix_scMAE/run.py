@@ -54,8 +54,7 @@ try:
 except ImportError:
     from model import AutoEncoder
 
-from methods.DeepLearning.PlantSPADE_LGCL.utils import ensure_dir, save_json
-from methods.DeepLearning.PlantSPADE_LGCL.run_plantspade import sanitize_anndata_for_write
+from methods.shared_utils import ensure_dir, save_json, sanitize_anndata_for_write
 from methods.DeepLearning import scMAE_family as family
 
 
