@@ -1,0 +1,21 @@
+name: plantspade_lgcl_stress_test_subsample
+note: >
+  Feasibility-only stress profile for large or unstable datasets. These runs are
+  not part of the main performance table.
+datasets:
+  - CRA007122
+  - SRP309176
+subsample:
+  per_class_max_cells: 1000
+  fallback_max_cells: 10000
+preprocessing:
+  n_top_genes: 1000
+  target_sum: 10000.0
+training:
+  pairs_per_epoch: 65536
+attention:
+  attention_topk_genes: 64
+evaluation:
+  include_louvain: false
+  run_oracle_sweep: false
+  silhouette_sample_size: 3000
