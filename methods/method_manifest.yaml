@@ -127,7 +127,7 @@ methods:
       - Pure Python reimplementation (original SC3 requires R)
       - Algorithm principle preserved: consensus clustering
 
-  - key: neighbornix_scmae
+  - key: neighbormix_scmae
     name: NeighborMix_scMAE
     full_name: NeighborMix-scMAE
     path: methods/DeepLearning/NeighborMix_scMAE/run.py
@@ -150,7 +150,17 @@ methods:
     default_in_formal: true
     framework: PyTorch
     role: ablation
-    extra_args: [--no_mix]
+    extra_args:
+      - --use_pseudo
+      - "false"
+      - --pseudo_weight
+      - "0"
+      - --neighbor_k
+      - "0"
+      - --mix_neighbors
+      - "0"
+      - --variant_name
+      - "nm_scmae_nomix"
 
   - key: scmae
     name: scMAE

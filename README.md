@@ -142,40 +142,80 @@ See [docs/migration_status.md](docs/migration_status.md) and [docs/model_authent
 
 ## Formal Benchmark
 
+### Formal Method List
+
+The default formal benchmark includes 10 methods:
+
+| Role | Method | Key |
+|------|--------|-----|
+| **Proposed** | NeighborMix-scMAE | `neighbormix_scmae` |
+| **Ablation** | NM-scMAE-noMix | `nm_scmae_nomix` |
+| **External baseline** | scMAE | `scmae` |
+| **Deep baseline** | DEC | `dec` |
+| **Deep baseline** | scDCC | `scdcc` |
+| **Deep baseline** | scDSC | `scdsc` |
+| **Traditional** | ScanpyStandard | `scanpy_standard` |
+| **Traditional** | Leiden | `leiden` |
+| **Traditional** | Louvain | `louvain` |
+| **Traditional** | SC3 | `sc3` |
+
 ### Quick Run
 
 ```bash
-# Run all VERIFIED methods on a dataset (GPU enabled)
+# Run all 10 formal methods (GPU enabled, GPU 1)
 python scripts/run_formal_benchmark.py \
   --data_path data/subsample_2k.h5ad \
-  --out_dir results/formal/subsample_2k \
+  --dataset_name subsample_2k \
+  --out_dir results/formal \
   --n_clusters 7 \
-  --seeds 42 43 44 \
-  --pretrain_epochs 200 \
-  --epochs 200
+  --seeds 42 \
+  --gpu 1
+
+# CPU-only run
+python scripts/run_formal_benchmark.py \
+  --data_path data/subsample_2k.h5ad \
+  --dataset_name subsample_2k \
+  --out_dir results/formal \
+  --n_clusters 7 \
+  --seeds 42 \
+  --no_cuda
+
+# Preflight / dry run (validate without executing)
+python scripts/run_formal_benchmark.py \
+  --data_path data/subsample_2k.h5ad \
+  --dataset_name subsample_2k \
+  --out_dir results/formal \
+  --n_clusters 7 \
+  --seeds 42 \
+  --gpu 1 \
+  --dry_run
 
 # Run specific methods
 python scripts/run_formal_benchmark.py \
-  --data_path data/SRP182008.h5ad \
-  --methods dec scdcc scanpy_standard \
-  --n_clusters 15 --seeds 42
-
-# Include pending models (output flagged as unverified)
-python scripts/run_formal_benchmark.py \
   --data_path data/subsample_2k.h5ad \
-  --methods scgnn sccdcg \
-  --n_clusters 7 --allow_unverified
+  --methods neighbormix_scmae dec scdcc \
+  --n_clusters 7 --seeds 42 --gpu 1
 ```
-
-### Formal Results
-
-Output files per method:
-- `embedding_final.npy`, `labels.npy`, `metrics.json`, `args.json`, `authenticity.json`
-- `benchmark_summary.csv` and `benchmark_summary_mean_std.csv` in the output root
 
 ### GPU Policy
 
-GPU 0 and GPU 7 are **forbidden** (occupied by other users). Default `--gpu` is `1` for all models that support CUDA. Use `--no_cuda` for CPU-only execution.
+**GPU 0 and GPU 7 are FORBIDDEN** (occupied by other users). Default `--gpu` is `1`. Only `--gpu 1-6` or `--no_cuda` are allowed. The runner validates GPU policy at startup and will exit if a forbidden GPU is detected.
+
+### Formal Results
+
+Output per method run:
+- `embedding_final.npy`, `labels.npy`, `metrics.json`, `args.json`
+- `authenticity.json` (authenticity audit record, `substitute_model_used: false`)
+- `status.json` (execution metadata: status, runtime, GPU, commit SHA, branch)
+- `command.txt` (exact command executed)
+- `run.log` (stdout/stderr capture)
+
+Summary tables in output root:
+- `benchmark_summary.csv` — full per-run traceability (seed, status, runtime, GPU, commit, command, error)
+- `benchmark_summary_mean_std.csv` — mean ± std over seeds (only `status=success` + `authenticity=VERIFIED` + `substitute_model_used=false` rows included)
+- `benchmark_summary_mean_std.md` — markdown version of the aggregated table
+
+**Only runs where `status=success`, `authenticity=VERIFIED`, and `substitute_model_used=false` are eligible for the main paper table.**
 
 ## Migration Status
 
