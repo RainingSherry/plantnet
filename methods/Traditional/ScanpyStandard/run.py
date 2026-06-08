@@ -136,7 +136,7 @@ def main():
 
     # 获取真实标签
     label_col = None
-    for candidate in ['cell_type', 'Celltype', 'celltype', 'cell_label', 'label']:
+    for candidate in ['resolved_label', 'cell_type', 'Celltype', 'celltype', 'cell_label', 'label']:
         if candidate in adata.obs.columns:
             label_col = candidate
             break

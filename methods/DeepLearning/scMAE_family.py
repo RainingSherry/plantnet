@@ -32,6 +32,7 @@ from methods.shared_utils import save_json
 # AnnData.obs 中常见的细胞类型标签列名列表。
 # 自动检测时会按出现顺序依次搜索这些键。
 LABEL_CANDIDATES = [
+    "resolved_label",   # from prepare_dataset.py output
     "maintype",
     "cell_type",
     "Celltype",

@@ -54,6 +54,8 @@ from typing import Dict, List, Optional, Any
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 METHODS_DIR = PROJECT_ROOT / "methods"
 MANIFEST_PATH = METHODS_DIR / "method_manifest.yaml"
+SCRIPTS_DIR = PROJECT_ROOT / "scripts"
+PROCESSED_DATA_DIR = PROJECT_ROOT / "data" / "processed"
 FORBIDDEN_GPUS = {"0", "7"}
 
 # Default formal method list (proposed + ablation + external + baselines)
@@ -93,6 +95,86 @@ def validate_gpu_policy(gpu: int, no_cuda: bool) -> None:
                 f"[GPU Policy] CUDA_VISIBLE_DEVICES={visible} contains forbidden GPU(s) {forbidden}. "
                 "GPU 0 and GPU 7 are NOT allowed."
             )
+
+
+def auto_convert_h5(data_path: str, dataset_name: str) -> tuple[str, int]:
+    """
+    If data_path ends with .h5, convert to .h5ad via prepare_dataset.py and return
+    the path to the converted file and inferred n_clusters.
+
+    Returns (converted_path, n_clusters).
+
+    If data_path ends with .h5ad, just loads and infers n_clusters (requires
+    --n_clusters auto or a real value), returning (data_path, n_clusters).
+
+    Exits on failure.
+    """
+    import scanpy as sc
+
+    ext = os.path.splitext(data_path)[1].lower()
+
+    if ext == ".h5":
+        PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
+        output_path = PROCESSED_DATA_DIR / f"{dataset_name}.h5ad"
+        meta_path = PROCESSED_DATA_DIR / f"{dataset_name}.meta.json"
+
+        # Reuse existing conversion if already done
+        if output_path.exists() and meta_path.exists():
+            print(f"  [auto-convert] Reusing cached: {output_path}")
+            with open(meta_path) as f:
+                meta = json.load(f)
+            return str(output_path), meta["n_clusters"]
+
+        # Build prepare_dataset.py command
+        prepare_script = SCRIPTS_DIR / "prepare_dataset.py"
+        cmd = [
+            sys.executable,
+            str(prepare_script),
+            "--input_path", data_path,
+            "--dataset_name", dataset_name,
+            "--output_dir", str(PROCESSED_DATA_DIR),
+            "--force",  # always regenerate fresh conversion
+        ]
+        print(f"\n  [auto-convert] .h5 detected. Converting via prepare_dataset.py ...")
+        print(f"    Input:  {data_path}")
+        print(f"    Output: {output_path}")
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=600,
+                env=os.environ.copy(),
+            )
+            if result.returncode != 0:
+                print(f"  [auto-convert] FAILED:\n{result.stderr}\n{result.stdout}")
+                raise SystemExit(1)
+            # Read back n_clusters from meta.json
+            with open(meta_path) as f:
+                meta = json.load(f)
+            n_clusters = meta["n_clusters"]
+            print(f"  [auto-convert] Done. shape=({meta['n_cells']}, {meta['n_genes']}), "
+                  f"n_clusters={n_clusters}")
+            return str(output_path), n_clusters
+        except subprocess.TimeoutExpired:
+            print("  [auto-convert] TIMEOUT (10 min)")
+            raise SystemExit(1)
+        except Exception as e:
+            print(f"  [auto-convert] ERROR: {e}")
+            raise SystemExit(1)
+
+    elif ext == ".h5ad":
+        # n_clusters is handled separately; just validate the file is readable
+        try:
+            ad = sc.read_h5ad(data_path)
+            return data_path, None  # caller must provide n_clusters
+        except Exception as e:
+            print(f"  [data] ERROR reading {data_path}: {e}")
+            raise SystemExit(1)
+
+    else:
+        print(f"  [data] Unsupported extension: {ext} (expected .h5 or .h5ad)")
+        raise SystemExit(1)
 
 
 def get_git_info() -> tuple[str, str]:
@@ -280,6 +362,7 @@ def run_method(
     branch: str,
     verbose: bool = False,
     dry_run: bool = False,
+    dataset_name: str = "",
 ) -> Dict[str, Any]:
     """Run a single method with a given seed. Returns a result dict."""
 
@@ -305,7 +388,8 @@ def run_method(
             end_time = datetime.now().isoformat()
             _write_status(out_dir, method_key, seed, status, return_code,
                           elapsed_seconds, gpu, no_cuda, start_time, end_time,
-                          cmd, commit_sha, branch, reason, "")
+                          cmd, commit_sha, branch, reason, "",
+                          dataset=dataset_name, n_clusters=n_clusters)
             return {
                 "method": method_key,
                 "seed": seed,
@@ -340,7 +424,8 @@ def run_method(
         end_time = datetime.now().isoformat()
         _write_status(out_dir, method_key, seed, status, return_code,
                       elapsed_seconds, gpu, no_cuda, start_time, end_time,
-                      cmd, commit_sha, branch, "", "")
+                      cmd, commit_sha, branch, "", "",
+                      dataset=dataset_name, n_clusters=n_clusters)
         return {
             "method": method_key,
             "seed": seed,
@@ -410,7 +495,8 @@ def run_method(
 
     _write_status(out_dir, method_key, seed, status, return_code,
                   elapsed_seconds, gpu, no_cuda, start_time, end_time,
-                  cmd, commit_sha, branch, "", error_msg)
+                  cmd, commit_sha, branch, "", error_msg,
+                  dataset=dataset_name, n_clusters=n_clusters)
 
     metrics = load_metrics(out_dir)
 
@@ -469,12 +555,14 @@ def _write_status(
     branch: str,
     reason: str,
     error_msg: str,
+    dataset: str = "",
+    n_clusters: int = None,
 ) -> None:
     """Write status.json to the output directory."""
     status_data = {
         "method": method,
         "seed": seed,
-        "dataset": "",
+        "dataset": dataset,
         "status": status,
         "return_code": return_code,
         "elapsed_seconds": elapsed_seconds,
@@ -488,6 +576,8 @@ def _write_status(
         "reason": reason,
         "error": error_msg,
     }
+    if n_clusters is not None:
+        status_data["n_clusters"] = n_clusters
     with open(out_dir / "status.json", "w", encoding="utf-8") as f:
         json.dump(status_data, f, indent=2)
 
@@ -748,8 +838,8 @@ Substitute implementations are forbidden.
                        help="Base output directory")
     parser.add_argument("--dataset_name", type=str, default=None,
                        help="Dataset name for summary tables (default: derived from data_path)")
-    parser.add_argument("--n_clusters", type=int, required=True,
-                       help="Number of clusters")
+    parser.add_argument("--n_clusters", type=str, required=True,
+                       help="Number of clusters. Use 'auto' to infer from labels in .h5 or .h5ad.")
     parser.add_argument("--seeds", type=int, nargs="+", default=[42],
                        help="Random seeds (default: 42)")
     parser.add_argument("--epochs", type=int, default=200,
@@ -777,9 +867,43 @@ Substitute implementations are forbidden.
     # ── GPU policy validation ──────────────────────────────────
     validate_gpu_policy(args.gpu, args.no_cuda)
 
+    # ── Auto-convert .h5 → .h5ad ─────────────────────────────
+    dataset_name = args.dataset_name or os.path.splitext(os.path.basename(args.data_path))[0]
+
+    data_path = os.path.abspath(args.data_path)
+    n_clusters_raw = args.n_clusters
+
+    if os.path.splitext(data_path)[1].lower() == ".h5":
+        # .h5 always auto-converts; n_clusters comes from prepare_dataset
+        data_path, n_clusters = auto_convert_h5(data_path, dataset_name)
+        if n_clusters is None:
+            print("ERROR: --n_clusters auto but prepare_dataset failed to infer n_clusters")
+            sys.exit(1)
+        print(f"  Resolved n_clusters={n_clusters} from .h5 conversion")
+    else:
+        # .h5ad: n_clusters may be 'auto' or a real int
+        if n_clusters_raw == "auto":
+            import scanpy as sc
+            ad = sc.read_h5ad(data_path)
+            # Use resolved_label if available, otherwise try common keys
+            label_col = None
+            for candidate in ["resolved_label", "cell_type", "Celltype",
+                               "celltype", "cell_label", "label"]:
+                if candidate in ad.obs.columns:
+                    label_col = candidate
+                    break
+            if label_col is None:
+                print(f"ERROR: Cannot auto-detect label column in {data_path}")
+                print(f"  Available obs columns: {list(ad.obs.columns)}")
+                sys.exit(1)
+            n_clusters = len(ad.obs[label_col].unique())
+            print(f"  Resolved n_clusters={n_clusters} from --n_clusters auto "
+                  f"(label_col={label_col!r})")
+        else:
+            n_clusters = int(n_clusters_raw)
+
     # ── Load manifest ───────────────────────────────────────────
     manifest = load_manifest()
-    dataset_name = args.dataset_name or os.path.splitext(os.path.basename(args.data_path))[0]
     if args.out_dir and dataset_name in args.out_dir:
         base_out_dir = Path(args.out_dir)
     else:
@@ -816,9 +940,9 @@ Substitute implementations are forbidden.
     print("=" * 70)
     print("Formal Benchmark Runner")
     print("=" * 70)
-    print(f"  Data:     {args.data_path}")
+    print(f"  Data:     {data_path}")
     print(f"  Dataset:  {dataset_name}")
-    print(f"  Clusters: {args.n_clusters}")
+    print(f"  Clusters: {n_clusters}")
     print(f"  Seeds:    {args.seeds}")
     print(f"  Epochs:   {args.epochs} (pretrain: {args.pretrain_epochs})")
     print(f"  CUDA:     {'disabled (CPU only)' if args.no_cuda else f'GPU {args.gpu}'}")
@@ -854,9 +978,9 @@ Substitute implementations are forbidden.
             for seed in args.seeds:
                 extra_args = method_info.get("extra_args", None)
                 cmd = build_command(
-                    method_key, method_info, args.data_path,
+                    method_key, method_info, data_path,
                     base_out_dir / f"{method_key}__seed{seed}__dry",
-                    args.n_clusters, args.epochs, args.pretrain_epochs,
+                    n_clusters, args.epochs, args.pretrain_epochs,
                     seed, args.gpu, args.no_cuda, extra_args,
                 )
                 icon = "✓" if allowed else "⊗"
@@ -883,6 +1007,7 @@ Substitute implementations are forbidden.
                         None, 0.0, args.gpu, args.no_cuda,
                         datetime.now().isoformat(), datetime.now().isoformat(),
                         [], commit_sha, branch, reason, "",
+                        dataset=dataset_name, n_clusters=n_clusters,
                     )
                 print()
                 continue
@@ -891,13 +1016,14 @@ Substitute implementations are forbidden.
             for seed in args.seeds:
                 result = run_method(
                     method_key, method_info,
-                    args.data_path, base_out_dir,
-                    args.n_clusters, args.epochs, args.pretrain_epochs,
+                    data_path, base_out_dir,
+                    n_clusters, args.epochs, args.pretrain_epochs,
                     seed, args.gpu, args.no_cuda,
                     args.allow_unverified,
                     commit_sha, branch,
                     verbose=args.verbose,
                     dry_run=args.dry_run,
+                    dataset_name=dataset_name,
                 )
                 all_results.append(result)
             print()

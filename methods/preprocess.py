@@ -279,6 +279,14 @@ def normalize_sc(adata, size_factors=True, filter_min_counts=True, logtrans_inpu
     if adata.raw is None:
         adata.raw = adata.copy()
 
+    # Step 1.5: Handle datasets that are already pre-normalized (e.g. float in [0, ~20]).
+    # prepare_dataset.py sets uns["is_pre_normalized"] for such files.
+    # In that case, skip log1p to avoid double-transformation.
+    if adata.uns.get("is_pre_normalized", False):
+        print("Detected pre-normalized data (uns['is_pre_normalized']=True). "
+              "Skipping log1p to avoid double-transformation.")
+        logtrans_input = False
+
     # Step 2: 检查预处理状态，智能决定需要执行哪些步骤
     is_norm, is_log1p, is_scaled = check_normalization(adata)
     print(f"是否归一化: {is_norm}, 是否 log1p 变换: {is_log1p}, 是否标准化: {is_scaled}")
@@ -365,7 +373,14 @@ def normalize_sc(adata, size_factors=True, filter_min_counts=True, logtrans_inpu
                 count_column = c
                 break
         if count_column is None:
-            raise KeyError(f"No count column found for size factors. Available obs columns: {list(adata.obs.columns)}")
+            # Compute from expression matrix if no count column exists.
+            # This handles .h5 → .h5ad converted datasets where n_counts was not stored.
+            if hasattr(adata.X, 'toarray'):
+                counts = np.asarray(adata.X.toarray()).sum(axis=1)
+            else:
+                counts = np.asarray(adata.X).sum(axis=1)
+            adata.obs['n_counts'] = counts.astype(np.float32)
+            count_column = 'n_counts'
         # Size factor = 细胞总 counts / 中位数总 counts
         adata.obs['size_factors'] = adata.obs[count_column] / np.median(adata.obs[count_column])
 
@@ -432,7 +447,7 @@ def prepare_data_for_model(file_path, size_factors=True, filter_min_counts=True,
     X = data.to_df()           # 获取预处理后的 DataFrame（细胞 × 基因）
     # 尝试多种常见的细胞类型列名
     label_col = None
-    for candidate in ['cell_type', 'Celltype', 'celltype', 'cell_label', 'label']:
+    for candidate in ['resolved_label', 'cell_type', 'Celltype', 'celltype', 'cell_label', 'label']:
         if candidate in data.obs.columns:
             label_col = candidate
             break

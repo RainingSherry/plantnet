@@ -8,7 +8,10 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Symbolic link to external data directory
-data
+data/
+
+# Processed / converted datasets (generated from raw .h5 inputs)
+data/processed/
 
 # Results / outputs (generated, not needed in repo)
 # Raw results are excluded:
@@ -16,6 +19,11 @@ results/
 # But formal benchmark summary tables are committed:
 !results/formal/*/benchmark_summary*.csv
 !results/formal/*/*/benchmark_summary*.csv
+# Also commit analysis summaries:
+!results/analysis/dataset_property_summary.csv
+!results/analysis/neighbormix_gain_summary.csv
+!results/analysis/neighbormix_property_correlation.csv
+!results/analysis/neighbormix_effect_interpretation.csv
 
 # Large data/model files (track these with Git LFS instead)
 # These patterns are here as a fallback for files not tracked by LFS:
@@ -27,7 +35,6 @@ results/
 *.npz
 *.parquet
 *.loom
-*.csv
 
 # OS files
 .DS_Store
