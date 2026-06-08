@@ -17,12 +17,24 @@ import os
 import sys
 import json
 import re
+import yaml
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
 # Project root
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 METHODS_DIR = PROJECT_ROOT / "methods"
+MANIFEST_PATH = METHODS_DIR / "method_manifest.yaml"
+
+
+def load_manifest() -> Dict[str, dict]:
+    """Load the method manifest YAML keyed by method key."""
+    try:
+        with open(MANIFEST_PATH, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+        return {m["key"]: m for m in data["methods"]}
+    except Exception:
+        return {}
 
 # ─────────────────────────────────────────────────────────────
 # Model definitions: each entry specifies required keyword checks
@@ -291,6 +303,95 @@ MODEL_CHECKS: Dict[str, dict] = {
             r"autoencoder",
         ],
     },
+
+    # ── scMAE family (proposed + ablation + base) ───────────────
+    "scmae": {
+        "name": "scMAE",
+        "dir": METHODS_DIR / "DeepLearning" / "scMAE",
+        "entry": "run.py",
+        "required": [
+            ("AutoEncoder", "AutoEncoder class"),
+            ("apply_scmae_noise", "scMAE mask noise"),
+            ("loss_mask", "mask loss computation"),
+            ("extract_embedding", "feature extraction"),
+            ("KMeans", "KMeans clustering evaluation"),
+            ("mask_prob", "mask probability"),
+        ],
+        "forbidden": [
+            ("--fake", "fake flag"),
+            ("--dummy", "dummy flag"),
+            ("--skip_model", "skip model flag"),
+            ("--kmeans_only", "kmeans-only flag"),
+        ],
+        "auth_patterns": [
+            r"class\s+AutoEncoder",
+            r"loss_mask",
+            r"apply_scmae_noise",
+            r"KMeans",
+        ],
+    },
+
+    "neighbormix_scmae": {
+        "name": "NeighborMix_scMAE",
+        "dir": METHODS_DIR / "DeepLearning" / "NeighborMix_scMAE",
+        "entry": "run.py",
+        "required": [
+            ("AutoEncoder", "AutoEncoder class"),
+            ("apply_scmae_noise", "scMAE mask noise"),
+            ("build_knn_distribution", "KNN distribution construction"),
+            ("sample_mix", "neighbor-mix sampling"),
+            ("pseudo_branch_enabled", "pseudo-cell branch control"),
+            ("loss_mask", "mask loss computation"),
+        ],
+        "forbidden": [
+            ("--fake", "fake flag"),
+            ("--dummy", "dummy flag"),
+            ("--skip_model", "skip model flag"),
+            ("--kmeans_only", "kmeans-only flag"),
+        ],
+        "auth_patterns": [
+            r"class\s+AutoEncoder",
+            r"build_knn_distribution",
+            r"sample_mix",
+            r"loss_mask",
+        ],
+    },
+
+    "nm_scmae_nomix": {
+        "name": "nm_scmae_nomix (ablation)",
+        "dir": METHODS_DIR / "DeepLearning" / "NeighborMix_scMAE",
+        "entry": "run.py",
+        "required": [
+            ("--use_pseudo", "use_pseudo flag"),
+            ("--pseudo_weight", "pseudo_weight flag"),
+            ("--neighbor_k", "neighbor_k flag"),
+            ("--mix_neighbors", "mix_neighbors flag"),
+            ("--variant_name", "variant_name flag"),
+        ],
+        "manifest_check": {
+            "key": "nm_scmae_nomix",
+            "expected_extra_args": [
+                "--use_pseudo", "false",
+                "--pseudo_weight", "0",
+                "--neighbor_k", "0",
+                "--mix_neighbors", "0",
+                "--variant_name", "nm_scmae_nomix",
+            ],
+        },
+        "forbidden": [
+            ("--fake", "fake flag"),
+            ("--dummy", "dummy flag"),
+            ("--skip_model", "skip model flag"),
+            ("--kmeans_only", "kmeans-only flag"),
+        ],
+        "auth_patterns": [
+            r"--use_pseudo",
+            r"--pseudo_weight",
+            r"--neighbor_k",
+            r"--mix_neighbors",
+            r"--variant_name",
+        ],
+    },
 }
 
 
@@ -430,6 +531,20 @@ def audit_model(model_key: str, config: dict) -> dict:
     result["gpu_default_check"] = {"pass": gpu_pass, "detail": gpu_detail}
     if not gpu_pass:
         result["warnings"].append(f"GPU default violation: {gpu_detail}")
+
+    # Manifest-driven extra_args check (for ablation variants that share run.py)
+    mc = config.get("manifest_check")
+    if mc:
+        manifest = load_manifest()
+        entry_in_manifest = manifest.get(mc.get("key", model_key), {})
+        actual_args = entry_in_manifest.get("extra_args", [])
+        expected_args = mc.get("expected_extra_args", [])
+        if actual_args != expected_args:
+            result["status"] = "FAIL"
+            result["failures"].append(
+                f"manifest extra_args mismatch: got {actual_args!r}, "
+                f"expected {expected_args!r}"
+            )
 
     return result
 

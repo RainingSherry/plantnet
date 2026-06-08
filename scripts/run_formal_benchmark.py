@@ -198,8 +198,10 @@ def build_command(
         cmd.extend(["--epochs", str(epochs)])
         if method_key in ("dec", "scdcc", "scdsc"):
             cmd.extend(["--pretrain_epochs", str(pretrain_epochs)])
-    elif method_key in ("dec", "scdcc"):
-        cmd.extend(["--pretrain_epochs", str(pretrain_epochs)])
+    elif is_deep_or_gnn:
+        cmd.extend(["--epochs", str(epochs)])
+        if method_key in ("dec", "scdcc", "scdsc"):
+            cmd.extend(["--pretrain_epochs", str(pretrain_epochs)])
 
     if no_cuda:
         if is_deep_or_gnn:
@@ -235,6 +237,27 @@ def load_metrics(out_dir: Path) -> Optional[Dict[str, float]]:
         with open(metrics_path, "r") as f:
             return json.load(f)
     return None
+
+
+def normalize_metrics(metrics: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Unwrap nested metrics structures into a flat dict of evaluation metrics.
+
+    Handles three known layouts:
+      1. {"kmeans_known_k": {...}}         — NeighborMix_scMAE / scMAE
+      2. {"fixed": {"kmeans_known_k": {...}}} — legacy double-nested
+      3. flat {"acc": ..., "nmi": ...}    — already flat, returned as-is
+    """
+    if not metrics:
+        return {}
+    if "kmeans_known_k" in metrics and isinstance(metrics["kmeans_known_k"], dict):
+        return metrics["kmeans_known_k"]
+    if "fixed" in metrics and isinstance(metrics["fixed"], dict):
+        fixed = metrics["fixed"]
+        if "kmeans_known_k" in fixed and isinstance(fixed["kmeans_known_k"], dict):
+            return fixed["kmeans_known_k"]
+        return fixed
+    return metrics
 
 
 # ────────────────────────────────────────────────────────────────
@@ -332,6 +355,16 @@ def run_method(
     try:
         env = os.environ.copy()
         env["PYTHONPATH"] = str(METHODS_DIR) + ":" + env.get("PYTHONPATH", "")
+        # Limit threading to avoid GPU OOM from thread over-subscription.
+        # PyTorch defaults to 96 threads; OpenBLAS maxes at 64.
+        # With 3 benchmarks + multiple workers, this causes SIGSEGV in CUDA.
+        env["OMP_NUM_THREADS"] = "4"
+        env["OPENBLAS_NUM_THREADS"] = "4"
+        env["MKL_NUM_THREADS"] = "4"
+        env["NUMEXPR_NUM_THREADS"] = "4"
+        # Prevent CUDA OOM fragmentation for large-graph methods (scDSC)
+        if method_key == "scdsc":
+            env["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
         proc = subprocess.run(
             cmd,
@@ -407,10 +440,12 @@ def run_method(
             f"  {icon} {method_key} (seed={seed}): {status} ({elapsed_seconds:.1f}s)"
         )
         if metrics:
+            nm = normalize_metrics(metrics)
+            acc = nm.get("acc"); nmi = nm.get("nmi"); ari = nm.get("ari")
             print(
-                f"    ACC={metrics.get('acc', 'N/A'):.4f} "
-                f"NMI={metrics.get('nmi', 'N/A'):.4f} "
-                f"ARI={metrics.get('ari', 'N/A'):.4f}"
+                f"    ACC={f'{acc:.4f}' if acc is not None else 'N/A'} "
+                f"NMI={f'{nmi:.4f}' if nmi is not None else 'N/A'} "
+                f"ARI={f'{ari:.4f}' if ari is not None else 'N/A'}"
             )
         if error_msg:
             print(f"    Error: {error_msg}")
@@ -535,7 +570,7 @@ def generate_summary_csv(results: List[Dict], out_path: Path, dataset: str) -> N
     """Generate benchmark_summary.csv with full traceability fields."""
     rows = []
     for r in results:
-        m = r["metrics"] or {}
+        m = normalize_metrics(r.get("metrics"))
         row = {
             "dataset": dataset,
             "method": r["method"],
@@ -607,9 +642,9 @@ def generate_mean_std_csv(results: List[Dict], out_path: Path, dataset: str) -> 
         }
         for metric in METRIC_NAMES:
             vals = [
-                r["metrics"].get(metric)
+                normalize_metrics(r.get("metrics")).get(metric)
                 for r in runs
-                if r.get("metrics") and r["metrics"].get(metric) is not None
+                if normalize_metrics(r.get("metrics")).get(metric) is not None
             ]
             if vals:
                 mean_val = statistics.mean(vals)
@@ -767,6 +802,7 @@ Substitute implementations are forbidden.
             k: v for k, v in manifest.items()
             if v.get("authenticity") == "VERIFIED"
             and v.get("smoke") in ("PASS", "UNKNOWN", "")
+            and v.get("default_in_formal") is True
         }
 
     if not selected:
