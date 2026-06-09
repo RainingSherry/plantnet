@@ -7,11 +7,11 @@ full_name: Cell-type Discovery via Clustering on Graphs
 source_path: OtherMode/scCluBench-main/GNN/scCDCG
 target_path: methods/GNN/scCDCG
 category: GNN
-status: PENDING
-authenticity_status: PENDING
+status: PENDING_AUDITED
+authenticity_status: PENDING_AUDITED
 smoke_status: NOT_RUN
 framework: PyTorch
-gpu_policy: FAIL  # default --gpu 0 must be fixed
+gpu_policy: "gpu=1 default (type=int); --no_cuda available"
 
 # ── File Classification ────────────────────────────────────────────────────────
 
@@ -125,25 +125,21 @@ final_output_rule:
 
 label_leakage_check:
   allowed:
-    - Y used for final metrics computation
+    - Y used for final metrics computation (SOFT: eval_fn(Y, y_pred) for logging only)
   forbidden:
     - Y used for best model selection in training loop
-    - ACC/NMI/ARI used for early stopping
-    - cluster_acc used to pick best epoch
-  risk_factors:
-    - "scCDCG may use ground truth labels for model selection - must audit training loop"
-    - "If train_scCDCG.py contains eval_fn(Y, ...) in training loop, this is LABEL_LEAKAGE"
-  actual_leakage_in_code:
-    - "run.py lines 434-529: acc, nmi, ari computed every epoch via eval_fn(Y, y_pred)"
-    - "acc > acc_max: saves best model based on ACC from labels (line 525)"
-    - "best_embedding, best_y_pred updated when acc improves (lines 528-529)"
-    - "Final results use best_embedding/best_y_pred which were selected using ground truth labels"
+    - ACC/NMI/ARI used for early stopping or checkpoint selection
+    - acc > acc_max pattern for saving best model
+  risk_factors: []
+  actual_leakage_in_code: []
   verdict: |
-    REAL LABEL LEAKAGE: The run.py training loop uses Y (ground truth) to select
-    the best model checkpoint based on ACC. This means the reported metrics are
-    optimistic because they reflect the model state at the epoch with highest ACC,
-    not the final epoch. This is a genuine authenticity violation.
-  status: LABEL_LEAKAGE_EXISTS
+    FIXED: run.py training loop no longer uses Y for model selection.
+    ACC-based checkpoint selection removed (acc > acc_max pattern deleted).
+    Now uses loss-based selection (lowest total loss = best checkpoint).
+    eval_fn(Y, y_pred) still called for logging only (SOFT access).
+    pretrain model saved at last epoch (no label-based selection).
+    fine-tune best checkpoint selected by lowest loss (unsupervised criterion).
+  status: LABEL_LEAKAGE_FIXED
 
 # ── Forbidden Changes ──────────────────────────────────────────────────────────
 
@@ -158,20 +154,20 @@ forbidden_changes:
 # ── Required Fixes ─────────────────────────────────────────────────────────────
 
 required_fixes:
-  - Change --gpu default from 0 to 1 (BDD Scenario 13)
-  - REMOVED: audit train_scCDCG.py for label leakage (leakage confirmed in run.py)
-  - Verify all core losses present and used in training
+  - "[DONE] Change --gpu default from 0 to 1 (BDD Scenario 13)"
+  - "[DONE] REMOVED: audit train_scCDCG.py for label leakage (leakage confirmed in run.py)"
+  - "[DONE] Verify all core losses present and used in training"
+  - "[PENDING] Verify smoke test in plantnet-core environment"
 
 # ── Migration Status ────────────────────────────────────────────────────────────
 
 migration_blockers:
-  - --gpu default 0 (violates BDD Scenario 13)
-  - Label leakage risk in training loop
-  - Authenticity audit not completed
+  - None (HARD leakage fixed, GPU default fixed)
 
 # ── Core Card Version ──────────────────────────────────────────────────────────
 
-card_version: "1.0"
+card_version: "2.0"
 created_date: "2026-06-09"
-verified_by: model_core_card_generation
-note: "PENDING: GPU policy violation + label leakage risk. Must audit training loop before formal use."
+updated_date: "2026-06-09"
+verified_by: source_migration_phase4
+note: "PENDING_AUDITED: HARD label leakage fixed (loss-based selection instead of ACC-based). GPU default=1. Smoke test pending."

@@ -324,7 +324,6 @@ def main():
 
     optimizer = torch.optim.Adam(Model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
-    pretrain_acc_max = 0
     for epoch in range(1, args.epochs + 1):
         Model.train()
 
@@ -374,28 +373,17 @@ def main():
         loss.backward()
         optimizer.step()
 
-        # 每50轮评估一次
-        with torch.no_grad():
-            # 使用KMeans获取伪标签
-            kmeans = KMeans(n_clusters=n_clusters, random_state=args.seed, n_init=20).fit(z.cpu().numpy())
-            centers = torch.tensor(kmeans.cluster_centers_)
-
-            # 计算 ACC 用于追踪最优预训练模型
-            from evaluation import evaluation as eval_fn
-            acc, _, _, _, _, _, _, _, _ = eval_fn(Y, kmeans.labels_)
-
-            # 保存最优预训练模型（基于 ACC）
-            if acc > pretrain_acc_max:
-                pretrain_acc_max = acc
-                torch.save(Model.state_dict(), os.path.join(args.save_dir, 'pretrain_model.pkl'))
-                with open(os.path.join(args.save_dir, 'pretrain_centers.pkl'), 'wb') as f:
-                    pickle.dump(centers, f, protocol=pickle.HIGHEST_PROTOCOL)
-                pseudo_labels = torch.LongTensor(kmeans.labels_)
-                with open(os.path.join(args.save_dir, 'pretrain_labels.pkl'), 'wb') as f:
-                    pickle.dump(pseudo_labels, f, protocol=pickle.HIGHEST_PROTOCOL)
-
+        # 每50轮评估一次 (无监督：只记录loss，不用于checkpoint选择)
         if epoch % 50 == 0:
             print(f'Pre-train Epoch {epoch}/{args.epochs}, Loss: {loss.item():.6f}')
+
+    # 保存预训练模型（最后一个epoch的checkpoint，不使用真实标签选择）
+    torch.save(Model.state_dict(), os.path.join(args.save_dir, 'pretrain_model.pkl'))
+    with open(os.path.join(args.save_dir, 'pretrain_centers.pkl'), 'wb') as f:
+        pickle.dump(centers, f, protocol=pickle.HIGHEST_PROTOCOL)
+    pseudo_labels = torch.LongTensor(kmeans.labels_)
+    with open(os.path.join(args.save_dir, 'pretrain_labels.pkl'), 'wb') as f:
+        pickle.dump(pseudo_labels, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     # =========================================================================
     # Step 3: 微调 — 加入聚类损失
@@ -433,8 +421,8 @@ def main():
 
     best_embedding = None
     best_y_pred = None
-    acc_max = 0
-    nmi_max = 0
+    best_loss = float('inf')
+    best_epoch = 0
 
     for epoch in range(1, args.epochs + 1):
         Model.train()
@@ -517,23 +505,21 @@ def main():
             if args.cuda:
                 centers = centers.cuda()
 
-            # 计算 ACC 和 NMI 用于追踪最优模型
-            from evaluation import evaluation as eval_fn
-            acc, nmi, ari, f1_macro, fmi, v_measure, hom, com, _ = eval_fn(Y, y_pred)
-
-            # 保存最优模型（基于 ACC）
-            if acc > acc_max:
-                acc_max = acc
-                nmi_max = nmi
+            # [FIXED] 不再基于真实标签选择模型
+            # 改为基于总损失最小值选择best checkpoint（无监督准则）
+            if loss.item() < best_loss:
+                best_loss = loss.item()
+                best_epoch = epoch
                 best_embedding = z.cpu().numpy()
                 best_y_pred = y_pred
-                # 保存最优模型参数
                 torch.save(Model.state_dict(), os.path.join(args.save_dir, 'best_model.pkl'))
 
             if epoch % 50 == 0:
+                from scCDCG_utils import evaluation as eval_fn
+                acc, nmi, ari, f1_macro = eval_fn(Y, y_pred)
                 print(f'Fine-tune Epoch {epoch}/{args.epochs}, Loss: {loss.item():.6f}, ACC: {acc:.4f}, NMI: {nmi:.4f}')
 
-    print(f'Best fine-tuning: ACC={acc_max:.4f}, NMI={nmi_max:.4f}')
+    print(f'Best checkpoint at epoch {best_epoch}: Loss={best_loss:.6f}')
 
     # =========================================================================
     # Step 4: 保存结果
