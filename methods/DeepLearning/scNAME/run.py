@@ -118,23 +118,18 @@ def main():
     os.makedirs(args.save_dir, exist_ok=True)
 
     # Load and preprocess data using standard interface
-    # NOTE: scNAME_normalize() requires RAW COUNTS for its assert check.
-    # Do NOT normalize/log-transform here — let scNAME_normalize handle it.
+    # NOTE: prepare_data_for_model does ALL preprocessing (normalize, log1p, scale, HVG).
+    # Do NOT call scNAME_normalize here — it would redo normalization on already-normalized
+    # data, causing NaN/inf corruption (filter_genes on float sparse matrix is destructive).
     print('Loading data...')
     X, Y, sf, adata = prepare_data_for_model(
         args.data_path,
-        size_factors=False,
+        size_factors=True,
         filter_min_counts=True,
-        logtrans_input=False,
-        normalize_input=False
+        logtrans_input=True,
+        normalize_input=True
     )
-
-    # Apply scNAME-specific normalization (ZINB-aware, without additional HVG filtering).
-    # prepare_data_for_model() already did HVG filtering → adata.X has 2000 genes.
-    # Do NOT call highly_variable_genes here again (would fail on already-HVG'd data).
-    print('Applying scNAME normalization...')
-    adata = scNAME_normalize(adata, copy=True, highly_genes=None,
-                             size_factors=False, normalize_input=False, logtrans_input=False)
+    print('Data ready (normalized, log-transformed, scaled, HVG-selected).')
 
     # Convert to numpy arrays
     X = np.array(X).astype(np.float32)
