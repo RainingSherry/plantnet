@@ -1,0 +1,70 @@
+# Model Core Card: scNAME (Placeholder)
+# Single-cell Network Attention Modeling for Expression
+
+model_key: scname
+name: scNAME
+full_name: Single-cell Network Attention Modeling for Expression
+description: Placeholder - TensorFlow/Keras model, code not fully migrated
+source_path: OtherMode/scCluBench-main/DeepLearning/scNAME
+target_path: methods/DeepLearning/scNAME
+category: DeepLearning
+status: CORE-INCOMPLETE
+authenticity_status: CORE-INCOMPLETE
+smoke_status: ENV-BLOCKED
+framework: TensorFlow
+gpu_policy: N/A
+
+# ── Status Reason ───────────────────────────────────────────────────────────────
+
+status_reason: |
+  PLACEHOLDER run.py exists but raises NotImplementedError / TensorFlow import error.
+  Actual source code from OtherMode not yet copied. This is a placeholder stub.
+  CORE-INCOMPLETE: full source must be copied before authenticity can be assessed.
+
+# ── File Classification ────────────────────────────────────────────────────────
+
+core_source_files:
+  - run.py     # Placeholder stub only
+
+support_files: []
+
+adapter_files: []
+
+generated_or_output_files: []
+
+# ── Core Components ────────────────────────────────────────────────────────────
+
+core_classes: []
+
+core_functions: []
+
+core_losses: []
+
+# ── Required Actions Before Migration ──────────────────────────────────────────
+
+required_before_migration:
+  - Copy full source from OtherMode/scCluBench-main/DeepLearning/scNAME
+  - Verify all model files exist in methods/DeepLearning/scNAME/
+  - Remove placeholder stub
+  - Implement TensorFlow-free PyTorch version OR
+  - Set up TensorFlow environment
+
+# ── Migration Status ────────────────────────────────────────────────────────────
+
+migration_blockers:
+  - Placeholder stub only (run.py with error message)
+  - TensorFlow dependency
+  - Actual model code not present
+
+# ── Forbidden Changes ──────────────────────────────────────────────────────────
+
+forbidden_changes:
+  - "Cannot migrate: no core code defined"
+  - Any "migration" of this placeholder would be UNSAFE_SUBSTITUTION
+
+# ── Core Card Version ──────────────────────────────────────────────────────────
+
+card_version: "1.0"
+created_date: "2026-06-09"
+verified_by: model_core_card_generation
+note: "CORE-INCOMPLETE: This model cannot be migrated until full source is copied."

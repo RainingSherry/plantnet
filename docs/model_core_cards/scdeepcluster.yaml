@@ -1,0 +1,127 @@
+# Model Core Card: scDeepCluster
+# Deep Embedded Clustering with Autoencoder (Guo et al., ICML 2018)
+
+model_key: scdeepcluster
+name: scDeepCluster
+full_name: scDeepCluster
+paper: Guo et al., ICML 2018
+source_path: OtherMode/scCluBench-main/DeepLearning/scDeepCluster
+target_path: methods/DeepLearning/scDeepCluster
+category: DeepLearning
+status: ENV-GATED
+authenticity_status: ENV-GATED
+smoke_status: ENV-BLOCKED
+framework: TensorFlow
+gpu_policy: N/A
+
+# ── Status Reason ───────────────────────────────────────────────────────────────
+
+status_reason: |
+  TensorFlow/Keras dependency. Code migrated to methods/DeepLearning/scDeepCluster/code/
+  but requires TensorFlow runtime. Not independently verified.
+  The run.py can display --help without TF but main() requires TF import.
+
+# ── File Classification ────────────────────────────────────────────────────────
+
+core_source_files:
+  - code/scDeepCluster.py   # Main model class
+  - code/layers.py          # Loss layers
+  - code/loss.py            # Loss functions
+  - code/preprocess.py      # Data preprocessing
+  - run.py                  # Entry point
+
+support_files: []
+
+adapter_files:
+  - run.py
+
+generated_or_output_files: []
+
+# ── Core Components ────────────────────────────────────────────────────────────
+
+core_classes:
+  - name: SCDeepCluster
+    file: code/scDeepCluster.py
+    description: Autoencoder + K-means + clustering layer (TF/Keras)
+    # Not independently verified - based on OtherMode reference
+    required_components:
+      - pretrain(): AE pretraining
+      - fit(): joint clustering training
+      - extract_feature(): get latent embedding
+
+core_functions:
+  - name: pretrain
+    file: code/scDeepCluster.py
+    description: Pretrain autoencoder (method)
+
+  - name: fit
+    file: code/scDeepCluster.py
+    description: Joint clustering training (method)
+
+  - name: extract_feature
+    file: code/scDeepCluster.py
+    description: Extract features from trained model (method)
+
+core_losses:
+  - name: reconstruction_loss
+    stage: pretrain
+    # Specific loss function TBD - requires source code review
+
+  - name: clustering_loss
+    stage: fit
+    # Specific loss function TBD - requires source code review
+
+# ── Training Stages ─────────────────────────────────────────────────────────────
+
+required_training_stages:
+  - name: pretrain
+    order: 1
+    description: Autoencoder pretraining
+
+  - name: kmeans_init
+    order: 2
+    description: KMeans initialization of cluster centers
+
+  - name: fit
+    order: 3
+    description: Joint clustering training
+
+# ── Data Flow ──────────────────────────────────────────────────────────────────
+
+core_data_flow:
+  - X (input gene expression)
+  - AE encoder → z (latent)
+  - AE decoder → x_recon (for reconstruction)
+  - KMeans on z → initial cluster centers
+  - Joint training with clustering loss
+  - Final: z as embedding, argmax(cluster_assignments) as labels
+
+final_output_rule:
+  latent_embedding: z from autoencoder
+  cluster_labels: from clustering layer
+
+# ── Forbidden Changes ──────────────────────────────────────────────────────────
+
+forbidden_changes:
+  - Replace TensorFlow model with PyTorch implementation
+  - Remove clustering layer
+  - Replace with KMeans-only approach
+  - Use ground truth labels to select best epoch
+
+# ── Environment Gating ─────────────────────────────────────────────────────────
+
+environment_requirements:
+  - TensorFlow >= 2.x
+  - Keras
+  - tensorflow_util or compatible preprocessing
+
+migration_blockers:
+  - TF/Keras environment not available in current conda environment
+  - Alternative: implement in PyTorch to achieve ENV-GATED resolution
+
+# ── Core Card Version ──────────────────────────────────────────────────────────
+
+card_version: "1.0"
+created_date: "2026-06-09"
+verified_by: model_core_card_generation
+note: "Not independently verified. Code exists but TF runtime unavailable."

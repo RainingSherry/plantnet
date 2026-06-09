@@ -1,0 +1,115 @@
+# Model Core Card: Louvain
+# Louvain Community Detection
+
+model_key: louvain
+name: Louvain
+full_name: Louvain Community Detection
+description: Louvain algorithm for community detection on KNN graph
+source_path: OtherMode/scCluBench-main/Traditional/Louvain
+target_path: methods/Traditional/Louvain
+category: Traditional
+status: VERIFIED
+authenticity_status: VERIFIED
+smoke_status: PASS
+framework: NetworkX
+gpu_policy: PASS
+
+# ── File Classification ────────────────────────────────────────────────────────
+
+core_source_files:
+  - run.py
+
+support_files: []
+
+adapter_files:
+  - run.py
+
+generated_or_output_files:
+  - embedding_final.npy
+  - labels.npy
+  - metrics.json
+  - args.json
+
+# ── Core Components ────────────────────────────────────────────────────────────
+
+core_classes: []
+
+core_functions:
+  - name: get_louvain_partition
+    file: run.py
+    description: Execute Louvain algorithm via networkx
+    must_preserve:
+      - networkx.algorithms.community.louvain_communities call
+      - resolution parameter
+      - seed argument
+
+core_pipeline_steps:
+  - step: 1
+    name: load_and_preprocess
+    description: Load data via prepare_data_for_model (normalize, log1p, HVG, scale)
+
+  - step: 2
+    name: build_knn_graph
+    description: sc.pp.neighbors on preprocessed data
+
+  - step: 3
+    name: convert_to_networkx
+    description: Build NetworkX Graph from scanpy connectivities with weights
+
+  - step: 4
+    name: tune_resolution
+    description: Auto-search resolution via NMI maximization (using normalized_mutual_info_score)
+
+  - step: 5
+    name: louvain_partition
+    description: Run louvain_communities with best resolution
+
+  - step: 6
+    name: PCA_embedding
+    description: PCA for visualization embedding
+
+# ── Data Flow ──────────────────────────────────────────────────────────────────
+
+core_data_flow:
+  - h5ad → prepare_data_for_model → X, Y, sf, adata
+  - X → sc.pp.neighbors → adjacency matrix
+  - adjacency → NetworkX Graph
+  - Graph + resolution → louvain_communities → community sets
+  - community sets → partition dict → labels
+  - X → PCA → embedding
+
+final_output_rule:
+  latent_embedding: PCA(X)
+  cluster_labels: louvain_communities partition
+
+# ── Forbidden Changes ──────────────────────────────────────────────────────────
+
+forbidden_changes:
+  - Replace networkx louvain_communities with Leiden-only
+  - Skip NMI search and hard-code resolution
+  - Replace Louvain with simple KMeans
+  - Use ground truth labels to directly assign cluster labels
+
+# ── Label Leakage Check ────────────────────────────────────────────────────────
+
+label_leakage_check:
+  allowed:
+    - Y used in NMI search for resolution (this is auto-tuning, not direct label usage)
+    - Y used for final metrics computation
+  forbidden:
+    - Directly assign Y as cluster labels
+    - Use Y to pick individual cell assignments
+
+# ── Compatibility Changes (Documented) ────────────────────────────────────────
+
+compatibility_changes: []
+
+core_logic_changes: []
+
+unsafe_substitutions: []
+
+# ── Core Card Version ──────────────────────────────────────────────────────────
+
+card_version: "1.0"
+created_date: "2026-06-09"
+verified_by: model_core_card_generation

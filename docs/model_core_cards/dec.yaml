@@ -1,0 +1,158 @@
+# Model Core Card: DEC
+# Deep Embedded Clustering (Xie et al., ICML 2016)
+
+model_key: dec
+name: DEC
+full_name: Deep Embedded Clustering
+paper: Xie et al., "Unsupervised Deep Embedding for Clustering Analysis", ICML 2016
+source_path: OtherMode/scCluBench-main/DeepLearning/dec
+target_path: methods/DeepLearning/dec
+category: DeepLearning
+status: VERIFIED
+authenticity_status: VERIFIED
+smoke_status: PASS
+framework: PyTorch
+gpu_policy: PASS
+
+# ── File Classification ────────────────────────────────────────────────────────
+
+core_source_files:
+  - run.py
+
+support_files: []
+
+adapter_files: []
+
+generated_or_output_files:
+  - embedding_final.npy
+  - labels.npy
+  - metrics.json
+  - args.json
+
+# ── Core Components ────────────────────────────────────────────────────────────
+
+core_classes:
+  - name: Autoencoder
+    file: run.py
+    description: Stacked encoder/decoder with ReLU activation
+    must_preserve:
+      - self.encoder
+      - self.decoder
+      - x_recon, z
+
+  - name: ClusteringLayer
+    file: run.py
+    description: Student-t soft assignment with learnable cluster centers
+    must_preserve:
+      - self.cluster_centers
+      - q ** 2
+
+  - name: DEC
+    file: run.py
+    description: Full model wrapping Autoencoder + ClusteringLayer
+    must_preserve:
+      - self.autoencoder
+      - self.clustering_layer
+      - def encode
+      - def forward
+
+core_functions:
+  - name: target_distribution
+    file: run.py
+    signature: "def target_distribution(q)"
+    description: KL target distribution P from soft assignment Q
+    must_preserve: "weight = q^2 / q.sum(0); return (weight.T / weight.sum(1)).T"
+
+  - name: set_seed
+    file: run.py
+    description: Random seed initialization
+
+core_losses:
+  - name: MSE reconstruction
+    stage: pretrain
+    formula: F.mse_loss(x_recon, x)
+    must_appear_in: pretrain method loop
+
+  - name: KL divergence clustering
+    stage: clustering_fit
+    formula: F.kl_div(q.log(), p, reduction='batchmean')
+    must_appear_in: clustering training loop
+
+# ── Training Stages ─────────────────────────────────────────────────────────────
+
+required_training_stages:
+  - name: pretraining
+    order: 1
+    description: Autoencoder pretraining with MSE reconstruction loss
+    evidence:
+      - pretrain() method defined
+      - F.mse_loss used
+      - optimizer on autoencoder parameters only
+      - batch loop over data
+
+  - name: kmeans_init
+    order: 2
+    description: KMeans initialization of cluster centers on AE embedding
+    evidence:
+      - KMeans(n_clusters) called on latent z
+      - cluster_centers.data initialized from kmeans.cluster_centers_
+
+  - name: clustering_fit
+    order: 3
+    description: Joint KL divergence optimization with clustering layer
+    evidence:
+      - SGD optimizer on full model parameters
+      - target_distribution() called each epoch
+      - F.kl_div loss computed and backward() called
+      - cluster_centers updated via gradient descent
+
+# ── Data Flow ──────────────────────────────────────────────────────────────────
+
+core_data_flow:
+  - X (raw input, float32)
+  - AE encode → z (latent)
+  - AE decode → x_recon (for pretrain MSE)
+  - ClusteringLayer(z) → q (soft assignment, Student-t)
+  - target_distribution(q) → p (target distribution)
+  - KL(q.log(), p) → clustering_loss
+
+final_output_rule:
+  latent_embedding: z from AE encode
+  cluster_labels: argmax of q
+
+# ── Forbidden Changes ──────────────────────────────────────────────────────────
+
+forbidden_changes:
+  - Remove ClusteringLayer class or replace with direct KMeans
+  - Skip pretrain_autoencoder stage
+  - Replace KL loss with MSE or cross-entropy for clustering
+  - Output PCA embedding instead of AE embedding
+  - Replace clustering_fit with KMeans-only path
+  - Use ground truth labels to select best epoch/model
+  - Hard-code cluster centers without learning
+
+# ── Label Leakage Check ────────────────────────────────────────────────────────
+
+label_leakage_check:
+  allowed:
+    - cluster_acc used for final metrics computation after training
+    - Y used in save() output
+  forbidden:
+    - eval_fn(Y, ...) called in training loop for best model selection
+    - cluster_acc used for early stopping
+    - Using ground truth to choose best epoch
+
+# ── Compatibility Changes (Documented) ────────────────────────────────────────
+
+compatibility_changes:
+  - changed sklearn.linear_assignment → scipy.optimize.linear_sum_assignment (deprecated API fix)
+
+core_logic_changes: []
+
+unsafe_substitutions: []
+
+# ── Core Card Version ──────────────────────────────────────────────────────────
+
+card_version: "1.0"
+created_date: "2026-06-09"
+verified_by: model_core_card_generation

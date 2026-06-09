@@ -2,10 +2,23 @@
 """
 Model Authenticity Audit Script
 ================================
-Per BDD Scenario 11: Automated model authenticity verification.
+Per BDD Scenario 7: Automated model authenticity verification.
 
-This script checks each migrated model for required core components
-without understanding model semantics — using keyword and structural checks.
+This script checks each migrated model for required core components.
+It supports two modes:
+
+  1. Card-driven mode (default): reads checks from docs/model_core_cards/*.yaml
+     Per BDD Scenario 7: model core definitions must come from cards.
+
+  2. Legacy mode (--legacy): uses hardcoded MODEL_CHECKS.
+     Kept for backward compatibility only; new models should use cards.
+
+Scenarios covered:
+  - Scenario 7:  core-card-driven audit
+  - Scenario 8:  check core losses are used in training loop
+  - Scenario 9:  check required_training_stages are preserved
+  - Scenario 10: check label leakage
+  - Scenario 11: check no OtherMode runtime dependency
 
 Exit codes:
     0  PASS   — All models pass or have documented warnings
@@ -25,24 +38,15 @@ from typing import Dict, List, Tuple, Optional
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 METHODS_DIR = PROJECT_ROOT / "methods"
 MANIFEST_PATH = METHODS_DIR / "method_manifest.yaml"
+CARDS_DIR = PROJECT_ROOT / "docs" / "model_core_cards"
 
 
-def load_manifest() -> Dict[str, dict]:
-    """Load the method manifest YAML keyed by method key."""
-    try:
-        with open(MANIFEST_PATH, "r", encoding="utf-8") as f:
-            data = yaml.safe_load(f)
-        return {m["key"]: m for m in data["methods"]}
-    except Exception:
-        return {}
+# ══════════════════════════════════════════════════════════════════════════════
+# LEGACY MODEL_CHECKS — used only with --legacy flag (backward compatibility)
+# New models should add entries to docs/model_core_cards/*.yaml
+# ══════════════════════════════════════════════════════════════════════════════
 
-# ─────────────────────────────────────────────────────────────
-# Model definitions: each entry specifies required keyword checks
-# Format: { model_key: { "dir": ..., "required": [...], "forbidden": [...] } }
-# ─────────────────────────────────────────────────────────────
-
-MODEL_CHECKS: Dict[str, dict] = {
-    # ── Deep Learning ────────────────────────────────────────
+LEGACY_MODEL_CHECKS: Dict[str, dict] = {
     "dec": {
         "name": "DEC",
         "dir": METHODS_DIR / "DeepLearning" / "dec",
@@ -69,7 +73,6 @@ MODEL_CHECKS: Dict[str, dict] = {
             r"kl_div",
         ],
     },
-
     "scdcc": {
         "name": "scDCC",
         "dir": METHODS_DIR / "DeepLearning" / "scDCC",
@@ -101,7 +104,6 @@ MODEL_CHECKS: Dict[str, dict] = {
             r"_dec_pi",
         ],
     },
-
     "scdsc": {
         "name": "scDSC (SDCN)",
         "dir": METHODS_DIR / "GNN" / "scDSC",
@@ -130,7 +132,6 @@ MODEL_CHECKS: Dict[str, dict] = {
             r"self\.gnn_\d",
         ],
     },
-
     "scdeepcluster": {
         "name": "scDeepCluster",
         "dir": METHODS_DIR / "DeepLearning" / "scDeepCluster",
@@ -155,8 +156,6 @@ MODEL_CHECKS: Dict[str, dict] = {
             r"code",
         ],
     },
-
-    # ── Traditional ─────────────────────────────────────────
     "scanpy_standard": {
         "name": "ScanpyStandard",
         "dir": METHODS_DIR / "Traditional" / "ScanpyStandard",
@@ -179,7 +178,6 @@ MODEL_CHECKS: Dict[str, dict] = {
             r"sc\.tl\.leiden",
         ],
     },
-
     "leiden": {
         "name": "Leiden",
         "dir": METHODS_DIR / "Traditional" / "Leiden",
@@ -190,9 +188,7 @@ MODEL_CHECKS: Dict[str, dict] = {
             ("RBConfigurationVertexPartition", "RBConfigurationVertexPartition"),
             ("igraph", "igraph import"),
         ],
-        "forbidden": [
-            ("--kmeans_only", "kmeans-only flag"),
-        ],
+        "forbidden": [("--kmeans_only", "kmeans-only flag")],
         "auth_patterns": [
             r"leidenalg",
             r"find_partition",
@@ -200,7 +196,6 @@ MODEL_CHECKS: Dict[str, dict] = {
             r"igraph",
         ],
     },
-
     "louvain": {
         "name": "Louvain",
         "dir": METHODS_DIR / "Traditional" / "Louvain",
@@ -209,15 +204,9 @@ MODEL_CHECKS: Dict[str, dict] = {
             ("louvain_communities", "louvain_communities"),
             ("networkx", "networkx import"),
         ],
-        "forbidden": [
-            ("--kmeans_only", "kmeans-only flag"),
-        ],
-        "auth_patterns": [
-            r"louvain_communities",
-            r"networkx",
-        ],
+        "forbidden": [("--kmeans_only", "kmeans-only flag")],
+        "auth_patterns": [r"louvain_communities", r"networkx"],
     },
-
     "sc3": {
         "name": "sc3",
         "dir": METHODS_DIR / "Traditional" / "sc3",
@@ -227,17 +216,13 @@ MODEL_CHECKS: Dict[str, dict] = {
             ("KMeans", "KMeans ensemble"),
             ("AgglomerativeClustering", "hierarchical clustering"),
         ],
-        "forbidden": [
-            ("--kmeans_only", "kmeans-only flag"),
-        ],
+        "forbidden": [("--kmeans_only", "kmeans-only flag")],
         "auth_patterns": [
             r"consensus",
             r"KMeans",
             r"AgglomerativeClustering",
         ],
     },
-
-    # ── GNN ─────────────────────────────────────────────────
     "scgnn": {
         "name": "scGNN",
         "dir": METHODS_DIR / "GNN" / "scGNN",
@@ -261,7 +246,6 @@ MODEL_CHECKS: Dict[str, dict] = {
             r"gae",
         ],
     },
-
     "sccdcg": {
         "name": "scCDCG",
         "dir": METHODS_DIR / "GNN" / "scCDCG",
@@ -285,7 +269,6 @@ MODEL_CHECKS: Dict[str, dict] = {
             r"pdf_norm",
         ],
     },
-
     "attentionae_sc": {
         "name": "AttentionAE_sc",
         "dir": METHODS_DIR / "GNN" / "AttentionAE_sc",
@@ -298,13 +281,8 @@ MODEL_CHECKS: Dict[str, dict] = {
             ("--fake", "fake flag"),
             ("--dummy", "dummy flag"),
         ],
-        "auth_patterns": [
-            r"attention",
-            r"autoencoder",
-        ],
+        "auth_patterns": [r"attention", r"autoencoder"],
     },
-
-    # ── scMAE family (proposed + ablation + base) ───────────────
     "scmae": {
         "name": "scMAE",
         "dir": METHODS_DIR / "DeepLearning" / "scMAE",
@@ -330,7 +308,6 @@ MODEL_CHECKS: Dict[str, dict] = {
             r"KMeans",
         ],
     },
-
     "neighbormix_scmae": {
         "name": "NeighborMix_scMAE",
         "dir": METHODS_DIR / "DeepLearning" / "NeighborMix_scMAE",
@@ -356,7 +333,6 @@ MODEL_CHECKS: Dict[str, dict] = {
             r"loss_mask",
         ],
     },
-
     "nm_scmae_nomix": {
         "name": "nm_scmae_nomix (ablation)",
         "dir": METHODS_DIR / "DeepLearning" / "NeighborMix_scMAE",
@@ -395,29 +371,57 @@ MODEL_CHECKS: Dict[str, dict] = {
 }
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# Utility functions
+# ══════════════════════════════════════════════════════════════════════════════
+
+def load_manifest() -> Dict[str, dict]:
+    """Load the method manifest YAML keyed by method key."""
+    try:
+        with open(MANIFEST_PATH, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+        return {m["key"]: m for m in data["methods"]}
+    except Exception:
+        return {}
+
+
 def read_file_content(file_path: Path) -> str:
-    """Read file content, return empty string if not found."""
+    """Read a file, return empty string if not found."""
     try:
         return file_path.read_text(encoding="utf-8", errors="ignore")
     except FileNotFoundError:
         return ""
 
 
-def read_model_files(model_dir: Path, entry: str) -> Dict[str, str]:
+def read_model_files(model_dir: Path) -> Dict[str, str]:
     """Read all Python files in a model directory."""
     files = {}
     if not model_dir.exists():
         return files
-
-    for py_file in model_dir.rglob("*.py"):
+    for py_file in sorted(model_dir.rglob("*.py")):
         rel = py_file.relative_to(model_dir)
         files[str(rel)] = read_file_content(py_file)
-
     return files
 
 
+def check_gpu_default(model_dir: Path, entry: str) -> Tuple[bool, str]:
+    """Check --gpu default != 0 (BDD Scenario 13)."""
+    entry_path = model_dir / entry
+    content = read_file_content(entry_path)
+    if not content:
+        return True, "entry file not found"
+    for line in content.split("\n"):
+        if "--gpu" in line.lower():
+            if re.search(r"['\"]?\s*--gpu\s*['\"]?\s*,.*?default\s*=\s*0\b", line, re.IGNORECASE):
+                return False, f"--gpu default=0: {line.strip()[:100]}"
+    return True, "GPU default != 0 or no --gpu argument"
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Legacy audit functions (used with --legacy flag)
+# ══════════════════════════════════════════════════════════════════════════════
+
 def check_required_keywords(content: str, required: List[Tuple[str, str]]) -> List[Tuple[str, bool]]:
-    """Check that all required keywords appear in the content."""
     results = []
     for keyword, description in required:
         found = keyword.lower() in content.lower()
@@ -426,17 +430,14 @@ def check_required_keywords(content: str, required: List[Tuple[str, str]]) -> Li
 
 
 def check_forbidden_keywords(content: str, forbidden: List[Tuple[str, str]]) -> List[Tuple[str, bool]]:
-    """Check that no forbidden patterns appear (True = violation found)."""
     results = []
     for keyword, description in forbidden:
-        # Case-insensitive search
         found = keyword.lower() in content.lower()
         results.append((description, found))
     return results
 
 
 def check_auth_patterns(content: str, patterns: List[str]) -> List[Tuple[str, bool]]:
-    """Check regex patterns for structural components."""
     results = []
     for pattern in patterns:
         try:
@@ -447,28 +448,8 @@ def check_auth_patterns(content: str, patterns: List[str]) -> List[Tuple[str, bo
     return results
 
 
-def check_gpu_default(model_dir: Path, entry: str) -> Tuple[bool, str]:
-    """
-    Check that --gpu does not default to 0.
-    Returns (pass, detail).
-    """
-    entry_path = model_dir / entry
-    content = read_file_content(entry_path)
-    if not content:
-        return True, "entry file not found, skipping GPU check"
-
-    lines = content.split('\n')
-    for line in lines:
-        # Only match the same logical line (not across newlines)
-        if '--gpu' in line.lower() or "'--gpu'" in line or '"--gpu"' in line:
-            # Check if default=0 appears on the same line
-            if re.search(r"['\"]?\s*--gpu\s*['\"]?\s*,.*?default\s*=\s*0\b", line, re.IGNORECASE):
-                return False, f"--gpu default=0 found on line: {line.strip()[:120]}"
-    return True, "GPU default != 0 or no --gpu argument"
-
-
-def audit_model(model_key: str, config: dict) -> dict:
-    """Audit a single model. Returns a dict with audit results."""
+def audit_model_legacy(model_key: str, config: dict) -> dict:
+    """Legacy keyword-based audit."""
     result = {
         "model_key": model_key,
         "name": config["name"],
@@ -479,60 +460,50 @@ def audit_model(model_key: str, config: dict) -> dict:
         "gpu_default_check": None,
         "missing_files": [],
     }
-
     model_dir = config["dir"]
     entry = config.get("entry", "run.py")
 
-    # Check if directory exists
     if not model_dir.exists():
         result["status"] = "FAIL"
         result["failures"].append(f"Directory does not exist: {model_dir}")
         return result
 
-    # Check if entry file exists
     entry_path = model_dir / entry
     if not entry_path.exists():
         result["status"] = "FAIL"
         result["failures"].append(f"Entry file does not exist: {entry_path}")
         return result
 
-    # Read all Python files
-    all_files = read_model_files(model_dir, entry)
+    all_files = read_model_files(model_dir)
     if not all_files:
         result["status"] = "FAIL"
         result["failures"].append("No Python files found in directory")
         return result
 
-    # Combine all content for keyword checks
     combined_content = "\n".join(all_files.values())
 
-    # Check required keywords
     required_results = check_required_keywords(combined_content, config.get("required", []))
     for desc, found in required_results:
         if not found:
             result["status"] = "FAIL"
             result["failures"].append(f"Required component missing: {desc}")
 
-    # Check forbidden keywords
     forbidden_results = check_forbidden_keywords(combined_content, config.get("forbidden", []))
     for desc, found in forbidden_results:
         if found:
             result["status"] = "FAIL"
             result["failures"].append(f"Forbidden pattern found: {desc}")
 
-    # Check auth regex patterns
     pattern_results = check_auth_patterns(combined_content, config.get("auth_patterns", []))
     missing_patterns = [p for p, found in pattern_results if not found]
     if missing_patterns:
         result["warnings"].append(f"Auth patterns not matched: {', '.join(missing_patterns)}")
 
-    # Check GPU default
     gpu_pass, gpu_detail = check_gpu_default(model_dir, entry)
     result["gpu_default_check"] = {"pass": gpu_pass, "detail": gpu_detail}
     if not gpu_pass:
         result["warnings"].append(f"GPU default violation: {gpu_detail}")
 
-    # Manifest-driven extra_args check (for ablation variants that share run.py)
     mc = config.get("manifest_check")
     if mc:
         manifest = load_manifest()
@@ -542,165 +513,382 @@ def audit_model(model_key: str, config: dict) -> dict:
         if actual_args != expected_args:
             result["status"] = "FAIL"
             result["failures"].append(
-                f"manifest extra_args mismatch: got {actual_args!r}, "
-                f"expected {expected_args!r}"
+                f"manifest extra_args mismatch: got {actual_args!r}, expected {expected_args!r}"
             )
 
     return result
 
 
-def check_env_blocked(model_key: str, config: dict) -> dict:
-    """Check if a model is environment-blocked (e.g., TensorFlow)."""
+# ══════════════════════════════════════════════════════════════════════════════
+# Card-driven audit (Per BDD Scenarios 7-10)
+# Model definitions come from docs/model_core_cards/*.yaml
+# ══════════════════════════════════════════════════════════════════════════════
+
+def load_cards() -> Dict[str, dict]:
+    """Load all YAML core cards."""
+    cards = {}
+    if not CARDS_DIR.exists():
+        return cards
+    for fpath in sorted(CARDS_DIR.glob("*.yaml")):
+        try:
+            with open(fpath, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+            key = data.get("model_key", fpath.stem)
+            cards[key] = data
+        except Exception as e:
+            print(f"  WARNING: Could not parse {fpath}: {e}", file=sys.stderr)
+    return cards
+
+
+def _find_class(content: str, class_name: str) -> bool:
+    return bool(re.search(rf"^class\s+{re.escape(class_name)}\s*[\(:]", content, re.MULTILINE))
+
+
+def _find_method(content: str, method_name: str) -> bool:
+    for p in [
+        rf"^def\s+{re.escape(method_name)}\s*\(",
+        rf"^\s+def\s+{re.escape(method_name)}\s*\(",
+        rf"^async\s+def\s+{re.escape(method_name)}\s*\(",
+    ]:
+        if re.search(p, content, re.MULTILINE):
+            return True
+    return False
+
+
+def _loss_in_training(content: str, loss_name: str) -> bool:
+    """Check if a loss appears in a training loop."""
+    lines = content.split("\n")
+    in_training = False
+    for line in lines:
+        stripped = line.strip()
+        if re.match(r"^\s*def\s+(fit|train|main)\s*\(", stripped):
+            in_training = True
+        elif in_training and re.match(r"^\s*def\s+", stripped):
+            in_training = False
+        if in_training:
+            code_part = re.split(r"#", stripped)[0]
+            if loss_name.lower() in code_part.lower():
+                return True
+    return False
+
+
+def _check_label_leakage(content: str) -> List[str]:
+    """Per BDD Scenario 10: detect label leakage in training loops."""
+    violations = []
+    lines = content.split("\n")
+    in_training = False
+    leakage_re = re.compile(
+        r"(eval_fn\s*\([^)]*Y|evaluation\s*\([^)]*Y|"
+        r"cluster_acc\s*\([^)]*Y|best.*=.*acc\b|"
+        r"if\s+.*acc\s*>|if\s+.*nmi\s*>)",
+        re.IGNORECASE,
+    )
+    for line in lines:
+        stripped = line.strip()
+        if re.match(r"^\s*def\s+(fit|train|main)\s*\(", stripped):
+            in_training = True
+        elif in_training and re.match(r"^\s*def\s+", stripped):
+            in_training = False
+        if in_training and leakage_re.search(stripped):
+            violations.append(stripped[:120])
+    return violations
+
+
+def _check_gpu_in_card(card: dict, target_path: Path) -> Tuple[bool, str]:
+    policy = card.get("gpu_policy", "N/A")
+    if policy == "N/A":
+        return True, "N/A"
+    entry = card.get("entry_file", "run.py")
+    content = read_file_content(target_path / entry)
+    if not content:
+        return True, "entry not found"
+    for line in content.split("\n"):
+        if "--gpu" in line.lower():
+            if re.search(r"['\"]?\s*--gpu\s*['\"]?\s*,.*?default\s*=\s*0\b", line, re.IGNORECASE):
+                return False, f"--gpu default=0: {line.strip()[:100]}"
+    return True, f"Policy={policy}"
+
+
+def audit_card_driven(model_key: str, card: dict, manifest_entry: dict) -> dict:
+    """
+    Per BDD Scenarios 7-10: audit a model using its core card.
+    """
+    target_path_str = card.get("target_path", "")
+    target_path = PROJECT_ROOT / target_path_str
+    status = card.get("status", "UNKNOWN")
     result = {
         "model_key": model_key,
-        "name": config["name"],
-        "status": "ENV-GATED",
-        "reason": "Environment-gated model",
-        "detail": "",
+        "name": card.get("name", model_key),
+        "status": "PASS",
+        "source": "core_card",
+        "card_version": card.get("card_version", "?"),
+        "warnings": [],
+        "failures": [],
+        "info": [],
     }
 
-    model_dir = config["dir"]
-    entry = model_dir / config.get("entry", "run.py")
-    content = read_file_content(entry_path) if (entry_path := entry).exists() else ""
+    # ── Status-based shortcuts ───────────────────────────────────────────
+    if status == "CORE-INCOMPLETE":
+        result["status"] = "CORE-INCOMPLETE"
+        result["info"].append("Placeholder — no core code defined")
+        return result
 
-    # Check for TF/Keras import patterns
-    tf_patterns = [
-        r"import\s+tensorflow",
-        r"from\s+tensorflow",
-        r"import\s+keras",
-        r"from\s+keras",
-    ]
-    for pattern in tf_patterns:
-        if re.search(pattern, content, re.IGNORECASE):
-            result["detail"] = "TensorFlow/Keras dependency detected"
-            break
+    if status == "ENV-GATED":
+        entry_path = target_path / card.get("entry_file", "run.py")
+        content = read_file_content(entry_path)
+        has_tf = bool(re.search(r"import\s+tensorflow|from\s+tensorflow", content, re.I))
+        result["status"] = "ENV-GATED"
+        result["info"].append(
+            "TensorFlow/Keras dependency detected" if has_tf else "ENV-GATED (stub)"
+        )
+        return result
+
+    # ── Load model files (including cross-directory siblings) ────────────────
+    files = {}
+    if target_path.exists():
+        for py_file in sorted(target_path.rglob("*.py")):
+            rel = str(py_file.relative_to(target_path))
+            files[rel] = read_file_content(py_file)
+        # Also load cross-directory sibling files referenced in core_source_files
+        for rel_file in card.get("core_source_files", []):
+            if rel_file.startswith(".."):
+                cross_path = target_path / rel_file
+                if cross_path.exists():
+                    files[rel_file] = read_file_content(cross_path)
+    all_content = "\n".join(files.values())
+
+    # 1. Core source files exist
+    for rel_file in card.get("core_source_files", []):
+        if not (target_path / rel_file).exists():
+            result["failures"].append(f"Core file missing: {rel_file}")
+
+    # 2. Core classes present
+    for cls in card.get("core_classes", []):
+        fname = cls.get("file", "")
+        cname = cls.get("name", "")
+        content = files.get(fname, all_content)
+        if not _find_class(content, cname):
+            result["failures"].append(f"Core class '{cname}' not found in {fname or 'any file'}")
+        for mp in cls.get("must_preserve", []):
+            if isinstance(mp, str) and mp.lower() not in content.lower():
+                result["failures"].append(f"  Missing: {mp}")
+
+    # 3. Core functions present
+    for fn in card.get("core_functions", []):
+        fname = fn.get("file", "")
+        fname2 = fn.get("name", "")
+        if not fname2:
+            sig = fn.get("signature", "")
+            fname2 = sig.split("(")[0].replace("def ", "").strip()
+        content = files.get(fname, all_content)
+        if not _find_method(content, fname2):
+            result["failures"].append(f"Core function '{fname2}' not found in {fname or 'any file'}")
+
+    # 4. Core losses used in training (Scenario 8)
+    for loss in card.get("core_losses", []):
+        lname = loss.get("name", "")
+        stage = loss.get("stage", "")
+        if lname and not _loss_in_training(all_content, lname):
+            result["warnings"].append(f"Core loss '{lname}' ({stage}) not used in training loop")
+
+    # 5. Required training stages (Scenario 9)
+    for stage in card.get("required_training_stages", []):
+        sname = stage.get("name", "")
+        evidence = stage.get("evidence", [])
+        missing_ev = [ev for ev in evidence if ev.lower() not in all_content.lower()]
+        if missing_ev:
+            result["warnings"].append(
+                f"Training stage '{sname}' may be incomplete: missing [{', '.join(missing_ev)}]"
+            )
+
+    # 6. Forbidden changes not introduced
+    for forb in card.get("forbidden_changes", []):
+        desc = forb if isinstance(forb, str) else forb.get("name", str(forb))
+        pattern = forb if isinstance(forb, str) else forb.get("pattern", forb.get("description", ""))
+        if pattern and pattern.lower() in all_content.lower():
+            result["failures"].append(f"Forbidden change: '{desc}'")
+
+    # 7. Label leakage (Scenario 10)
+    leakage = _check_label_leakage(all_content)
+    for v in leakage:
+        result["failures"].append(f"LABEL_LEAKAGE: {v}")
+
+    # 8. GPU policy
+    gpu_ok, gpu_detail = _check_gpu_in_card(card, target_path)
+    if not gpu_ok:
+        result["failures"].append(f"GPU policy violation: {gpu_detail}")
+
+    if result["failures"]:
+        result["status"] = "FAIL"
 
     return result
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# Main function
+# ══════════════════════════════════════════════════════════════════════════════
+
 def main():
     import argparse
-
     parser = argparse.ArgumentParser(
         description="Audit model authenticity for all migrated methods."
     )
+    parser.add_argument("--model", type=str, default=None, help="Audit only a specific model key")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Show detailed output")
+    parser.add_argument("--json", action="store_true", help="Output results as JSON")
     parser.add_argument(
-        "--model",
-        type=str,
-        default=None,
-        help="Audit only a specific model key (e.g., 'dec', 'scdcc'). "
-             "If not provided, audits all models.",
-    )
-    parser.add_argument(
-        "--verbose", "-v",
+        "--legacy",
         action="store_true",
-        help="Show detailed output for each check",
-    )
-    parser.add_argument(
-        "--json",
-        action="store_true",
-        help="Output results as JSON",
+        help="Use legacy hardcoded MODEL_CHECKS instead of core cards",
     )
     args = parser.parse_args()
-
-    # Determine which models to audit
-    if args.model:
-        if args.model not in MODEL_CHECKS:
-            print(f"ERROR: Unknown model key '{args.model}'")
-            print(f"Available: {', '.join(sorted(MODEL_CHECKS.keys()))}")
-            sys.exit(2)
-        models_to_audit = {args.model: MODEL_CHECKS[args.model]}
-    else:
-        models_to_audit = MODEL_CHECKS
-
-    results = []
-    all_pass = True
-    any_fail = False
 
     print("=" * 70)
     print("Model Authenticity Audit")
     print("=" * 70)
+
+    if args.legacy:
+        _run_legacy_mode(args)
+        return
+
+    # ── Card-driven mode (default) ────────────────────────────────────────
+    print("Mode: CARD-DRIVEN (docs/model_core_cards/*.yaml)")
+    print()
+    manifest = load_manifest()
+    cards = load_cards()
+    print(f"Loaded {len(cards)} core cards, {len(manifest)} manifest entries.")
     print()
 
-    for model_key, config in sorted(models_to_audit.items()):
-        print(f"  Auditing: {config['name']} ({model_key})...")
+    models_to_check = sorted(set(list(cards.keys()) + list(manifest.keys())))
+    results = []
 
-        # Quick env-gated check: look for TF in the main entry file
+    for model_key in models_to_check:
+        card = cards.get(model_key)
+        manifest_entry = manifest.get(model_key)
+
+        if not card:
+            print(f"  ? [NO_CARD    ] {model_key} — no core card, skipping")
+            print()
+            continue
+
+        print(f"  Checking: {card.get('name', model_key)} ({model_key})...", end=" ", flush=True)
+        result = audit_card_driven(model_key, card, manifest_entry)
+        results.append(result)
+
+        icon = {
+            "PASS": "✓", "FAIL": "✗", "WARN": "⚠",
+            "ENV-GATED": "⊗", "CORE-INCOMPLETE": "○",
+        }.get(result["status"], "?")
+
+        print(f"{icon} [{result['status']:16}]  (card v{result.get('card_version','?')})")
+
+        if args.verbose:
+            for info in result.get("info", []):
+                print(f"    INFO: {info}")
+            for w in result.get("warnings", []):
+                print(f"    WARN: {w}")
+            for f in result.get("failures", []):
+                print(f"    FAIL: {f}")
+
+    # ── Summary ────────────────────────────────────────────────────────────
+    print()
+    print("=" * 70)
+    print("Summary")
+    print("=" * 70)
+
+    counts = {}
+    for r in results:
+        s = r["status"]
+        counts[s] = counts.get(s, 0) + 1
+    total = len(results)
+    for s, c in sorted(counts.items()):
+        print(f"  {s:20}: {c}/{total}")
+
+    if args.json:
+        print()
+        print(json.dumps({"mode": "card-driven", "results": results, "summary": counts}, indent=2, default=str))
+
+    if any(r["status"] == "FAIL" for r in results):
+        print()
+        print("  Some models have authenticity failures.")
+        sys.exit(1)
+    sys.exit(0)
+
+
+def _run_legacy_mode(args):
+    """Legacy keyword-based audit (backward compatibility)."""
+    print("Mode: LEGACY (hardcoded MODEL_CHECKS)")
+    print()
+    print("NOTE: Prefer default card-driven mode. Core card definitions live in")
+    print("      docs/model_core_cards/*.yaml")
+    print()
+
+    manifest = load_manifest()
+    results = []
+    any_fail = False
+
+    for model_key, config in sorted(LEGACY_MODEL_CHECKS.items()):
+        print(f"  Auditing: {config['name']} ({model_key})...", end=" ", flush=True)
+
         entry_path = config["dir"] / config.get("entry", "run.py")
         entry_content = read_file_content(entry_path)
 
         is_env_gated = False
-        for tf_pattern in [r"import\s+tensorflow", r"from\s+tensorflow", r"import\s+keras", r"from\s+keras"]:
+        for tf_pattern in [
+            r"import\s+tensorflow", r"from\s+tensorflow",
+            r"import\s+keras", r"from\s+keras",
+        ]:
             if re.search(tf_pattern, entry_content, re.IGNORECASE):
                 is_env_gated = True
                 break
 
         if is_env_gated:
-            print(f"    → ENV-GATED (TensorFlow/Keras dependency)")
-            result = check_env_blocked(model_key, config)
+            result = {
+                "model_key": model_key,
+                "name": config["name"],
+                "status": "ENV-GATED",
+                "detail": "TensorFlow/Keras dependency detected",
+                "warnings": [],
+                "failures": [],
+            }
+            print(f"⊗ [ENV-GATED]")
         else:
-            result = audit_model(model_key, config)
+            result = audit_model_legacy(model_key, config)
+            icon = "✓" if result["status"] == "PASS" else "✗"
+            extra = f" ({len(result['warnings'])} warning(s))" if result.get("warnings") else ""
+            print(f"{icon} [{result['status']:9}]{extra}")
+
+            if args.verbose:
+                for f in result.get("failures", []):
+                    print(f"    FAIL: {f}")
+                for w in result.get("warnings", []):
+                    print(f"    WARN: {w}")
+                if result.get("gpu_default_check"):
+                    g = result["gpu_default_check"]
+                    print(f"    GPU:  {'PASS' if g['pass'] else 'FAIL'} — {g['detail']}")
+
+            if result["status"] == "FAIL":
+                any_fail = True
 
         results.append(result)
 
-        status_icon = {"PASS": "✓", "FAIL": "✗", "ENV-GATED": "⊗", "WARN": "⚠"}.get(
-            result["status"], "?"
-        )
-        status_str = f"  {status_icon} [{result['status']}] {config['name']}"
-        if result.get("warnings"):
-            status_str += f"  ({len(result['warnings'])} warning(s))"
-        print(status_str)
-
-        if args.verbose:
-            if result.get("failures"):
-                for f in result["failures"]:
-                    print(f"      FAIL: {f}")
-            if result.get("warnings"):
-                for w in result["warnings"]:
-                    print(f"      WARN: {w}")
-            if result.get("gpu_default_check"):
-                g = result["gpu_default_check"]
-                print(f"      GPU:  {'PASS' if g['pass'] else 'FAIL'} — {g['detail']}")
-
-        if result["status"] == "FAIL":
-            any_fail = True
-            all_pass = False
-        elif result["status"] == "ENV-GATED":
-            all_pass = False  # Env-gated is not a pass
-
-        print()
-
-    # ── Summary ───────────────────────────────────────────────
+    print()
     print("=" * 70)
     print("Summary")
     print("=" * 70)
-
-    status_counts = {"PASS": 0, "FAIL": 0, "ENV-GATED": 0, "WARN": 0}
+    counts = {"PASS": 0, "FAIL": 0, "ENV-GATED": 0}
     for r in results:
         s = r["status"]
-        status_counts[s] = status_counts.get(s, 0) + 1
-
+        counts[s] = counts.get(s, 0) + 1
     total = len(results)
-    print(f"  Total models audited: {total}")
-    print(f"  PASS:        {status_counts.get('PASS', 0)}/{total}")
-    print(f"  FAIL:        {status_counts.get('FAIL', 0)}/{total}")
-    print(f"  ENV-GATED:   {status_counts.get('ENV-GATED', 0)}/{total}")
-
-    if any_fail:
-        print()
-        print("  ⚠  Some models have authenticity issues.")
-        print("     Models with FAIL status cannot enter the formal benchmark.")
-        print("     Models with ENV-GATED status are blocked by environment dependencies.")
+    for s, c in sorted(counts.items()):
+        print(f"  {s:20}: {c}/{total}")
 
     if args.json:
         print()
-        print(json.dumps({"results": results, "summary": status_counts}, indent=2, default=str))
+        print(json.dumps({"mode": "legacy", "results": results, "summary": counts}, indent=2, default=str))
 
-    # ── Exit code ────────────────────────────────────────────
-    if any_fail:
-        sys.exit(1)
-    else:
-        sys.exit(0)
+    sys.exit(1 if any_fail else 0)
 
 
 if __name__ == "__main__":

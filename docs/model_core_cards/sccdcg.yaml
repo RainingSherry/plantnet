@@ -1,0 +1,177 @@
+# Model Core Card: scCDCG
+# Cell-type Discovery via Clustering on Graphs
+
+model_key: sccdcg
+name: scCDCG
+full_name: Cell-type Discovery via Clustering on Graphs
+source_path: OtherMode/scCluBench-main/GNN/scCDCG
+target_path: methods/GNN/scCDCG
+category: GNN
+status: PENDING
+authenticity_status: PENDING
+smoke_status: NOT_RUN
+framework: PyTorch
+gpu_policy: FAIL  # default --gpu 0 must be fixed
+
+# ── File Classification ────────────────────────────────────────────────────────
+
+core_source_files:
+  - run.py               # Entry point
+  - model.py              # AE_GAT, AE_NN, ClusterAssignment
+  - scCDCG_layer.py       # Custom layers
+  - scCDCG_utils.py       # Utilities
+  - scCDCG_preprocess.py  # Graph construction and preprocessing
+  - train_scCDCG.py        # Training loop
+  - __init__.py
+
+support_files: []
+
+adapter_files:
+  - run.py
+
+generated_or_output_files: []
+
+# ── Core Components ────────────────────────────────────────────────────────────
+
+core_classes:
+  - name: AE_GAT
+    file: model.py
+    description: Graph Attention Autoencoder
+    required_components:
+      - Multi-head attention layers
+      - Graph structure input
+      - Reconstruction loss
+
+  - name: AE_NN
+    file: model.py
+    description: Nearest-neighbor Autoencoder
+    required_components:
+      - Feedforward encoder/decoder
+      - Neighborhood reconstruction
+
+  - name: ClusterAssignment
+    file: model.py
+    description: Clustering layer with assignment matrix
+    required_components:
+      - pdf_norm: probability density normalization
+      - DEC-style soft assignment
+
+  - name: FULL_NN
+    file: model.py
+    description: Full model combining AE + clustering (NN version)
+    required_components:
+      - AE_NN encoder
+      - ClusterAssignment module
+      - Joint loss
+
+core_functions:
+  - name: sinkhorn
+    file: run.py
+    description: Sinkhorn optimal transport for clustering
+
+  - name: pdf_norm
+    file: scCDCG_utils.py
+    description: Probability density normalization for clustering
+
+core_losses:
+  - name: reconstruction_loss
+    formula: MSE(x_recon, x)  # from original reference
+    stage: pretrain
+
+  - name: orthogonal_loss
+    formula: Encourages orthogonal cluster assignments
+    stage: pretrain
+
+  - name: covariance_loss
+    formula: Encourages diverse cluster representations
+    stage: pretrain
+
+  - name: clustering_loss (DEC/Sinkhorn)
+    formula: KL divergence or Sinkhorn distance
+    stage: fit
+
+# ── Training Stages ─────────────────────────────────────────────────────────────
+
+required_training_stages:
+  - name: pretrain
+    order: 1
+    description: AE pretraining with orthogonal + covariance losses
+    evidence:
+      - pretrain() method defined
+      - MSE + orthogonal + covariance losses
+
+  - name: kmeans_init
+    order: 2
+    description: KMeans initialization of cluster centers
+
+  - name: fit (clustering)
+    order: 3
+    description: DEC/Sinkhorn clustering with joint loss
+
+# ── Data Flow ──────────────────────────────────────────────────────────────────
+
+core_data_flow:
+  - X (gene expression) → graph construction → adj matrix
+  - AE_GAT/AE_NN encode → z (latent)
+  - AE decode → x_recon (reconstruction)
+  - ClusterAssignment(z) → soft cluster assignments
+  - Joint loss: reconstruction + orthogonal + covariance + clustering
+
+final_output_rule:
+  latent_embedding: z from AE
+  cluster_labels: from ClusterAssignment
+
+# ── Label Leakage Check ────────────────────────────────────────────────────────
+
+label_leakage_check:
+  allowed:
+    - Y used for final metrics computation
+  forbidden:
+    - Y used for best model selection in training loop
+    - ACC/NMI/ARI used for early stopping
+    - cluster_acc used to pick best epoch
+  risk_factors:
+    - "scCDCG may use ground truth labels for model selection - must audit training loop"
+    - "If train_scCDCG.py contains eval_fn(Y, ...) in training loop, this is LABEL_LEAKAGE"
+  actual_leakage_in_code:
+    - "run.py lines 434-529: acc, nmi, ari computed every epoch via eval_fn(Y, y_pred)"
+    - "acc > acc_max: saves best model based on ACC from labels (line 525)"
+    - "best_embedding, best_y_pred updated when acc improves (lines 528-529)"
+    - "Final results use best_embedding/best_y_pred which were selected using ground truth labels"
+  verdict: |
+    REAL LABEL LEAKAGE: The run.py training loop uses Y (ground truth) to select
+    the best model checkpoint based on ACC. This means the reported metrics are
+    optimistic because they reflect the model state at the epoch with highest ACC,
+    not the final epoch. This is a genuine authenticity violation.
+  status: LABEL_LEAKAGE_EXISTS
+
+# ── Forbidden Changes ──────────────────────────────────────────────────────────
+
+forbidden_changes:
+  - Remove AE branch
+  - Remove attention mechanism from AE_GAT
+  - Replace ClusterAssignment with simple KMeans
+  - Remove Sinkhorn or DEC clustering
+  - Default --gpu 0 (BDD Scenario 13 violation)
+  - Use ground truth labels to select best epoch/model
+
+# ── Required Fixes ─────────────────────────────────────────────────────────────
+
+required_fixes:
+  - Change --gpu default from 0 to 1 (BDD Scenario 13)
+  - REMOVED: audit train_scCDCG.py for label leakage (leakage confirmed in run.py)
+  - Verify all core losses present and used in training
+
+# ── Migration Status ────────────────────────────────────────────────────────────
+
+migration_blockers:
+  - --gpu default 0 (violates BDD Scenario 13)
+  - Label leakage risk in training loop
+  - Authenticity audit not completed
+
+# ── Core Card Version ──────────────────────────────────────────────────────────
+
+card_version: "1.0"
+created_date: "2026-06-09"
+verified_by: model_core_card_generation
+note: "PENDING: GPU policy violation + label leakage risk. Must audit training loop before formal use."

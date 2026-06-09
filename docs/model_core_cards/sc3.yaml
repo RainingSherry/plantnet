@@ -1,0 +1,111 @@
+# Model Core Card: sc3
+# Single-Cell Consensus Clustering (Kiselev et al., Nature Methods 2017)
+
+model_key: sc3
+name: sc3
+full_name: Single-Cell Consensus Clustering
+paper: Kiselev et al., Nature Methods 2017
+description: Pure Python reimplementation of SC3 consensus clustering
+source_path: OtherMode/scCluBench-main/Traditional/sc3
+target_path: methods/Traditional/sc3
+category: Traditional
+status: VERIFIED
+authenticity_status: VERIFIED
+smoke_status: PASS
+framework: scikit-learn
+gpu_policy: PASS
+
+# ── File Classification ────────────────────────────────────────────────────────
+
+core_source_files:
+  - run.py
+
+support_files: []
+
+adapter_files:
+  - run.py
+
+generated_or_output_files:
+  - embedding_final.npy
+  - labels.npy
+  - metrics.json
+
+# ── Core Components ────────────────────────────────────────────────────────────
+
+core_classes: []
+
+core_functions:
+  - name: build_consensus_matrix
+    file: run.py
+    description: Build consensus matrix via multiple K-means runs
+    must_preserve:
+      - PCA dimensionality reduction
+      - Multiple K-means configurations
+      - Consensus matrix accumulation
+      - return (consensus_matrix, X_pca)
+
+core_pipeline_steps:
+  - step: 1
+    name: load_and_preprocess
+    description: Load data via prepare_data_for_model (normalize, log1p, HVG, NO scale)
+
+  - step: 2
+    name: PCA_reduction
+    description: PCA on preprocessed data (n_pcs=20)
+
+  - step: 3
+    name: consensus_matrix
+    description: build_consensus_matrix via multi-configuration K-means
+
+  - step: 4
+    name: final_clustering
+    description: AgglomerativeClustering on distance matrix (1 - consensus)
+    must_preserve:
+      - metric='precomputed'
+      - linkage='average'
+      - fallback to KMeans if hierarchical fails
+
+  - step: 5
+    name: label_alignment
+    description: Hungarian algorithm alignment with ground truth
+
+# ── Data Flow ──────────────────────────────────────────────────────────────────
+
+core_data_flow:
+  - h5ad → prepare_data_for_model → X, Y, sf, adata
+  - X → PCA(n_pcs=20) → X_pca
+  - X_pca + multiple K-means → consensus matrix
+  - consensus → dist_matrix (1 - consensus)
+  - dist_matrix → AgglomerativeClustering → y_pred
+  - y_pred + Y → linear_sum_assignment → y_pred_aligned
+  - metrics computation → metrics.json
+
+final_output_rule:
+  latent_embedding: X_pca from PCA
+  cluster_labels: y_pred from hierarchical clustering (aligned)
+
+# ── Forbidden Changes ──────────────────────────────────────────────────────────
+
+forbidden_changes:
+  - Replace consensus clustering with single K-means
+  - Remove hierarchical clustering step
+  - Skip consensus matrix construction
+  - Replace with Leiden or Louvain on PCA directly
+  - Use ground truth labels to choose best clustering run
+
+# ── Compatibility Changes (Documented) ────────────────────────────────────────
+
+compatibility_changes:
+  - Pure Python reimplementation (original SC3 requires R)
+  - Uses scipy.optimize.linear_sum_assignment (not R consensus approach)
+  - Missing: k-medoids, bootstrapping, and cell filtering from original SC3
+
+core_logic_changes: []
+
+unsafe_substitutions: []
+
+# ── Core Card Version ──────────────────────────────────────────────────────────
+
+card_version: "1.0"
+created_date: "2026-06-09"
+verified_by: model_core_card_generation

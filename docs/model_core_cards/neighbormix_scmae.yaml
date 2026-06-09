@@ -1,0 +1,163 @@
+# Model Core Card: NeighborMix-scMAE
+# NeighborMix-enhanced scMAE (proposed method)
+
+model_key: neighbormix_scmae
+name: NeighborMix_scMAE
+full_name: NeighborMix-scMAE
+description: scMAE with NeighborMix pseudo-cell augmentation
+source_path: methods/DeepLearning/NeighborMix_scMAE
+target_path: methods/DeepLearning/NeighborMix_scMAE
+category: DeepLearning
+status: VERIFIED
+authenticity_status: VERIFIED
+smoke_status: PASS
+framework: PyTorch
+gpu_policy: PASS
+role: proposed  # proposed method
+
+# ── File Classification ────────────────────────────────────────────────────────
+
+core_source_files:
+  - run.py          # AutoEncoder, apply_scmae_noise, build_knn_distribution, sample_mix, extract_embedding
+  - model.py        # AutoEncoder class definition
+  - ../scMAE_family.py  # Shared utilities (scMAE_family)
+
+support_files: []
+
+adapter_files:
+  - run.py
+
+generated_or_output_files:
+  - embedding_final.npy
+  - labels.npy
+  - metrics.json
+  - args.json
+
+# ── Core Components ────────────────────────────────────────────────────────────
+
+core_classes:
+  - name: AutoEncoder
+    file: model.py
+    description: Masked autoencoder with NeighborMix branches
+    must_preserve:
+      - self.encoder
+      - self.mask_predictor
+      - self.decoder
+      - loss_mask
+
+core_functions:
+  - name: apply_scmae_noise
+    file: run.py
+    description: Apply scMAE mask noise
+    must_preserve:
+      - Bernoulli sampling for mask positions
+      - Replaces masked positions with values from random cells
+
+  - name: build_knn_distribution
+    file: run.py
+    description: Build KNN distribution for neighbor sampling
+    must_preserve:
+      - PCA + cosine similarity for neighborhood
+      - NearestNeighbors for efficient lookup
+      - Distribution over neighbors (softmax of distances)
+
+  - name: sample_mix
+    file: run.py
+    description: Sample neighbor-weighted pseudo-cells
+    must_preserve:
+      - Sample from KNN distribution
+      - Linear combination of cell with neighbor
+      - alpha parameter for blending strength
+
+  - name: loss_mask
+    file: model.py
+    description: Compute masked losses for both branches
+    must_preserve:
+      - real_loss: on original masked cells
+      - pseudo_loss: on neighbor-mixed masked cells
+      - mask loss component
+
+  - name: extract_embedding
+    file: run.py
+    description: Extract latent embedding from encoder
+    must_preserve:
+      - Uses model.feature() method to extract latent
+
+core_losses:
+  - name: L_reconstruction (real)
+    stage: training
+    formula: MSE on masked positions of original cells
+
+  - name: L_reconstruction (pseudo)
+    stage: training
+    formula: MSE on masked positions of pseudo-cells
+    note: pseudo_branch must be enabled (--use_pseudo=true, --pseudo_weight>0)
+
+  - name: L_mask (BCE)
+    stage: training
+    formula: BCE on mask prediction
+
+  - name: total_loss
+    formula: real_loss + pseudo_loss + mask_loss
+
+# ── Training Stages ─────────────────────────────────────────────────────────────
+
+required_training_stages:
+  - name: pretrain_mae_neighbormix
+    order: 1
+    description: Masked autoencoder training with NeighborMix augmentation
+    evidence:
+      - build_knn_distribution before training loop
+      - sample_mix in training loop for pseudo-cells
+      - real_loss + pseudo_loss + mask_loss computed
+      - pseudo_branch_enabled=True
+      - backward() and optimizer.step()
+
+  - name: extract_embedding
+    order: 2
+    description: Extract latent embedding
+
+  - name: kmeans_clustering
+    order: 3
+    description: KMeans on latent embedding
+
+# ── Data Flow ──────────────────────────────────────────────────────────────────
+
+core_data_flow:
+  - X (gene expression)
+  - PCA + cosine_sim → knn_distributions
+  - sample_mix(X, knn_distributions) → pseudo_X
+  - apply_scmae_noise(X) → masked_X, mask, target
+  - apply_scmae_noise(pseudo_X) → masked_pseudo_X, pseudo_mask, pseudo_target
+  - Encoder(masked_X) → latent_real
+  - Encoder(masked_pseudo_X) → latent_pseudo
+  - real_loss + pseudo_loss + mask_loss → total_loss
+  - KMeans(embedding) → cluster labels
+
+final_output_rule:
+  latent_embedding: encoder output on real cells
+  cluster_labels: KMeans on embedding
+
+# ── Forbidden Changes ──────────────────────────────────────────────────────────
+
+forbidden_changes:
+  - Remove pseudo_branch or always-set pseudo_branch_enabled=False
+  - Remove build_knn_distribution or replace with uniform sampling
+  - Remove sample_mix or replace with simple data augmentation
+  - Replace NeighborMix with random mixing (not KNN-weighted)
+  - Use ground truth labels to select best epoch
+  - Replace KMeans with direct label assignment
+
+# ── Compatibility Changes (Documented) ────────────────────────────────────────
+
+compatibility_changes: []
+
+core_logic_changes: []
+
+unsafe_substitutions: []
+
+# ── Core Card Version ──────────────────────────────────────────────────────────
+
+card_version: "1.0"
+created_date: "2026-06-09"
+verified_by: model_core_card_generation

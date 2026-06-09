@@ -1,0 +1,149 @@
+# Model Core Card: nm_scmae_nomix (noMix ablation)
+# NeighborMix-scMAE with NeighborMix disabled (ablation control)
+
+model_key: nm_scmae_nomix
+name: nm_scmae_nomix
+full_name: NeighborMix-scMAE noMix (ablation)
+description: NeighborMix-scMAE with --use_pseudo=false --neighbor_k=0 (NeighborMix disabled)
+source_path: methods/DeepLearning/NeighborMix_scMAE
+target_path: methods/DeepLearning/NeighborMix_scMAE
+category: DeepLearning
+status: VERIFIED
+authenticity_status: VERIFIED
+smoke_status: PASS
+framework: PyTorch
+gpu_policy: PASS
+role: ablation  # ablation: NeighborMix disabled
+
+# ── Relationship to neighbormix_scmae ──────────────────────────────────────────
+
+variant_of: neighbormix_scmae
+variant_difference: |
+  All core components identical to NeighborMix-scMAE.
+  Difference: --use_pseudo=false, --neighbor_k=0, --mix_neighbors=0
+  Result: pseudo_branch produces no neighbor-mixed cells.
+  Effect: Equivalent to base scMAE (no NeighborMix augmentation).
+  This ablation confirms that NeighborMix is the source of gain, not architecture changes.
+
+# ── File Classification ────────────────────────────────────────────────────────
+
+core_source_files:
+  - run.py          # AutoEncoder, apply_scmae_noise, build_knn_distribution, sample_mix, extract_embedding
+  - model.py        # AutoEncoder class definition
+  - ../scMAE_family.py  # Shared utilities
+
+support_files: []
+
+adapter_files:
+  - run.py
+
+generated_or_output_files:
+  - embedding_final.npy
+  - labels.npy
+  - metrics.json
+  - args.json
+
+# ── Core Components ────────────────────────────────────────────────────────────
+
+core_classes:
+  - name: AutoEncoder
+    file: model.py
+    description: Same scMAE architecture as NeighborMix-scMAE
+    must_preserve: Identical to neighbormix_scmae
+
+core_functions:
+  - name: apply_scmae_noise
+    file: run.py
+    description: Same as NeighborMix-scMAE (in run.py)
+
+  - name: build_knn_distribution
+    file: run.py
+    description: Still called but --neighbor_k=0 disables actual neighbor usage
+
+  - name: sample_mix
+    file: run.py
+    description: Called but --mix_neighbors=0 produces no mixing
+
+  - name: loss_mask
+    file: model.py
+    description: Only real_loss active (pseudo_loss has zero weight)
+
+  - name: extract_embedding
+    file: run.py
+    description: Same as NeighborMix-scMAE
+
+core_losses:
+  - name: L_reconstruction (real only)
+    stage: training
+    formula: MSE on masked positions of original cells
+
+  - name: L_mask (BCE)
+    stage: training
+    formula: BCE on mask prediction
+
+  - name: pseudo_loss (disabled)
+    stage: training
+    formula: 0 (pseudo_weight=0, neighbor_k=0, mix_neighbors=0)
+
+# ── Required Arguments ─────────────────────────────────────────────────────────
+
+required_extra_args:
+  - "--use_pseudo"
+  - "false"
+  - "--neighbor_k"
+  - "0"
+  - "--mix_neighbors"
+  - "0"
+  - "--variant_name"
+  - "nm_scmae_nomix"
+
+# ── Training Stages ─────────────────────────────────────────────────────────────
+
+required_training_stages:
+  - name: pretrain_mae
+    order: 1
+    description: Masked autoencoder training (no pseudo-branch contribution)
+    evidence:
+      - --use_pseudo=false, --neighbor_k=0, --mix_neighbors=0
+      - real_loss + mask_loss active
+      - pseudo_branch_enabled=False
+
+  - name: extract_embedding
+    order: 2
+
+  - name: kmeans_clustering
+    order: 3
+
+# ── Data Flow ──────────────────────────────────────────────────────────────────
+
+core_data_flow:
+  - X → apply_scmae_noise → masked_X, mask, target
+  - Encoder(masked_X) → latent
+  - real_loss + mask_loss → total_loss
+  - KMeans(embedding) → cluster labels
+  # Note: KNN distribution built but neighbor_k=0 → no mixing
+
+final_output_rule:
+  latent_embedding: encoder output
+  cluster_labels: KMeans on embedding
+
+# ── Forbidden Changes ──────────────────────────────────────────────────────────
+
+forbidden_changes:
+  - Enable NeighborMix in this ablation
+  - Modify AutoEncoder architecture to differ from NeighborMix-scMAE
+  - Use ground truth labels to select best epoch
+
+# ── Compatibility Changes (Documented) ────────────────────────────────────────
+
+compatibility_changes: []
+
+core_logic_changes: []
+
+unsafe_substitutions: []
+
+# ── Core Card Version ──────────────────────────────────────────────────────────
+
+card_version: "1.0"
+created_date: "2026-06-09"
+verified_by: model_core_card_generation

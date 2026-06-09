@@ -1,0 +1,125 @@
+# Model Core Card: scGNN
+# Single-cell Graph Neural Network (Wang et al., Bioinformatics 2021)
+
+model_key: scgnn
+name: scGNN
+full_name: Single-cell Graph Neural Network
+paper: Wang et al., Bioinformatics 2021
+source_path: OtherMode/scCluBench-main/GNN/scGNN
+target_path: methods/GNN/scGNN
+category: GNN
+status: PENDING
+authenticity_status: PENDING
+smoke_status: NOT_RUN
+framework: PyTorch
+gpu_policy: FAIL  # default --gpu 0 must be fixed
+
+# ── File Classification ────────────────────────────────────────────────────────
+
+core_source_files:
+  - run.py              # Entry point, CLI, training loop
+  - model.py            # AE, VAE model definitions
+  - gae_embedding.py    # GAEembedding function for graph autoencoder
+  - LTMG_R.py          # LTMG regularization
+  - util_function.py    # Utility functions
+  - graph_function.py   # Graph construction
+
+support_files: []
+
+adapter_files:
+  - run.py
+
+generated_or_output_files: []
+
+# ── Core Components ────────────────────────────────────────────────────────────
+
+core_classes:
+  - name: AE
+    file: model.py
+    description: Autoencoder model
+    required_components:
+      - encoder layers
+      - decoder layers
+      - forward returns (recon_batch, z)
+
+  - name: VAE
+    file: model.py
+    description: Variational Autoencoder model
+    required_components:
+      - encoder with mu and logvar
+      - reparameterization
+      - decoder
+
+core_functions:
+  - name: GAEembedding
+    file: gae_embedding.py
+    description: Graph AutoEncoder embedding for clustering
+    required_components:
+      - GCNModelVAE or GCNModelAE
+      - loss_function for GAE training
+      - Returns hidden embedding
+
+  - name: generateAdj
+    file: graph_function.py
+    description: Build graph from gene expression data
+
+  - name: runLTMG
+    file: LTMG_R.py
+    description: LTMG-based regularization via R integration
+
+core_losses:
+  - name: reconstruction_loss
+    # TBD from source review
+
+  - name: gae_loss
+    # TBD from source review
+
+  - name: em_clustering_loss
+    # TBD from source review
+
+# ── Training Stages ─────────────────────────────────────────────────────────────
+
+required_training_stages:
+  - name: preprocessing
+    order: 1
+    description: Graph construction and LTMG preprocessing
+
+  - name: ae_vae_pretrain
+    order: 2
+    description: AE or VAE pretraining
+
+  - name: gae_embedding
+    order: 3
+    description: Graph AutoEncoder embedding
+
+  - name: em_clustering
+    order: 4
+    description: EM-style iterative clustering
+
+# ── Forbidden Changes ──────────────────────────────────────────────────────────
+
+forbidden_changes:
+  - Remove AE/VAE branch
+  - Remove GAE embedding
+  - Replace EM clustering with simple KMeans
+  - Use ground truth labels to select best epoch
+  - Default --gpu 0 (BDD Scenario 13 violation)
+
+# ── Required Fixes ─────────────────────────────────────────────────────────────
+
+required_fixes:
+  - Change --gpu default from 0 to 1 (BDD Scenario 13)
+
+# ── Migration Status ────────────────────────────────────────────────────────────
+
+migration_blockers:
+  - --gpu default 0 (violates BDD Scenario 13)
+  - Authenticity audit not completed
+  - GPU policy violation must be resolved before formal use
+
+# ── Core Card Version ──────────────────────────────────────────────────────────
+
+card_version: "1.0"
+created_date: "2026-06-09"
+verified_by: model_core_card_generation
+note: "PENDING: Full source reviewed but authenticity audit not completed. GPU policy violation."

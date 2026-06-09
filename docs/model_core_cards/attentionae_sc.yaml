@@ -1,0 +1,123 @@
+# Model Core Card: AttentionAE_sc
+# Attention-based Autoencoder for Single-Cell
+
+model_key: attentionae_sc
+name: AttentionAE_sc
+full_name: Attention-based Autoencoder for Single-Cell
+source_path: OtherMode/scCluBench-main/GNN/AttentionAE-sc
+target_path: methods/GNN/AttentionAE_sc
+category: GNN
+status: PENDING
+authenticity_status: PENDING
+smoke_status: NOT_RUN
+framework: PyTorch
+gpu_policy: FAIL  # default --gpu 0 must be fixed
+
+# ── File Classification ────────────────────────────────────────────────────────
+
+core_source_files:
+  - run.py                   # Entry point
+  - model.py                 # AttentionAE model
+  - loss.py                  # Loss functions (ZINBLoss)
+  - train.py                 # Training loop
+  - utils.py                 # Utilities
+  - preprocessing_h5.py      # H5 preprocessing
+  - preprocessing_baron.py    # Baron dataset preprocessing
+  - run_AttentionAE-sc.py    # Original reference runner
+
+support_files:
+  - preprocessing_h5.py
+  - preprocessing_baron.py
+
+adapter_files:
+  - run.py
+
+generated_or_output_files: []
+
+# ── Core Components ────────────────────────────────────────────────────────────
+
+core_classes:
+  - name: AttentionAE
+    file: model.py
+    description: Attention-based autoencoder for single-cell
+    required_components:
+      - Attention mechanism for gene/cell importance
+      - Encoder-decoder architecture
+      - Latent space representation
+
+  - name: ZINBLoss
+    file: loss.py
+    description: Zero-Inflated Negative Binomial loss
+    required_components:
+      - ZINB formulation for count data
+      - Scale factor support
+
+core_functions:
+  - name: train
+    file: train.py
+    description: Main training function
+    must_preserve:
+      - ZINBLoss used for reconstruction
+      - Graph regularization loss
+      - Training loop with optimizer.step()
+
+  - name: clustering
+    file: train.py
+    description: Clustering optimization with attention
+    must_preserve:
+      - Leiden for cluster center initialization
+      - KL divergence loss for clustering
+      - ZINBLoss for reconstruction
+
+core_losses:
+  - name: ZINB reconstruction loss
+    formula: ZINBLoss(x, mean, disp, pi, scale_factor)
+    stage: training
+
+  - name: attention regularization loss
+    # TBD from source review
+
+# ── Training Stages ─────────────────────────────────────────────────────────────
+
+required_training_stages:
+  - name: pretrain
+    order: 1
+    description: Attention AE pretraining with ZINB loss
+
+  - name: kmeans_init
+    order: 2
+    description: KMeans initialization of cluster centers
+
+  - name: fit
+    order: 3
+    description: Joint training with attention + clustering
+
+# ── Forbidden Changes ──────────────────────────────────────────────────────────
+
+forbidden_changes:
+  - Remove attention mechanism
+  - Replace ZINBLoss with MSE
+  - Replace with simple AE
+  - Default --gpu 0 (BDD Scenario 13 violation)
+  - Use ground truth labels to select best epoch
+
+# ── Required Fixes ─────────────────────────────────────────────────────────────
+
+required_fixes:
+  - Change --gpu default from 0 to 1 (BDD Scenario 13)
+  - Verify attention mechanism in model.py
+  - Verify ZINBLoss used in train.py
+
+# ── Migration Status ────────────────────────────────────────────────────────────
+
+migration_blockers:
+  - --gpu default 0 (violates BDD Scenario 13)
+  - Authenticity audit not completed
+  - GPU policy violation must be resolved before formal use
+
+# ── Core Card Version ──────────────────────────────────────────────────────────
+
+card_version: "1.0"
+created_date: "2026-06-09"
+verified_by: model_core_card_generation
+note: "PENDING: GPU policy violation. Must audit full source before formal use."

@@ -1,0 +1,235 @@
+# Model Core Card: scDSC (SDCN)
+# Structural Deep Clustering Network (Zheng et al., IJCAI 2019)
+
+model_key: scdsc
+name: scDSC
+full_name: Structural Deep Clustering Network
+aka: SDCN
+paper: Zheng et al., IJCAI 2019
+source_path: OtherMode/scCluBench-main/GNN/scDSC
+target_path: methods/GNN/scDSC
+category: GNN
+status: VERIFIED
+authenticity_status: VERIFIED
+smoke_status: PASS
+framework: PyTorch
+gpu_policy: PASS
+
+# ── File Classification ────────────────────────────────────────────────────────
+
+core_source_files:
+  - run.py           # Entry point, SDCN model, training loop, build_graph
+  - GNN.py          # GNNLayer (graph neural network layer)
+  - layers.py        # ZINBLoss, MeanAct, DispAct
+  - filter.py
+  - T.py
+  - evaluation.py
+  - preprocess.py
+  - utils.py
+
+support_files:
+  - utils.py
+  - evaluation.py
+  - preprocess.py
+
+adapter_files:
+  - run.py
+
+generated_or_output_files:
+  - embedding_final.npy
+  - labels.npy
+  - metrics.json
+  - args.json
+
+# ── Core Components ────────────────────────────────────────────────────────────
+
+core_classes:
+  - name: AE
+    file: run.py
+    description: 3-layer autoencoder with BatchNorm
+    must_preserve:
+      - enc_1
+      - enc_2
+      - enc_3
+      - BN1
+      - BN2
+      - BN3
+      - z_layer
+      - dec_1
+      - dec_2
+      - dec_3
+
+  - name: SDCN
+    file: run.py
+    description: "Full model: AE + GNN layers + cluster layer + ZINB decoder"
+    must_preserve:
+      - self.ae
+      - gnn_1
+      - gnn_2
+      - gnn_3
+      - gnn_4
+      - gnn_5
+      - cluster_layer
+      - _dec_mean
+      - _dec_disp
+      - _dec_pi
+      - zinb_loss
+
+  - name: GNNLayer
+    file: GNN.py
+    description: Graph neural network layer
+    must_preserve:
+      - self.weight
+      - forward(
+
+  - name: ZINBLoss
+    file: layers.py
+    description: Zero-Inflated Negative Binomial loss
+    must_preserve: Full ZINB formula (see scDCC card)
+
+  - name: MeanAct
+    file: layers.py
+    description: Mean activation for ZINB mean parameter
+    must_preserve: torch.clamp(torch.exp(x), min=1e-5, max=1e6)
+
+  - name: DispAct
+    file: layers.py
+    description: Dispersion activation for ZINB dispersion parameter
+    must_preserve: torch.clamp(F.softplus(x), min=1e-4, max=1e4)
+
+core_functions:
+  - name: target_distribution
+    file: run.py
+    signature: "def target_distribution(q)"
+    description: KL target distribution P from soft assignment Q
+
+  - name: build_graph
+    file: run.py
+    signature: "def build_graph(X, k)"
+    description: Build k-NN graph from data (adjacency matrix)
+
+  - name: pretrain_ae
+    file: run.py
+    description: Pretrain autoencoder with MSE loss
+
+  - name: normalize_adj
+    file: run.py
+    description: Row-normalize sparse adjacency matrix
+
+  - name: sparse_mx_to_torch_sparse_tensor
+    file: run.py
+    description: Convert scipy sparse to torch sparse tensor
+
+  - name: set_seed
+    file: run.py
+    description: Random seed initialization
+
+core_losses:
+  - name: MSE reconstruction (pretrain)
+    stage: pretrain_ae
+    formula: F.mse_loss(x_bar, X_tensor)
+
+  - name: BCE loss
+    stage: fit
+    formula: F.binary_cross_entropy(q, p)  # q from GNN, p from target_distribution
+
+  - name: CE loss (KL divergence)
+    stage: fit
+    formula: F.kl_div(pred.log(), p, reduction='batchmean')  # pred from GNN softmax
+
+  - name: MSE reconstruction
+    stage: fit
+    formula: F.mse_loss(x_bar, X_tensor)
+
+  - name: ZINB loss
+    stage: fit
+    formula: zinb_loss(x_raw_batch, mean_batch, disp_batch, pi_batch, sf_batch)
+
+  - name: total_loss
+    stage: fit
+    formula: w_bce*BCE + w_ce*CE + w_re*MSE + w_zinb*ZINB
+
+# ── Training Stages ─────────────────────────────────────────────────────────────
+
+required_training_stages:
+  - name: pretrain_ae
+    order: 1
+    description: Autoencoder pretraining with MSE reconstruction
+    evidence:
+      - pretrain_ae() defined
+      - F.mse_loss called
+      - Adam optimizer on ae.parameters()
+      - backward() + step()
+
+  - name: kmeans_init
+    order: 2
+    description: KMeans initialization of cluster centers
+    evidence:
+      - model.ae used to get latent z
+      - KMeans(n_clusters).fit_predict(z)
+      - cluster_layer.data initialized
+
+  - name: fit (joint training)
+    order: 3
+    description: Joint AE + GNN + ZINB + clustering training
+    evidence:
+      - model(x, adj) called
+      - BCE + CE + MSE + ZINB losses computed
+      - total_loss = weighted sum of all four
+      - backward() and optimizer.step()
+      - target_distribution() updated each epoch
+
+# ── Data Flow ──────────────────────────────────────────────────────────────────
+
+core_data_flow:
+  - X (log-normalized input)
+  - X_raw (norm_log layer for ZINB)
+  - build_graph(X, k) → adj (sparse KNN matrix)
+  - AE(x) → x_bar, tra1, tra2, tra3, z, dec_h3
+  - GNN layers combine structural info with AE intermediate representations
+  - GNN output → predict (softmax) + q (soft assignment)
+  - ZINB decoder on dec_h3 → mean, disp, pi
+  - target_distribution(q) → p
+  - Joint loss: BCE(q,p) + CE(pred,p) + MSE(x_bar,X) + ZINB(x_raw,mean,disp,pi)
+
+final_output_rule:
+  latent_embedding: z from AE encode
+  cluster_labels: argmax of predict from GNN layer output
+
+# ── Forbidden Changes ──────────────────────────────────────────────────────────
+
+forbidden_changes:
+  - Remove AE branch (must be present in forward pass)
+  - Remove GNN layers or reduce number
+  - Remove ZINB decoder (_dec_mean, _dec_disp, _dec_pi)
+  - Remove ZINBLoss or replace with MSE
+  - Replace BCE + CE + MSE + ZINB with fewer losses
+  - Use ground truth labels to select best epoch
+  - Replace GNN branch with Leiden/Louvain
+  - Skip pretrain_ae stage
+
+# ── Label Leakage Check ────────────────────────────────────────────────────────
+
+label_leakage_check:
+  allowed:
+    - Y used for final metrics computation
+  forbidden:
+    - Using Y in training loop for best model selection
+    - eval_fn(Y, ...) for early stopping
+
+# ── Compatibility Changes (Documented) ────────────────────────────────────────
+
+compatibility_changes:
+  - raw_counts uses adata.layers['norm_log'] for ZINB loss
+  - ZINB loss computed in batches to prevent GPU OOM (batch_size=256)
+  - normalize_adj for row-normalizing sparse adjacency
+
+core_logic_changes: []
+
+unsafe_substitutions: []
+
+# ── Core Card Version ──────────────────────────────────────────────────────────
+
+card_version: "1.0"
+created_date: "2026-06-09"
+verified_by: model_core_card_generation
