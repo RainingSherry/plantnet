@@ -1,30 +1,39 @@
-# Model Core Card: scNAME (Placeholder)
+# Model Core Card: scNAME
 # Single-cell Network Attention Modeling for Expression
 
 model_key: scname
 name: scNAME
 full_name: Single-cell Network Attention Modeling for Expression
-description: Placeholder - TensorFlow/Keras model, code not fully migrated
+description: Self-supervised contrastive learning for scRNA-seq clustering using neighbor-aware masked autoencoder with mask loss, contrastive loss, and clustering loss.
 source_path: OtherMode/scCluBench-main/DeepLearning/scNAME
 target_path: methods/DeepLearning/scNAME
 category: DeepLearning
-status: CORE-INCOMPLETE
-authenticity_status: CORE-INCOMPLETE
+status: ENV-GATED
+authenticity_status: ENV-GATED
 smoke_status: ENV-BLOCKED
 framework: TensorFlow
-gpu_policy: N/A
+gpu_policy: "gpu=1 default (type=int); --no_cuda available"
+env_gate_reason: Requires TensorFlow/Keras (plantnet-tf1). Not available in main environment.
 
 # ── Status Reason ───────────────────────────────────────────────────────────────
 
 status_reason: |
-  PLACEHOLDER run.py exists but raises NotImplementedError / TensorFlow import error.
-  Actual source code from OtherMode not yet copied. This is a placeholder stub.
-  CORE-INCOMPLETE: full source must be copied before authenticity can be assessed.
+  Full source code migrated from OtherMode/scCluBench-main/DeepLearning/scNAME.
+  run.py updated with lazy TF import, unified CLI (--gpu type=int default=1, --no_cuda, --seed default=42).
+  All model files (scNAME_network.py, scNAME_loss.py, scNAME_main.py, etc.) copied intact.
+  ENV-GATED: TensorFlow not available in main conda environment. Use plantnet-tf1 runtime.
 
 # ── File Classification ────────────────────────────────────────────────────────
 
 core_source_files:
-  - run.py     # Placeholder stub only
+  # Main entry point
+  - run.py                    # Migrated: lazy TF import, unified CLI, _repo_root pattern
+  # Model core
+  - scNAME_network.py        # Autoencoder network with neighbor-aware masking
+  - scNAME_loss.py           # ZINB loss, mask loss, contrastive loss
+  - scNAME_main.py           # Main training logic
+  - scNAME_preprocess.py    # Preprocessing utilities
+  - scNAME_utils.py          # Utility functions
 
 support_files: []
 
@@ -32,39 +41,73 @@ adapter_files: []
 
 generated_or_output_files: []
 
-# ── Core Components ────────────────────────────────────────────────────────────
+# ── Core Components ───────────────────────────────────────────────────────────
 
-core_classes: []
+core_classes:
+  - name: autoencoder
+    file: scNAME_network.py
+    description: Masked autoencoder with neighbor-aware self-supervised learning
 
-core_functions: []
+core_functions:
+  - name: mask_generator
+    file: scNAME_network.py
+    description: Generate random mask for self-supervised learning
+  - name: pretext_generator
+    file: scNAME_network.py
+    description: Generate corrupted input and pretext targets
+  - name: pretrain
+    file: scNAME_main.py
+    description: Pretrain autoencoder with mask/contrastive losses
+  - name: funetrain
+    file: scNAME_main.py
+    description: Fine-tune with clustering loss
 
-core_losses: []
+core_losses:
+  - name: mask loss
+    search_patterns: [mask, alpha]
+  - name: neighbor / contrastive loss
+    search_patterns: [temperature, beta]
+  - name: kmeans / clustering loss
+    search_patterns: [gamma, cluster]
+  - name: ZINB reconstruction loss
+    search_patterns: [ZINB, zinb, MeanAct, DispAct]
 
 # ── Required Actions Before Migration ──────────────────────────────────────────
 
 required_before_migration:
-  - Copy full source from OtherMode/scCluBench-main/DeepLearning/scNAME
-  - Verify all model files exist in methods/DeepLearning/scNAME/
-  - Remove placeholder stub
-  - Implement TensorFlow-free PyTorch version OR
-  - Set up TensorFlow environment
+  - "[DONE] Copy full source from OtherMode/scCluBench-main/DeepLearning/scNAME"
+  - "[DONE] Remove placeholder stub, replace with migrated run.py"
+  - "[DONE] Update run.py with lazy TF import and unified CLI"
+  - "[PENDING] Verify smoke test in plantnet-tf1 environment"
 
 # ── Migration Status ────────────────────────────────────────────────────────────
 
 migration_blockers:
-  - Placeholder stub only (run.py with error message)
-  - TensorFlow dependency
-  - Actual model code not present
+  - None (source migrated)
+
+migration_status: SOURCE_MIGRATED
 
 # ── Forbidden Changes ──────────────────────────────────────────────────────────
 
 forbidden_changes:
-  - "Cannot migrate: no core code defined"
-  - Any "migration" of this placeholder would be UNSAFE_SUBSTITUTION
+  - Do not replace ZINB reconstruction with simple MSE
+  - Do not remove mask/contrastive/clustering losses
+  - Do not skip pretrain or funetrain stages
+  - Do not replace autoencoder with PCA + KMeans
+  - Do not import from OtherMode at runtime
 
-# ── Core Card Version ──────────────────────────────────────────────────────────
+# ── Runtime Configuration ──────────────────────────────────────────────────────
 
-card_version: "1.0"
+runtime:
+  backend: conda
+  env_name: plantnet-tf1
+  python: /data/luolie/conda/envs/scssl_bench_py310/bin/python
+  env_file: envs/plantnet-tf1.yml
+
+# ── Core Card Version ─────────────────────────────────────────────────────────
+
+card_version: "2.0"
 created_date: "2026-06-09"
-verified_by: model_core_card_generation
-note: "CORE-INCOMPLETE: This model cannot be migrated until full source is copied."
+updated_date: "2026-06-09"
+verified_by: source_migration_phase3
+note: "Full source migrated. ENV-GATED: requires plantnet-tf1 runtime. No model core modifications made."

@@ -79,18 +79,28 @@ def parse_args():
     parser.add_argument('--ae_weights', type=str, default=None,
                         help='Path to pretrained autoencoder weights')
 
+    parser.add_argument('--seed', type=int, default=42,
+                        help='Random seed')
+    parser.add_argument('--gpu', type=int, default=1,
+                        help='GPU device ID')
+    parser.add_argument('--no_cuda', action='store_true',
+                        help='Disable CUDA')
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
 
+    # Handle no_cuda
+    if args.no_cuda:
+        os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
     # Import TF lazily (only when actually running, not just for --help)
     tf, keras, keras_Adam = _check_tf()
 
     from numpy.random import seed
-    seed(2211)
-    tf.random.set_seed(2211)
+    seed(args.seed)
+    tf.random.set_seed(args.seed)
 
     from sklearn.cluster import KMeans
     from sklearn.preprocessing import LabelEncoder
