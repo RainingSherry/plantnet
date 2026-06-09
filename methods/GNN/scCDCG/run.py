@@ -327,7 +327,8 @@ def main():
     # 预训练前先用随机初始化的AE做一次KMeans，得到初始centers
     # (这样即使epochs=1也不会出现kmeans/centers未定义的情况)
     with torch.no_grad():
-        _h_init = Model.encoder(x.cuda() if args.cuda else x)
+        _adj = adj_self_loop.cuda() if args.cuda else adj_self_loop
+        _h_init = Model.forward(x.cuda() if args.cuda else x, _adj)[0]
         _z_init = torch.nn.functional.normalize(_h_init, p=2, dim=0).cpu().numpy()
         _kmeans_init = KMeans(n_clusters=n_clusters, random_state=args.seed, n_init=20).fit(_z_init)
         kmeans = _kmeans_init
