@@ -141,6 +141,13 @@ def main():
     else:
         raw_counts = X.copy()
 
+    # raw_counts must match adata.X shape (same HVG subset), not adata.raw which has all genes
+    # adata.X already has the HVG-subset; use it as reference
+    n_genes = X.shape[1]
+    if raw_counts.shape[1] != n_genes:
+        print(f'WARNING: raw_counts has {raw_counts.shape[1]} genes, expected {n_genes}. Using X as counts.')
+        raw_counts = X.copy()
+
     n_clusters = args.n_clusters if args.n_clusters > 0 else len(np.unique(Y))
     print(f'Number of cells: {X.shape[0]}, Number of genes: {X.shape[1]}')
     print(f'Number of clusters: {n_clusters}')

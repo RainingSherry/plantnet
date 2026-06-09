@@ -150,14 +150,10 @@ def main():
         le = LabelEncoder()
         Y = le.fit_transform(Y)
 
-    # Get raw counts for ZINB loss
-    if adata.raw is not None:
-        raw_counts = adata.raw.X
-        if hasattr(raw_counts, 'toarray'):
-            raw_counts = raw_counts.toarray()
-        raw_counts = np.array(raw_counts).astype(np.float32)
-    else:
-        raw_counts = X.copy()
+    # Get raw counts for ZINB loss — must match adata.X shape (same genes as HVG subset)
+    # adata.raw contains ALL genes; adata.X only has HVG genes after prepare_data_for_model
+    # Use adata.to_df() which matches adata.X
+    raw_counts = np.array(adata.to_df()).astype(np.float32)
 
     # Shuffle data
     n = X.shape[0]
