@@ -118,13 +118,15 @@ def main():
     os.makedirs(args.save_dir, exist_ok=True)
 
     # Load and preprocess data using standard interface
+    # NOTE: scNAME_normalize() requires RAW COUNTS for its assert check.
+    # Do NOT normalize/log-transform here — let scNAME_normalize handle it.
     print('Loading data...')
     X, Y, sf, adata = prepare_data_for_model(
         args.data_path,
-        size_factors=True,
+        size_factors=False,
         filter_min_counts=True,
-        logtrans_input=True,
-        normalize_input=True
+        logtrans_input=False,
+        normalize_input=False
     )
 
     # Apply HVG selection (scNAME model expects fixed 2000 gene input)
@@ -135,7 +137,12 @@ def main():
     # Convert to numpy arrays
     X = np.array(X).astype(np.float32)
     Y = np.array(Y)
-    sf = np.array(sf).astype(np.float32).reshape(-1, 1)
+
+    # Compute size factors from raw counts if not provided by prepare_data_for_model
+    if sf is None:
+        total_counts = np.array(adata.X.sum(axis=1)).flatten()
+        median_count = np.median(total_counts)
+        sf = (total_counts / median_count).astype(np.float32).reshape(-1, 1)
 
     # Encode labels to integers if needed
     from sklearn.preprocessing import LabelEncoder

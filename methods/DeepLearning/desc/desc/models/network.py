@@ -315,7 +315,7 @@ class DescModel(object):
         #encoder=load_model("encoder.h5")
         #
         y0=pd.Series(y_pred,dtype='category')
-        y0.cat.categories=range(0,len(y0.cat.categories))
+        y0 = y0.cat.set_categories(range(0, len(y0.cat.categories)))
         print("The final prediction cluster is:")
         x=y0.value_counts()
         print(x.sort_index(ascending=True))
@@ -360,7 +360,7 @@ class DescModel(object):
         #
         
         y0=pd.Series(y_pred,dtype='category')
-        y0.cat.categories=range(0,len(y0.cat.categories))
+        y0 = y0.cat.set_categories(range(0, len(y0.cat.categories)))
         print("The final prediction cluster is:")
         x=y0.value_counts()
         print(x.sort_index(ascending=True))

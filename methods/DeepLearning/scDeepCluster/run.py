@@ -111,7 +111,7 @@ def main():
     from sklearn.cluster import KMeans
     from sklearn.preprocessing import LabelEncoder
 
-    from code.scDeepCluster import SCDeepCluster
+    from scdeepcluster_src.scDeepCluster import SCDeepCluster
 
     os.makedirs(args.save_dir, exist_ok=True)
     save_json(vars(args), os.path.join(args.save_dir, 'run_config.json'))

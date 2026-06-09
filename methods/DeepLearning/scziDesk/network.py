@@ -28,7 +28,7 @@ class autoencoder(object):
         self.x_count = tf.compat.v1.placeholder(dtype=tf.float32, shape=(None, self.dims[0]))
 
         self.clusters = tf.compat.v1.get_variable(name=self.dataname + "/clusters_rep", shape=[self.cluster_num, self.dims[-1]],
-                                        dtype=tf.float32, initializer=tf.glorot_uniform_initializer())
+                                        dtype=tf.float32, initializer=tf.compat.v1.glorot_uniform_initializer())
 
         self.h = self.x
         self.h = GaussianNoise(self.noise_sd, name='input_noise')(self.h)
