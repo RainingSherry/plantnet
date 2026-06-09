@@ -53,6 +53,9 @@ env/
 .venv/
 .env/
 
+# Runtime registry with local absolute paths (commit only the example)
+envs/runtime_registry.yaml
+
 # Python build artifacts
 *.egg-info/
 dist/

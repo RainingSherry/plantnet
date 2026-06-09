@@ -180,65 +180,150 @@ methods:
     category: DeepLearning
     authenticity: ENV-GATED
     smoke: ENV-BLOCKED
-    gpu_policy: N/A
+    gpu_policy: PASS
     default_in_formal: false
     framework: TensorFlow
     reason: TensorFlow/Keras dependency
+    source_path: OtherMode/scCluBench-main/DeepLearning/scDeepCluster
+    runtime:
+      env_name: plantnet-tf1
+      backend: conda
+      description: "TensorFlow 2.x + Keras for scDeepCluster, scNAME, scziDesk"
 
   - key: scname
     name: scNAME
     path: methods/DeepLearning/scNAME/run.py
     category: DeepLearning
     authenticity: ENV-GATED
+    smoke: ENV-BLOCKED
+    gpu_policy: PASS
     default_in_formal: false
     framework: TensorFlow
     reason: TensorFlow/Keras dependency
+    source_path: OtherMode/scCluBench-main/DeepLearning/scNAME
+    runtime:
+      env_name: plantnet-tf1
+      backend: conda
+      description: "TensorFlow 2.x + Keras for scDeepCluster, scNAME, scziDesk"
+    source_files:
+      - run.py
+      - scNAME_network.py
+      - scNAME_loss.py
+      - scNAME_main.py
+      - scNAME_preprocess.py
+      - scNAME_utils.py
 
   - key: sczidesk
     name: scziDesk
     path: methods/DeepLearning/scziDesk/run.py
     category: DeepLearning
     authenticity: ENV-GATED
+    smoke: ENV-BLOCKED
+    gpu_policy: PASS
     default_in_formal: false
     framework: TensorFlow
     reason: TensorFlow/Keras dependency
+    source_path: OtherMode/scCluBench-main/DeepLearning/scziDesk
+    runtime:
+      env_name: plantnet-tf1
+      backend: conda
+      description: "TensorFlow 2.x + Keras for scDeepCluster, scNAME, scziDesk"
+    source_files:
+      - run.py
+      - network.py
+      - loss.py
+      - preprocess.py
+      - utils.py
+      - zidpkm.py
+      - scziDesk/loss.py
+      - scziDesk/network.py
+      - scziDesk/preprocess.py
+      - scziDesk/utils.py
+      - scziDesk/zidpkm.py
+      - scDeepCluster/layers.py
+      - scDeepCluster/loss.py
+      - scDeepCluster/preprocess.py
+      - scDeepCluster/scDeepCluster.py
+      - scDeepCluster/scDeepCluster_latent.py
+      - scDeepCluster/scDeepCluster_estimate_k.py
 
   - key: desc
     name: DESC
     path: methods/DeepLearning/desc/run.py
     category: DeepLearning
     authenticity: ENV-GATED
+    smoke: ENV-BLOCKED
+    gpu_policy: PASS
     default_in_formal: false
     framework: TensorFlow
     reason: TensorFlow/Keras dependency
+    source_path: OtherMode/scCluBench-main/DeepLearning/desc
+    runtime:
+      env_name: plantnet-desc
+      backend: conda
+      description: "TensorFlow 2.x + Keras for DESC (separate env from plantnet-tf1)"
+    source_files:
+      - run.py
+      - desc/__init__.py
+      - desc/models/__init__.py
+      - desc/models/desc.py
+      - desc/models/network.py
+      - desc/models/SAE.py
+      - desc/tools/__init__.py
+      - desc/tools/preprocessing.py
+      - desc/tools/read.py
+      - desc/tools/write.py
+      - desc/tools/downstream.py
+      - desc/tools/test.py
+      - desc/datasets/__init__.py
+      - setup.py
 
-  # ── PENDING: full code migrated, not yet audited ──
+  # ── PENDING_AUDITED: audited but smoke not yet run ──
   - key: scgnn
     name: scGNN
     path: methods/GNN/scGNN/run.py
     category: GNN
-    authenticity: PENDING
+    authenticity: PENDING_AUDITED
+    smoke: NOT_RUN
+    gpu_policy: PASS
     default_in_formal: false
     framework: PyTorch
-    gpu_policy: PASS (fixed default=1)
+    source_path: OtherMode/scCluBench-main/GNN/scGNN
+    runtime:
+      env_name: plantnet-scgnn
+      backend: conda
+      description: "PyTorch for scGNN (noregu mode, no R dependency)"
 
   - key: sccdcg
     name: scCDCG
     path: methods/GNN/scCDCG/run.py
     category: GNN
-    authenticity: PENDING
+    authenticity: PENDING_AUDITED
+    smoke: NOT_RUN
+    gpu_policy: PASS
     default_in_formal: false
     framework: PyTorch
-    gpu_policy: PASS (fixed default=1)
+    source_path: OtherMode/scCluBench-main/GNN/scCDCG
+    runtime:
+      env_name: plantnet-sccdcg
+      backend: conda
+      description: "PyTorch 1.12 for scCDCG"
+    note: "HARD label leakage fixed: loss-based checkpoint selection instead of ACC-based"
 
   - key: attentionae_sc
     name: AttentionAE_sc
     path: methods/GNN/AttentionAE_sc/run.py
     category: GNN
-    authenticity: PENDING
+    authenticity: PENDING_AUDITED
+    smoke: NOT_RUN
+    gpu_policy: PASS
     default_in_formal: false
     framework: PyTorch
-    gpu_policy: PASS (fixed default=1)
+    source_path: OtherMode/scCluBench-main/GNN/AttentionAE_sc
+    runtime:
+      env_name: plantnet-attentionae
+      backend: conda
+      description: "PyTorch for AttentionAE_sc"
 
   # ── PLACEHOLDER: Foundation model stubs ──
   - key: scgpt

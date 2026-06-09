@@ -47,6 +47,7 @@ import yaml
 import time
 import subprocess
 import argparse
+import shutil
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Optional, Any
@@ -57,8 +58,6 @@ MANIFEST_PATH = METHODS_DIR / "method_manifest.yaml"
 SCRIPTS_DIR = PROJECT_ROOT / "scripts"
 PROCESSED_DATA_DIR = PROJECT_ROOT / "data" / "processed"
 FORBIDDEN_GPUS = {"0", "7"}
-
-# Default formal method list (proposed + ablation + external + baselines)
 DEFAULT_FORMAL_METHODS = [
     "neighbormix_scmae",
     "nm_scmae_nomix",
@@ -71,6 +70,86 @@ DEFAULT_FORMAL_METHODS = [
     "louvain",
     "sc3",
 ]
+
+
+# ────────────────────────────────────────────────────────────────
+# Runtime Registry (Phase 1 / Scenario 1.2)
+# ────────────────────────────────────────────────────────────────
+
+def load_runtime_registry(registry_path: Optional[Path]) -> Dict[str, dict]:
+    """Load runtime registry YAML. Returns empty dict if not found or not specified."""
+    if not registry_path or not registry_path.exists():
+        return {}
+    try:
+        with open(registry_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+        return data.get("runtimes", {})
+    except Exception as e:
+        print(f"  WARNING: Could not load runtime registry {registry_path}: {e}", file=sys.stderr)
+        return {}
+
+
+def resolve_python_executable(
+    method_key: str,
+    method_info: Dict[str, Any],
+    runtime_registry: Dict[str, dict],
+) -> str:
+    """
+    Per BDD Scenario 2.1: resolve the correct Python executable for a method.
+
+    Priority:
+      1. Explicit runtime.python from runtime_registry (if configured)
+      2. sys.executable (fallback: current environment)
+
+    The registry maps logical names (e.g. 'plantnet-tf1') to concrete Python paths.
+    Each method can specify a 'runtime_env' key pointing to a registry entry.
+    """
+    runtime_env = method_info.get("runtime_env", "")
+    if runtime_env and runtime_env in runtime_registry:
+        entry = runtime_registry[runtime_env]
+        python_path = entry.get("python", "")
+        if python_path and Path(python_path).exists():
+            return python_path
+        # python not found — fall back
+        print(f"  WARNING: runtime '{runtime_env}' python not found: {python_path}, using default", file=sys.stderr)
+    return sys.executable
+
+
+def write_environment_json(out_dir: Path, python_executable: str, runtime_env: str = "") -> None:
+    """
+    Per BDD Scenario 2.3: write environment.json with version info.
+    """
+    env_data = {
+        "runtime_backend": "conda",
+        "runtime_env": runtime_env or "default",
+        "python_executable": python_executable,
+        "python_version": "",
+        "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES", ""),
+        "torch_version": "",
+        "tensorflow_version": "",
+        "scanpy_version": "",
+        "anndata_version": "",
+    }
+
+    # Collect version info from the actual Python executable
+    exe = python_executable or sys.executable
+    version_cmds = [
+        ("python_version", [exe, "-c", "import sys; print(sys.version.split()[0])"]),
+        ("torch_version", [exe, "-c", "import torch; print(torch.__version__)"]),
+        ("tensorflow_version", [exe, "-c", "import tensorflow; print(tensorflow.__version__)"]),
+        ("scanpy_version", [exe, "-c", "import scanpy; print(scanpy.__version__)"]),
+        ("anndata_version", [exe, "-c", "import anndata; print(anndata.__version__)"]),
+    ]
+    for key, cmd in version_cmds:
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                env_data[key] = result.stdout.strip()
+        except Exception:
+            pass
+
+    with open(out_dir / "environment.json", "w", encoding="utf-8") as f:
+        json.dump(env_data, f, indent=2)
 
 
 # ────────────────────────────────────────────────────────────────
@@ -248,6 +327,7 @@ def write_authenticity_json(out_dir: Path, method_info: Dict[str, Any]) -> None:
 # ────────────────────────────────────────────────────────────────
 
 def build_command(
+    python_bin: str,
     method_key: str,
     method_info: Dict[str, Any],
     data_path: str,
@@ -260,12 +340,17 @@ def build_command(
     no_cuda: bool,
     extra_args: Optional[List[str]] = None,
 ) -> List[str]:
-    """Build the command-line invocation for a method."""
+    """Build the command-line invocation for a method.
+
+    Args:
+        python_bin: Path to the Python executable to use.
+                    Use resolved_python_executable(), not sys.executable.
+    """
 
     run_py = PROJECT_ROOT / method_info["path"]
 
     cmd = [
-        sys.executable,
+        python_bin,
         str(run_py),
         "--data_path", data_path,
         "--save_dir", str(out_dir),
@@ -363,6 +448,8 @@ def run_method(
     verbose: bool = False,
     dry_run: bool = False,
     dataset_name: str = "",
+    python_bin: str = "",
+    runtime_env: str = "",
 ) -> Dict[str, Any]:
     """Run a single method with a given seed. Returns a result dict."""
 
@@ -379,6 +466,7 @@ def run_method(
     cmd: List[str] = []
 
     write_authenticity_json(out_dir, method_info)
+    write_environment_json(out_dir, python_bin or sys.executable, runtime_env)
 
     # Check if allowed
     allowed, reason = check_authenticity(method_key, method_info)
@@ -389,7 +477,9 @@ def run_method(
             _write_status(out_dir, method_key, seed, status, return_code,
                           elapsed_seconds, gpu, no_cuda, start_time, end_time,
                           cmd, commit_sha, branch, reason, "",
-                          dataset=dataset_name, n_clusters=n_clusters)
+                          dataset=dataset_name, n_clusters=n_clusters,
+                          python_executable=python_bin or sys.executable,
+                          runtime_env=runtime_env)
             return {
                 "method": method_key,
                 "seed": seed,
@@ -411,6 +501,7 @@ def run_method(
 
     extra_args = method_info.get("extra_args", None)
     cmd = build_command(
+        python_bin or sys.executable,
         method_key, method_info, data_path, out_dir,
         n_clusters, epochs, pretrain_epochs, seed,
         gpu, no_cuda, extra_args,
@@ -425,7 +516,9 @@ def run_method(
         _write_status(out_dir, method_key, seed, status, return_code,
                       elapsed_seconds, gpu, no_cuda, start_time, end_time,
                       cmd, commit_sha, branch, "", "",
-                      dataset=dataset_name, n_clusters=n_clusters)
+                      dataset=dataset_name, n_clusters=n_clusters,
+                      python_executable=python_bin or sys.executable,
+                      runtime_env=runtime_env)
         return {
             "method": method_key,
             "seed": seed,
@@ -496,7 +589,9 @@ def run_method(
     _write_status(out_dir, method_key, seed, status, return_code,
                   elapsed_seconds, gpu, no_cuda, start_time, end_time,
                   cmd, commit_sha, branch, "", error_msg,
-                  dataset=dataset_name, n_clusters=n_clusters)
+                  dataset=dataset_name, n_clusters=n_clusters,
+                  python_executable=python_bin or sys.executable,
+                  runtime_env=runtime_env)
 
     metrics = load_metrics(out_dir)
 
@@ -514,6 +609,8 @@ def run_method(
         "commit_sha": commit_sha,
         "branch": branch,
         "command": " ".join(cmd),
+        "python_executable": python_bin or sys.executable,
+        "runtime_env": runtime_env,
     }
 
     if verbose:
@@ -557,6 +654,8 @@ def _write_status(
     error_msg: str,
     dataset: str = "",
     n_clusters: int = None,
+    python_executable: str = "",
+    runtime_env: str = "",
 ) -> None:
     """Write status.json to the output directory."""
     status_data = {
@@ -575,6 +674,8 @@ def _write_status(
         "branch": branch,
         "reason": reason,
         "error": error_msg,
+        "runtime_env": runtime_env,
+        "python_executable": python_executable,
     }
     if n_clusters is not None:
         status_data["n_clusters"] = n_clusters
@@ -680,6 +781,8 @@ def generate_summary_csv(results: List[Dict], out_path: Path, dataset: str) -> N
             "runtime_seconds": r.get("elapsed_seconds", ""),
             "gpu": r.get("gpu", ""),
             "no_cuda": r.get("no_cuda", ""),
+            "runtime_env": r.get("runtime_env", ""),
+            "python_executable": r.get("python_executable", ""),
             "commit_sha": r.get("commit_sha", ""),
             "branch": r.get("branch", ""),
             "command": r.get("command", ""),
@@ -849,6 +952,9 @@ Substitute implementations are forbidden.
     parser.add_argument("--methods", type=str, nargs="+", default=None,
                        help=f"Method keys to run. Default: all VERIFIED+Smoke=PASS. "
                             f"Default formal list: {DEFAULT_FORMAL_METHODS}")
+    parser.add_argument("--runtime_registry", type=str, default=None,
+                       help="Path to runtime_registry.yaml for per-method Python resolution. "
+                            "Default: envs/runtime_registry.yaml if exists.")
     parser.add_argument("--no_cuda", action="store_true",
                        help="Disable CUDA (use CPU only)")
     parser.add_argument("--gpu", type=int, default=1,
@@ -904,6 +1010,20 @@ Substitute implementations are forbidden.
 
     # ── Load manifest ───────────────────────────────────────────
     manifest = load_manifest()
+
+    # ── Load runtime registry ──────────────────────────────────
+    runtime_registry_path = args.runtime_registry
+    if runtime_registry_path is None:
+        default_reg = PROJECT_ROOT / "envs" / "runtime_registry.yaml"
+        if default_reg.exists():
+            runtime_registry_path = str(default_reg)
+    if runtime_registry_path:
+        runtime_registry = load_runtime_registry(Path(str(runtime_registry_path)))
+        print(f"  Runtime registry: {runtime_registry_path} ({len(runtime_registry)} entries)")
+    else:
+        runtime_registry = {}
+        print("  Runtime registry: none (using default sys.executable)")
+
     if args.out_dir and dataset_name in args.out_dir:
         base_out_dir = Path(args.out_dir)
     else:
@@ -973,11 +1093,15 @@ Substitute implementations are forbidden.
     if args.dry_run:
         print("DRY RUN — no models executed. Preflight checks passed.")
         print()
+        # Load runtime registry for dry run command display
+        runtime_registry_local = load_runtime_registry(Path(str(runtime_registry_path))) if runtime_registry_path else {}
         for method_key, method_info in sorted(selected.items()):
             allowed, reason = check_authenticity(method_key, method_info)
+            py_bin = resolve_python_executable(method_key, method_info, runtime_registry_local)
             for seed in args.seeds:
                 extra_args = method_info.get("extra_args", None)
                 cmd = build_command(
+                    py_bin,
                     method_key, method_info, data_path,
                     base_out_dir / f"{method_key}__seed{seed}__dry",
                     n_clusters, args.epochs, args.pretrain_epochs,
@@ -1002,18 +1126,24 @@ Substitute implementations are forbidden.
                     out_dir = base_out_dir / run_id
                     os.makedirs(out_dir, exist_ok=True)
                     write_authenticity_json(out_dir, method_info)
+                    skipped_runtime_env = method_info.get("runtime_env", "")
+                    skipped_python = resolve_python_executable(method_key, method_info, runtime_registry)
                     _write_status(
                         out_dir, method_key, seed, "skipped",
                         None, 0.0, args.gpu, args.no_cuda,
                         datetime.now().isoformat(), datetime.now().isoformat(),
                         [], commit_sha, branch, reason, "",
                         dataset=dataset_name, n_clusters=n_clusters,
+                        python_executable=skipped_python,
+                        runtime_env=skipped_runtime_env,
                     )
                 print()
                 continue
 
             print(f"  Running {method_key}...")
             for seed in args.seeds:
+                runtime_env = method_info.get("runtime_env", "")
+                python_bin = resolve_python_executable(method_key, method_info, runtime_registry)
                 result = run_method(
                     method_key, method_info,
                     data_path, base_out_dir,
@@ -1024,6 +1154,8 @@ Substitute implementations are forbidden.
                     verbose=args.verbose,
                     dry_run=args.dry_run,
                     dataset_name=dataset_name,
+                    python_bin=python_bin,
+                    runtime_env=runtime_env,
                 )
                 all_results.append(result)
             print()
