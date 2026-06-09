@@ -132,28 +132,33 @@ def find_import(content: str, module_or_class: str) -> bool:
     return False
 
 
-def find_loss_in_training(content: str, loss_name: str) -> bool:
+def find_loss_in_training(content: str, search_patterns: List[str]) -> bool:
     """
-    Check if a loss appears in a training loop context.
-    Looks for the loss name near 'backward', 'step', 'optimizer', 'loss'.
+    Check if any of search_patterns appears in a training loop.
+    Each pattern is a regex checked case-insensitively inside fit/train/main blocks.
+    Falls back to full-file search if no training block found.
     """
-    # Split into training-related blocks
+    if not search_patterns:
+        return True
+    compiled = [re.compile(p, re.I) for p in search_patterns]
     lines = content.split("\n")
     in_training_block = False
     for line in lines:
         stripped = line.strip()
-        # Detect training loops
-        if any(kw in stripped for kw in ["def fit(", "def train(", "for epoch", "for batch", "while "]):
+        if re.match(r"^\s*def\s+(fit|train|main)\s*\(", stripped):
             in_training_block = True
+        elif in_training_block and re.match(r"^\s*def\s+", stripped):
+            in_training_block = False
         if in_training_block:
-            if stripped.startswith("def ") and "fit" not in stripped and "train" not in stripped:
-                in_training_block = False
-            if loss_name.lower() in stripped.lower():
-                # Make sure it's not just a comment
-                code_part = re.split(r"#", stripped)[0]
-                if loss_name.lower() in code_part.lower():
+            code_part = re.split(r"#", stripped)[0]
+            for pattern in compiled:
+                if pattern.search(code_part):
                     return True
-    return loss_name.lower() in content.lower()
+    # Fallback: check full file
+    for pattern in compiled:
+        if pattern.search(content):
+            return True
+    return False
 
 
 def find_forbidden_pattern(content: str, forbidden: str) -> Tuple[bool, str]:
@@ -182,43 +187,100 @@ def check_gpu_default(target_path: Path, entry: str) -> Tuple[bool, str]:
     return True, "GPU default != 0 or no --gpu argument"
 
 
-def check_label_leakage(content: str) -> List[str]:
+def check_label_leakage(content: str) -> Tuple[List[str], List[str]]:
     """
-    Check for label leakage patterns in training loops.
-    Looks for ground truth used for best model selection, early stopping, etc.
-    """
-    violations = []
-    lines = content.split("\n")
-    in_training_loop = False
+    Per BDD Scenario 1: distinguish HARD (FAIL) from SOFT (WARN).
 
-    # Patterns that indicate label leakage in training
-    leakage_patterns = [
-        (r"eval_fn\s*\(\s*Y\s*[,\)]", "eval_fn called with Y in training loop"),
-        (r"evaluation\s*\(\s*Y\s*[,\)]", "evaluation called with Y in training loop"),
-        (r"cluster_acc\s*\([^)]*Y[^)]*\)", "cluster_acc called with Y in training loop"),
-        (r"acc\s*=\s*cluster_acc\s*\([^)]*\)", "cluster_acc assigned during training"),
-        (r"if\s+.*acc.*>.*best", "Using ACC to track best model in training loop"),
-        (r"if\s+.*nmi.*>.*best", "Using NMI to track best model in training loop"),
-        (r"best.*=.*acc\b", "Using ACC as best metric in training loop"),
+    HARD (FAIL): Y used for model/epoch selection
+    SOFT (WARN): Y accessed but only for printing/final metrics
+    """
+    hard = []
+    soft = []
+    lines = content.split("\n")
+    in_training = False
+    in_acc_if = False
+    in_nmi_if = False
+    acc_if_indent = -1
+    nmi_if_indent = -1
+
+    def get_indent(line: str) -> int:
+        return len(line) - len(line.lstrip())
+
+    soft_patterns = [
+        (r"eval_fn\s*\([^)]*Y\b",              "eval_fn(Y, ...) in training loop"),
+        (r"cluster_acc\s*\([^)]*Y\b",          "cluster_acc(y, ...) in training loop"),
+        (r"nmi_score\s*\([^)]*Y\b",            "nmi_score with Y in training loop"),
+        (r"ari_score\s*\([^)]*Y\b",            "ari_score with Y in training loop"),
+        (r"f1_score\s*\([^)]*Y\b",             "f1_score with Y in training loop"),
+        (r"accuracy_score\s*\([^)]*Y\b",       "accuracy_score with Y in training loop"),
     ]
+    standalone_hard = [
+        (r"pretrain_acc_max\s*=\s*acc\b",    "pretrain_acc_max = acc"),
+        (r"acc_max\s*=\s*acc\b",             "acc_max = acc"),
+        (r"best_nmi\s*=\s*nmi\b",            "best_nmi = nmi"),
+        (r"best_ari\s*=\s*ari\b",            "best_ari = ari"),
+        (r"if\s+acc\s*>=?\s*pretrain_acc_max", "if acc >= pretrain_acc_max"),
+    ]
+    soft_re = [(re.compile(p, re.I), d) for p, d in soft_patterns]
+    standalone_hard_re = [(re.compile(p, re.I), d) for p, d in standalone_hard]
 
     for line in lines:
         stripped = line.strip()
-        # Track if we're in a training function
+        if not stripped or stripped.startswith("#"):
+            continue
+        indent = get_indent(line)
+
         if re.match(r"^\s*def\s+(fit|train|main)\s*\(", stripped):
-            in_training_loop = True
-        elif in_training_loop and re.match(r"^\s*def\s+", stripped):
-            in_training_loop = False
+            in_training = True
+            in_acc_if = False
+            in_nmi_if = False
+            acc_if_indent = -1
+            nmi_if_indent = -1
+        elif in_training and re.match(r"^\s*def\s+", stripped):
+            in_training = False
+            in_acc_if = False
+            in_nmi_if = False
+            continue
 
-        if in_training_loop:
-            for pattern, description in leakage_patterns:
-                if re.search(pattern, stripped, re.IGNORECASE):
-                    # Allow label usage only in the final metrics computation block
-                    if "metrics.json" in content[content.find(stripped):content.find(stripped)+500]:
-                        continue
-                    violations.append(f"{description}: {stripped[:100]}")
+        if not in_training:
+            continue
 
-    return violations
+        code_part = re.split(r"#", stripped)[0]
+
+        # Detect acc > best: / nmi > best: blocks
+        if re.search(r"if\s+.*\bac+[cs]\b.*\>", code_part, re.I):
+            in_acc_if = True
+            acc_if_indent = indent
+        elif in_acc_if and indent <= acc_if_indent and not stripped.startswith(("elif", "else")):
+            in_acc_if = False
+
+        if re.search(r"if\s+.*\bnmi\b.*\>", code_part, re.I):
+            in_nmi_if = True
+            nmi_if_indent = indent
+        elif in_nmi_if and indent <= nmi_if_indent and not stripped.startswith(("elif", "else")):
+            in_nmi_if = False
+
+        # HARD: inside acc > best: or nmi > best: block
+        if in_acc_if or in_nmi_if:
+            if re.search(r"best_embedding\s*=|best_y_pred\s*=", code_part):
+                hard.append(f"Y used: best state saved inside acc/nmi conditional: {stripped[:100]}")
+            if re.search(r"torch\.save|model\.state_dict\(\)|best_model", code_part):
+                hard.append(f"Y used: checkpoint saved inside acc/nmi conditional: {stripped[:100]}")
+            continue
+
+        # SOFT
+        for pattern, desc in soft_re:
+            if pattern.search(code_part):
+                soft.append(f"SOFT [{desc}]: {stripped[:100]}")
+                break
+
+        # STANDALONE HARD
+        for pattern, desc in standalone_hard_re:
+            if pattern.search(code_part):
+                hard.append(f"HARD [{desc}]: {stripped[:100]}")
+                break
+
+    return hard, soft
 
 
 def check_core_components(card: dict, target_path: Path) -> Tuple[List[str], List[str]]:
@@ -285,12 +347,20 @@ def check_core_components(card: dict, target_path: Path) -> Tuple[List[str], Lis
         if not content or not find_function(content, name):
             failures.append(f"Core function '{name}' not found in {file or 'any file'}")
 
-    # Check core losses appear in training
+    # Check core losses appear in training (Scenario 3: search_patterns)
     for loss in card.get("core_losses", []):
         loss_name = loss.get("name", "")
         stage = loss.get("stage", "")
-        if not find_loss_in_training(all_content, loss_name):
-            warnings.append(f"Core loss '{loss_name}' ({stage}) not found in training loop")
+        search_patterns = loss.get("search_patterns", [])
+        if search_patterns:
+            if not find_loss_in_training(all_content, search_patterns):
+                warnings.append(
+                    f"Core loss '{loss_name}' ({stage}) not found in training loop "
+                    f"(search_patterns: {search_patterns})"
+                )
+        elif loss_name:
+            if not find_loss_in_training(all_content, [re.escape(loss_name)]):
+                warnings.append(f"Core loss '{loss_name}' ({stage}) not found in training loop")
 
     return failures, warnings
 
@@ -377,10 +447,11 @@ def check_card(card: dict, manifest_entry: Optional[dict]) -> CheckResult:
     if unsafe_subs:
         result.failures.append(f"UNSAFE_SUBSTITUTION detected: {unsafe_subs}")
 
-    # ── 7. Check label leakage ────────────────────────────────────────────────
-    leakage = check_label_leakage(all_content)
-    if leakage:
-        result.failures.extend([f"LABEL_LEAKAGE: {v}" for v in leakage])
+    # ── 7. Check label leakage (Scenario 1: HARD vs SOFT) ─────────────────────
+    hard_leaks, soft_leaks = check_label_leakage(all_content)
+    if hard_leaks:
+        result.failures.extend([f"LABEL_LEAKAGE: {v}" for v in hard_leaks])
+    result.warnings.extend([f"LABEL_ACCESS: {v}" for v in soft_leaks])
 
     # ── 8. Check GPU default ─────────────────────────────────────────────────
     if card.get("gpu_policy") == "FAIL":
@@ -520,7 +591,8 @@ def main():
         "WARN": [],
         "ENV-GATED": ["scdeepcluster", "scname", "sczidesk", "desc"],
         "CORE-INCOMPLETE": ["scname", "sczidesk", "desc"],
-        "FAIL": ["sccdcg", "scdcc"],  # Known label leakage violations
+        "FAIL": ["sccdcg"],  # Known HARD label leakage violation (acc_max = acc + pretrain_acc_max guard)
+        # scdcc: only SOFT label access (cluster_acc called for printing) → WARN, not FAIL
     }
 
     # We expect FAIL count = 0, CORE-INCOMPLETE for placeholders, ENV-GATED for TF models

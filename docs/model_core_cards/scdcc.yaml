@@ -89,21 +89,33 @@ core_losses:
   - name: ZINB reconstruction loss
     stage: pretrain_autoencoder
     formula: zinb_loss(x_raw, mean, disp, pi, scale_factor)
+    search_patterns:
+      - zinb_loss
+      - ZINBLoss
     must_appear_in: pretrain_autoencoder batch loop
 
   - name: ZINB reconstruction loss
     stage: fit (clustering)
     formula: zinb_loss(x_raw_batch, mean_batch, disp_batch, pi_batch, sf_batch)
+    search_patterns:
+      - zinb_loss
+      - ZINBLoss
     must_appear_in: fit batch loop (combined with cluster_loss)
 
   - name: cluster_loss (KL divergence)
     stage: fit (clustering)
     formula: self.cluster_loss(target_p, q_batch) = gamma * kld(p, q)
+    search_patterns:
+      - cluster_loss
+      - kld\(p
     must_appear_in: fit batch loop (combined with ZINB loss)
 
   - name: total_loss
     stage: fit
     formula: cluster_loss + zinb_loss
+    search_patterns:
+      - total_loss
+      - loss\.backward
     must_appear_in: fit batch loop with backward()
 
 # ── Training Stages ─────────────────────────────────────────────────────────────

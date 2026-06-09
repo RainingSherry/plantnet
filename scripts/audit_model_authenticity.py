@@ -555,8 +555,14 @@ def _find_method(content: str, method_name: str) -> bool:
     return False
 
 
-def _loss_in_training(content: str, loss_name: str) -> bool:
-    """Check if a loss appears in a training loop."""
+def _loss_in_training(content: str, search_patterns: List[str]) -> bool:
+    """
+    Check if any of search_patterns appears in a training loop.
+    Each pattern is a regex checked (case-insensitive) inside fit/train/main blocks.
+    """
+    if not search_patterns:
+        return True
+    compiled = [re.compile(p, re.I) for p in search_patterns]
     lines = content.split("\n")
     in_training = False
     for line in lines:
@@ -567,31 +573,130 @@ def _loss_in_training(content: str, loss_name: str) -> bool:
             in_training = False
         if in_training:
             code_part = re.split(r"#", stripped)[0]
-            if loss_name.lower() in code_part.lower():
-                return True
+            for pattern in compiled:
+                if pattern.search(code_part):
+                    return True
     return False
 
 
-def _check_label_leakage(content: str) -> List[str]:
-    """Per BDD Scenario 10: detect label leakage in training loops."""
-    violations = []
+def _check_label_leakage(content: str) -> Tuple[List[str], List[str]]:
+    """
+    Per BDD Scenario 1: distinguish HARD_LABEL_LEAKAGE from SOFT_LABEL_ACCESS.
+
+    HARD (FAIL): ground truth Y used for model/epoch selection, checkpoint selection
+                 e.g.  if acc > best: save_model()
+    SOFT (WARN): ground truth Y accessed but only for progress printing, final metrics
+                 e.g.  print(f"acc={cluster_acc(y, pred)}")
+    """
+    hard_violations = []
+    soft_violations = []
     lines = content.split("\n")
     in_training = False
-    leakage_re = re.compile(
-        r"(eval_fn\s*\([^)]*Y|evaluation\s*\([^)]*Y|"
-        r"cluster_acc\s*\([^)]*Y|best.*=.*acc\b|"
-        r"if\s+.*acc\s*>|if\s+.*nmi\s*>)",
-        re.IGNORECASE,
-    )
+
+    # Track if we're inside an "if acc > best:" or "if nmi > best:" block
+    # Only assignments inside these blocks count as HARD leakage
+    in_acc_if_block = False
+    in_nmi_if_block = False
+    acc_if_indent = -1
+    nmi_if_indent = -1
+
+    def get_indent(line: str) -> int:
+        stripped = line.lstrip()
+        return len(line) - len(stripped)
+
+    # ── SOFT patterns: Y used for printing / final metrics ───────────────────
+    soft_patterns = [
+        (r"eval_fn\s*\([^)]*Y\b",              "eval_fn(Y, ...) called in training loop"),
+        (r"cluster_acc\s*\([^)]*Y\b",          "cluster_acc(y, ...) called in training loop"),
+        (r"nmi_score\s*\([^)]*Y\b",            "nmi_score with Y called in training loop"),
+        (r"ari_score\s*\([^)]*Y\b",            "ari_score with Y called in training loop"),
+        (r"f1_score\s*\([^)]*Y\b",             "f1_score with Y called in training loop"),
+        (r"accuracy_score\s*\([^)]*Y\b",        "accuracy_score with Y called in training loop"),
+    ]
+
+    # ── HARD standalone patterns: always hard regardless of context ───────────
+    # These are one-liners that ARE the leakage (not inside an if-block)
+    standalone_hard = [
+        (r"pretrain_acc_max\s*=\s*acc\b",
+         "pretrain_acc_max = acc (tracks best accuracy from labels)"),
+        (r"acc_max\s*=\s*acc\b",
+         "acc_max = acc (tracks best accuracy from labels)"),
+        (r"best_nmi\s*=\s*nmi\b",
+         "best_nmi = nmi (tracks best NMI from labels)"),
+        (r"best_ari\s*=\s*ari\b",
+         "best_ari = ari (tracks best ARI from labels)"),
+        (r"if\s+acc\s*>=?\s*pretrain_acc_max",
+         "if acc >= pretrain_acc_max (early stopping via label metric)"),
+    ]
+
+    soft_re = [(re.compile(p, re.I), d) for p, d in soft_patterns]
+    standalone_hard_re = [(re.compile(p, re.I), d) for p, d in standalone_hard]
+
     for line in lines:
         stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+
+        indent = get_indent(line)
+
         if re.match(r"^\s*def\s+(fit|train|main)\s*\(", stripped):
             in_training = True
+            in_acc_if_block = False
+            in_nmi_if_block = False
+            acc_if_indent = -1
+            nmi_if_indent = -1
         elif in_training and re.match(r"^\s*def\s+", stripped):
             in_training = False
-        if in_training and leakage_re.search(stripped):
-            violations.append(stripped[:120])
-    return violations
+            in_acc_if_block = False
+            in_nmi_if_block = False
+            continue
+
+        if not in_training:
+            continue
+
+        code_part = re.split(r"#", stripped)[0]
+
+        # ── Detect acc > best: / nmi > best: conditional blocks ─────────────
+        # Enter block: `if ... acc ... > ... best`
+        if re.search(r"if\s+.*\bac+[cs]\b.*\>", code_part, re.I):
+            in_acc_if_block = True
+            acc_if_indent = indent
+        elif in_acc_if_block and indent <= acc_if_indent and not stripped.startswith(("elif", "else")):
+            in_acc_if_block = False
+
+        if re.search(r"if\s+.*\bnmi\b.*\>", code_part, re.I):
+            in_nmi_if_block = True
+            nmi_if_indent = indent
+        elif in_nmi_if_block and indent <= nmi_if_indent and not stripped.startswith(("elif", "else")):
+            in_nmi_if_block = False
+
+        # ── HARD: inside acc > best: or nmi > best: block ──────────────────
+        if in_acc_if_block or in_nmi_if_block:
+            # Best state saved inside metric-conditional block = HARD leakage
+            if re.search(r"best_embedding\s*=|best_y_pred\s*=", code_part):
+                hard_violations.append(
+                    f"HARD_LABEL_LEAKAGE [Y used: best state saved inside acc/nmi conditional]: {stripped[:100]}"
+                )
+            # Best model checkpoint saved inside this block = HARD leakage
+            if re.search(r"torch\.save|model\.state_dict\(\)|best_model", code_part):
+                hard_violations.append(
+                    f"HARD_LABEL_LEAKAGE [Y used: model checkpoint saved inside acc/nmi conditional]: {stripped[:100]}"
+                )
+            continue  # skip soft check for lines inside hard blocks
+
+        # ── SOFT: Y in training loop but not in acc > best: block ─────────
+        for pattern, desc in soft_re:
+            if pattern.search(code_part):
+                soft_violations.append(f"SOFT_LABEL_ACCESS [{desc}]: {stripped[:100]}")
+                break
+
+        # ── STANDALONE HARD: patterns that are always hard ─────────────────
+        for pattern, desc in standalone_hard_re:
+            if pattern.search(code_part):
+                hard_violations.append(f"HARD_LABEL_LEAKAGE [{desc}]: {stripped[:100]}")
+                break
+
+    return hard_violations, soft_violations
 
 
 def _check_gpu_in_card(card: dict, target_path: Path) -> Tuple[bool, str]:
@@ -611,7 +716,14 @@ def _check_gpu_in_card(card: dict, target_path: Path) -> Tuple[bool, str]:
 
 def audit_card_driven(model_key: str, card: dict, manifest_entry: dict) -> dict:
     """
-    Per BDD Scenarios 7-10: audit a model using its core card.
+    Per BDD Scenarios 7-11: audit a model using its core card.
+
+    Scenario 1:  HARD vs SOFT label leakage
+    Scenario 7:  core-card-driven audit
+    Scenario 8:  check core losses are used in training loop
+    Scenario 9:  check required_training_stages are preserved
+    Scenario 10: check label leakage (HARD/FAIL vs SOFT/WARN)
+    Scenario 11: check no OtherMode runtime dependency
     """
     target_path_str = card.get("target_path", "")
     target_path = PROJECT_ROOT / target_path_str
@@ -684,12 +796,24 @@ def audit_card_driven(model_key: str, card: dict, manifest_entry: dict) -> dict:
         if not _find_method(content, fname2):
             result["failures"].append(f"Core function '{fname2}' not found in {fname or 'any file'}")
 
-    # 4. Core losses used in training (Scenario 8)
+    # 4. Core losses used in training (Scenario 3 + 8)
     for loss in card.get("core_losses", []):
         lname = loss.get("name", "")
         stage = loss.get("stage", "")
-        if lname and not _loss_in_training(all_content, lname):
-            result["warnings"].append(f"Core loss '{lname}' ({stage}) not used in training loop")
+        # Scenario 3: prefer search_patterns list, fall back to name matching
+        search_patterns = loss.get("search_patterns", [])
+        if search_patterns:
+            if not _loss_in_training(all_content, search_patterns):
+                result["warnings"].append(
+                    f"Core loss '{lname}' ({stage}) not used in training loop "
+                    f"(search_patterns: {search_patterns})"
+                )
+        elif lname:
+            # Fallback: use name as a single pattern
+            if not _loss_in_training(all_content, [re.escape(lname)]):
+                result["warnings"].append(
+                    f"Core loss '{lname}' ({stage}) not used in training loop"
+                )
 
     # 5. Required training stages (Scenario 9)
     for stage in card.get("required_training_stages", []):
@@ -708,10 +832,12 @@ def audit_card_driven(model_key: str, card: dict, manifest_entry: dict) -> dict:
         if pattern and pattern.lower() in all_content.lower():
             result["failures"].append(f"Forbidden change: '{desc}'")
 
-    # 7. Label leakage (Scenario 10)
-    leakage = _check_label_leakage(all_content)
-    for v in leakage:
-        result["failures"].append(f"LABEL_LEAKAGE: {v}")
+    # 7. Label leakage (BDD Scenario 1 + 10: HARD vs SOFT)
+    hard_leaks, soft_leaks = _check_label_leakage(all_content)
+    for v in hard_leaks:
+        result["failures"].append(v)
+    for v in soft_leaks:
+        result["warnings"].append(v)
 
     # 8. GPU policy
     gpu_ok, gpu_detail = _check_gpu_in_card(card, target_path)
@@ -761,16 +887,59 @@ def main():
 
     models_to_check = sorted(set(list(cards.keys()) + list(manifest.keys())))
     results = []
+    no_card_results = []  # models without cards (Scenarios 2+4)
 
     for model_key in models_to_check:
         card = cards.get(model_key)
         manifest_entry = manifest.get(model_key)
 
         if not card:
-            print(f"  ? [NO_CARD    ] {model_key} — no core card, skipping")
+            # ── Scenario 2+4: no core card ───────────────────────────────
+            manifest_auth = (manifest_entry or {}).get("authenticity", "UNKNOWN")
+            is_placeholder = manifest_auth == "PLACEHOLDER"
+            # Scenario 2: VERIFIED / default_in_formal without card = FAIL
+            is_verified = (manifest_entry or {}).get("authenticity") == "VERIFIED"
+            is_default = (manifest_entry or {}).get("default_in_formal") == True
+            if is_verified or is_default:
+                status = "FAIL"
+                icon = "✗"
+                reason = "manifest VERIFIED/default_in_formal requires a core card"
+                if manifest_entry:
+                    mname = manifest_entry.get("name", model_key)
+                else:
+                    mname = model_key
+                print(f"  {icon} [{status:16}] {model_key}")
+                if args.verbose:
+                    print(f"    FAIL: {reason}")
+                no_card_results.append({
+                    "model_key": model_key, "name": mname, "status": status,
+                    "reason": reason, "manifest_entry": manifest_entry,
+                })
+            elif is_placeholder:
+                # Scenario 4: Foundation PLACEHOLDER → SKIPPED_PLACEHOLDER
+                status = "SKIPPED_PLACEHOLDER"
+                icon = "○"
+                reason = (manifest_entry or {}).get("reason", "Foundation model placeholder")
+                mname = (manifest_entry or {}).get("name", model_key)
+                print(f"  {icon} [{status:16}] {model_key}")
+                if args.verbose:
+                    print(f"    INFO: {reason}")
+                no_card_results.append({
+                    "model_key": model_key, "name": mname, "status": status,
+                    "reason": reason, "manifest_entry": manifest_entry,
+                })
+            else:
+                # PENDING without card — informational only
+                print(f"  ? [NO_CARD    ] {model_key} — no core card, skipping")
+                no_card_results.append({
+                    "model_key": model_key, "name": model_key,
+                    "status": "NO_CARD", "reason": "no core card",
+                    "manifest_entry": manifest_entry,
+                })
             print()
             continue
 
+        # ── Normal card-driven audit ─────────────────────────────────────
         print(f"  Checking: {card.get('name', model_key)} ({model_key})...", end=" ", flush=True)
         result = audit_card_driven(model_key, card, manifest_entry)
         results.append(result)
@@ -790,25 +959,60 @@ def main():
             for f in result.get("failures", []):
                 print(f"    FAIL: {f}")
 
+    # ── Scenario 2: manifest vs core card conflict detection ─────────────────
+    manifest_conflicts = []
+    for r in results + no_card_results:
+        manifest_entry = r.get("manifest_entry") or {}
+        card_status = r.get("status", "")
+        manifest_auth = manifest_entry.get("authenticity", "")
+        is_default = manifest_entry.get("default_in_formal", False)
+
+        if manifest_auth == "VERIFIED" and card_status == "FAIL":
+            manifest_conflicts.append(
+                f"  CONFLICT: {r['model_key']} — manifest VERIFIED but core card is FAIL"
+            )
+        if is_default and card_status == "FAIL":
+            manifest_conflicts.append(
+                f"  CONFLICT: {r['model_key']} — manifest default_in_formal=true but core card is FAIL"
+            )
+
     # ── Summary ────────────────────────────────────────────────────────────
     print()
     print("=" * 70)
     print("Summary")
     print("=" * 70)
 
+    all_results = results + no_card_results
     counts = {}
-    for r in results:
-        s = r["status"]
+    for r in all_results:
+        s = r.get("status", "UNKNOWN")
         counts[s] = counts.get(s, 0) + 1
-    total = len(results)
+    total = len(all_results)
     for s, c in sorted(counts.items()):
-        print(f"  {s:20}: {c}/{total}")
+        print(f"  {s:25}: {c}/{total}")
+
+    if manifest_conflicts:
+        print()
+        print("  MANIFEST CONFLICTS (BDD Scenario 2):")
+        for c in manifest_conflicts:
+            print(c)
 
     if args.json:
         print()
-        print(json.dumps({"mode": "card-driven", "results": results, "summary": counts}, indent=2, default=str))
+        print(json.dumps({
+            "mode": "card-driven",
+            "results": results,
+            "no_card_results": no_card_results,
+            "manifest_conflicts": manifest_conflicts,
+            "summary": counts,
+        }, indent=2, default=str))
 
-    if any(r["status"] == "FAIL" for r in results):
+    # Exit code: 0 = all pass, 1 = any FAIL or manifest conflict
+    has_fail = any(
+        r.get("status") == "FAIL"
+        for r in results + no_card_results
+    )
+    if has_fail or manifest_conflicts:
         print()
         print("  Some models have authenticity failures.")
         sys.exit(1)

@@ -69,15 +69,26 @@ core_losses:
   - name: L_reconstruction (weighted MSE)
     stage: training
     formula: MSE(reconstructed, original) on masked positions
+    search_patterns:
+      - F.mse_loss
+      - mse_loss
+      - loss_recon
     weight: masked_data_weight (default 0.75)
 
   - name: L_mask (BCE)
     stage: training
     formula: BCE(predict_mask, was_masked) on masked positions
+    search_patterns:
+      - F.binary_cross_entropy
+      - BCE
+      - loss_mask
     weight: mask_loss_weight (default 0.7)
 
   - name: total_loss
     formula: L_reconstruction + L_mask
+    search_patterns:
+      - total_loss
+      - loss\.backward
 
 # ── Training Stages ─────────────────────────────────────────────────────────────
 

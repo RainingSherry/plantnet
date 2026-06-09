@@ -71,11 +71,17 @@ core_losses:
   - name: MSE reconstruction
     stage: pretrain
     formula: F.mse_loss(x_recon, x)
+    search_patterns:
+      - F.mse_loss
+      - mse_loss
     must_appear_in: pretrain method loop
 
   - name: KL divergence clustering
     stage: clustering_fit
     formula: F.kl_div(q.log(), p, reduction='batchmean')
+    search_patterns:
+      - kl_div
+      - F\.kl_div
     must_appear_in: clustering training loop
 
 # ── Training Stages ─────────────────────────────────────────────────────────────
