@@ -89,6 +89,22 @@ def load_runtime_registry(registry_path: Optional[Path]) -> Dict[str, dict]:
         return {}
 
 
+def get_runtime_env(method_info: Dict[str, Any]) -> str:
+    """
+    Extract the logical runtime name from method_info.
+
+    Supports both flat (runtime_env) and nested (runtime.env_name) formats.
+    """
+    # Flat format: runtime_env = "plantnet-tf1"
+    if method_info.get("runtime_env"):
+        return str(method_info["runtime_env"])
+    # Nested format: runtime = {env_name: "plantnet-tf1", ...}
+    runtime = method_info.get("runtime") or {}
+    if isinstance(runtime, dict):
+        return runtime.get("env_name", "")
+    return ""
+
+
 def resolve_python_executable(
     method_key: str,
     method_info: Dict[str, Any],
@@ -98,20 +114,31 @@ def resolve_python_executable(
     Per BDD Scenario 2.1: resolve the correct Python executable for a method.
 
     Priority:
-      1. Explicit runtime.python from runtime_registry (if configured)
-      2. sys.executable (fallback: current environment)
+      1. method_info["runtime"]["python"] (absolute path, if present and exists)
+      2. runtime_registry[runtime_env]["python"] (from registry)
+      3. sys.executable (fallback: current environment)
 
     The registry maps logical names (e.g. 'plantnet-tf1') to concrete Python paths.
-    Each method can specify a 'runtime_env' key pointing to a registry entry.
+    Logical name is read from runtime.env_name or runtime_env field.
     """
-    runtime_env = method_info.get("runtime_env", "")
+    runtime_env = get_runtime_env(method_info)
+
+    # 1. Direct python path in manifest runtime field
+    runtime = method_info.get("runtime") or {}
+    if isinstance(runtime, dict):
+        python_path = runtime.get("python", "")
+        if python_path and Path(python_path).exists():
+            return python_path
+
+    # 2. Lookup via runtime_registry[runtime_env]
     if runtime_env and runtime_env in runtime_registry:
         entry = runtime_registry[runtime_env]
         python_path = entry.get("python", "")
         if python_path and Path(python_path).exists():
             return python_path
-        # python not found — fall back
         print(f"  WARNING: runtime '{runtime_env}' python not found: {python_path}, using default", file=sys.stderr)
+
+    # 3. Fallback
     return sys.executable
 
 
@@ -297,6 +324,8 @@ def check_authenticity(method_key: str, method_info: Dict[str, Any]) -> tuple[bo
         return False, f"ENV-GATED: {method_info.get('reason', 'unknown env')}"
     elif auth == "PENDING":
         return False, "PENDING (not yet audited)"
+    elif auth == "PENDING_AUDITED":
+        return False, "PENDING_AUDITED (audited, smoke not yet run)"
     elif auth == "PLACEHOLDER":
         return False, "PLACEHOLDER (no code)"
     elif auth == "FAILED":
@@ -743,6 +772,9 @@ def collect_results(base_out_dir: Path, method_keys: List[str], seeds: List[int]
             "authenticity": auth_data.get("authenticity", "UNKNOWN"),
             "substitute_model_used": auth_data.get("substitute_model_used", True),
             "unverified": auth_data.get("unverified", False),
+            # Runtime isolation fields (written by _write_status / run_method)
+            "runtime_env": status_data.get("runtime_env", ""),
+            "python_executable": status_data.get("python_executable", ""),
         })
     return results
 
@@ -1126,7 +1158,7 @@ Substitute implementations are forbidden.
                     out_dir = base_out_dir / run_id
                     os.makedirs(out_dir, exist_ok=True)
                     write_authenticity_json(out_dir, method_info)
-                    skipped_runtime_env = method_info.get("runtime_env", "")
+                    skipped_runtime_env = get_runtime_env(method_info)
                     skipped_python = resolve_python_executable(method_key, method_info, runtime_registry)
                     _write_status(
                         out_dir, method_key, seed, "skipped",
@@ -1142,7 +1174,7 @@ Substitute implementations are forbidden.
 
             print(f"  Running {method_key}...")
             for seed in args.seeds:
-                runtime_env = method_info.get("runtime_env", "")
+                runtime_env = get_runtime_env(method_info)
                 python_bin = resolve_python_executable(method_key, method_info, runtime_registry)
                 result = run_method(
                     method_key, method_info,

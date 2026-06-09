@@ -2,9 +2,8 @@
 # ============================================================
 #
 # Per BDD Scenario 1.2: This file maps logical runtime names to concrete
-# Python executables. The ACTUAL file (with real absolute paths) is
-# envs/runtime_registry.yaml, but runtime_registry.example.yaml (without
-# absolute paths) is what gets committed to GitHub.
+# Python executables. Copy this to runtime_registry.yaml and fill in the
+# actual paths for your machine.
 #
 # HOW TO USE:
 #   1. Copy this to runtime_registry.yaml
@@ -12,14 +11,14 @@
 #   3. Point run_formal_benchmark.py to it via --runtime_registry
 #
 # IMPORTANT: Do NOT commit runtime_registry.yaml with real paths to GitHub.
-# Only commit runtime_registry.example.yaml.
+# Only commit runtime_registry.example.yaml with placeholder paths.
 
 runtimes:
   # ── Main environment: existing scclubench-main conda env ──────────────
   plantnet-core:
     backend: conda
     description: "Main environment — PyTorch + Scanpy + scCluBench deps (no TF)"
-    python: /data/luolie/conda/envs/scclubench-main/bin/python
+    python: <FILL_ME>/envs/plantnet-core/bin/python
     env_file: envs/plantnet-core.yml
     notes: "Default fallback when no runtime is specified"
 
@@ -27,23 +26,23 @@ runtimes:
   plantnet-tf1:
     backend: conda
     description: "TensorFlow 2.x environment for scDeepCluster, scNAME, scziDesk"
-    python: /data/luolie/conda/envs/scssl_bench_py310/bin/python
+    python: <FILL_ME>/envs/plantnet-tf1/bin/python
     env_file: envs/plantnet-tf1.yml
-    notes: "scssl_bench_py310 has TF 2.15.0 + torch"
+    notes: "Requires TensorFlow 2.x + Keras"
 
   # ── DESC: separate env due to potentially different TF version ─────────
   plantnet-desc:
     backend: conda
-    description: "DESC specific environment"
-    python: /data/luolie/conda/envs/scssl_bench_py310/bin/python
+    description: "DESC specific environment (separate from plantnet-tf1)"
+    python: <FILL_ME>/envs/plantnet-desc/bin/python
     env_file: envs/plantnet-desc.yml
-    notes: "DESC may need specific TF versions"
+    notes: "DESC may need specific TF versions or dependency combos"
 
   # ── scCDCG: PyTorch environment ───────────────────────────────────────
   plantnet-sccdcg:
     backend: conda
     description: "scCDCG PyTorch environment"
-    python: /data/luolie/conda/envs/scclubench-sccdcg/bin/python
+    python: <FILL_ME>/envs/plantnet-sccdcg/bin/python
     env_file: envs/plantnet-sccdcg.yml
     notes: "PyTorch 1.12.0 + CUDA 11.3"
 
@@ -51,7 +50,7 @@ runtimes:
   plantnet-scgnn:
     backend: conda
     description: "scGNN PyTorch environment (noregu/LTMG mode)"
-    python: /data/luolie/conda/envs/scclubench-main/bin/python
+    python: <FILL_ME>/envs/plantnet-scgnn/bin/python
     env_file: envs/plantnet-scgnn.yml
     notes: "Default: noregu mode (no R/rpy2). LTMG requires plantnet-scgnn-r."
 
@@ -59,7 +58,7 @@ runtimes:
   plantnet-scgnn-r:
     backend: conda
     description: "scGNN with R/rpy2 for LTMG regularization"
-    python: /data/luolie/conda/envs/scclubench-main/bin/python
+    python: <FILL_ME>/envs/plantnet-scgnn-r/bin/python
     env_file: envs/plantnet-scgnn-r.yml
     notes: "Requires R package scGNNLTMG + rpy2. Not needed for noregu mode."
 
@@ -67,6 +66,6 @@ runtimes:
   plantnet-attentionae:
     backend: conda
     description: "AttentionAE_sc PyTorch environment"
-    python: /data/luolie/conda/envs/scclubench-main/bin/python
+    python: <FILL_ME>/envs/plantnet-attentionae/bin/python
     env_file: envs/plantnet-attentionae.yml
     notes: "Same core deps as plantnet-core"
