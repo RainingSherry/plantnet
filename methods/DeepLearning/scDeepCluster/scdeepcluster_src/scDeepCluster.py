@@ -17,15 +17,15 @@ from sklearn import metrics
 
 import h5py
 import scanpy as sc
-from layers import ConstantDispersionLayer, SliceLayer, ColWiseMultLayer
-from loss import poisson_loss, NB, ZINB
-from preprocess import read_dataset, normalize
+from .layers import ConstantDispersionLayer, SliceLayer, ColWiseMultLayer
+from .loss import poisson_loss, NB, ZINB
+from .preprocess import read_dataset, normalize
 import tensorflow as tf
 
 from numpy.random import seed
 seed(2211)
-from tensorflow import set_random_seed
-set_random_seed(2211)
+import tensorflow as tf
+tf.random.set_seed(2211)
 
 MeanAct = lambda x: tf.clip_by_value(K.exp(x), 1e-5, 1e6)
 DispAct = lambda x: tf.clip_by_value(tf.nn.softplus(x), 1e-4, 1e4)
