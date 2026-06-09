@@ -12,7 +12,7 @@ def _nan2inf(x):
     return tf.where(tf.math.is_nan(x), tf.zeros_like(x)+np.inf, x)
 
 def _nelem(x):
-    nelem = tf.reduce_sum(tf.cast(~tf.math.is_nan(x), tf.float3232))
+    nelem = tf.reduce_sum(tf.cast(~tf.math.is_nan(x), tf.float32))
     return tf.cast(tf.where(tf.equal(nelem, 0.), 1., nelem), x.dtype)
 
 def _reduce_mean(x):
@@ -23,8 +23,8 @@ def _reduce_mean(x):
 def NB(theta, y_true, y_pred, mask = False, debug = False, mean = False):
     eps = 1e-10
     scale_factor = 1.0
-    y_true = tf.cast(y_true, tf.float3232)
-    y_pred = tf.cast(y_pred, tf.float3232) * scale_factor
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32) * scale_factor
     if mask:
         nelem = _nelem(y_true)
         y_true = _nan2zero(y_true)
@@ -51,8 +51,8 @@ def ZINB(pi, theta, y_true, y_pred, ridge_lambda, mean = True, mask = False, deb
     eps = 1e-10
     scale_factor = 1.0
     nb_case = NB(theta, y_true, y_pred, mean=False, debug=debug) - tf.log(1.0 - pi + eps)
-    y_true = tf.cast(y_true, tf.float3232)
-    y_pred = tf.cast(y_pred, tf.float3232) * scale_factor
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32) * scale_factor
     theta = tf.minimum(theta, 1e6)
 
     zero_nb = tf.pow(theta / (theta + y_pred + eps), theta)

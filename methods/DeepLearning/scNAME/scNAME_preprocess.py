@@ -109,6 +109,11 @@ def normalize(adata, copy=True, highly_genes = None, filter_min_counts=True, siz
     if logtrans_input:
         sc.pp.log1p(adata)
     if highly_genes != None:
+        # Final safety net: replace inf/nan before HVG (pd.cut can't handle inf)
+        if sp.sparse.issparse(adata.X):
+            adata.X.data = np.nan_to_num(adata.X.data, nan=0.0, posinf=0.0, neginf=0.0)
+        else:
+            adata.X = np.nan_to_num(np.asarray(adata.X), nan=0.0, posinf=0.0, neginf=0.0)
         sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5, n_top_genes = highly_genes, subset=True)
     if normalize_input:
         sc.pp.scale(adata)
