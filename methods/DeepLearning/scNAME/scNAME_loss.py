@@ -82,7 +82,7 @@ def NB(theta, y_true, y_pred, mask = False, debug = False, mean = False):##y_pre
         nelem = _nelem(y_true)
         y_true = _nan2zero(y_true)
     theta = tf.minimum(theta, 1e6)
-    t1 = tf.lgamma(theta + eps) + tf.lgamma(y_true + 1.0) - tf.lgamma(y_true + theta + eps)
+    t1 = tf.math.lgamma(theta + eps) + tf.math.lgamma(y_true + 1.0) - tf.math.lgamma(y_true + theta + eps)
     t2 = (theta + y_true) * tf.log(1.0 + (y_pred / (theta + eps))) + (y_true * (tf.log(theta + eps) - tf.log(y_pred + eps)))
     if debug:
         assert_ops = [tf.verify_tensor_all_finite(y_pred, 'y_pred has inf/nans'),

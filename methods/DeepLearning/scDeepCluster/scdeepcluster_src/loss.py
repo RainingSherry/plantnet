@@ -43,7 +43,7 @@ def poisson_loss(y_true, y_pred):
 
     # last term can be avoided since it doesn't depend on y_pred
     # however keeping it gives a nice lower bound to zero
-    ret = y_pred - y_true*tf.log(y_pred+1e-10) + tf.lgamma(y_true+1.0)
+    ret = y_pred - y_true*tf.log(y_pred+1e-10) + tf.math.lgamma(y_true+1.0)
 
     return tf.divide(tf.reduce_sum(ret), nelem)
 
@@ -84,7 +84,7 @@ class NB(object):
             # Clip theta
             theta = tf.minimum(self.theta, 1e6)
 
-            t1 = tf.lgamma(theta+eps) + tf.lgamma(y_true+1.0) - tf.lgamma(y_true+theta+eps)
+            t1 = tf.math.lgamma(theta+eps) + tf.math.lgamma(y_true+1.0) - tf.math.lgamma(y_true+theta+eps)
             t2 = (theta+y_true) * tf.log(1.0 + (y_pred/(theta+eps))) + (y_true * (tf.log(theta+eps) - tf.log(y_pred+eps)))
 
             if self.debug:
