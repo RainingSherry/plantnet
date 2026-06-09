@@ -129,9 +129,11 @@ def main():
         normalize_input=False
     )
 
-    # Apply HVG selection (scNAME model expects fixed 2000 gene input)
-    print('Applying HVG selection (top 2000 highly variable genes)...')
-    adata = scNAME_normalize(adata, copy=True, highly_genes=2000,
+    # Apply scNAME-specific normalization (ZINB-aware, without additional HVG filtering).
+    # prepare_data_for_model() already did HVG filtering → adata.X has 2000 genes.
+    # Do NOT call highly_variable_genes here again (would fail on already-HVG'd data).
+    print('Applying scNAME normalization...')
+    adata = scNAME_normalize(adata, copy=True, highly_genes=None,
                              size_factors=False, normalize_input=False, logtrans_input=False)
 
     # Convert to numpy arrays
