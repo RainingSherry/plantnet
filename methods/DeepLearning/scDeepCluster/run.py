@@ -66,6 +66,8 @@ def parse_args():
                         help='Alpha parameter for clustering layer')
     parser.add_argument('--pretrain_epochs', type=int, default=400,
                         help='Number of pretraining epochs')
+    parser.add_argument('--epochs', type=int, default=None,
+                       help='Unified CLI alias for --pretrain_epochs (smoke test shortcut)')
     parser.add_argument('--maxiter', type=int, default=20000,
                         help='Maximum number of iterations')
     parser.add_argument('--batch_size', type=int, default=256,
@@ -90,6 +92,10 @@ def parse_args():
 
 def main():
     args = parse_args()
+
+    # Forward --epochs -> --pretrain_epochs (unified CLI convenience)
+    if args.epochs is not None:
+        args.pretrain_epochs = args.epochs
 
     # Handle no_cuda
     if args.no_cuda:

@@ -19,6 +19,7 @@ sys.path.insert(0, _repo_root)
 
 from preprocess import prepare_data_for_model
 from utils import save
+from scNAME_preprocess import normalize as scNAME_normalize
 
 _TF_READY = False
 
@@ -125,6 +126,11 @@ def main():
         logtrans_input=True,
         normalize_input=True
     )
+
+    # Apply HVG selection (scNAME model expects fixed 2000 gene input)
+    print('Applying HVG selection (top 2000 highly variable genes)...')
+    adata = scNAME_normalize(adata, copy=True, highly_genes=2000,
+                             size_factors=False, normalize_input=False, logtrans_input=False)
 
     # Convert to numpy arrays
     X = np.array(X).astype(np.float32)

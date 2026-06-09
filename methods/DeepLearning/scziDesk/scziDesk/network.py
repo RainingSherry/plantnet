@@ -1,3 +1,5 @@
+import tensorflow.compat.v1 as tf
+tf.disable_eager_execution()
 from keras.layers import GaussianNoise, Dense, Activation
 from sklearn.cluster import KMeans
 from loss import *
@@ -21,11 +23,11 @@ class autoencoder(object):
 
         self.n_stacks = len(self.dims) - 1
 
-        self.sf_layer = tf.placeholder(dtype=tf.float32, shape=(None, 1))
-        self.x = tf.placeholder(dtype=tf.float32, shape=(None, self.dims[0]))
-        self.x_count = tf.placeholder(dtype=tf.float32, shape=(None, self.dims[0]))
+        self.sf_layer = tf.compat.v1.placeholder(dtype=tf.float32, shape=(None, 1))
+        self.x = tf.compat.v1.placeholder(dtype=tf.float32, shape=(None, self.dims[0]))
+        self.x_count = tf.compat.v1.placeholder(dtype=tf.float32, shape=(None, self.dims[0]))
 
-        self.clusters = tf.get_variable(name=self.dataname + "/clusters_rep", shape=[self.cluster_num, self.dims[-1]],
+        self.clusters = tf.compat.v1.get_variable(name=self.dataname + "/clusters_rep", shape=[self.cluster_num, self.dims[-1]],
                                         dtype=tf.float32, initializer=tf.glorot_uniform_initializer())
 
         self.h = self.x
@@ -73,19 +75,19 @@ class autoencoder(object):
         else:
             self.total_loss = self.likelihood_loss + self.alpha * self.kmeans_loss
 
-        self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
+        self.optimizer = tf.compat.v1.train.AdamOptimizer(self.learning_rate)
         self.pretrain_op = self.optimizer.minimize(self.likelihood_loss)
         self.train_op = self.optimizer.minimize(self.total_loss)
 
     def pretrain(self, X, count_X, size_factor, batch_size, pretrain_epoch, gpu_option):
         print("begin the pretraining")
-        init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+        init = tf.group(tf.compat.v1.global_variables_initializer(), tf.compat.v1.local_variables_initializer())
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu_option
-        config_ = tf.ConfigProto()
+        config_ = tf.compat.v1.ConfigProto()
         config_.gpu_options.allow_growth = True
         config_.allow_soft_placement = True
-        self.sess = tf.Session(config=config_)
+        self.sess = tf.compat.v1.Session(config=config_)
         self.sess.run(init)
 
         self.latent_repre = np.zeros((X.shape[0], self.dims[-1]))
@@ -122,7 +124,7 @@ class autoencoder(object):
         self.latent_repre = np.nan_to_num(self.latent_repre)
         self.kmeans_pred = kmeans.fit_predict(self.latent_repre)
         self.last_pred = np.copy(self.kmeans_pred)
-        self.sess.run(tf.assign(self.clusters, kmeans.cluster_centers_))
+        self.sess.run(tf.compat.v1.assign(self.clusters, kmeans.cluster_centers_))
         print("begin the funetraining")
 
         fune_index = 0

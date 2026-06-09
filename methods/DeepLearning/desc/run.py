@@ -76,6 +76,8 @@ def parse_args():
                         help='Number of pretraining epochs')
     parser.add_argument('--max_iter', type=int, default=1000,
                         help='Maximum iterations for clustering')
+    parser.add_argument('--epochs', type=int, default=None,
+                       help='Unified CLI alias for --max_iter (smoke test shortcut)')
     parser.add_argument('--batch_size', type=int, default=256,
                         help='Batch size')
     parser.add_argument('--tol', type=float, default=0.005,
@@ -95,6 +97,10 @@ def parse_args():
 def main():
     """Main function."""
     args = parse_args()
+
+    # Forward --epochs -> --max_iter (unified CLI convenience)
+    if args.epochs is not None:
+        args.max_iter = args.epochs
 
     # Lazy import TF and DESC only when actually running
     _ensure_tf()

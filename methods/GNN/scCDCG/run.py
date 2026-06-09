@@ -540,7 +540,7 @@ def main():
     # =========================================================================
     # Step 4: 保存结果
     # =========================================================================
-    save(args.save_dir, Y, best_y_pred, args.epochs, best_embedding)
+    save(args.save_dir, Y, best_y_pred, args.epochs, best_embedding, args=vars(args))
     print(f'Training completed.')
     print(f'Results saved to: {args.save_dir}')
 
