@@ -182,7 +182,7 @@ def main():
     embedding = adata_result.obsm[embedding_key]
 
     # Save results using standard interface
-    save(args.save_dir, Y, y_pred, args.max_iter, embedding)
+    save(args.save_dir, Y, y_pred, args.max_iter, embedding, args=vars(args))
 
     print(f'Training completed.')
     print(f'Results saved to: {args.save_dir}')

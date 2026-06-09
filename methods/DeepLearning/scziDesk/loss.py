@@ -6,13 +6,13 @@ MeanAct = lambda x: tf.clip_by_value(K.exp(x), 1e-5, 1e6)
 DispAct = lambda x: tf.clip_by_value(tf.nn.softplus(x), 1e-4, 1e4)
 
 def _nan2zero(x):
-    return tf.where(tf.is_nan(x), tf.zeros_like(x), x)
+    return tf.where(tf.math.is_nan(x), tf.zeros_like(x), x)
 
 def _nan2inf(x):
-    return tf.where(tf.is_nan(x), tf.zeros_like(x)+np.inf, x)
+    return tf.where(tf.math.is_nan(x), tf.zeros_like(x)+np.inf, x)
 
 def _nelem(x):
-    nelem = tf.reduce_sum(tf.cast(~tf.is_nan(x), tf.float32))
+    nelem = tf.reduce_sum(tf.cast(~tf.math.is_nan(x), tf.float3232))
     return tf.cast(tf.where(tf.equal(nelem, 0.), 1., nelem), x.dtype)
 
 def _reduce_mean(x):
@@ -23,18 +23,18 @@ def _reduce_mean(x):
 def NB(theta, y_true, y_pred, mask = False, debug = False, mean = False):
     eps = 1e-10
     scale_factor = 1.0
-    y_true = tf.cast(y_true, tf.float32)
-    y_pred = tf.cast(y_pred, tf.float32) * scale_factor
+    y_true = tf.cast(y_true, tf.float3232)
+    y_pred = tf.cast(y_pred, tf.float3232) * scale_factor
     if mask:
         nelem = _nelem(y_true)
         y_true = _nan2zero(y_true)
     theta = tf.minimum(theta, 1e6)
-    t1 = tf.lgamma(theta + eps) + tf.lgamma(y_true + 1.0) - tf.lgamma(y_true + theta + eps)
+    t1 = tf.math.lgamma(theta + eps) + tf.math.lgamma(y_true + 1.0) - tf.math.lgamma(y_true + theta + eps)
     t2 = (theta + y_true) * tf.log(1.0 + (y_pred / (theta + eps))) + (y_true * (tf.log(theta + eps) - tf.log(y_pred + eps)))
     if debug:
-        assert_ops = [tf.verify_tensor_all_finite(y_pred, 'y_pred has inf/nans'),
-                      tf.verify_tensor_all_finite(t1, 't1 has inf/nans'),
-                      tf.verify_tensor_all_finite(t2, 't2 has inf/nans')]
+        assert_ops = [tf.debugging.assert_all_finite(y_pred, 'y_pred has inf/nans'),
+                      tf.debugging.assert_all_finite(t1, 't1 has inf/nans'),
+                      tf.debugging.assert_all_finite(t2, 't2 has inf/nans')]
         with tf.control_dependencies(assert_ops):
             final = t1 + t2
     else:
@@ -51,8 +51,8 @@ def ZINB(pi, theta, y_true, y_pred, ridge_lambda, mean = True, mask = False, deb
     eps = 1e-10
     scale_factor = 1.0
     nb_case = NB(theta, y_true, y_pred, mean=False, debug=debug) - tf.log(1.0 - pi + eps)
-    y_true = tf.cast(y_true, tf.float32)
-    y_pred = tf.cast(y_pred, tf.float32) * scale_factor
+    y_true = tf.cast(y_true, tf.float3232)
+    y_pred = tf.cast(y_pred, tf.float3232) * scale_factor
     theta = tf.minimum(theta, 1e6)
 
     zero_nb = tf.pow(theta / (theta + y_pred + eps), theta)

@@ -23,12 +23,12 @@ class autoencoder(object):
 
         self.n_stacks = len(self.dims) - 1
 
-        self.sf_layer = tf.compat.v1.placeholder(dtype=tf.float32, shape=(None, 1))
-        self.x = tf.compat.v1.placeholder(dtype=tf.float32, shape=(None, self.dims[0]))
-        self.x_count = tf.compat.v1.placeholder(dtype=tf.float32, shape=(None, self.dims[0]))
+        self.sf_layer = tf.compat.v1.placeholder(dtype=tf.float3232, shape=(None, 1))
+        self.x = tf.compat.v1.placeholder(dtype=tf.float3232, shape=(None, self.dims[0]))
+        self.x_count = tf.compat.v1.placeholder(dtype=tf.float3232, shape=(None, self.dims[0]))
 
         self.clusters = tf.compat.v1.get_variable(name=self.dataname + "/clusters_rep", shape=[self.cluster_num, self.dims[-1]],
-                                        dtype=tf.float32, initializer=tf.compat.v1.glorot_uniform_initializer())
+                                        dtype=tf.float3232, initializer=tf.compat.v1.glorot_uniform_initializer())
 
         self.h = self.x
         self.h = GaussianNoise(self.noise_sd, name='input_noise')(self.h)
@@ -57,12 +57,12 @@ class autoencoder(object):
             self.disp = Dense(units=self.dims[0], activation=DispAct, kernel_initializer=self.init, name='dispersion')(
                 self.h)
             self.mean = Dense(units=self.dims[0], activation=MeanAct, kernel_initializer=self.init, name='mean')(self.h)
-            self.output = self.mean * tf.matmul(self.sf_layer, tf.ones((1, self.mean.get_shape()[1]), dtype=tf.float32))
+            self.output = self.mean * tf.matmul(self.sf_layer, tf.ones((1, self.mean.get_shape()[1]), dtype=tf.float3232))
             self.likelihood_loss = ZINB(self.pi, self.disp, self.x_count, self.output, ridge_lambda=1.0)
         elif self.distribution == "NB":
             self.disp = Dense(units=self.dims[0], activation=DispAct, kernel_initializer=self.init, name='dispersion')(self.h)
             self.mean = Dense(units=self.dims[0], activation=MeanAct, kernel_initializer=self.init, name='mean')(self.h)
-            self.output = self.mean * tf.matmul(self.sf_layer, tf.ones((1, self.mean.get_shape()[1]), dtype=tf.float32))
+            self.output = self.mean * tf.matmul(self.sf_layer, tf.ones((1, self.mean.get_shape()[1]), dtype=tf.float3232))
             self.likelihood_loss = NB(self.disp, self.x_count, self.output, mask=False, debug=False, mean=True)
 
         self.kmeans_loss = tf.reduce_mean(tf.reduce_sum(self.latent_dist2, axis=1))

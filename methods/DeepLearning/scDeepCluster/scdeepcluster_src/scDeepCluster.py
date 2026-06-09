@@ -16,7 +16,7 @@ from sklearn.cluster import KMeans
 from sklearn import metrics
 
 import h5py
-import scanpy.api as sc
+import scanpy as sc
 from layers import ConstantDispersionLayer, SliceLayer, ColWiseMultLayer
 from loss import poisson_loss, NB, ZINB
 from preprocess import read_dataset, normalize
