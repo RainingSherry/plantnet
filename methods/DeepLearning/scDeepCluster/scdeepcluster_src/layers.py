@@ -1,6 +1,5 @@
-from keras.engine.topology import Layer
-from keras.layers import Lambda
-from keras import backend as K
+from tensorflow.keras.layers import Layer, Lambda
+import tensorflow.keras.backend as K
 import tensorflow as tf
 
 

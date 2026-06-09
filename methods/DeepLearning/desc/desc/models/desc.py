@@ -155,8 +155,8 @@ def train_single(data,dims=None,
         print("The summary of desc model is:")
         desc.model.summary()
     print("The runtime of (resolution="+str(louvain_resolution)+")is:",get_time()-tic)
-    y_pred=pd.Series(np.argmax(q_pred,axis=1),index=adata.obs.index,dtype='category')
-    y_pred.cat.categories=list(range(len(y_pred.unique())))
+    y_pred = pd.Series(np.argmax(q_pred, axis=1), index=adata.obs.index, dtype='category')
+    y_pred = y_pred.cat.set_categories(list(range(len(y_pred.unique()))))
     adata.obs['desc_'+str(louvain_resolution)]=y_pred
     adata.obsm['X_Embeded_z'+str(louvain_resolution)]=Embeded_z
     if do_tsne:

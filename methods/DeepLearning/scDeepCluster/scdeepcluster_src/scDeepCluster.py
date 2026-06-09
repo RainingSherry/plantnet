@@ -4,14 +4,13 @@ Implementation of scDeepCluster for scRNA-seq data
 
 from time import time
 import numpy as np
-from keras.models import Model
-import keras.backend as K
-from keras.engine.topology import Layer, InputSpec
-from keras.layers import Dense, Input, GaussianNoise, Layer, Activation
-from keras.models import Model
-from keras.optimizers import SGD, Adam
-from keras.utils.vis_utils import plot_model
-from keras.callbacks import EarlyStopping
+import tensorflow as tf
+tf.get_logger().setLevel('ERROR')
+import tensorflow.keras.backend as K
+from tensorflow.keras.layers import Layer, InputSpec, Dense, Input, GaussianNoise, Activation
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import SGD, Adam
+from tensorflow.keras.callbacks import EarlyStopping
 
 from sklearn.cluster import KMeans
 from sklearn import metrics
