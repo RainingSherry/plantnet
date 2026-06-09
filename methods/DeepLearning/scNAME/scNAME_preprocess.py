@@ -109,14 +109,15 @@ def normalize(adata, copy=True, highly_genes = None, filter_min_counts=True, siz
     if logtrans_input:
         sc.pp.log1p(adata)
     if highly_genes != None:
-        # Replace inf/nan before HVG — sc.pp.log1p/normalize can introduce NaN in sparse matrices
+        sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5, n_top_genes = highly_genes, subset=True)
+        # Cleanup inf/nan AFTER subset (subset=True rebuilds the sparse matrix and can introduce NaN)
         X = adata.X
         if sp.sparse.issparse(X):
-            # Force dense conversion for nan_to_num to catch all NaN/inf
-            X = X.toarray()
-        X_clean = np.nan_to_num(np.asarray(X), nan=0.0, posinf=0.0, neginf=0.0)
-        adata.X = sp.sparse.csr_matrix(X_clean) if sp.sparse.issparse(X) else X_clean
-        sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5, n_top_genes = highly_genes, subset=True)
+            X_data = X.data.copy()
+            X_data = np.nan_to_num(X_data, nan=0.0, posinf=0.0, neginf=0.0)
+            adata.X = sp.sparse.csr_matrix((X_data, X.indices, X.indptr), shape=X.shape)
+        else:
+            adata.X = np.nan_to_num(np.asarray(X), nan=0.0, posinf=0.0, neginf=0.0)
     if normalize_input:
         sc.pp.scale(adata)
     return adata
