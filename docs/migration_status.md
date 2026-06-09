@@ -110,8 +110,8 @@ This document tracks the migration of scCluBench baseline methods into the isola
 | **Authenticity** | **ENV-GATED** |
 | **Framework** | TensorFlow/Keras |
 | **Smoke Test** | ENV-BLOCKED (TF import required at runtime) |
-| **GPU Policy** | N/A (TF-gated) |
-| **Known Deviations** | TF required; `--help` works without TF but `main()` requires TF import |
+| **GPU Policy** | PASS (`--gpu` type=int default=1; `--no_cuda` supported) |
+| **Known Deviations** | TF required; `--help` works without TF via lazy import; runtime isolation via plantnet-tf1 |
 
 **Core Components (migrated, not independently verified)**:
 - `SCDeepCluster` model class in `code/scDeepCluster.py`
@@ -160,36 +160,69 @@ This document tracks the migration of scCluBench baseline methods into the isola
 | Field | Value |
 |-------|-------|
 | **Model** | scNAME |
+| **Paper** | Self-supervised Contrastive Learning for scRNA-seq Clustering |
 | **Source Path** | `OtherMode/scCluBench-main/DeepLearning/scNAME/` |
 | **Target Path** | `methods/DeepLearning/scNAME/` |
-| **Source Files Migrated** | Placeholder only |
+| **Source Files Migrated** | Full migration: `run.py`, `scNAME_network.py`, `scNAME_loss.py`, `scNAME_main.py`, `scNAME_preprocess.py`, `scNAME_utils.py` |
 | **Authenticity** | **ENV-GATED** |
 | **Framework** | TensorFlow/Keras |
-| **Known Deviations** | Requires TensorFlow; placeholder `run.py` with clear error message |
+| **Smoke Test** | ENV-BLOCKED (TF import required at runtime) |
+| **GPU Policy** | PASS (`--gpu` type=int default=1; `--no_cuda` supported) |
+| **Known Deviations** | Full source migrated; `--help` works without TF via lazy import; runtime isolation via plantnet-tf1 |
+
+**Core Components (migrated, ENV-GATED)**:
+- `autoencoder` class: masked autoencoder with neighbor-aware self-supervised learning
+- `mask_generator()`, `pretext_generator()`: self-supervised corruption
+- `pretrain()`: pretrain with mask + contrastive losses
+- `funetrain()`: fine-tune with clustering loss
+- ZINB reconstruction, mask loss, contrastive loss, clustering loss preserved
+
+**Note**: Full source migrated from OtherMode. ENV-GATED: requires plantnet-tf1 runtime. No model core modifications made.
 
 ### scziDesk
 
 | Field | Value |
 |-------|-------|
 | **Model** | scziDesk |
+| **Paper** | Zero-Inflated Deep Embedding for Single-cell RNA-seq Clustering |
 | **Source Path** | `OtherMode/scCluBench-main/DeepLearning/scziDesk/` |
 | **Target Path** | `methods/DeepLearning/scziDesk/` |
-| **Source Files Migrated** | Placeholder only |
+| **Source Files Migrated** | Full migration: `run.py`, `network.py`, `loss.py`, `preprocess.py`, `utils.py`, `zidpkm.py`, full `scziDesk/` and `scDeepCluster/` sub-packages |
 | **Authenticity** | **ENV-GATED** |
 | **Framework** | TensorFlow/Keras |
-| **Known Deviations** | Requires TensorFlow; placeholder `run.py` with clear error message |
+| **Smoke Test** | ENV-BLOCKED (TF import required at runtime) |
+| **GPU Policy** | PASS (`--gpu` type=int default=1; `--no_cuda` supported) |
+| **Known Deviations** | Full source migrated; `--help` works without TF via lazy import; runtime isolation via plantnet-tf1 |
+
+**Core Components (migrated, ENV-GATED)**:
+- `autoencoder` class: ZINB reconstruction + self-training
+- `pretrain()`: pretrain with ZINB reconstruction
+- `funetrain()`: fine-tune with target distribution self-training
+- ZINB loss, KL divergence, self-training refinement preserved
+
+**Note**: Full source migrated from OtherMode. ENV-GATED: requires plantnet-tf1 runtime. No model core modifications made.
 
 ### DESC
 
 | Field | Value |
 |-------|-------|
 | **Model** | DESC |
+| **Paper** | Deep Embedded Single-cell Clustering |
 | **Source Path** | `OtherMode/scCluBench-main/DeepLearning/desc/` |
 | **Target Path** | `methods/DeepLearning/desc/` |
-| **Source Files Migrated** | Placeholder only |
+| **Source Files Migrated** | Full migration: `run.py`, full `desc/` package (`models/desc.py`, `models/network.py`, `models/SAE.py`, `tools/`, `datasets/`), `setup.py` |
 | **Authenticity** | **ENV-GATED** |
 | **Framework** | TensorFlow/Keras |
-| **Known Deviations** | Requires TensorFlow; placeholder `run.py` with clear error message |
+| **Smoke Test** | ENV-BLOCKED (TF import required at runtime) |
+| **GPU Policy** | PASS (`--gpu` type=int default=1; `--no_cuda` supported) |
+| **Known Deviations** | Full source migrated; `--help` works without TF via lazy import; runtime isolation via plantnet-desc |
+
+**Core Components (migrated, ENV-GATED)**:
+- `train()` function in `desc/models/desc.py`: stacked denoising autoencoder + Louvain clustering
+- `getdims()`: automatic encoder dimension suggestion
+- SDAE with denoising, Louvain-based self-training preserved
+
+**Note**: Full source migrated from OtherMode. ENV-GATED: requires plantnet-desc runtime (separate from plantnet-tf1). No model core modifications made.
 
 ### scGNN
 
@@ -198,43 +231,51 @@ This document tracks the migration of scCluBench baseline methods into the isola
 | **Model** | scGNN |
 | **Paper** | Wang et al., Bioinformatics 2021 |
 | **Source Path** | `OtherMode/scCluBench-main/GNN/scGNN/` |
-| **Target Path** | `methods/GNN/scGNN/` |
+| **Target Path** | `methods/DeepLearning/scGNN/` |
 | **Source Files Migrated** | Full migration: `run.py`, `scGNN.py`, `model.py`, `util_function.py`, `graph_function.py`, `benchmark_util.py`, `clustering_metric.py`, `gae_embedding.py`, `Preprocessing_main.py`, `Preprocessing_benchmark.py`, `PreprocessingscGNN.py`, `LTMG_R.py` |
-| **Authenticity** | **PENDING** |
+| **Authenticity** | **PENDING_AUDITED** |
 | **Framework** | PyTorch |
-| **Smoke Test** | Not run |
-| **GPU Policy** | FAIL (`--gpu` default 0, BDD Scenario 13 violation) |
-| **Known Deviations** | Full model code migrated; `--gpu` default 0 must be fixed before formal use |
+| **Smoke Test** | NOT_RUN (dry-run verified OK) |
+| **GPU Policy** | PASS (`--gpu` type=int default=1; `--no_cuda` supported) |
+| **Known Deviations** | Full model code migrated; no OtherMode dependency; default noregu mode (no R) |
 
-**Note**: Original scGNN has extensive parameters for AE/VAE/GAE, EM clustering, graph pruning. No simplified replacement detected, but authenticity audit not yet completed.
+**Note**: Source migrated. Authenticity audit PASS. GPU default fixed. Smoke test pending actual run (dry-run passes). No OtherMode runtime dependency.
 
 ### scCDCG
 
 | Field | Value |
 |-------|-------|
 | **Model** | scCDCG |
+| **Paper** | Cell-type Discovery via Clustering on Graphs |
 | **Source Path** | `OtherMode/scCluBench-main/GNN/scCDCG/` |
 | **Target Path** | `methods/GNN/scCDCG/` |
 | **Source Files Migrated** | `run.py`, `model.py`, `scCDCG_layer.py`, `scCDCG_utils.py`, `scCDCG_preprocess.py`, `train_scCDCG.py`, `__init__.py` |
-| **Authenticity** | **PENDING** |
+| **Authenticity** | **PENDING_AUDITED** (HARD label leakage FIXED) |
 | **Framework** | PyTorch |
-| **Smoke Test** | Not run |
-| **GPU Policy** | FAIL (`--gpu` default 0, BDD Scenario 13 violation) |
-| **Known Deviations** | Full model code migrated; `--gpu` default 0 must be fixed before formal use |
+| **Smoke Test** | NOT_RUN |
+| **GPU Policy** | PASS (`--gpu` type=int default=1; `--no_cuda` supported) |
+| **Known Deviations** | Full model code migrated; HARD label leakage fixed (loss-based checkpoint selection); GPU default fixed |
+
+**HARD Label Leakage Fix**:
+- REMOVED: `acc > acc_max` pattern for saving best model (ACC-based checkpoint selection)
+- REMOVED: `torch.save(Model.state_dict())` inside `if acc > acc_max` block
+- REPLACED WITH: loss-based checkpoint selection (`if loss.item() < best_loss`)
+- PRETRAIN: Last epoch checkpoint saved (no label-based selection)
+- SOFT label access: `eval_fn(Y, y_pred)` still called for logging only (allowed per BDD)
 
 ### AttentionAE_sc
 
 | Field | Value |
 |-------|-------|
-| **Model** | AttentionAE |
+| **Model** | AttentionAE_sc |
 | **Source Path** | `OtherMode/scCluBench-main/GNN/AttentionAE-sc/` |
 | **Target Path** | `methods/GNN/AttentionAE_sc/` |
 | **Source Files Migrated** | `run.py`, `model.py`, `loss.py`, `train.py`, `utils.py`, `preprocessing_h5.py`, `preprocessing_baron.py`, `run_AttentionAE-sc.py` |
-| **Authenticity** | **PENDING** |
+| **Authenticity** | **PENDING_AUDITED** |
 | **Framework** | PyTorch |
-| **Smoke Test** | Not run |
-| **GPU Policy** | FAIL (`--gpu` default 0, BDD Scenario 13 violation) |
-| **Known Deviations** | Full model code migrated; `--gpu` default 0 must be fixed before formal use |
+| **Smoke Test** | NOT_RUN (dry-run verified OK) |
+| **GPU Policy** | PASS (`--gpu` type=int default=1; `--no_cuda` supported) |
+| **Known Deviations** | Full model code migrated; no OtherMode dependency |
 
 **Note**: Directory renamed from `AttentionAE-sc` to `AttentionAE_sc` per BDD Scenario 3.
 
@@ -325,14 +366,14 @@ The following models have `--gpu` default 0 (forbidden per BDD Scenario 13). The
 | scDCC | `methods/DeepLearning/scDCC/run.py` | `--gpu 0` | Passive (CPU by default via `--no_cuda`) |
 | scDSC | `methods/GNN/scDSC/run.py` | `--gpu 0` | Passive (CPU by default via `--no_cuda`) |
 | scMAE | `methods/DeepLearning/scMAE/run.py` | `--gpu 0` | Passive (CPU by default via `--no_cuda`) |
-| **scGNN** | `methods/GNN/scGNN/run.py` | `--gpu 0` | **Must fix** |
-| **scCDCG** | `methods/GNN/scCDCG/run.py` | `--gpu 0` | **Must fix** |
-| **AttentionAE_sc** | `methods/GNN/AttentionAE_sc/run.py` | `--gpu 0` | **Must fix** |
-| **scziDesk** | `methods/DeepLearning/scziDesk/run.py` | `--gpu 0` | ENV-GATED (TF) |
-| **scNAME** | `methods/DeepLearning/scNAME/run.py` | `--gpu 0` | ENV-GATED (TF) |
-| **DESC** | `methods/DeepLearning/desc/run.py` | `--gpu 0` | ENV-GATED (TF) |
+| **scGNN** | `methods/GNN/scGNN/run.py` | `--gpu 0` | **FIXED** (default=1, --no_cuda available) |
+| **scCDCG** | `methods/GNN/scCDCG/run.py` | `--gpu 0` | **FIXED** (default=1, --no_cuda available) |
+| **AttentionAE_sc** | `methods/GNN/AttentionAE_sc/run.py` | `--gpu 0` | **FIXED** (default=1, --no_cuda available) |
+| **scziDesk** | `methods/DeepLearning/scziDesk/run.py` | `--gpu 0` | **FIXED** (default=1, --no_cuda available; ENV-GATED) |
+| **scNAME** | `methods/DeepLearning/scNAME/run.py` | `--gpu 0` | **FIXED** (default=1, --no_cuda available; ENV-GATED) |
+| **DESC** | `methods/DeepLearning/desc/run.py` | `--gpu None` | **FIXED** (default=1, --no_cuda available; ENV-GATED) |
 
-**Note**: Models with passive policy (DEC, scDCC, scDSC, scMAE) already default to CPU via `--no_cuda`, so the `--gpu 0` default is only triggered when CUDA is explicitly requested. However, the explicit default=0 should still be changed to default=1 for clarity. Priority to fix: scGNN, scCDCG, AttentionAE_sc (pending formal use).
+**Note**: Models with passive policy (DEC, scDCC, scDSC, scMAE) already default to CPU via `--no_cuda`. All migrated models now have `--gpu` type=int default=1 and `--no_cuda` support.
 
 ---
 
@@ -353,12 +394,12 @@ The following methods are currently eligible for the default formal benchmark ru
 | Louvain | VERIFIED | PASS | Yes |
 | sc3 | VERIFIED | PASS | Yes |
 | scDeepCluster | ENV-GATED | ENV-BLOCKED | No |
-| scGNN | PENDING | Not run | No |
-| scCDCG | PENDING | Not run | No |
-| AttentionAE_sc | PENDING | Not run | No |
 | scNAME | ENV-GATED | ENV-BLOCKED | No |
 | scziDesk | ENV-GATED | ENV-BLOCKED | No |
 | DESC | ENV-GATED | ENV-BLOCKED | No |
+| scGNN | PENDING_AUDITED | NOT_RUN | No |
+| scCDCG | PENDING_AUDITED | NOT_RUN | No |
+| AttentionAE_sc | PENDING_AUDITED | NOT_RUN | No |
 
 ---
 
