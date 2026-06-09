@@ -30,7 +30,7 @@ def NB(theta, y_true, y_pred, mask = False, debug = False, mean = False):
         y_true = _nan2zero(y_true)
     theta = tf.minimum(theta, 1e6)
     t1 = tf.math.lgamma(theta + eps) + tf.math.lgamma(y_true + 1.0) - tf.math.lgamma(y_true + theta + eps)
-    t2 = (theta + y_true) * tf.log(1.0 + (y_pred / (theta + eps))) + (y_true * (tf.log(theta + eps) - tf.log(y_pred + eps)))
+    t2 = (theta + y_true) * tf.math.log(1.0 + (y_pred / (theta + eps))) + (y_true * (tf.math.log(theta + eps) - tf.math.log(y_pred + eps)))
     if debug:
         assert_ops = [tf.debugging.assert_all_finite(y_pred, 'y_pred has inf/nans'),
                       tf.debugging.assert_all_finite(t1, 't1 has inf/nans'),
@@ -50,13 +50,13 @@ def NB(theta, y_true, y_pred, mask = False, debug = False, mean = False):
 def ZINB(pi, theta, y_true, y_pred, ridge_lambda, mean = True, mask = False, debug = False):
     eps = 1e-10
     scale_factor = 1.0
-    nb_case = NB(theta, y_true, y_pred, mean=False, debug=debug) - tf.log(1.0 - pi + eps)
+    nb_case = NB(theta, y_true, y_pred, mean=False, debug=debug) - tf.math.log(1.0 - pi + eps)
     y_true = tf.cast(y_true, tf.float32)
     y_pred = tf.cast(y_pred, tf.float32) * scale_factor
     theta = tf.minimum(theta, 1e6)
 
     zero_nb = tf.pow(theta / (theta + y_pred + eps), theta)
-    zero_case = -tf.log(pi + ((1.0 - pi) * zero_nb) + eps)
+    zero_case = -tf.math.log(pi + ((1.0 - pi) * zero_nb) + eps)
     result = tf.where(tf.less(y_true, 1e-8), zero_case, nb_case)
     ridge = ridge_lambda * tf.square(pi)
     result += ridge

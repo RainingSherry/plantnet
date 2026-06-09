@@ -135,11 +135,12 @@ def main():
     X = np.array(X).astype(np.float32)
     Y = np.array(Y)
 
-    # Compute size factors from raw counts if not provided by prepare_data_for_model
+    # Compute size factors — always reshape to (n_cells, 1) for TF placeholder
     if sf is None:
         total_counts = np.array(adata.X.sum(axis=1)).flatten()
         median_count = np.median(total_counts)
-        sf = (total_counts / median_count).astype(np.float32).reshape(-1, 1)
+        sf = (total_counts / median_count).astype(np.float32)
+    sf = np.array(sf).astype(np.float32).reshape(-1, 1)
 
     # Encode labels to integers if needed
     from sklearn.preprocessing import LabelEncoder
