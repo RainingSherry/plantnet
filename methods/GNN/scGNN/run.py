@@ -40,6 +40,8 @@ def parse_args():
     parser.add_argument('--batch_size', type=int, default=12800, help='Original scGNN batch size')
     parser.add_argument('--Regu_epochs', type=int, default=500, help='Original scGNN pretrain epochs')
     parser.add_argument('--EM_epochs', type=int, default=200, help='Original scGNN EM epochs')
+    parser.add_argument('--epochs', type=int, default=None,
+                        help='Unified CLI alias for --EM_epochs (smoke test shortcut)')
     parser.add_argument('--EM_iteration', type=int, default=10, help='Original scGNN EM iterations')
     parser.add_argument('--cluster_epochs', type=int, default=200, help='Original scGNN cluster AE epochs')
     parser.add_argument('--quickmode', action='store_true', help='Use original scGNN quickmode')
@@ -68,7 +70,11 @@ def parse_args():
     parser.add_argument('--GAEmodel', type=str, default='gcn_vae', help='Original scGNN GAE model')
     parser.add_argument('--GAElr_dw', type=float, default=0.001, help='Original scGNN GAE regularization learning rate')
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    # Forward --epochs -> --EM_epochs (unified CLI convenience)
+    if args.epochs is not None:
+        args.EM_epochs = args.epochs
+    return args
 
 
 def ensure_dir(path):
@@ -246,7 +252,7 @@ def collect_and_save_results(data_path, dataset_alias, save_dir, original_output
     y_pred = pd.factorize(result_df.iloc[:, 0].astype(str))[0]
     embedding = embedding_df.to_numpy()
 
-    save(save_dir, y_true, y_pred, 0, embedding)
+    save(save_dir, y_true, y_pred, 0, embedding, args=vars(args))
     print(f'Original scGNN output clusters: {len(np.unique(y_pred))}')
     print(f'H5AD reference cell types: {inferred_clusters}')
 

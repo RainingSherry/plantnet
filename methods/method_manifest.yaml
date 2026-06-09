@@ -305,9 +305,9 @@ methods:
     framework: PyTorch
     source_path: OtherMode/scCluBench-main/GNN/scCDCG
     runtime:
-      env_name: plantnet-sccdcg
+      env_name: plantnet-core
       backend: conda
-      description: "PyTorch 1.12 for scCDCG"
+      description: "Uses shared preprocess.py which requires scanpy/anndata/h5py/scipy — use plantnet-core"
     note: "HARD label leakage fixed: loss-based checkpoint selection instead of ACC-based"
 
   - key: attentionae_sc

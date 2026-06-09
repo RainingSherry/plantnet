@@ -324,6 +324,15 @@ def main():
 
     optimizer = torch.optim.Adam(Model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
+    # 预训练前先用随机初始化的AE做一次KMeans，得到初始centers
+    # (这样即使epochs=1也不会出现kmeans/centers未定义的情况)
+    with torch.no_grad():
+        _h_init = Model.encoder(x.cuda() if args.cuda else x)
+        _z_init = torch.nn.functional.normalize(_h_init, p=2, dim=0).cpu().numpy()
+        _kmeans_init = KMeans(n_clusters=n_clusters, random_state=args.seed, n_init=20).fit(_z_init)
+        kmeans = _kmeans_init
+        centers = torch.tensor(_kmeans_init.cluster_centers_)
+
     for epoch in range(1, args.epochs + 1):
         Model.train()
 
@@ -376,6 +385,12 @@ def main():
         # 每50轮评估一次 (无监督：只记录loss，不用于checkpoint选择)
         if epoch % 50 == 0:
             print(f'Pre-train Epoch {epoch}/{args.epochs}, Loss: {loss.item():.6f}')
+            # 更新kmeans以供后续使用
+            z_np = z.cpu().numpy()
+            kmeans = KMeans(n_clusters=n_clusters, random_state=args.seed, n_init=20).fit(z_np)
+            centers = torch.tensor(kmeans.cluster_centers_)
+            if args.cuda:
+                centers = centers.cuda()
 
     # 保存预训练模型（最后一个epoch的checkpoint，不使用真实标签选择）
     torch.save(Model.state_dict(), os.path.join(args.save_dir, 'pretrain_model.pkl'))

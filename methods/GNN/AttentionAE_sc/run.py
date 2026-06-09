@@ -317,7 +317,7 @@ def main():
             print(f'Clustering Epoch {epoch + 1}/{args.epochs}, Loss: {loss.item():.4f}')
 
     # Save results using standard interface
-    save(args.save_dir, Y, best_y_pred, args.epochs, best_embedding)
+    save(args.save_dir, Y, best_y_pred, args.epochs, best_embedding, args=vars(args))
 
     print(f'Training completed.')
     print(f'Results saved to: {args.save_dir}')
