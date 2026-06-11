@@ -2,8 +2,8 @@
 """
 Formal Benchmark Runner
 =======================
-Per BDD Scenarios 1-16: Runs only Authenticity=VERIFIED + Smoke=PASS models
-by default. Reads from methods/method_manifest.yaml.
+Per BDD Scenarios 1-16: Runs the curated DEFAULT_FORMAL_METHODS list
+by default. Method metadata is read from methods/method_manifest.yaml.
 
 GPU 0 and GPU 7 are FORBIDDEN. Only --gpu 1-6 is allowed.
 
@@ -22,7 +22,6 @@ Usage:
             dec \
             scdcc \
             scdsc \
-            scanpy_standard \
             leiden \
             louvain \
             sc3
@@ -47,6 +46,7 @@ import yaml
 import time
 import subprocess
 import argparse
+import re
 import shutil
 from pathlib import Path
 from datetime import datetime
@@ -65,7 +65,6 @@ DEFAULT_FORMAL_METHODS = [
     "dec",
     "scdcc",
     "scdsc",
-    "scanpy_standard",
     "leiden",
     "louvain",
     "sc3",
@@ -142,7 +141,12 @@ def resolve_python_executable(
     return sys.executable
 
 
-def write_environment_json(out_dir: Path, python_executable: str, runtime_env: str = "") -> None:
+def write_environment_json(
+    out_dir: Path,
+    python_executable: str,
+    runtime_env: str = "",
+    framework: str = "",
+) -> None:
     """
     Per BDD Scenario 2.3: write environment.json with version info.
     """
@@ -156,24 +160,35 @@ def write_environment_json(out_dir: Path, python_executable: str, runtime_env: s
         "tensorflow_version": "",
         "scanpy_version": "",
         "anndata_version": "",
+        "version_errors": {},
     }
 
     # Collect version info from the actual Python executable
     exe = python_executable or sys.executable
     version_cmds = [
         ("python_version", [exe, "-c", "import sys; print(sys.version.split()[0])"]),
-        ("torch_version", [exe, "-c", "import torch; print(torch.__version__)"]),
-        ("tensorflow_version", [exe, "-c", "import tensorflow; print(tensorflow.__version__)"]),
-        ("scanpy_version", [exe, "-c", "import scanpy; print(scanpy.__version__)"]),
-        ("anndata_version", [exe, "-c", "import anndata; print(anndata.__version__)"]),
     ]
+    framework_lower = str(framework).lower()
+    if any(token in framework_lower for token in ("torch", "pytorch")):
+        version_cmds.append(("torch_version", [exe, "-c", "import torch; print(torch.__version__)"]))
+    if any(token in framework_lower for token in ("tensorflow", "keras")):
+        version_cmds.append(("tensorflow_version", [exe, "-c", "import tensorflow; print(tensorflow.__version__)"]))
+    if "scanpy" in framework_lower:
+        version_cmds.extend([
+            ("scanpy_version", [exe, "-c", "import scanpy; print(scanpy.__version__)"]),
+            ("anndata_version", [exe, "-c", "import anndata; print(anndata.__version__)"]),
+        ])
     for key, cmd in version_cmds:
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=3)
             if result.returncode == 0:
                 env_data[key] = result.stdout.strip()
-        except Exception:
-            pass
+            else:
+                env_data["version_errors"][key] = result.stderr.strip()[-500:]
+        except subprocess.TimeoutExpired:
+            env_data["version_errors"][key] = "version probe timed out"
+        except Exception as exc:
+            env_data["version_errors"][key] = str(exc)
 
     with open(out_dir / "environment.json", "w", encoding="utf-8") as f:
         json.dump(env_data, f, indent=2)
@@ -203,6 +218,29 @@ def validate_gpu_policy(gpu: int, no_cuda: bool) -> None:
             )
 
 
+def source_fingerprint(path: str) -> Dict[str, Any]:
+    """Return stable source-file identity fields for conversion cache checks."""
+    resolved = os.path.abspath(path)
+    stat = os.stat(resolved)
+    return {
+        "input_path": resolved,
+        "input_size": int(stat.st_size),
+        "input_mtime_ns": int(stat.st_mtime_ns),
+    }
+
+
+def conversion_cache_matches(meta: Dict[str, Any], data_path: str, dataset_name: str) -> bool:
+    """Check whether an existing converted h5ad was created from this exact source file."""
+    expected = {
+        "dataset_name": dataset_name,
+        **source_fingerprint(data_path),
+        "conversion_label_key": "auto",
+        "conversion_matrix_key": "auto",
+        "conversion_n_clusters": "auto",
+    }
+    return all(meta.get(key) == value for key, value in expected.items())
+
+
 def auto_convert_h5(data_path: str, dataset_name: str) -> tuple[str, int]:
     """
     If data_path ends with .h5, convert to .h5ad via prepare_dataset.py and return
@@ -224,12 +262,13 @@ def auto_convert_h5(data_path: str, dataset_name: str) -> tuple[str, int]:
         output_path = PROCESSED_DATA_DIR / f"{dataset_name}.h5ad"
         meta_path = PROCESSED_DATA_DIR / f"{dataset_name}.meta.json"
 
-        # Reuse existing conversion if already done
         if output_path.exists() and meta_path.exists():
-            print(f"  [auto-convert] Reusing cached: {output_path}")
             with open(meta_path) as f:
                 meta = json.load(f)
-            return str(output_path), meta["n_clusters"]
+            if conversion_cache_matches(meta, data_path, dataset_name):
+                print(f"  [auto-convert] Reusing cached: {output_path}")
+                return str(output_path), meta["n_clusters"]
+            print(f"  [auto-convert] Cache is stale for {dataset_name}; regenerating.")
 
         # Build prepare_dataset.py command
         prepare_script = SCRIPTS_DIR / "prepare_dataset.py"
@@ -415,15 +454,25 @@ def build_command(
 # Output verification
 # ────────────────────────────────────────────────────────────────
 
-def verify_output(out_dir: Path) -> bool:
+def required_artifacts(method_info: Dict[str, Any]) -> List[str]:
+    """Return required output artifacts for a method."""
+    required = method_info.get("required_artifacts")
+    if required is None:
+        return ["metrics.json"]
+    if isinstance(required, str):
+        return [required]
+    return [str(item) for item in required]
+
+
+def verify_output(out_dir: Path, method_info: Dict[str, Any]) -> tuple[bool, str]:
     """
-    Verify that a method's output contains all required files.
-    Returns True if all required files exist.
+    Verify that a method's output contains its required files.
+    Returns (ok, reason).
     """
-    for fname in ("embedding_final.npy", "labels.npy", "metrics.json", "args.json"):
-        if not (out_dir / fname).exists():
-            return False
-    return True
+    missing = [fname for fname in required_artifacts(method_info) if not (out_dir / fname).exists()]
+    if missing:
+        return False, "Missing required output files: " + ", ".join(missing)
+    return True, ""
 
 
 def load_metrics(out_dir: Path) -> Optional[Dict[str, float]]:
@@ -433,6 +482,14 @@ def load_metrics(out_dir: Path) -> Optional[Dict[str, float]]:
         with open(metrics_path, "r") as f:
             return json.load(f)
     return None
+
+
+def parse_seed_from_run_id(run_id: str) -> Optional[int]:
+    """Parse seed from run IDs like method__seed42__20260611_120000."""
+    match = re.search(r"(?:^|__)seed(-?\d+)(?:__|_|$)", run_id)
+    if not match:
+        return None
+    return int(match.group(1))
 
 
 def normalize_metrics(metrics: Optional[Dict[str, Any]]) -> Dict[str, Any]:
@@ -495,7 +552,12 @@ def run_method(
     cmd: List[str] = []
 
     write_authenticity_json(out_dir, method_info)
-    write_environment_json(out_dir, python_bin or sys.executable, runtime_env)
+    write_environment_json(
+        out_dir,
+        python_bin or sys.executable,
+        runtime_env,
+        framework=method_info.get("framework", ""),
+    )
 
     # Check if allowed
     allowed, reason = check_authenticity(method_key, method_info)
@@ -569,6 +631,10 @@ def run_method(
         env["OPENBLAS_NUM_THREADS"] = "4"
         env["MKL_NUM_THREADS"] = "4"
         env["NUMEXPR_NUM_THREADS"] = "4"
+        env.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
+        env.setdefault("NUMBA_CACHE_DIR", "/tmp/numba-cache")
+        os.makedirs(env["MPLCONFIGDIR"], exist_ok=True)
+        os.makedirs(env["NUMBA_CACHE_DIR"], exist_ok=True)
         # Prevent CUDA OOM fragmentation for large-graph methods (scDSC)
         if method_key == "scdsc":
             env["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
@@ -593,11 +659,13 @@ def run_method(
         if return_code != 0:
             status = "failed"
             error_msg = f"Exit code {return_code}"
-        elif not verify_output(out_dir):
-            status = "incomplete"
-            error_msg = "Missing required output files"
         else:
-            status = "success"
+            ok, reason = verify_output(out_dir, method_info)
+            if ok:
+                status = "success"
+            else:
+                status = "incomplete"
+                error_msg = reason
 
     except subprocess.TimeoutExpired:
         status = "timeout"
@@ -745,13 +813,8 @@ def collect_results(base_out_dir: Path, method_keys: List[str], seeds: List[int]
             with open(auth_path) as f:
                 auth_data = json.load(f)
 
-        # Parse seed from dir name if not in status
-        seed_from_dir = None
-        for s in seeds:
-            seed_str = f"seed{s}_"
-            if seed_str in sub_dir.name:
-                seed_from_dir = s
-                break
+        # Parse seed from dir name if not in status.
+        seed_from_dir = parse_seed_from_run_id(sub_dir.name)
         if seed_from_dir is None:
             seed_from_dir = status_data.get("seed", "unknown")
 
@@ -927,7 +990,7 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=f"""
 Examples:
-  # Default formal run: all 10 methods (proposed + ablation + baselines)
+  # Default formal run: curated methods (proposed + ablation + baselines)
   python scripts/run_formal_benchmark.py \\
       --data_path data/subsample_2k.h5ad \\
       --dataset_name subsample_2k \\
@@ -952,7 +1015,7 @@ Examples:
   # Run specific methods
   python scripts/run_formal_benchmark.py \\
       --data_path data/SRP182008.h5ad \\
-      --methods dec scdcc scanpy_standard \\
+      --methods dec scdcc leiden \\
       --n_clusters 15 --seeds 42
 
   # Include pending/unverified (flagged as unverified in output)
@@ -962,7 +1025,7 @@ Examples:
       --n_clusters 7 --allow_unverified --gpu 1
 
 GPU Policy: GPU 0 and GPU 7 are FORBIDDEN.
-Only VERIFIED + Smoke=PASS methods are included in formal benchmark by default.
+Only the curated DEFAULT_FORMAL_METHODS list is included by default.
 Substitute implementations are forbidden.
 """,
     )
@@ -982,8 +1045,7 @@ Substitute implementations are forbidden.
     parser.add_argument("--pretrain_epochs", type=int, default=200,
                        help="Pretraining epochs for models with pretrain phase")
     parser.add_argument("--methods", type=str, nargs="+", default=None,
-                       help=f"Method keys to run. Default: all VERIFIED+Smoke=PASS. "
-                            f"Default formal list: {DEFAULT_FORMAL_METHODS}")
+                       help=f"Method keys to run. Default formal list: {DEFAULT_FORMAL_METHODS}")
     parser.add_argument("--runtime_registry", type=str, default=None,
                        help="Path to runtime_registry.yaml for per-method Python resolution. "
                             "Default: envs/runtime_registry.yaml if exists.")
@@ -1074,12 +1136,17 @@ Substitute implementations are forbidden.
         if missing:
             print(f"WARNING: Unknown method keys: {missing}")
     else:
-        selected = {
-            k: v for k, v in manifest.items()
-            if v.get("authenticity") == "VERIFIED"
-            and v.get("smoke") in ("PASS", "UNKNOWN", "")
-            and v.get("default_in_formal") is True
-        }
+        selected = {}
+        for k in DEFAULT_FORMAL_METHODS:
+            if k not in manifest:
+                print(f"WARNING: Default method key missing from manifest: {k!r}")
+                continue
+            method_info = manifest[k]
+            allowed, reason = check_authenticity(k, method_info)
+            if allowed:
+                selected[k] = method_info
+            else:
+                print(f"WARNING: Default method {k!r} skipped ({reason})")
 
     if not selected:
         print("ERROR: No valid methods selected. Use --methods or check manifest.")

@@ -3,7 +3,7 @@
 # Format: per BDD Scenarios 5, 15
 
 methods:
-  # ── VERIFIED + Smoke PASS: eligible for default formal run ──
+  # ── Curated default formal methods are defined by scripts/run_formal_benchmark.py::DEFAULT_FORMAL_METHODS ──
   - key: dec
     name: DEC
     full_name: Deep Embedded Clustering
@@ -14,6 +14,11 @@ methods:
     gpu_policy: PASS
     default_in_formal: true
     framework: PyTorch
+    required_artifacts: &canonical_artifacts
+      - metrics.json
+      - embedding_final.npy
+      - labels.npy
+      - args.json
     source_path: OtherMode/scCluBench-main/DeepLearning/dec
     target_path: methods/DeepLearning/dec
     source_files:
@@ -29,6 +34,7 @@ methods:
     gpu_policy: PASS
     default_in_formal: true
     framework: PyTorch
+    required_artifacts: *canonical_artifacts
     source_path: OtherMode/scCluBench-main/DeepLearning/scDCC
     target_path: methods/DeepLearning/scDCC
     source_files:
@@ -50,6 +56,7 @@ methods:
     gpu_policy: PASS
     default_in_formal: true
     framework: PyTorch
+    required_artifacts: *canonical_artifacts
     source_path: OtherMode/scCluBench-main/GNN/scDSC
     target_path: methods/GNN/scDSC
     source_files:
@@ -72,8 +79,9 @@ methods:
     authenticity: VERIFIED
     smoke: PASS
     gpu_policy: PASS
-    default_in_formal: true
+    default_in_formal: false
     framework: Scanpy
+    required_artifacts: *canonical_artifacts
     source_path: OtherMode/scCluBench-main/Traditional/ScanpyStandard
     target_path: methods/Traditional/ScanpyStandard
     source_files:
@@ -89,6 +97,7 @@ methods:
     gpu_policy: PASS
     default_in_formal: true
     framework: igraph+leidenalg
+    required_artifacts: *canonical_artifacts
     source_path: OtherMode/scCluBench-main/Traditional/Leiden
     target_path: methods/Traditional/Leiden
     source_files:
@@ -104,6 +113,7 @@ methods:
     gpu_policy: PASS
     default_in_formal: true
     framework: NetworkX
+    required_artifacts: *canonical_artifacts
     source_path: OtherMode/scCluBench-main/Traditional/Louvain
     target_path: methods/Traditional/Louvain
     source_files:
@@ -119,6 +129,7 @@ methods:
     gpu_policy: PASS
     default_in_formal: true
     framework: scikit-learn
+    required_artifacts: *canonical_artifacts
     source_path: OtherMode/scCluBench-main/Traditional/sc3
     target_path: methods/Traditional/sc3
     source_files:
@@ -137,6 +148,7 @@ methods:
     gpu_policy: PASS
     default_in_formal: true
     framework: PyTorch
+    required_artifacts: *canonical_artifacts
     role: proposed
 
   - key: nm_scmae_nomix
@@ -149,6 +161,7 @@ methods:
     gpu_policy: PASS
     default_in_formal: true
     framework: PyTorch
+    required_artifacts: *canonical_artifacts
     role: ablation
     extra_args:
       - --use_pseudo
@@ -172,6 +185,7 @@ methods:
     gpu_policy: PASS
     default_in_formal: true
     framework: PyTorch
+    required_artifacts: *canonical_artifacts
 
   # ── ENV-GATED: blocked by environment ──
   - key: scdeepcluster
@@ -259,7 +273,7 @@ methods:
     authenticity: VERIFIED
     smoke: PASS
     gpu_policy: PASS
-    default_in_formal: true
+    default_in_formal: false
     framework: TensorFlow
     source_path: OtherMode/scCluBench-main/DeepLearning/desc
     runtime:
@@ -310,7 +324,7 @@ methods:
     authenticity: VERIFIED
     smoke: PASS
     gpu_policy: PASS
-    default_in_formal: true
+    default_in_formal: false
     framework: PyTorch
     source_path: OtherMode/scCluBench-main/GNN/scCDCG
     runtime:
@@ -341,7 +355,7 @@ methods:
     authenticity: VERIFIED
     smoke: PASS
     gpu_policy: PASS
-    default_in_formal: true
+    default_in_formal: false
     framework: PyTorch
     source_path: OtherMode/scCluBench-main/GNN/AttentionAE-sc
     target_path: methods/GNN/AttentionAE_sc

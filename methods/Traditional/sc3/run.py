@@ -31,13 +31,8 @@ import sys
 import argparse
 import numpy as np
 from sklearn.cluster import AgglomerativeClustering, KMeans
-from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score
-from sklearn.metrics import f1_score, fowlkes_mallows_score
-from sklearn.metrics import v_measure_score, homogeneity_score, completeness_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn.decomposition import PCA
-from scipy.spatial.distance import pdist, squareform
-from scipy.optimize import linear_sum_assignment
 import json
 import warnings
 warnings.filterwarnings('ignore')
@@ -168,56 +163,21 @@ def main():
 
     print(f'Number of clusters found: {len(np.unique(y_pred))}')
 
-    # 保存结果
+    # 保存结果。统一 save() 会调用 methods/evaluation.py 中的标准评估逻辑，
+    # 避免本方法单独实现 Hungarian 对齐后覆盖 metrics.json。
     save(args.save_dir, Y, y_pred, 0, X_pca, args=vars(args))
 
-    # ========== Step 3: 计算评估指标 ==========
     metrics_path = os.path.join(args.save_dir, 'metrics.json')
-
-    # Use Hungarian algorithm (scipy) to align predicted labels with ground truth
-    le = LabelEncoder()
-    y_enc = le.fit_transform(y_pred)
-    gt_enc = le.fit_transform(Y)
-    D = max(int(y_enc.max()), int(gt_enc.max())) + 1
-    cost = np.zeros((D, D), dtype=np.float64)
-    for i in range(len(y_enc)):
-        cost[int(y_enc[i]), int(gt_enc[i])] -= 1
-    rows, cols = linear_sum_assignment(cost)
-    y_map = {col: row for row, col in zip(rows, cols)}
-    y_pred_aligned = np.array([y_map.get(int(p), int(p)) for p in y_enc])
-
-    # 计算各项评估指标
-    acc = float(np.mean(y_pred_aligned == Y))
-    nmi = float(normalized_mutual_info_score(Y, y_pred))
-    ari = float(adjusted_rand_score(Y, y_pred))
-    f1 = float(f1_score(Y, y_pred, average='macro', zero_division=0))
-    fmi = float(fowlkes_mallows_score(Y, y_pred))
-    vms = float(v_measure_score(Y, y_pred))
-    hom = float(homogeneity_score(Y, y_pred))
-    comp = float(completeness_score(Y, y_pred))
-
-    # 保存指标到 JSON
-    metrics = {
-        'acc': acc,           # 准确率（标签对齐后）
-        'nmi': nmi,           # 标准化互信息
-        'ari': ari,           # 调整兰德指数
-        'f1_macro': f1,      # F1 分数（宏平均）
-        'fmi': fmi,           # Fowlkes-Mallows 指数
-        'v_measure': vms,    # V-measure（同质性和完整性调和平均）
-        'homogeneity': hom,   # 同质性（每个簇只包含单一类的程度）
-        'completeness': comp  # 完整性（同一类的成员都被分到同一簇的程度）
-    }
-
-    with open(metrics_path, 'w') as f:
-        json.dump(metrics, f, indent=2)
+    with open(metrics_path, 'r') as f:
+        metrics = json.load(f)
 
     print(f'\nSC3 Results (Pure Python):')
-    print(f'  ACC:        {acc:.4f}')   # 准确率
-    print(f'  NMI:        {nmi:.4f}')   # 标准化互信息
-    print(f'  ARI:        {ari:.4f}')   # 调整兰德指数
-    print(f'  F1-macro:   {f1:.4f}')   # F1 分数
-    print(f'  FMI:        {fmi:.4f}')   # Fowlkes-Mallows 指数
-    print(f'  V-measure:  {vms:.4f}')  # V-measure
+    print(f"  ACC:        {metrics['acc']:.4f}")   # 准确率
+    print(f"  NMI:        {metrics['nmi']:.4f}")   # 标准化互信息
+    print(f"  ARI:        {metrics['ari']:.4f}")   # 调整兰德指数
+    print(f"  F1-macro:   {metrics['f1_macro']:.4f}")   # F1 分数
+    print(f"  FMI:        {metrics['fmi']:.4f}")   # Fowlkes-Mallows 指数
+    print(f"  V-measure:  {metrics['v_measure']:.4f}")  # V-measure
     print(f'\nResults saved to: {args.save_dir}')
 
 

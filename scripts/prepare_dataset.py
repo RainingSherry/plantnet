@@ -448,9 +448,12 @@ Examples:
     print(f"\nSaved: {output_path}")
 
     # Write a companion .json sidecar with resolved metadata
+    input_stat = os.stat(input_path)
     meta = {
         "dataset_name": dataset_name,
         "input_path": str(input_path),
+        "input_size": int(input_stat.st_size),
+        "input_mtime_ns": int(input_stat.st_mtime_ns),
         "output_path": str(output_path),
         "n_cells": int(adata.n_obs),
         "n_genes": int(adata.n_vars),
@@ -461,6 +464,9 @@ Examples:
         "label_key": adata.uns.get("label_key"),
         "resolved_label_key": adata.uns.get("resolved_label_key"),
         "label_is_integer": adata.uns.get("label_is_integer", False),
+        "conversion_label_key": args.label_key,
+        "conversion_matrix_key": args.matrix_key or "auto",
+        "conversion_n_clusters": args.n_clusters,
     }
     meta_path = output_path.replace(".h5ad", ".meta.json")
     with open(meta_path, "w", encoding="utf-8") as f:

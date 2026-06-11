@@ -397,9 +397,11 @@ def apply_scmae_noise(x: torch.Tensor, mask_ratio: float) -> tuple[torch.Tensor,
     """
     应用 scMAE 风格的掩码扰动：将一部分位置替换为其他细胞对应位置的值。
 
-    对于 x 中的每个元素，都会以 `mask_ratio` 的概率被独立替换为
-    随机打乱后的 x 中对应位置的值。返回的 mask 张量用于标记哪些位置被修改：
-    1.0 表示发生了替换，0.0 表示保持不变。
+    对于 x 中的每个元素，都会以 `mask_ratio` 的概率被独立抽中，并替换为
+    随机打乱后的 x 中对应位置的值。返回的 mask 张量标记实际发生数值变化的位置：
+    1.0 表示替换后数值不同，0.0 表示保持不变或替换后数值相同。
+    因此在零值较多的稀疏 scRNA 数据上，实际有效 mask rate 可能低于配置的
+    `mask_ratio`。训练脚本应记录 mask.mean() 作为 effective mask rate。
     这模拟了 scMAE 预训练阶段所使用的扰动策略。
     """
     should_swap = torch.bernoulli(float(mask_ratio) * torch.ones_like(x))

@@ -374,12 +374,17 @@ def main():
     ).to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-    history = {"loss": []}
+    history = {
+        "loss": [],
+        "effective_mask_rate": [],
+        "configured_mask_ratio": float(args.mask_prob),
+    }
     print('Starting training...')
 
     for epoch in range(1, max(1, args.epochs) + 1):
         model.train()
         total_loss = 0.0
+        total_mask_rate = 0.0
         n_batches = 0
 
         for _, x_cpu, _ in train_loader:
@@ -391,12 +396,18 @@ def main():
             optimizer.step()
 
             total_loss += float(loss.detach().cpu())
+            total_mask_rate += float(mask.mean().detach().cpu())
             n_batches += 1
 
         avg_loss = total_loss / max(1, n_batches)
+        avg_mask_rate = total_mask_rate / max(1, n_batches)
         history["loss"].append(avg_loss)
+        history["effective_mask_rate"].append(avg_mask_rate)
         if epoch == 1 or epoch == args.epochs or epoch % 10 == 0:
-            print(f'Epoch {epoch:03d}/{args.epochs} loss={avg_loss:.4f}')
+            print(
+                f'Epoch {epoch:03d}/{args.epochs} '
+                f'loss={avg_loss:.4f} effective_mask={avg_mask_rate:.4f}'
+            )
 
     embedding, labels_out = family.extract_embedding(model, test_loader, device)
     np.save(save_dir / "embedding_final.npy", embedding.astype(np.float32))

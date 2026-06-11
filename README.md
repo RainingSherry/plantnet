@@ -144,7 +144,7 @@ See [docs/migration_status.md](docs/migration_status.md) and [docs/model_authent
 
 ### Formal Method List
 
-The default formal benchmark includes 10 methods:
+The default formal benchmark includes 9 methods:
 
 | Role | Method | Key |
 |------|--------|-----|
@@ -154,7 +154,6 @@ The default formal benchmark includes 10 methods:
 | **Deep baseline** | DEC | `dec` |
 | **Deep baseline** | scDCC | `scdcc` |
 | **Deep baseline** | scDSC | `scdsc` |
-| **Traditional** | ScanpyStandard | `scanpy_standard` |
 | **Traditional** | Leiden | `leiden` |
 | **Traditional** | Louvain | `louvain` |
 | **Traditional** | SC3 | `sc3` |
@@ -162,7 +161,7 @@ The default formal benchmark includes 10 methods:
 ### Quick Run
 
 ```bash
-# Run all 10 formal methods (GPU enabled, GPU 1)
+# Run all 9 formal methods (GPU enabled, GPU 1)
 python scripts/run_formal_benchmark.py \
   --data_path data/subsample_2k.h5ad \
   --dataset_name subsample_2k \

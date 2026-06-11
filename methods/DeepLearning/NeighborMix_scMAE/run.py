@@ -211,6 +211,9 @@ def parse_args():
     return parser.parse_args()
 
 
+# Legacy local helpers below are retained for compatibility/debugging only.
+# The active main() path uses methods.DeepLearning.scMAE_family for seeding,
+# device selection, dataset loading, embedding extraction, and evaluation.
 def set_seed(seed: int) -> None:
     """
     为所有随机数生成器设置种子，以尽量保证结果可复现。
@@ -752,11 +755,20 @@ def main():
         "pseudo_weight": [],
         "real_mask_rate": [],
         "pseudo_mask_rate": [],
+        "configured_mask_ratio": float(args.mask_ratio),
+        "mask_rate_note": "real_mask_rate and pseudo_mask_rate are effective rates where corrupted values differ from original values.",
     }
+    epoch_metric_keys = [
+        "loss",
+        "real_loss",
+        "pseudo_loss",
+        "real_mask_rate",
+        "pseudo_mask_rate",
+    ]
 
     for epoch in range(1, max(1, args.epochs) + 1):
         model.train()
-        totals = {key: 0.0 for key in history}
+        totals = {key: 0.0 for key in epoch_metric_keys}
         n_batches = 0
 
         for idx_t, x_cpu, _ in train_loader:
@@ -799,7 +811,7 @@ def main():
             totals["pseudo_mask_rate"] += float(pseudo_mask_rate.detach().cpu())
             n_batches += 1
 
-        for key in totals:
+        for key in epoch_metric_keys:
             history[key].append(totals[key] / max(1, n_batches))
         history["pseudo_weight"].append(float(args.pseudo_weight) if pseudo_branch_enabled else 0.0)
 
