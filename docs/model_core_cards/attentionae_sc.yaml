@@ -7,11 +7,11 @@ full_name: Attention-based Autoencoder for Single-Cell
 source_path: OtherMode/scCluBench-main/GNN/AttentionAE-sc
 target_path: methods/GNN/AttentionAE_sc
 category: GNN
-status: PENDING
-authenticity_status: PENDING
-smoke_status: NOT_RUN
+status: VERIFIED
+authenticity_status: VERIFIED
+smoke_status: PASS
 framework: PyTorch
-gpu_policy: FAIL  # default --gpu 0 must be fixed
+gpu_policy: PASS  # --gpu default=1, --no_cuda supported
 
 # ── File Classification ────────────────────────────────────────────────────────
 

@@ -118,6 +118,7 @@ environment_requirements:
 migration_blockers:
   - TF/Keras environment not available in current conda environment
   - Alternative: implement in PyTorch to achieve ENV-GATED resolution
+  - "[COMPAT] sklearn import updated: scipy.optimize.linear_sum_assignment replaces deprecated sklearn.utils.linear_assignment_ (Phase 1 fix, no model core change)"
 
 # ── Core Card Version ──────────────────────────────────────────────────────────
 

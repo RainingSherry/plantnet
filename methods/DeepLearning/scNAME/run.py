@@ -227,7 +227,7 @@ def main():
     embedding_restored = embedding[restore_ix]
 
     # Save results using standard interface
-    save(args.save_dir, Y_restored, y_pred_restored, args.epochs, embedding_restored)
+    save(args.save_dir, Y_restored, y_pred_restored, args.epochs, embedding_restored, args=vars(args))
 
     print(f'Training completed.')
     print(f'Results saved to: {args.save_dir}')

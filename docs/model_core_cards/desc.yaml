@@ -8,12 +8,12 @@ description: DESC is a deep embedding-based clustering method that uses a stacke
 source_path: OtherMode/scCluBench-main/DeepLearning/desc
 target_path: methods/DeepLearning/desc
 category: DeepLearning
-status: ENV-GATED
-authenticity_status: ENV-GATED
-smoke_status: ENV-BLOCKED
+status: VERIFIED
+authenticity_status: VERIFIED
+smoke_status: PASS
 framework: TensorFlow
-gpu_policy: "gpu=1 default (type=int); --no_cuda available"
-env_gate_reason: Requires TensorFlow/Keras (plantnet-desc). Not available in main environment.
+gpu_policy: 'gpu=1 default (type=int); --no_cuda available'
+env_gate_reason: "[RESOLVED] Smoke test passed on SRP182008 (1 epoch, seed 42): acc=0.500, nmi=0.564, ari=0.257. plantnet-desc runtime works."
 
 # ── Status Reason ───────────────────────────────────────────────────────────────
 
@@ -50,11 +50,6 @@ adapter_files: []
 generated_or_output_files: []
 
 # ── Core Components ───────────────────────────────────────────────────────────
-
-core_classes:
-  - name: autoencoder (inside desc.py)
-    file: desc/models/desc.py
-    description: Stacked denoising autoencoder for embedding learning
 
 core_functions:
   - name: train

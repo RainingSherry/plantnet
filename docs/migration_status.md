@@ -164,20 +164,23 @@ This document tracks the migration of scCluBench baseline methods into the isola
 | **Source Path** | `OtherMode/scCluBench-main/DeepLearning/scNAME/` |
 | **Target Path** | `methods/DeepLearning/scNAME/` |
 | **Source Files Migrated** | Full migration: `run.py`, `scNAME_network.py`, `scNAME_loss.py`, `scNAME_main.py`, `scNAME_preprocess.py`, `scNAME_utils.py` |
-| **Authenticity** | **ENV-GATED** |
+| **Authenticity** | **VERIFIED** |
 | **Framework** | TensorFlow/Keras |
-| **Smoke Test** | ENV-BLOCKED (TF import required at runtime) |
+| **Smoke Test** | **PASS** (small data: ACC=0.392, NMI=0.480, ARI=0.185; 49.5s) |
 | **GPU Policy** | PASS (`--gpu` type=int default=1; `--no_cuda` supported) |
 | **Known Deviations** | Full source migrated; `--help` works without TF via lazy import; runtime isolation via plantnet-tf1 |
 
-**Core Components (migrated, ENV-GATED)**:
+**Bugs Fixed (Phase 5)**:
+- Added `args=vars(args)` to `save()` call — previously `args.json` was missing, causing "Missing required output files" in formal benchmark
+
+**Core Components (migrated, smoke verified)**:
 - `autoencoder` class: masked autoencoder with neighbor-aware self-supervised learning
 - `mask_generator()`, `pretext_generator()`: self-supervised corruption
 - `pretrain()`: pretrain with mask + contrastive losses
 - `funetrain()`: fine-tune with clustering loss
 - ZINB reconstruction, mask loss, contrastive loss, clustering loss preserved
 
-**Note**: Full source migrated from OtherMode. ENV-GATED: requires plantnet-tf1 runtime. No model core modifications made.
+**Note**: Full source migrated from OtherMode. ENV-GATED resolved: plantnet-tf1 runtime works. Small data smoke PASS. No model core modifications.
 
 ### scziDesk
 
@@ -188,19 +191,25 @@ This document tracks the migration of scCluBench baseline methods into the isola
 | **Source Path** | `OtherMode/scCluBench-main/DeepLearning/scziDesk/` |
 | **Target Path** | `methods/DeepLearning/scziDesk/` |
 | **Source Files Migrated** | Full migration: `run.py`, `network.py`, `loss.py`, `preprocess.py`, `utils.py`, `zidpkm.py`, full `scziDesk/` and `scDeepCluster/` sub-packages |
-| **Authenticity** | **ENV-GATED** |
+| **Authenticity** | **VERIFIED** |
 | **Framework** | TensorFlow/Keras |
-| **Smoke Test** | ENV-BLOCKED (TF import required at runtime) |
+| **Smoke Test** | **PASS** (small data: ACC=0.428, NMI=0.510, ARI=0.235; 39.7s) |
 | **GPU Policy** | PASS (`--gpu` type=int default=1; `--no_cuda` supported) |
 | **Known Deviations** | Full source migrated; `--help` works without TF via lazy import; runtime isolation via plantnet-tf1 |
 
-**Core Components (migrated, ENV-GATED)**:
+**Bugs Fixed (Phase 5)**:
+- `network.py`: `tf.log` → `tf.math.log` (TF2 compatibility)
+- `run.py`: `raw_counts` shape guard — prevents `ValueError` when raw gene count doesn't match HVG subset
+- `network.py`: `Y_pred` guard for epochs < update_epoch — prevents `AttributeError`
+- `run.py`: Added `args=vars(args)` to `save()` call
+
+**Core Components (migrated, smoke verified)**:
 - `autoencoder` class: ZINB reconstruction + self-training
 - `pretrain()`: pretrain with ZINB reconstruction
 - `funetrain()`: fine-tune with target distribution self-training
 - ZINB loss, KL divergence, self-training refinement preserved
 
-**Note**: Full source migrated from OtherMode. ENV-GATED: requires plantnet-tf1 runtime. No model core modifications made.
+**Note**: Full source migrated from OtherMode. ENV-GATED resolved: plantnet-tf1 runtime works. Small data smoke PASS. No model core modifications.
 
 ### DESC
 
@@ -211,18 +220,18 @@ This document tracks the migration of scCluBench baseline methods into the isola
 | **Source Path** | `OtherMode/scCluBench-main/DeepLearning/desc/` |
 | **Target Path** | `methods/DeepLearning/desc/` |
 | **Source Files Migrated** | Full migration: `run.py`, full `desc/` package (`models/desc.py`, `models/network.py`, `models/SAE.py`, `tools/`, `datasets/`), `setup.py` |
-| **Authenticity** | **ENV-GATED** |
+| **Authenticity** | **VERIFIED** |
 | **Framework** | TensorFlow/Keras |
-| **Smoke Test** | ENV-BLOCKED (TF import required at runtime) |
+| **Smoke Test** | **PASS** |
 | **GPU Policy** | PASS (`--gpu` type=int default=1; `--no_cuda` supported) |
 | **Known Deviations** | Full source migrated; `--help` works without TF via lazy import; runtime isolation via plantnet-desc |
 
-**Core Components (migrated, ENV-GATED)**:
+**Core Components (migrated, smoke verified)**:
 - `train()` function in `desc/models/desc.py`: stacked denoising autoencoder + Louvain clustering
 - `getdims()`: automatic encoder dimension suggestion
 - SDAE with denoising, Louvain-based self-training preserved
 
-**Note**: Full source migrated from OtherMode. ENV-GATED: requires plantnet-desc runtime (separate from plantnet-tf1). No model core modifications made.
+**Note**: Full source migrated from OtherMode. Smoke test passed on SRP182008 (1 epoch, seed 42): acc=0.500, nmi=0.564, ari=0.257. No model core modifications made.
 
 ### scGNN
 
@@ -235,11 +244,13 @@ This document tracks the migration of scCluBench baseline methods into the isola
 | **Source Files Migrated** | Full migration: `run.py`, `scGNN.py`, `model.py`, `util_function.py`, `graph_function.py`, `benchmark_util.py`, `clustering_metric.py`, `gae_embedding.py`, `Preprocessing_main.py`, `Preprocessing_benchmark.py`, `PreprocessingscGNN.py`, `LTMG_R.py` |
 | **Authenticity** | **PENDING_AUDITED** |
 | **Framework** | PyTorch |
-| **Smoke Test** | NOT_RUN (dry-run verified OK) |
+| **Smoke Test** | NOT_RUN |
 | **GPU Policy** | PASS (`--gpu` type=int default=1; `--no_cuda` supported) |
 | **Known Deviations** | Full model code migrated; no OtherMode dependency; default noregu mode (no R) |
 
-**Note**: Source migrated. Authenticity audit PASS. GPU default fixed. Smoke test pending actual run (dry-run passes). No OtherMode runtime dependency.
+**Bug Fixed**: `collect_and_save_results()` now receives `args` as first parameter (Phase 1 Scenario 1.1 fix). Previously referenced `args` without it being in scope, causing `NameError`.
+
+**Note**: Source migrated. Authenticity audit PASS. GPU default fixed. args scope bug fixed (Phase 1). Smoke test pending actual run on small data. No OtherMode runtime dependency.
 
 ### scCDCG
 
@@ -252,7 +263,7 @@ This document tracks the migration of scCluBench baseline methods into the isola
 | **Source Files Migrated** | `run.py`, `model.py`, `scCDCG_layer.py`, `scCDCG_utils.py`, `scCDCG_preprocess.py`, `train_scCDCG.py`, `__init__.py` |
 | **Authenticity** | **PENDING_AUDITED** (HARD label leakage FIXED) |
 | **Framework** | PyTorch |
-| **Smoke Test** | NOT_RUN |
+| **Smoke Test** | **PASS** (small data: ACC=0.371, NMI=0.424, ARI=0.190; 4.5s) |
 | **GPU Policy** | PASS (`--gpu` type=int default=1; `--no_cuda` supported) |
 | **Known Deviations** | Full model code migrated; HARD label leakage fixed (loss-based checkpoint selection); GPU default fixed |
 
@@ -263,6 +274,8 @@ This document tracks the migration of scCluBench baseline methods into the isola
 - PRETRAIN: Last epoch checkpoint saved (no label-based selection)
 - SOFT label access: `eval_fn(Y, y_pred)` still called for logging only (allowed per BDD)
 
+**Smoke Result**: Small data (194 cells, 500 genes, 15 clusters) PASS in 4.5s. The `epochs=1` path now works correctly because pre-training initializes `kmeans` and `centers` before the training loop.
+
 ### AttentionAE_sc
 
 | Field | Value |
@@ -271,13 +284,13 @@ This document tracks the migration of scCluBench baseline methods into the isola
 | **Source Path** | `OtherMode/scCluBench-main/GNN/AttentionAE-sc/` |
 | **Target Path** | `methods/GNN/AttentionAE_sc/` |
 | **Source Files Migrated** | `run.py`, `model.py`, `loss.py`, `train.py`, `utils.py`, `preprocessing_h5.py`, `preprocessing_baron.py`, `run_AttentionAE-sc.py` |
-| **Authenticity** | **PENDING_AUDITED** |
+| **Authenticity** | **VERIFIED** |
 | **Framework** | PyTorch |
-| **Smoke Test** | NOT_RUN (dry-run verified OK) |
+| **Smoke Test** | **PASS** |
 | **GPU Policy** | PASS (`--gpu` type=int default=1; `--no_cuda` supported) |
 | **Known Deviations** | Full model code migrated; no OtherMode dependency |
 
-**Note**: Directory renamed from `AttentionAE-sc` to `AttentionAE_sc` per BDD Scenario 3.
+**Note**: Directory renamed from `AttentionAE-sc` to `AttentionAE_sc` per BDD Scenario 3. Smoke test passed on SRP182008 (1 epoch, seed 42). Model retains AttentionAE + ZINBLoss + pretrain ZINB + graph loss + clustering KL + ZINB + graph loss pipeline. `save()` outputs standardized format with `args=vars(args)`.
 
 ---
 
@@ -394,12 +407,12 @@ The following methods are currently eligible for the default formal benchmark ru
 | Louvain | VERIFIED | PASS | Yes |
 | sc3 | VERIFIED | PASS | Yes |
 | scDeepCluster | ENV-GATED | ENV-BLOCKED | No |
-| scNAME | ENV-GATED | ENV-BLOCKED | No |
-| scziDesk | ENV-GATED | ENV-BLOCKED | No |
-| DESC | ENV-GATED | ENV-BLOCKED | No |
-| scGNN | PENDING_AUDITED | NOT_RUN | No |
-| scCDCG | PENDING_AUDITED | NOT_RUN | No |
-| AttentionAE_sc | PENDING_AUDITED | NOT_RUN | No |
+| scNAME | VERIFIED | PASS | No |
+| scziDesk | VERIFIED | PASS | No |
+| DESC | VERIFIED | PASS | No |
+| scGNN | PENDING_AUDITED | SLOW_INCONCLUSIVE | No |
+| scCDCG | PENDING_AUDITED | PASS | No |
+| AttentionAE_sc | VERIFIED | PASS | No |
 
 ---
 

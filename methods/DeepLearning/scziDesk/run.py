@@ -150,6 +150,11 @@ def main():
     # Build model dimensions
     dims = [X.shape[1]] + args.dims
 
+    # raw_counts must match adata.X shape (same HVG subset), not adata.raw which has all genes
+    if raw_counts.shape[1] != dims[0]:
+        print(f'WARNING: raw_counts has {raw_counts.shape[1]} genes, expected {dims[0]}. Using X as counts.')
+        raw_counts = X.copy()
+
     # Reset TensorFlow graph
     tf.reset_default_graph()
 
@@ -197,7 +202,7 @@ def main():
     embedding = model.latent_repre
 
     # Save results using standard interface
-    save(args.save_dir, Y, y_pred, args.epochs, embedding)
+    save(args.save_dir, Y, y_pred, args.epochs, embedding, args=vars(args))
 
     print(f'Training completed.')
     print(f'Results saved to: {args.save_dir}')

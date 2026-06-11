@@ -68,8 +68,8 @@ class autoencoder(object):
         self.kmeans_loss = tf.reduce_mean(tf.reduce_sum(self.latent_dist2, axis=1))
 
         if self_training:
-            self.cross_entropy = -tf.reduce_sum(self.latent_q * tf.log(self.latent_p))
-            self.entropy = -tf.reduce_sum(self.latent_q * tf.log(self.latent_q))
+            self.cross_entropy = -tf.reduce_sum(self.latent_q * tf.math.log(self.latent_p))
+            self.entropy = -tf.reduce_sum(self.latent_q * tf.math.log(self.latent_q))
             self.kl_loss = self.cross_entropy - self.entropy
             self.total_loss = self.likelihood_loss + self.alpha * self.kmeans_loss + self.gamma * self.kl_loss
         else:
@@ -165,5 +165,12 @@ class autoencoder(object):
                                 self.x_count: count_X[(fune_index * batch_size):(
                                         (fune_index + 1) * batch_size)]})
                         fune_index += 1
+        # Run final prediction pass if Y_pred was never set (epochs < update_epoch)
+        if not hasattr(self, 'Y_pred') or self.Y_pred is None:
+            dist = self.sess.run(self.latent_dist1, feed_dict={
+                self.sf_layer: size_factor,
+                self.x: X,
+                self.x_count: count_X})
+            self.Y_pred = np.argmin(dist, axis=1)
         self.sess.close()
         return self.Y_pred

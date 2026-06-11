@@ -229,7 +229,7 @@ def train_with_original_scgnn(args, dataset_alias, work_root, original_output_di
     run_command(command, cwd=THIS_DIR)
 
 
-def collect_and_save_results(data_path, dataset_alias, save_dir, original_output_dir):
+def collect_and_save_results(args, data_path, dataset_alias, save_dir, original_output_dir):
     label_map, inferred_clusters = load_labels_from_h5ad(data_path)
     embedding_path = os.path.join(original_output_dir, f'{dataset_alias}_embedding.csv')
     result_path = os.path.join(original_output_dir, f'{dataset_alias}_results.txt')
@@ -275,7 +275,7 @@ def main():
     train_with_original_scgnn(args, dataset_alias, work_root, original_output_dir)
 
     print('Collecting original scGNN outputs into benchmark format...')
-    collect_and_save_results(args.data_path, dataset_alias, save_dir, original_output_dir)
+    collect_and_save_results(args, args.data_path, dataset_alias, save_dir, original_output_dir)
 
     print(f'Finished. Benchmark outputs are in: {save_dir}')
     print(f'Original scGNN raw outputs are in: {original_output_dir}')

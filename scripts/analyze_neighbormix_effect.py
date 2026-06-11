@@ -119,7 +119,12 @@ def compute_gain_summary(benchmark_data: dict, out_path: str) -> list:
 
         for m in METRICS:
             nm_val = get_method_metric(benchmark_data, ds, "neighbormix_scmae", m)
+            # Fallback: if nm_scmae_nomix not in results, use scmae as noMix alias
             nomix_val = get_method_metric(benchmark_data, ds, "nm_scmae_nomix", m)
+            nomix_is_alias = False
+            if nomix_val is None:
+                nomix_val = get_method_metric(benchmark_data, ds, "scmae", m)
+                nomix_is_alias = True
             scmae_val = get_method_metric(benchmark_data, ds, "scmae", m)
 
             row[f"{m}_neighbormix"] = round(nm_val, 4) if nm_val is not None else None
@@ -131,9 +136,13 @@ def compute_gain_summary(benchmark_data: dict, out_path: str) -> list:
 
             row[f"delta_{m}_vs_nomix"] = delta_vs_nomix
             row[f"delta_{m}_vs_scmae"] = delta_vs_scmae
+            # Primary delta: prefers noMix (which may alias scmae), falls back to scmae
+            row[f"delta_{m}"] = delta_vs_nomix if delta_vs_nomix is not None else delta_vs_scmae
 
-        # Effect classification (based on delta_ari_vs_nomix)
-        delta_ari = row.get("delta_ari_vs_nomix")
+        row["nomix_is_alias"] = nomix_is_alias
+
+        # Effect classification (based on delta_ari — prefers vs_nomix, falls back to vs_scmae)
+        delta_ari = row.get("delta_ari")
         if delta_ari is not None:
             if delta_ari >= 0.02:
                 effect = "positive"
@@ -148,12 +157,14 @@ def compute_gain_summary(benchmark_data: dict, out_path: str) -> list:
         rows.append(row)
 
     # Write CSV
-    fieldnames = ["dataset"] + [f"{m}_neighbormix" for m in METRICS] \
+    fieldnames = ["dataset"] \
+        + [f"{m}_neighbormix" for m in METRICS] \
         + [f"{m}_nomix" for m in METRICS] \
         + [f"{m}_scmae" for m in METRICS] \
+        + [f"delta_{m}" for m in METRICS] \
         + [f"delta_{m}_vs_nomix" for m in METRICS] \
         + [f"delta_{m}_vs_scmae" for m in METRICS] \
-        + ["effect_group"]
+        + ["nomix_is_alias", "effect_group"]
 
     with open(out_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -181,7 +192,7 @@ def compute_correlations(gain_rows: list, property_dict: dict, out_path: str) ->
     Returns list of correlation records.
     """
     datasets = [r["dataset"] for r in gain_rows]
-    delta_ari = [r.get("delta_ari_vs_nomix") for r in gain_rows]
+    delta_ari = [r.get("delta_ari") for r in gain_rows]
 
     # Which property columns to correlate with delta_ari
     prop_cols = [
@@ -264,7 +275,7 @@ def plot_correlations(gain_rows: list, property_dict: dict, out_dir: str) -> lis
         return []
 
     datasets = [r["dataset"] for r in gain_rows]
-    delta_ari = [r.get("delta_ari_vs_nomix") for r in gain_rows]
+    delta_ari = [r.get("delta_ari") for r in gain_rows]
 
     plots = []
     plot_pairs = [
@@ -314,7 +325,7 @@ def plot_correlations(gain_rows: list, property_dict: dict, out_dir: str) -> lis
         ax.axhline(0, color="gray", linestyle="-", alpha=0.3)
 
         ax.set_xlabel(prop_label, fontsize=10)
-        ax.set_ylabel("ΔARI (NeighborMix vs noMix)", fontsize=10)
+        ax.set_ylabel("ΔARI (NeighborMix vs noMix/scMAE)", fontsize=10)
         ax.set_title(f"delta_ari vs {prop_label}", fontsize=11)
         ax.grid(True, alpha=0.3)
 
@@ -345,7 +356,7 @@ def generate_interpretation(
     for r in gain_rows:
         ds = r["dataset"]
         props = property_dict.get(ds, {})
-        delta_ari = r.get("delta_ari_vs_nomix")
+        delta_ari = r.get("delta_ari")
         effect = r.get("effect_group", "insufficient_data")
 
         # Find top correlated properties
@@ -447,7 +458,7 @@ def main():
     print(f"\n{'Dataset':<35} {'delta_ari':>10} {'effect':>12}")
     print("-" * 60)
     for r in gain_rows:
-        da = r.get("delta_ari_vs_nomix")
+        da = r.get("delta_ari")
         da_str = f"{da:+.4f}" if da is not None else "N/A"
         print(f"{r['dataset']:<35} {da_str:>10} {r['effect_group']:>12}")
 

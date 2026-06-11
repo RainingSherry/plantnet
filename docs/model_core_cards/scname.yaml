@@ -8,12 +8,12 @@ description: Self-supervised contrastive learning for scRNA-seq clustering using
 source_path: OtherMode/scCluBench-main/DeepLearning/scNAME
 target_path: methods/DeepLearning/scNAME
 category: DeepLearning
-status: ENV-GATED
-authenticity_status: ENV-GATED
-smoke_status: ENV-BLOCKED
+status: VERIFIED
+authenticity_status: VERIFIED
+smoke_status: PASS  # Small data: ACC=0.392, NMI=0.480, ARI=0.185 (49.5s)
 framework: TensorFlow
 gpu_policy: "gpu=1 default (type=int); --no_cuda available"
-env_gate_reason: Requires TensorFlow/Keras (plantnet-tf1). Not available in main environment.
+env_gate_reason: "[RESOLVED] plantnet-tf1 runtime works. Small data smoke PASS."
 
 # ── Status Reason ───────────────────────────────────────────────────────────────
 
@@ -56,10 +56,12 @@ core_functions:
     file: scNAME_network.py
     description: Generate corrupted input and pretext targets
   - name: pretrain
-    file: scNAME_main.py
+    file: scNAME_network.py
+    class: autoencoder
     description: Pretrain autoencoder with mask/contrastive losses
   - name: funetrain
-    file: scNAME_main.py
+    file: scNAME_network.py
+    class: autoencoder
     description: Fine-tune with clustering loss
 
 core_losses:
@@ -83,7 +85,8 @@ required_before_migration:
 # ── Migration Status ────────────────────────────────────────────────────────────
 
 migration_blockers:
-  - None (source migrated)
+  - "[FIXED] Added args=vars(args) to save() call — args.json missing caused formal benchmark verification failure"
+  - "[FIXED] ENV-GATED resolved: plantnet-tf1 runtime works"
 
 migration_status: SOURCE_MIGRATED
 

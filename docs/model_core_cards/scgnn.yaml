@@ -8,11 +8,11 @@ paper: Wang et al., Bioinformatics 2021
 source_path: OtherMode/scCluBench-main/GNN/scGNN
 target_path: methods/GNN/scGNN
 category: GNN
-status: PENDING
-authenticity_status: PENDING
+status: PENDING_SMOKE
+authenticity_status: PENDING_AUDITED
 smoke_status: NOT_RUN
 framework: PyTorch
-gpu_policy: FAIL  # default --gpu 0 must be fixed
+gpu_policy: PASS  # fixed: --gpu default=1, --no_cuda supported
 
 # ── File Classification ────────────────────────────────────────────────────────
 
@@ -108,18 +108,20 @@ forbidden_changes:
 # ── Required Fixes ─────────────────────────────────────────────────────────────
 
 required_fixes:
-  - Change --gpu default from 0 to 1 (BDD Scenario 13)
+  - "[FIXED] Change --gpu default from 0 to 1 (BDD Scenario 13)"
+  - "[FIXED] collect_and_save_results() args scope bug (NameError) — added args parameter (Phase 1)"
+  - Smoke test pending on small data
 
 # ── Migration Status ────────────────────────────────────────────────────────────
 
 migration_blockers:
-  - --gpu default 0 (violates BDD Scenario 13)
-  - Authenticity audit not completed
-  - GPU policy violation must be resolved before formal use
+  - "[FIXED] --gpu default 0 (fixed to default=1)"
+  - "[FIXED] args scope bug in collect_and_save_results() (Phase 1)"
+  - "[SLOW] Small data (194 cells) takes 600s+ — preprocessing is inherently slow. Full-data run inconclusive."
 
 # ── Core Card Version ──────────────────────────────────────────────────────────
 
 card_version: "1.0"
 created_date: "2026-06-09"
 verified_by: model_core_card_generation
-note: "PENDING: Full source reviewed but authenticity audit not completed. GPU policy violation."
+note: "PENDING_AUDITED: GPU policy fixed (default=1), args scope bug fixed (Phase 1). Smoke test pending. Authenticity audit PASS. No OtherMode runtime dependency."

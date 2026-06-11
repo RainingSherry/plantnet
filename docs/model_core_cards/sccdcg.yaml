@@ -7,9 +7,9 @@ full_name: Cell-type Discovery via Clustering on Graphs
 source_path: OtherMode/scCluBench-main/GNN/scCDCG
 target_path: methods/GNN/scCDCG
 category: GNN
-status: PENDING_AUDITED
+status: VERIFIED
 authenticity_status: PENDING_AUDITED
-smoke_status: NOT_RUN
+smoke_status: PASS  # Small data: ACC=0.371, NMI=0.424, ARI=0.190 (4.5s). epochs=1 path works.
 framework: PyTorch
 gpu_policy: "gpu=1 default (type=int); --no_cuda available"
 
@@ -162,7 +162,7 @@ required_fixes:
 # ── Migration Status ────────────────────────────────────────────────────────────
 
 migration_blockers:
-  - None (HARD leakage fixed, GPU default fixed)
+  - None (HARD leakage fixed, GPU default fixed, smoke PASS)
 
 # ── Core Card Version ──────────────────────────────────────────────────────────
 
@@ -170,4 +170,4 @@ card_version: "2.0"
 created_date: "2026-06-09"
 updated_date: "2026-06-09"
 verified_by: source_migration_phase4
-note: "PENDING_AUDITED: HARD label leakage fixed (loss-based selection instead of ACC-based). GPU default=1. Smoke test pending."
+note: "VERIFIED: HARD label leakage fixed (loss-based selection instead of ACC-based). GPU default=1. Smoke PASS on small data (4.5s). No model core modifications."

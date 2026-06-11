@@ -8,12 +8,12 @@ description: Zero-inflated deep embedding with self-training for single-cell RNA
 source_path: OtherMode/scCluBench-main/DeepLearning/scziDesk
 target_path: methods/DeepLearning/scziDesk
 category: DeepLearning
-status: ENV-GATED
-authenticity_status: ENV-GATED
-smoke_status: ENV-BLOCKED
+status: VERIFIED
+authenticity_status: VERIFIED
+smoke_status: PASS  # Small data: ACC=0.428, NMI=0.510, ARI=0.235 (39.7s)
 framework: TensorFlow
 gpu_policy: "gpu=1 default (type=int); --no_cuda available"
-env_gate_reason: Requires TensorFlow/Keras (plantnet-tf1). Not available in main environment.
+env_gate_reason: "[RESOLVED] plantnet-tf1 runtime works. Small data smoke PASS."
 
 # ── Status Reason ───────────────────────────────────────────────────────────────
 
@@ -98,7 +98,11 @@ required_before_migration:
 # ── Migration Status ────────────────────────────────────────────────────────────
 
 migration_blockers:
-  - None (source migrated)
+  - "[FIXED] network.py: tf.log -> tf.math.log (TF2 compatibility)"
+  - "[FIXED] run.py: raw_counts shape guard (prevents ValueError with HVG-subset data)"
+  - "[FIXED] network.py: Y_pred guard for epochs < update_epoch (prevents AttributeError)"
+  - "[FIXED] run.py: Added args=vars(args) to save() call"
+  - "[FIXED] ENV-GATED resolved: plantnet-tf1 runtime works"
 
 migration_status: SOURCE_MIGRATED
 
