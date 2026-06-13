@@ -1,0 +1,9 @@
+method_name: RG_NeighborMix_scMAE
+variant_name: rg_nm_v1_random
+mix_mode: random
+gate_mode: constant
+edge_reliability_mode: none
+neighbor_k: 10
+mix_neighbors: 4
+gate_max: 0.10
+pseudo_weight: 0.3

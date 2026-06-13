@@ -1,0 +1,49 @@
+{
+  "dataset": "Tosches",
+  "method": "RG_NeighborMix_scMAE",
+  "variant": "rg_nm_phase2_gate_max_0p2",
+  "seed": 42,
+  "n_cells": 18664,
+  "n_genes": 1000,
+  "n_clusters": 15,
+  "mix_mode": "reliability",
+  "pseudo_enabled": true,
+  "edge_weight_summary": {
+    "edge_weight_entropy": 2.245666027069092,
+    "effective_neighbor_count": 9.459118843078613,
+    "max_edge_weight_mean": 0.16121061146259308,
+    "max_edge_weight_p95": 0.22250010073184967,
+    "fraction_effective_neighbors_lt_2": 0.00010715816545220746
+  },
+  "gate_summary": {
+    "gate_mode": "topology",
+    "gate_min": 0.0,
+    "gate_max": 0.2,
+    "mean_node_gate": 0.11584988236427307,
+    "min_node_gate": 0.055059101432561874,
+    "max_node_gate": 0.16691572964191437,
+    "fraction_gate_lt_0p01": 0.0,
+    "fraction_gate_gt_90pct_max": 0.0,
+    "uncertainty_enabled": false,
+    "uncertainty_source": "disabled",
+    "mean_perturb_proxy": 0.07777141034603119
+  },
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6178204029147021,
+      "nmi": 0.7295074660407923,
+      "ari": 0.5212693145068252,
+      "f1_macro": 0.6548147453267334,
+      "fmi": 0.6011609896948604,
+      "v_measure": 0.7295074660407923,
+      "homogeneity": 0.7707929457975673,
+      "completeness": 0.6924198341398659,
+      "n_pred_clusters": 15,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "label_leakage": false
+}

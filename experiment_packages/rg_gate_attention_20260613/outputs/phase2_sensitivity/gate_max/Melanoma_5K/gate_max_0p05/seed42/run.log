@@ -1,0 +1,15 @@
+Command: /data/luolie/conda/base/bin/python /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/RG_NeighborMix_scMAE/run.py --data_path /home/luolie/biopipeline/dimension-reduction/plantnet/data/processed_scmae/Melanoma_5K.h5ad --save_dir /home/luolie/biopipeline/dimension-reduction/plantnet/results/formal/rg_phase2_sensitivity_e80/gate_max/Melanoma_5K/gate_max_0p05/seed42 --dataset_name Melanoma_5K --n_clusters 9 --epochs 80 --batch_size 256 --n_top_genes 1000 --seed 42 --gpu 1 --no_save_h5ad --method_name RG_NeighborMix_scMAE --variant_name rg_nm_phase2_gate_max_0p05 --mix_mode reliability --gate_mode topology --edge_reliability_mode sim_mutual_snn_distance --neighbor_k 10 --mix_neighbors 4 --gate_max 0.05 --pseudo_weight 0.3
+
+Using device: cuda:0
+/data/luolie/conda/base/lib/python3.13/functools.py:934: UserWarning: zero-centering a sparse array/matrix densifies it.
+  return dispatch(args[0].__class__)(*args, **kw)
+Epoch 001/80 loss=0.6104 real=0.4482 pseudo=0.5408 gate=0.0291
+Epoch 010/80 loss=0.3728 real=0.2258 pseudo=0.4903 gate=0.0291
+Epoch 020/80 loss=0.3661 real=0.2212 pseudo=0.4830 gate=0.0291
+Epoch 030/80 loss=0.3618 real=0.2172 pseudo=0.4818 gate=0.0291
+Epoch 040/80 loss=0.3594 real=0.2153 pseudo=0.4802 gate=0.0291
+Epoch 050/80 loss=0.3564 real=0.2135 pseudo=0.4763 gate=0.0291
+Epoch 060/80 loss=0.3556 real=0.2125 pseudo=0.4771 gate=0.0291
+Epoch 070/80 loss=0.3534 real=0.2103 pseudo=0.4772 gate=0.0291
+Epoch 080/80 loss=0.3524 real=0.2098 pseudo=0.4754 gate=0.0291
+Results saved to: /home/luolie/biopipeline/dimension-reduction/plantnet/results/formal/rg_phase2_sensitivity_e80/gate_max/Melanoma_5K/gate_max_0p05/seed42

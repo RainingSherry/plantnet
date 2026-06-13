@@ -1,0 +1,15 @@
+Command: /data/luolie/conda/base/bin/python /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/RG_NeighborMix_scMAE/run.py --data_path /home/luolie/biopipeline/dimension-reduction/plantnet/data/processed_scmae/Tosches.h5ad --save_dir /home/luolie/biopipeline/dimension-reduction/plantnet/results/formal/rg_phase2_sensitivity_e80/neighbor_k/Tosches/neighbor_k_5/seed42 --dataset_name Tosches --n_clusters 15 --epochs 80 --batch_size 256 --n_top_genes 1000 --seed 42 --gpu 4 --no_save_h5ad --method_name RG_NeighborMix_scMAE --variant_name rg_nm_phase2_neighbor_k_5 --mix_mode reliability --gate_mode topology --edge_reliability_mode sim_mutual_snn_distance --neighbor_k 5 --mix_neighbors 4 --gate_max 0.15 --pseudo_weight 0.3
+
+Using device: cuda:0
+/data/luolie/conda/base/lib/python3.13/functools.py:934: UserWarning: zero-centering a sparse array/matrix densifies it.
+  return dispatch(args[0].__class__)(*args, **kw)
+Epoch 001/80 loss=0.4559 real=0.3022 pseudo=0.5126 gate=0.0852
+Epoch 010/80 loss=0.3763 real=0.2314 pseudo=0.4831 gate=0.0852
+Epoch 020/80 loss=0.3732 real=0.2289 pseudo=0.4809 gate=0.0852
+Epoch 030/80 loss=0.3710 real=0.2275 pseudo=0.4782 gate=0.0852
+Epoch 040/80 loss=0.3681 real=0.2252 pseudo=0.4765 gate=0.0852
+Epoch 050/80 loss=0.3658 real=0.2235 pseudo=0.4744 gate=0.0852
+Epoch 060/80 loss=0.3647 real=0.2229 pseudo=0.4726 gate=0.0852
+Epoch 070/80 loss=0.3647 real=0.2227 pseudo=0.4736 gate=0.0852
+Epoch 080/80 loss=0.3633 real=0.2219 pseudo=0.4711 gate=0.0852
+Results saved to: /home/luolie/biopipeline/dimension-reduction/plantnet/results/formal/rg_phase2_sensitivity_e80/neighbor_k/Tosches/neighbor_k_5/seed42

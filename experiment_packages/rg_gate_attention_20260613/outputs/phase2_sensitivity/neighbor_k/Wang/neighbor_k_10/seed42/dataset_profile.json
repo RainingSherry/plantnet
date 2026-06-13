@@ -1,0 +1,17 @@
+{
+  "dataset_name": "Wang",
+  "n_cells": 9519,
+  "n_genes_original": 14561,
+  "n_genes": 1000,
+  "label_key": "resolved_label",
+  "n_cell_types": 2,
+  "cell_type_counts": {
+    "alveolar type 1": 7426,
+    "alveolar type 2": 2093
+  },
+  "counts_source": "adata.X_log1p_fallback",
+  "input_mode": "log1p",
+  "has_raw": false,
+  "has_layers_counts": false,
+  "scale_input": true
+}

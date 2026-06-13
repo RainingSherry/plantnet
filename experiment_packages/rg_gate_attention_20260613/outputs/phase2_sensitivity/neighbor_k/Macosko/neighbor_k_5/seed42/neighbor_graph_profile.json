@@ -1,0 +1,9 @@
+{
+  "neighbor_k": 5,
+  "tau": 0.2,
+  "knn_pca_dim": 50,
+  "mean_neighbor_similarity": 0.9250876903533936,
+  "mean_mutual_ratio": 0.29791108730583826,
+  "mean_snn": 0.1052853986620903,
+  "mean_max_neighbor_prob": 0.21185705065727234
+}

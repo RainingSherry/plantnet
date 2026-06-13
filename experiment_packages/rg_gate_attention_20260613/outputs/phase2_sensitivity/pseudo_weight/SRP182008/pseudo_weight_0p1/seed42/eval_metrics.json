@@ -1,0 +1,25 @@
+{
+  "dataset": "SRP182008",
+  "method": "RG_NeighborMix_scMAE",
+  "seed": 42,
+  "n_clusters": 15,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.56245375166494,
+      "nmi": 0.6004908515428156,
+      "ari": 0.3566339173823635,
+      "f1_macro": 0.4985609562258574,
+      "fmi": 0.4458883707078577,
+      "v_measure": 0.6004908515428156,
+      "homogeneity": 0.5694532669425608,
+      "completeness": 0.635106829898717,
+      "n_pred_clusters": 15,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

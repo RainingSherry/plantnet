@@ -1,0 +1,13 @@
+{
+  "gate_mode": "topology",
+  "gate_min": 0.0,
+  "gate_max": 0.05,
+  "mean_node_gate": 0.02841559424996376,
+  "min_node_gate": 0.008642489090561867,
+  "max_node_gate": 0.04262329638004303,
+  "fraction_gate_lt_0p01": 2.231744331369398e-05,
+  "fraction_gate_gt_90pct_max": 0.0,
+  "uncertainty_enabled": false,
+  "uncertainty_source": "disabled",
+  "mean_perturb_proxy": 0.08109718561172485
+}

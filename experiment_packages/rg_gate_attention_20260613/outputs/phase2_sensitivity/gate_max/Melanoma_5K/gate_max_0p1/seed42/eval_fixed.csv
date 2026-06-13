@@ -1,0 +1,2 @@
+dataset,method,seed,variant,mix_mode,gate_mode,edge_reliability_mode,gate_max,pseudo_weight,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,RG_NeighborMix_scMAE,42,rg_nm_phase2_gate_max_0p1,reliability,topology,sim_mutual_snn_distance,0.1,0.3,0.7345446487923776,0.7310747392438397,0.6581767508992941,0.6533052764246897,0.7259306659963639,0.7310747392438396,0.7605918211632928,0.7037630700760726,9,,fixed,kmeans_known_k,True

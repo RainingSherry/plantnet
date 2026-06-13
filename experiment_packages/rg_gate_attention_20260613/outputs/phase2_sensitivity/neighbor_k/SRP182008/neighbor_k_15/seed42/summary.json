@@ -1,0 +1,49 @@
+{
+  "dataset": "SRP182008",
+  "method": "RG_NeighborMix_scMAE",
+  "variant": "rg_nm_phase2_neighbor_k_15",
+  "seed": 42,
+  "n_cells": 13514,
+  "n_genes": 1000,
+  "n_clusters": 15,
+  "mix_mode": "reliability",
+  "pseudo_enabled": true,
+  "edge_weight_summary": {
+    "edge_weight_entropy": 2.637058734893799,
+    "effective_neighbor_count": 14.002345085144043,
+    "max_edge_weight_mean": 0.12374045699834824,
+    "max_edge_weight_p95": 0.1960374414920807,
+    "fraction_effective_neighbors_lt_2": 0.0
+  },
+  "gate_summary": {
+    "gate_mode": "topology",
+    "gate_min": 0.0,
+    "gate_max": 0.1,
+    "mean_node_gate": 0.056899543851614,
+    "min_node_gate": 0.013627289794385433,
+    "max_node_gate": 0.08383886516094208,
+    "fraction_gate_lt_0p01": 0.0,
+    "fraction_gate_gt_90pct_max": 0.0,
+    "uncertainty_enabled": false,
+    "uncertainty_source": "disabled",
+    "mean_perturb_proxy": 0.13309688866138458
+  },
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5845789551576144,
+      "nmi": 0.6213127057962352,
+      "ari": 0.42929656803409294,
+      "f1_macro": 0.5421027696306423,
+      "fmi": 0.49092302265814025,
+      "v_measure": 0.6213127057962352,
+      "homogeneity": 0.609224804001532,
+      "completeness": 0.6338900007912527,
+      "n_pred_clusters": 15,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "label_leakage": false
+}

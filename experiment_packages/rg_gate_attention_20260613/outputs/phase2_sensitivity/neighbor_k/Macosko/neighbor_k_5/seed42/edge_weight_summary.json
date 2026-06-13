@@ -1,0 +1,8 @@
+{
+  "edge_reliability_mode": "sim_mutual_snn_distance",
+  "edge_weight_entropy": 1.563175082206726,
+  "effective_neighbor_count": 4.778664588928223,
+  "max_edge_weight_mean": 0.28400734066963196,
+  "max_edge_weight_p95": 0.3857051134109497,
+  "fraction_effective_neighbors_lt_2": 0.00011158721656846992
+}

@@ -1,0 +1,2 @@
+dataset,method,seed,variant,mix_mode,gate_mode,edge_reliability_mode,gate_max,pseudo_weight,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+SRP182008,RG_NeighborMix_scMAE,42,rg_nm_phase2_gate_max_0p05,reliability,topology,sim_mutual_snn_distance,0.05,0.3,0.6288293621429628,0.6078939170796471,0.448559613923014,0.5178395490561362,0.521165075406692,0.607893917079647,0.5770484676573697,0.6422232057276269,15,,fixed,kmeans_known_k,True
