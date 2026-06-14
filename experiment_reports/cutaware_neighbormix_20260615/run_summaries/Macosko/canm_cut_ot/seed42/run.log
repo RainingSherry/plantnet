@@ -1,0 +1,17 @@
+Command: /data/luolie/conda/base/bin/python /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/CutAware_NeighborMix_scMAE/run.py --data_path /home/luolie/biopipeline/dimension-reduction/plantnet/data/processed_scmae/Macosko.h5ad --save_dir /home/luolie/biopipeline/dimension-reduction/plantnet/results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42 --dataset_name Macosko --variant_name canm_cut_ot --seed 42 --n_clusters 12 --epochs 80 --batch_size 256 --n_top_genes 1000 --gpu 2 --no_save_h5ad
+
+Using device: cuda:0
+/data/luolie/conda/base/lib/python3.13/functools.py:934: UserWarning: zero-centering a sparse array/matrix densifies it.
+  return dispatch(args[0].__class__)(*args, **kw)
+Epoch 001/80 loss=0.4075 scmae=0.2303 cut=0.6258 ot=0.5205 mass=[0.029,0.164]
+Epoch 010/80 loss=nan scmae=nan cut=nan ot=nan mass=[nan,nan]
+Epoch 020/80 loss=nan scmae=nan cut=nan ot=nan mass=[nan,nan]
+Epoch 030/80 loss=nan scmae=nan cut=nan ot=nan mass=[nan,nan]
+Epoch 040/80 loss=nan scmae=nan cut=nan ot=nan mass=[nan,nan]
+Epoch 050/80 loss=nan scmae=nan cut=nan ot=nan mass=[nan,nan]
+Epoch 060/80 loss=nan scmae=nan cut=nan ot=nan mass=[nan,nan]
+Epoch 070/80 loss=nan scmae=nan cut=nan ot=nan mass=[nan,nan]
+Epoch 080/80 loss=nan scmae=nan cut=nan ot=nan mass=[nan,nan]
+/data/luolie/conda/base/lib/python3.13/site-packages/sklearn/base.py:1336: ConvergenceWarning: Number of distinct clusters (1) found smaller than n_clusters (12). Possibly due to duplicate points in X.
+  return fit_method(estimator, *args, **kwargs)
+Results saved to: /home/luolie/biopipeline/dimension-reduction/plantnet/results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42

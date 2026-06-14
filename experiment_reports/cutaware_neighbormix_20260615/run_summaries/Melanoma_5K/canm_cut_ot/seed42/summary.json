@@ -1,0 +1,55 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "CutAware_NeighborMix_scMAE",
+  "variant": "canm_cut_ot",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "pseudo_enabled": false,
+  "cut_enabled": true,
+  "ot_enabled": true,
+  "attention_probe_enabled": false,
+  "edge_weight_summary": {
+    "edge_reliability_mode": "sim_mutual_snn_distance",
+    "edge_weight_entropy": 2.2190656661987305,
+    "effective_neighbor_count": 9.249198913574219,
+    "max_edge_weight_mean": 0.17842428386211395,
+    "max_edge_weight_p95": 0.3013256788253784,
+    "fraction_effective_neighbors_lt_2": 0.0,
+    "prune_quantile": 0.0,
+    "pruned_fraction": 0.0
+  },
+  "cut_diagnostics": {
+    "soft_cut": 0.08486826717853546,
+    "soft_association": 0.915131688117981,
+    "ncut_surrogate": 0.09116317331790924,
+    "cluster_mass_min": 0.03826634958386421,
+    "cluster_mass_max": 0.26875168085098267,
+    "assignment_entropy": 0.16703210771083832,
+    "max_cluster_fraction": 0.28783514292045204
+  },
+  "embedding_similarity_diagnostics": {
+    "mean_cosine": 0.5031948685646057,
+    "p95_cosine": 0.9885649681091309,
+    "fraction_cosine_gt_0p9": 0.132565
+  },
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6705074230002216,
+      "nmi": 0.6738938765810111,
+      "ari": 0.5484888723048812,
+      "f1_macro": 0.5294217696795741,
+      "fmi": 0.6362650998256687,
+      "v_measure": 0.673893876581011,
+      "homogeneity": 0.7146725487762968,
+      "completeness": 0.6375176067112438,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "label_leakage": false
+}
