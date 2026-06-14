@@ -129,6 +129,7 @@ graph_cut_loss(...)
 sinkhorn_balanced_assignment(...)
 ot_self_training_loss(...)
 apply_cluster_cut_reweight(...)
+CutAwareAutoEncoder.edge_gate_scores(...)
 cut_diagnostics.json
 embedding_similarity_diagnostics.json
 ```
@@ -154,6 +155,8 @@ Reason: the first experiment should isolate whether cut/OT fixes NeighborMix neg
 | canm_cut_ot | Graph cut objective | Explicit | Sinkhorn balance | Does cut-aware graph use beat mixing? |
 | canm_mix_plus_cut | Mixing + cut objective | Explicit | Sinkhorn balance | Is mixing still useful after boundary control? |
 | canm_cut_reweighted_mix | Mixing after cross-edge downweighting | Explicit in edge weights | Avoids direct cut-gradient collapse | Does scCDCG-style cutting fix NeighborMix itself? |
+| canm_gated_cut_mix | Learnable gated mixing after cross-edge downweighting | Explicit plus learned edge reliability | Gate prior/entropy/cluster consistency | Can attention/gating recover useful neighbors after cut priors? |
+| canm_gated_cut_warm | Warm-started gated mixing after cross-edge downweighting | Explicit plus learned edge reliability | Delayed gate, no cluster gate loss | Does a conservative gate help without amplifying early pseudo-cluster noise? |
 | canm_attention_fusion_probe | Assignment fusion probe | Indirect | Sinkhorn/cut optional | Is attention disagreement informative? |
 
 ## Recommended First Run

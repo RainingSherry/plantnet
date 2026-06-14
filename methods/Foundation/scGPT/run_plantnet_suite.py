@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[3]
-RUNNER = ROOT / "methods" / "DeepLearning" / "CutAware_NeighborMix_scMAE" / "run.py"
+RUNNER = ROOT / "methods" / "Foundation" / "scGPT" / "run_plantnet.py"
 FORBIDDEN_GPUS = {0, 7}
 
 
@@ -30,32 +30,17 @@ DATASETS = {
     "Wang": DatasetSpec("Wang", "data/processed/Wang.h5ad", 2),
 }
 
-VARIANTS = ["canm_diagnostic_only", "canm_cut_ot", "canm_mix_plus_cut"]
-KNOWN_VARIANTS = {
-    "canm_diagnostic_only",
-    "canm_cut_ot",
-    "canm_mix_plus_cut",
-    "canm_cut_ot_warm",
-    "canm_mix_plus_cut_warm",
-    "canm_cut_reweighted_mix",
-    "canm_gated_cut_mix",
-    "canm_gated_cut_warm",
-    "canm_attention_fusion_probe",
-}
 
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="Run CutAware NeighborMix representative ablations.")
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run scGPT PlantNet suite.")
     parser.add_argument("--datasets", nargs="+", default=list(DATASETS))
-    parser.add_argument("--variants", nargs="+", default=VARIANTS)
     parser.add_argument("--seeds", nargs="+", type=int, default=[42])
-    parser.add_argument("--gpus", nargs="+", type=int, default=[1, 2, 3, 4, 5, 6])
-    parser.add_argument("--epochs", type=int, default=80)
-    parser.add_argument("--batch_size", type=int, default=256)
+    parser.add_argument("--gpus", nargs="+", type=int, default=[2, 3, 4, 5, 6])
+    parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--n_top_genes", type=int, default=1000)
-    parser.add_argument("--out_dir", default="results/experimental/cutaware_neighbormix_20260615")
+    parser.add_argument("--pca_dim", type=int, default=50)
+    parser.add_argument("--out_dir", default="results/experimental/scgpt_plantnet_20260615")
     parser.add_argument("--dry_run", action="store_true")
-    parser.add_argument("--fail_fast", action="store_true")
     return parser.parse_args()
 
 
@@ -65,21 +50,19 @@ def validate_gpus(gpus: list[int]) -> None:
         raise SystemExit(f"Forbidden GPU(s) requested: {bad}. Use only GPUs 1-6.")
 
 
-def command_for(args, ds: DatasetSpec, variant: str, seed: int, save_dir: Path) -> list[str]:
+def command_for(args, ds: DatasetSpec, seed: int, save_dir: Path) -> list[str]:
     return [
         sys.executable,
         str(RUNNER),
         "--data_path", str(ROOT / ds.path),
         "--save_dir", str(save_dir),
         "--dataset_name", ds.name,
-        "--variant_name", variant,
         "--seed", str(seed),
         "--n_clusters", str(ds.n_clusters),
-        "--epochs", str(args.epochs),
         "--batch_size", str(args.batch_size),
         "--n_top_genes", str(args.n_top_genes),
+        "--pca_dim", str(args.pca_dim),
         "--gpu", "{GPU}",
-        "--no_save_h5ad",
     ]
 
 
@@ -94,15 +77,12 @@ def main() -> int:
         ds = DATASETS[ds_name]
         if not (ROOT / ds.path).exists():
             raise SystemExit(f"Missing data file for {ds.name}: {ROOT / ds.path}")
-        for variant in args.variants:
-            if variant not in KNOWN_VARIANTS:
-                raise SystemExit(f"Unknown variant {variant!r}")
-            for seed in args.seeds:
-                save_dir = out_root / ds.name / variant / f"seed{seed}"
-                jobs.append((ds, variant, seed, command_for(args, ds, variant, seed, save_dir), save_dir / "run.log"))
+        for seed in args.seeds:
+            save_dir = out_root / ds.name / "scgpt_plantnet" / f"seed{seed}"
+            jobs.append((ds, seed, command_for(args, ds, seed, save_dir), save_dir / "run.log"))
 
     if args.dry_run:
-        for _, _, _, cmd_t, _ in jobs:
+        for _, _, cmd_t, _ in jobs:
             print(" ".join(str(args.gpus[0]) if token == "{GPU}" else token for token in cmd_t))
         return 0
 
@@ -112,23 +92,21 @@ def main() -> int:
     next_job = 0
 
     def launch(job_index: int, gpu: int) -> subprocess.Popen:
-        ds, variant, seed, cmd_t, log_path = jobs[job_index]
+        ds, seed, cmd_t, log_path = jobs[job_index]
         cmd = [str(gpu) if token == "{GPU}" else token for token in cmd_t]
         env = os.environ.copy()
         env["CUDA_VISIBLE_DEVICES"] = str(gpu)
-        env["OMP_NUM_THREADS"] = "4"
-        env["OPENBLAS_NUM_THREADS"] = "4"
-        env["MKL_NUM_THREADS"] = "4"
-        env["NUMEXPR_NUM_THREADS"] = "4"
-        env.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
-        env.setdefault("NUMBA_CACHE_DIR", "/tmp/numba-cache")
+        env["OMP_NUM_THREADS"] = "1"
+        env["OPENBLAS_NUM_THREADS"] = "1"
+        env["MKL_NUM_THREADS"] = "1"
+        env["NUMEXPR_NUM_THREADS"] = "1"
         log_path.parent.mkdir(parents=True, exist_ok=True)
         handle = open(log_path, "w", encoding="utf-8")
         handle.write("Command: " + " ".join(cmd) + "\n\n")
         handle.flush()
         proc = subprocess.Popen(cmd, cwd=str(ROOT), env=env, stdout=handle, stderr=subprocess.STDOUT, text=True)
         proc._plantnet_log_handle = handle  # type: ignore[attr-defined]
-        proc._plantnet_label = f"{ds.name}/{variant}/seed{seed}/gpu{gpu}"  # type: ignore[attr-defined]
+        proc._plantnet_label = f"{ds.name}/scgpt_plantnet/seed{seed}/gpu{gpu}"  # type: ignore[attr-defined]
         print(f"[start] {proc._plantnet_label} pid={proc.pid}", flush=True)
         return proc
 
@@ -136,7 +114,7 @@ def main() -> int:
         while free_gpus and next_job < len(jobs):
             gpu = free_gpus.pop(0)
             proc = launch(next_job, gpu)
-            running.append((proc, proc._plantnet_label, jobs[next_job][4]))  # type: ignore[attr-defined]
+            running.append((proc, proc._plantnet_label, jobs[next_job][3]))  # type: ignore[attr-defined]
             next_job += 1
         time.sleep(5)
         still = []
@@ -153,10 +131,6 @@ def main() -> int:
             else:
                 failures += 1
                 print(f"[fail] {label} rc={rc} log={log_path}", flush=True)
-                if args.fail_fast:
-                    for p, _, _ in still:
-                        p.terminate()
-                    return rc
         running = still
         free_gpus.sort()
     print(f"Done. jobs={len(jobs)} failures={failures} out={out_root}", flush=True)

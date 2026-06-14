@@ -27,7 +27,7 @@ from methods.DeepLearning.CutAware_NeighborMix_scMAE.diagnostics import (
     pairwise_similarity_digest,
     per_cell_type_metrics,
 )
-from methods.DeepLearning.CutAware_NeighborMix_scMAE.mixing import make_neighbor_mixed_batch
+from methods.DeepLearning.CutAware_NeighborMix_scMAE.mixing import make_gated_neighbor_mixed_batch, make_neighbor_mixed_batch
 from methods.DeepLearning.CutAware_NeighborMix_scMAE.model import CutAwareAutoEncoder
 from methods.DeepLearning.CutAware_NeighborMix_scMAE.neighbor_graph import (
     apply_cluster_cut_reweight,
@@ -60,6 +60,8 @@ def parse_args():
             "canm_cut_ot_warm",
             "canm_mix_plus_cut_warm",
             "canm_cut_reweighted_mix",
+            "canm_gated_cut_mix",
+            "canm_gated_cut_warm",
             "canm_attention_fusion_probe",
         ],
     )
@@ -95,6 +97,13 @@ def parse_args():
     parser.add_argument("--pseudo_weight", type=float, default=0.2)
     parser.add_argument("--cut_weight", type=float, default=0.2)
     parser.add_argument("--ot_weight", type=float, default=0.1)
+    parser.add_argument("--gate_prior_weight", type=float, default=0.02)
+    parser.add_argument("--gate_entropy_weight", type=float, default=0.001)
+    parser.add_argument("--gate_cluster_weight", type=float, default=0.02)
+    parser.add_argument("--gate_start_epoch", type=int, default=1)
+    parser.add_argument("--gate_cluster_start_epoch", type=int, default=10)
+    parser.add_argument("--gate_temperature", type=float, default=1.0)
+    parser.add_argument("--gate_min", type=float, default=0.05)
     parser.add_argument("--attention_probe_weight", type=float, default=0.0)
     parser.add_argument("--ot_temperature", type=float, default=0.2)
     parser.add_argument("--ot_iterations", type=int, default=3)
@@ -146,7 +155,7 @@ def save_graph_outputs(save_dir: Path, graph, edge_reliability, edge_weights, ed
 
 def maybe_apply_cut_reweight(args, save_dir: Path, graph, edge_weights, edge_summary, n_clusters: int, suffix: str = ""):
     cut_reweight_summary = {}
-    if args.variant_name == "canm_cut_reweighted_mix":
+    if args.variant_name in {"canm_cut_reweighted_mix", "canm_gated_cut_mix", "canm_gated_cut_warm"}:
         cut_labels, edge_weights, cut_reweight_summary = apply_cluster_cut_reweight(
             graph=graph,
             edge_weights=edge_weights,
@@ -195,6 +204,25 @@ def main():
         args.pseudo_weight = max(float(args.pseudo_weight), 0.2)
         args.cut_weight = 0.0
         args.ot_weight = 0.0
+        args.attention_probe_weight = 0.0
+    elif args.variant_name == "canm_gated_cut_mix":
+        args.pseudo_weight = max(float(args.pseudo_weight), 0.2)
+        args.cut_weight = 0.0
+        args.ot_weight = 0.0
+        args.gate_prior_weight = min(max(float(args.gate_prior_weight), 0.0), 0.05)
+        args.gate_entropy_weight = min(max(float(args.gate_entropy_weight), 0.0), 0.005)
+        args.gate_cluster_weight = min(max(float(args.gate_cluster_weight), 0.0), 0.05)
+        args.attention_probe_weight = 0.0
+    elif args.variant_name == "canm_gated_cut_warm":
+        args.pseudo_weight = max(float(args.pseudo_weight), 0.2)
+        args.cut_weight = 0.0
+        args.ot_weight = 0.0
+        args.gate_prior_weight = min(max(float(args.gate_prior_weight), 0.0), 0.05)
+        args.gate_entropy_weight = 0.0
+        args.gate_cluster_weight = 0.0
+        args.gate_start_epoch = max(int(args.gate_start_epoch), 20)
+        args.gate_cluster_start_epoch = max(int(args.gate_cluster_start_epoch), 999999)
+        args.gate_min = max(float(args.gate_min), 0.2)
         args.attention_probe_weight = 0.0
     elif args.variant_name == "canm_attention_fusion_probe":
         args.pseudo_weight = 0.0
@@ -254,7 +282,8 @@ def main():
         mask_loss_weight=args.mask_loss_weight,
     ).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-    pseudo_enabled = args.variant_name in {"canm_mix_plus_cut", "canm_mix_plus_cut_warm", "canm_cut_reweighted_mix"} and float(args.pseudo_weight) > 0.0
+    gated_mix_enabled = args.variant_name in {"canm_gated_cut_mix", "canm_gated_cut_warm"}
+    pseudo_enabled = args.variant_name in {"canm_mix_plus_cut", "canm_mix_plus_cut_warm", "canm_cut_reweighted_mix", "canm_gated_cut_mix", "canm_gated_cut_warm"} and float(args.pseudo_weight) > 0.0
     cut_enabled = float(args.cut_weight) > 0.0 and int(args.cut_neighbors) > 0
     ot_enabled = float(args.ot_weight) > 0.0
     attention_probe_enabled = float(args.attention_probe_weight) > 0.0
@@ -266,10 +295,15 @@ def main():
         "cut_loss": [],
         "ot_loss": [],
         "attention_probe_loss": [],
+        "gate_prior_loss": [],
+        "gate_entropy_loss": [],
+        "gate_cluster_loss": [],
         "real_reconstruction_loss": [],
         "real_mask_loss": [],
         "real_mask_rate": [],
         "mean_mix_delta": [],
+        "mean_gate": [],
+        "gate_effective_neighbors": [],
         "cluster_mass_min": [],
         "cluster_mass_max": [],
         "assignment_entropy": [],
@@ -291,15 +325,37 @@ def main():
             pseudo_loss = torch.zeros((), dtype=scmae_loss.dtype, device=device)
             mix_info = {"mean_mix_delta": 0.0}
             if pseudo_enabled:
-                x_prime, sample_weight, mix_info = make_neighbor_mixed_batch(
-                    data_np=data_np,
-                    batch_indices=idx_np,
-                    batch_x=x,
-                    graph=graph,
-                    edge_weights=edge_weights,
-                    mix_neighbors=args.mix_neighbors,
-                    alpha=args.mix_alpha,
-                )
+                gate_losses = {
+                    "gate_prior_loss": torch.zeros((), dtype=scmae_loss.dtype, device=device),
+                    "gate_entropy_loss": torch.zeros((), dtype=scmae_loss.dtype, device=device),
+                    "gate_cluster_loss": torch.zeros((), dtype=scmae_loss.dtype, device=device),
+                }
+                if gated_mix_enabled and epoch >= int(args.gate_start_epoch):
+                    x_prime, sample_weight, mix_info, gate_losses = make_gated_neighbor_mixed_batch(
+                        data_np=data_np,
+                        batch_indices=idx_np,
+                        batch_x=x,
+                        graph=graph,
+                        edge_weights=edge_weights,
+                        model=model,
+                        anchor_latent=latent,
+                        anchor_probs=q,
+                        mix_neighbors=args.mix_neighbors,
+                        alpha=args.mix_alpha,
+                        gate_temperature=args.gate_temperature,
+                        gate_min=args.gate_min,
+                        cluster_temperature=args.cluster_temperature,
+                    )
+                else:
+                    x_prime, sample_weight, mix_info = make_neighbor_mixed_batch(
+                        data_np=data_np,
+                        batch_indices=idx_np,
+                        batch_x=x,
+                        graph=graph,
+                        edge_weights=edge_weights,
+                        mix_neighbors=args.mix_neighbors,
+                        alpha=args.mix_alpha,
+                    )
                 xp_corrupt, pseudo_mask = family.apply_scmae_noise(x_prime, args.mask_ratio)
                 _, pseudo_loss, _ = model.loss_mask_weighted(
                     xp_corrupt,
@@ -308,6 +364,17 @@ def main():
                     sample_weight=sample_weight,
                 )
                 loss = loss + float(args.pseudo_weight) * pseudo_loss
+                if gated_mix_enabled:
+                    loss = loss + float(args.gate_prior_weight) * gate_losses["gate_prior_loss"]
+                    loss = loss + float(args.gate_entropy_weight) * gate_losses["gate_entropy_loss"]
+                    if epoch >= int(args.gate_cluster_start_epoch):
+                        loss = loss + float(args.gate_cluster_weight) * gate_losses["gate_cluster_loss"]
+            else:
+                gate_losses = {
+                    "gate_prior_loss": torch.zeros((), dtype=scmae_loss.dtype, device=device),
+                    "gate_entropy_loss": torch.zeros((), dtype=scmae_loss.dtype, device=device),
+                    "gate_cluster_loss": torch.zeros((), dtype=scmae_loss.dtype, device=device),
+                }
 
             cut_loss_value = torch.zeros((), dtype=scmae_loss.dtype, device=device)
             cut_stats = {"cut_loss": 0.0, "cluster_mass_min": 0.0, "cluster_mass_max": 0.0, "assignment_entropy": 0.0}
@@ -365,10 +432,15 @@ def main():
             totals["cut_loss"] += float(cut_loss_value.detach().cpu())
             totals["ot_loss"] += float(ot_loss_value.detach().cpu())
             totals["attention_probe_loss"] += float(attention_loss_value.detach().cpu())
+            totals["gate_prior_loss"] += float(gate_losses["gate_prior_loss"].detach().cpu())
+            totals["gate_entropy_loss"] += float(gate_losses["gate_entropy_loss"].detach().cpu())
+            totals["gate_cluster_loss"] += float(gate_losses["gate_cluster_loss"].detach().cpu())
             totals["real_reconstruction_loss"] += float(real_parts["reconstruction_loss"].cpu())
             totals["real_mask_loss"] += float(real_parts["mask_loss"].cpu())
             totals["real_mask_rate"] += float(real_mask.mean().detach().cpu())
             totals["mean_mix_delta"] += float(mix_info["mean_mix_delta"])
+            totals["mean_gate"] += float(mix_info.get("mean_gate", 0.0))
+            totals["gate_effective_neighbors"] += float(mix_info.get("gate_effective_neighbors", 0.0))
             totals["cluster_mass_min"] += float(cut_stats.get("cluster_mass_min", mean_q.min().detach().cpu()))
             totals["cluster_mass_max"] += float(cut_stats.get("cluster_mass_max", mean_q.max().detach().cpu()))
             totals["assignment_entropy"] += float(cut_stats.get("assignment_entropy", (-(q * q.clamp_min(1e-8).log()).sum(dim=1).mean()).detach().cpu()))
@@ -380,7 +452,8 @@ def main():
             print(
                 f"Epoch {epoch:03d}/{args.epochs} loss={history['loss'][-1]:.4f} "
                 f"scmae={history['scmae_loss'][-1]:.4f} cut={history['cut_loss'][-1]:.4f} "
-                f"ot={history['ot_loss'][-1]:.4f} mass=[{history['cluster_mass_min'][-1]:.3f},{history['cluster_mass_max'][-1]:.3f}]",
+                f"ot={history['ot_loss'][-1]:.4f} gate={history['mean_gate'][-1]:.3f} "
+                f"mass=[{history['cluster_mass_min'][-1]:.3f},{history['cluster_mass_max'][-1]:.3f}]",
                 flush=True,
             )
 
@@ -455,6 +528,10 @@ def main():
                 "ot_weight": float(args.ot_weight),
                 "pseudo_weight": float(args.pseudo_weight),
                 "cut_cross_weight": float(args.cut_cross_weight),
+                "gate_prior_weight": float(args.gate_prior_weight),
+                "gate_entropy_weight": float(args.gate_entropy_weight),
+                "gate_cluster_weight": float(args.gate_cluster_weight),
+                "gate_start_epoch": int(args.gate_start_epoch),
                 "neighbor_k": int(args.neighbor_k),
                 "edge_prune_quantile": float(args.edge_prune_quantile),
                 "graph_refresh_interval": int(args.graph_refresh_interval),
@@ -484,6 +561,7 @@ def main():
         "n_genes": int(data_np.shape[1]),
         "n_clusters": int(n_clusters),
         "pseudo_enabled": bool(pseudo_enabled),
+        "gated_mix_enabled": bool(gated_mix_enabled),
         "cut_enabled": bool(cut_enabled),
         "ot_enabled": bool(ot_enabled),
         "attention_probe_enabled": bool(attention_probe_enabled),

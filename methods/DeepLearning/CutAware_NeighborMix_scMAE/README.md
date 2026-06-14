@@ -44,6 +44,12 @@ canm_mix_plus_cut
 canm_cut_reweighted_mix
   NeighborMix expression perturbation with candidate cross-cluster edges explicitly downweighted before mixing. This is the direct network-level migration of the scCDCG idea into NeighborMix.
 
+canm_gated_cut_mix
+  Cut-reweighted NeighborMix plus a learnable edge gate. The gate uses anchor/neighbor latents and graph features to decide how much each candidate neighbor should contribute.
+
+canm_gated_cut_warm
+  Conservative gate variant. It first runs cut-reweighted NeighborMix, then enables the edge gate after warmup without cluster-consistency regularization.
+
 canm_attention_fusion_probe
   Diagnostic AttentionAE-sc-style fusion probe. It is intentionally not the main route because attention does not by itself cut bad edges.
 ```

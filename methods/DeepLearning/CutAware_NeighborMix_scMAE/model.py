@@ -12,18 +12,58 @@ from methods.DeepLearning.NeighborMix_scMAE.model import AutoEncoder as _BaseAut
 class CutAwareAutoEncoder(_BaseAutoEncoder):
     """scMAE encoder with a lightweight clustering head for cut/OT losses."""
 
-    def __init__(self, num_genes: int, n_clusters: int, **kwargs):
+    def __init__(self, num_genes: int, n_clusters: int, edge_feature_dim: int = 5, **kwargs):
+        dropout_rate = float(kwargs.get("dropout", 0.0))
         super().__init__(num_genes=num_genes, **kwargs)
         if n_clusters <= 1:
             raise ValueError(f"n_clusters must be > 1 for cut-aware training, got {n_clusters}.")
         self.n_clusters = int(n_clusters)
         self.cluster_head = nn.Linear(self.hidden_size, self.n_clusters)
+        self.edge_feature_dim = int(edge_feature_dim)
+        self.edge_gate = nn.Sequential(
+            nn.Linear(self.hidden_size * 4 + self.edge_feature_dim, self.hidden_size),
+            nn.GELU(),
+            nn.Dropout(dropout_rate),
+            nn.Linear(self.hidden_size, 1),
+        )
 
     def cluster_logits(self, latent: torch.Tensor) -> torch.Tensor:
         return self.cluster_head(latent)
 
     def cluster_probs(self, latent: torch.Tensor, temperature: float = 1.0) -> torch.Tensor:
         return torch.softmax(self.cluster_logits(latent) / max(float(temperature), 1e-6), dim=1)
+
+    def edge_gate_logits(
+        self,
+        src_latent: torch.Tensor,
+        dst_latent: torch.Tensor,
+        edge_features: torch.Tensor,
+    ) -> torch.Tensor:
+        if src_latent.shape != dst_latent.shape:
+            raise ValueError("src_latent and dst_latent must have the same shape.")
+        if edge_features.shape[0] != src_latent.shape[0]:
+            raise ValueError("edge_features must align with latent edge rows.")
+        features = torch.cat(
+            [
+                src_latent,
+                dst_latent,
+                torch.abs(src_latent - dst_latent),
+                src_latent * dst_latent,
+                edge_features.to(dtype=src_latent.dtype, device=src_latent.device),
+            ],
+            dim=1,
+        )
+        return self.edge_gate(features).squeeze(-1)
+
+    def edge_gate_scores(
+        self,
+        src_latent: torch.Tensor,
+        dst_latent: torch.Tensor,
+        edge_features: torch.Tensor,
+        temperature: float = 1.0,
+    ) -> torch.Tensor:
+        logits = self.edge_gate_logits(src_latent, dst_latent, edge_features)
+        return torch.sigmoid(logits / max(float(temperature), 1e-6))
 
     def loss_mask_weighted(
         self,
