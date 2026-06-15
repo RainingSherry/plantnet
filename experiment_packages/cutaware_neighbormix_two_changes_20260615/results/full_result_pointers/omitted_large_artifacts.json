@@ -1,0 +1,2305 @@
+{
+  "count": 575,
+  "files": [
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/embedding.h5",
+      "bytes": 23302208
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/embedding.h5",
+      "bytes": 23302208
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/embedding.h5",
+      "bytes": 23302208
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/embedding.h5",
+      "bytes": 23302208
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/embedding.h5",
+      "bytes": 23302208
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/embedding.h5",
+      "bytes": 23302208
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/embedding.h5",
+      "bytes": 23302208
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/embedding.h5",
+      "bytes": 23302208
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/embedding_final.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/embeddings_base.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/embedding_final.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/embeddings_base.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/embedding_final.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/embeddings_base.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/embedding_final.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/embeddings_base.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/embedding_final.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/embeddings_base.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/embedding_final.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/embeddings_base.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/embedding_final.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/embeddings_base.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/embedding_final.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/embeddings_base.npy",
+      "bytes": 22941824
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/embedding.h5",
+      "bytes": 9707328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/embedding.h5",
+      "bytes": 9707328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/embedding.h5",
+      "bytes": 9707328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/embedding.h5",
+      "bytes": 9707328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/embedding.h5",
+      "bytes": 9707328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/embedding.h5",
+      "bytes": 9707328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/embedding.h5",
+      "bytes": 9707328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/embedding.h5",
+      "bytes": 9707328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/embedding_final.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/embeddings_base.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/embedding_final.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/embeddings_base.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/embedding_final.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/embeddings_base.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/embedding_final.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/embeddings_base.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/embedding_final.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/embeddings_base.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/embedding_final.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/embeddings_base.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/embedding_final.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/embeddings_base.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/embedding_final.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/embeddings_base.npy",
+      "bytes": 9556096
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/embedding.h5",
+      "bytes": 7029328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/embedding.h5",
+      "bytes": 7029328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/embedding.h5",
+      "bytes": 7029328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/embedding.h5",
+      "bytes": 7029328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/embedding.h5",
+      "bytes": 7029328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/embedding.h5",
+      "bytes": 7029328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/embedding.h5",
+      "bytes": 7029328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/embedding.h5",
+      "bytes": 7029328
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/embedding_final.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/embeddings_base.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/embedding_final.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/embeddings_base.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/embedding_final.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/embeddings_base.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/embedding_final.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/embeddings_base.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/embedding_final.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/embeddings_base.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/embedding_final.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/embeddings_base.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/embedding_final.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/embeddings_base.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/embedding_final.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/embeddings_base.npy",
+      "bytes": 6919296
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/model.pt",
+      "bytes": 6588458
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/model.pt",
+      "bytes": 6588394
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/model.pt",
+      "bytes": 6560426
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/model.pt",
+      "bytes": 6560426
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/model.pt",
+      "bytes": 6558762
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/model.pt",
+      "bytes": 6558762
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/model.pt",
+      "bytes": 6557354
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/model.pt",
+      "bytes": 6557354
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/model.pt",
+      "bytes": 6553770
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/model.pt",
+      "bytes": 6553706
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/model.pt",
+      "bytes": 6321278
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/model.pt",
+      "bytes": 6320894
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/model.pt",
+      "bytes": 6320894
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/model.pt",
+      "bytes": 6320830
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/model.pt",
+      "bytes": 6320830
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/model.pt",
+      "bytes": 6320830
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/model.pt",
+      "bytes": 6293246
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/model.pt",
+      "bytes": 6292926
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/model.pt",
+      "bytes": 6292862
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/model.pt",
+      "bytes": 6292862
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/model.pt",
+      "bytes": 6292862
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/model.pt",
+      "bytes": 6292798
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/model.pt",
+      "bytes": 6291646
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/model.pt",
+      "bytes": 6291390
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/model.pt",
+      "bytes": 6291326
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/model.pt",
+      "bytes": 6291326
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/model.pt",
+      "bytes": 6291326
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/model.pt",
+      "bytes": 6291262
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/model.pt",
+      "bytes": 6290238
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/model.pt",
+      "bytes": 6289854
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/model.pt",
+      "bytes": 6289854
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/model.pt",
+      "bytes": 6289790
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/model.pt",
+      "bytes": 6289790
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/model.pt",
+      "bytes": 6289790
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/model.pt",
+      "bytes": 6286590
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/model.pt",
+      "bytes": 6286206
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/model.pt",
+      "bytes": 6286206
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/model.pt",
+      "bytes": 6286142
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/model.pt",
+      "bytes": 6286142
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/model.pt",
+      "bytes": 6286142
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/embedding.h5",
+      "bytes": 4951928
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/embedding.h5",
+      "bytes": 4951928
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/embedding.h5",
+      "bytes": 4951928
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/embedding.h5",
+      "bytes": 4951928
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/embedding.h5",
+      "bytes": 4951928
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/embedding.h5",
+      "bytes": 4951928
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/embedding.h5",
+      "bytes": 4951928
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/embedding.h5",
+      "bytes": 4951928
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/embedding_final.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/embeddings_base.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/embedding_final.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/embeddings_base.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/embedding_final.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/embeddings_base.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/embedding_final.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/embeddings_base.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/embedding_final.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/embeddings_base.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/embedding_final.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/embeddings_base.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/embedding_final.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/embeddings_base.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/embedding_final.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/embeddings_base.npy",
+      "bytes": 4873856
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/neighbor_indices.npy",
+      "bytes": 3584768
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/neighbor_indices.npy",
+      "bytes": 3584768
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/neighbor_indices.npy",
+      "bytes": 3584768
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/neighbor_indices.npy",
+      "bytes": 3584768
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/neighbor_indices.npy",
+      "bytes": 3584768
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/neighbor_indices.npy",
+      "bytes": 3584768
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/neighbor_indices.npy",
+      "bytes": 3584768
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/neighbor_indices.npy",
+      "bytes": 3584768
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/embedding.h5",
+      "bytes": 2348808
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/embedding.h5",
+      "bytes": 2348808
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/embedding.h5",
+      "bytes": 2348808
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/embedding.h5",
+      "bytes": 2348808
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/embedding.h5",
+      "bytes": 2348808
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/embedding.h5",
+      "bytes": 2348808
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/embedding.h5",
+      "bytes": 2348808
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/embedding.h5",
+      "bytes": 2348808
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/embedding_final.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/embeddings_base.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/embedding_final.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/embeddings_base.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/embedding_final.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/embeddings_base.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/embedding_final.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/embeddings_base.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/embedding_final.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/embeddings_base.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/embedding_final.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/embeddings_base.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/embedding_final.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/embeddings_base.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/embedding_final.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/embeddings_base.npy",
+      "bytes": 2310784
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/cluster_probs.npy",
+      "bytes": 2150912
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/cluster_probs.npy",
+      "bytes": 2150912
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/cluster_probs.npy",
+      "bytes": 2150912
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/cluster_probs.npy",
+      "bytes": 2150912
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/cluster_probs.npy",
+      "bytes": 2150912
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/cluster_probs.npy",
+      "bytes": 2150912
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/cluster_probs.npy",
+      "bytes": 2150912
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/cluster_probs.npy",
+      "bytes": 2150912
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/neighbor_similarity.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/neighbor_distance.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/edge_reliability.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/neighbor_base_probs.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/neighbor_similarity.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/neighbor_distance.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/edge_reliability.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/neighbor_base_probs.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/neighbor_similarity.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/neighbor_distance.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/edge_reliability.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/neighbor_similarity.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/neighbor_distance.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/edge_reliability.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/neighbor_similarity.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/neighbor_distance.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/edge_reliability.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/neighbor_base_probs.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/neighbor_similarity.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/neighbor_distance.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/edge_reliability.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/neighbor_base_probs.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/neighbor_similarity.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/neighbor_distance.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/edge_reliability.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/neighbor_base_probs.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/neighbor_similarity.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/neighbor_distance.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/edge_reliability.npy",
+      "bytes": 1792448
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/neighbor_indices.npy",
+      "bytes": 1493248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/neighbor_indices.npy",
+      "bytes": 1493248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/neighbor_indices.npy",
+      "bytes": 1493248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/neighbor_indices.npy",
+      "bytes": 1493248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/neighbor_indices.npy",
+      "bytes": 1493248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/neighbor_indices.npy",
+      "bytes": 1493248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/neighbor_indices.npy",
+      "bytes": 1493248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/neighbor_indices.npy",
+      "bytes": 1493248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/cluster_probs.npy",
+      "bytes": 1119968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/cluster_probs.npy",
+      "bytes": 1119968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/cluster_probs.npy",
+      "bytes": 1119968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/cluster_probs.npy",
+      "bytes": 1119968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/cluster_probs.npy",
+      "bytes": 1119968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/cluster_probs.npy",
+      "bytes": 1119968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/cluster_probs.npy",
+      "bytes": 1119968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/cluster_probs.npy",
+      "bytes": 1119968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/neighbor_indices.npy",
+      "bytes": 1081248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/neighbor_indices.npy",
+      "bytes": 1081248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/neighbor_indices.npy",
+      "bytes": 1081248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/neighbor_indices.npy",
+      "bytes": 1081248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/neighbor_indices.npy",
+      "bytes": 1081248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/neighbor_indices.npy",
+      "bytes": 1081248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/neighbor_indices.npy",
+      "bytes": 1081248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/neighbor_indices.npy",
+      "bytes": 1081248
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/cluster_probs.npy",
+      "bytes": 810968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/cluster_probs.npy",
+      "bytes": 810968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/cluster_probs.npy",
+      "bytes": 810968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/cluster_probs.npy",
+      "bytes": 810968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/cluster_probs.npy",
+      "bytes": 810968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/cluster_probs.npy",
+      "bytes": 810968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/cluster_probs.npy",
+      "bytes": 810968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/cluster_probs.npy",
+      "bytes": 810968
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/neighbor_indices.npy",
+      "bytes": 761648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/neighbor_indices.npy",
+      "bytes": 761648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/neighbor_indices.npy",
+      "bytes": 761648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/neighbor_indices.npy",
+      "bytes": 761648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/neighbor_indices.npy",
+      "bytes": 761648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/neighbor_indices.npy",
+      "bytes": 761648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/neighbor_indices.npy",
+      "bytes": 761648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/neighbor_indices.npy",
+      "bytes": 761648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/neighbor_similarity.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/neighbor_distance.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/edge_reliability.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/neighbor_base_probs.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/neighbor_similarity.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/neighbor_distance.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/edge_reliability.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/neighbor_base_probs.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/neighbor_similarity.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/neighbor_distance.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/edge_reliability.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/neighbor_similarity.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/neighbor_distance.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/edge_reliability.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/neighbor_similarity.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/neighbor_distance.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/edge_reliability.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/neighbor_base_probs.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/neighbor_similarity.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/neighbor_distance.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/edge_reliability.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/neighbor_base_probs.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/neighbor_similarity.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/neighbor_distance.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/edge_reliability.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/neighbor_base_probs.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/neighbor_similarity.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/neighbor_distance.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/edge_reliability.npy",
+      "bytes": 746688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/neighbor_similarity.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/neighbor_distance.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/edge_reliability.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/neighbor_base_probs.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/neighbor_similarity.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/neighbor_distance.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/edge_reliability.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/neighbor_base_probs.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/neighbor_similarity.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/neighbor_distance.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/edge_reliability.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/neighbor_similarity.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/neighbor_distance.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/edge_reliability.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/neighbor_similarity.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/neighbor_distance.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/edge_reliability.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/neighbor_base_probs.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/neighbor_similarity.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/neighbor_distance.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/edge_reliability.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/neighbor_base_probs.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/neighbor_similarity.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/neighbor_distance.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/edge_reliability.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/neighbor_base_probs.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/neighbor_similarity.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/neighbor_distance.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/edge_reliability.npy",
+      "bytes": 540688
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/neighbor_similarity.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/neighbor_distance.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/edge_reliability.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/neighbor_base_probs.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/neighbor_similarity.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/neighbor_distance.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/edge_reliability.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/neighbor_base_probs.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/neighbor_similarity.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/neighbor_distance.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/edge_reliability.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/neighbor_similarity.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/neighbor_distance.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/edge_reliability.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/neighbor_similarity.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/neighbor_distance.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/edge_reliability.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/neighbor_base_probs.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/neighbor_similarity.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/neighbor_distance.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/edge_reliability.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/neighbor_base_probs.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/neighbor_similarity.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/neighbor_distance.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/edge_reliability.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/neighbor_base_probs.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/neighbor_similarity.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/neighbor_distance.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/edge_reliability.npy",
+      "bytes": 380888
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/neighbor_indices.npy",
+      "bytes": 361168
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/neighbor_indices.npy",
+      "bytes": 361168
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/neighbor_indices.npy",
+      "bytes": 361168
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/neighbor_indices.npy",
+      "bytes": 361168
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/neighbor_indices.npy",
+      "bytes": 361168
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/neighbor_indices.npy",
+      "bytes": 361168
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/neighbor_indices.npy",
+      "bytes": 361168
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/neighbor_indices.npy",
+      "bytes": 361168
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/labels.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/labels.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/eval_kmeans_known_k.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/labels.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/eval_kmeans_known_k.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/labels.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/labels.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/labels.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/eval_kmeans_known_k.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/labels.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/eval_kmeans_known_k.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/labels.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/eval_kmeans_known_k.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 358592
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/neighbor_similarity.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/neighbor_distance.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/edge_reliability.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/neighbor_base_probs.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/neighbor_similarity.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/neighbor_distance.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/edge_reliability.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/neighbor_base_probs.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/neighbor_similarity.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/neighbor_distance.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/edge_reliability.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/neighbor_similarity.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/neighbor_distance.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/edge_reliability.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/neighbor_base_probs.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/neighbor_similarity.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/neighbor_distance.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/edge_reliability.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/neighbor_base_probs.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/neighbor_similarity.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/neighbor_distance.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/edge_reliability.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/neighbor_base_probs.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/neighbor_similarity.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/neighbor_distance.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/edge_reliability.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/neighbor_base_probs.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/neighbor_similarity.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/neighbor_distance.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/edge_reliability.npy",
+      "bytes": 180648
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/cluster_probs.npy",
+      "bytes": 162596
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/cluster_probs.npy",
+      "bytes": 162596
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/cluster_probs.npy",
+      "bytes": 162596
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/cluster_probs.npy",
+      "bytes": 162596
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/cluster_probs.npy",
+      "bytes": 162596
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/cluster_probs.npy",
+      "bytes": 162596
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/cluster_probs.npy",
+      "bytes": 162596
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/cluster_probs.npy",
+      "bytes": 162596
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/labels.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/labels.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/eval_kmeans_known_k.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/labels.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/eval_kmeans_known_k.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/labels.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/labels.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/labels.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/eval_kmeans_known_k.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/labels.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/eval_kmeans_known_k.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/labels.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/eval_kmeans_known_k.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 149440
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/labels.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/labels.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/eval_kmeans_known_k.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/labels.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/eval_kmeans_known_k.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/labels.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/labels.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/labels.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/eval_kmeans_known_k.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/labels.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/eval_kmeans_known_k.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/labels.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/eval_kmeans_known_k.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 108240
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/labels.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/cluster_probs.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/labels.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/cluster_probs.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/eval_kmeans_known_k.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/labels.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/cluster_probs.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/eval_kmeans_known_k.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/labels.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/cluster_probs.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/labels.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/cluster_probs.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/labels.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/cluster_probs.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/eval_kmeans_known_k.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/labels.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/cluster_probs.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/eval_kmeans_known_k.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/labels.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/cluster_probs.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/eval_kmeans_known_k.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 76280
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_warm/seed42/gene_names.npy",
+      "bytes": 48128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_gated_cut_mix/seed42/gene_names.npy",
+      "bytes": 48128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_reweighted_mix/seed42/gene_names.npy",
+      "bytes": 48128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut_warm/seed42/gene_names.npy",
+      "bytes": 48128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot_warm/seed42/gene_names.npy",
+      "bytes": 48128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_mix_plus_cut/seed42/gene_names.npy",
+      "bytes": 48128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_cut_ot/seed42/gene_names.npy",
+      "bytes": 48128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/SRP182008/canm_diagnostic_only/seed42/gene_names.npy",
+      "bytes": 48128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/labels.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/labels.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/eval_kmeans_known_k.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/graph_cut_seed_clusters.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/labels.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/eval_kmeans_known_k.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/labels.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/labels.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/eval_kmeans_known_k.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/labels.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/eval_kmeans_known_k.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/labels.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/eval_kmeans_known_k.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/labels.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/eval_kmeans_known_k.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/eval_kmeans_known_k_mapped.npy",
+      "bytes": 36232
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_warm/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_gated_cut_mix/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_reweighted_mix/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut_warm/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot_warm/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_mix_plus_cut/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_cut_ot/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Wang/canm_diagnostic_only/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_mix/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_reweighted_mix/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut_warm/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot_warm/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_mix_plus_cut/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_cut_ot/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Tosches/canm_diagnostic_only/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_warm/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_gated_cut_mix/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut_warm/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot_warm/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_mix_plus_cut/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_ot/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Macosko/canm_diagnostic_only/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_warm/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_gated_cut_mix/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_reweighted_mix/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut_warm/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_mix_plus_cut/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot/seed42/gene_names.npy",
+      "bytes": 20128
+    },
+    {
+      "path": "results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_diagnostic_only/seed42/gene_names.npy",
+      "bytes": 20128
+    }
+  ]
+}

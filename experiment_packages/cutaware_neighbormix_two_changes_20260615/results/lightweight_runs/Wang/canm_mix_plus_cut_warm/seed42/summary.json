@@ -1,0 +1,55 @@
+{
+  "dataset": "Wang",
+  "method": "CutAware_NeighborMix_scMAE",
+  "variant": "canm_mix_plus_cut_warm",
+  "seed": 42,
+  "n_cells": 9519,
+  "n_genes": 1000,
+  "n_clusters": 2,
+  "pseudo_enabled": false,
+  "cut_enabled": true,
+  "ot_enabled": true,
+  "attention_probe_enabled": false,
+  "edge_weight_summary": {
+    "edge_reliability_mode": "sim_mutual_snn_distance",
+    "edge_weight_entropy": 2.2471065521240234,
+    "effective_neighbor_count": 9.480402946472168,
+    "max_edge_weight_mean": 0.15997278690338135,
+    "max_edge_weight_p95": 0.22201292216777802,
+    "fraction_effective_neighbors_lt_2": 0.0,
+    "prune_quantile": 0.0,
+    "pruned_fraction": 0.0
+  },
+  "cut_diagnostics": {
+    "soft_cut": 0.002071827184408903,
+    "soft_association": 0.9979282021522522,
+    "ncut_surrogate": 0.0024077207781374454,
+    "cluster_mass_min": 0.27130046486854553,
+    "cluster_mass_max": 0.7287233471870422,
+    "assignment_entropy": 0.0013041571946814656,
+    "max_cluster_fraction": 0.7288580733270301
+  },
+  "embedding_similarity_diagnostics": {
+    "mean_cosine": 0.7264928817749023,
+    "p95_cosine": 0.9987362623214722,
+    "fraction_cosine_gt_0p9": 0.498365
+  },
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.9470532618972581,
+      "nmi": 0.6967659908540387,
+      "ari": 0.7852678042917005,
+      "f1_macro": 0.928520226600478,
+      "fmi": 0.9212955467879874,
+      "v_measure": 0.6967659908540389,
+      "homogeneity": 0.7347506938894985,
+      "completeness": 0.6625156519241545,
+      "n_pred_clusters": 2,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "label_leakage": false
+}

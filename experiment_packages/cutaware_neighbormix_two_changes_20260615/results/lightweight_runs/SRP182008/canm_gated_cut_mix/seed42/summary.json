@@ -1,0 +1,74 @@
+{
+  "dataset": "SRP182008",
+  "method": "CutAware_NeighborMix_scMAE",
+  "variant": "canm_gated_cut_mix",
+  "seed": 42,
+  "n_cells": 13514,
+  "n_genes": 1000,
+  "n_clusters": 15,
+  "pseudo_enabled": true,
+  "gated_mix_enabled": true,
+  "cut_enabled": false,
+  "ot_enabled": false,
+  "attention_probe_enabled": false,
+  "edge_weight_summary": {
+    "edge_reliability_mode": "sim_mutual_snn_distance",
+    "edge_weight_entropy": 2.2392418384552,
+    "effective_neighbor_count": 9.404626846313477,
+    "max_edge_weight_mean": 0.16884125769138336,
+    "max_edge_weight_p95": 0.25627434253692627,
+    "fraction_effective_neighbors_lt_2": 0.0,
+    "prune_quantile": 0.0,
+    "pruned_fraction": 0.0,
+    "cut_reweight_enabled": true,
+    "cut_partition_source": "kmeans_on_graph_embedding",
+    "cut_cross_weight": 0.05,
+    "cut_partition_n_clusters": 15,
+    "fraction_candidate_cross_edges": 0.1011247595086577,
+    "cross_edge_mass_before": 0.099019855260849,
+    "cross_edge_mass_after": 0.01960882358253002,
+    "cross_edge_mass_reduction": 0.07941103167831898
+  },
+  "cut_reweight_summary": {
+    "cut_reweight_enabled": true,
+    "cut_partition_source": "kmeans_on_graph_embedding",
+    "cut_cross_weight": 0.05,
+    "cut_partition_n_clusters": 15,
+    "fraction_candidate_cross_edges": 0.1011247595086577,
+    "cross_edge_mass_before": 0.099019855260849,
+    "cross_edge_mass_after": 0.01960882358253002,
+    "cross_edge_mass_reduction": 0.07941103167831898
+  },
+  "cut_diagnostics": {
+    "soft_cut": 3.514807394822128e-05,
+    "soft_association": 0.9999648928642273,
+    "ncut_surrogate": 0.9333313703536987,
+    "cluster_mass_min": 2.561560563663079e-07,
+    "cluster_mass_max": 0.9999979138374329,
+    "assignment_entropy": 0.0002222377370344475,
+    "max_cluster_fraction": 1.0
+  },
+  "embedding_similarity_diagnostics": {
+    "mean_cosine": 0.6466782689094543,
+    "p95_cosine": 0.8811221122741699,
+    "fraction_cosine_gt_0p9": 0.03489
+  },
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6089240787331656,
+      "nmi": 0.6292471868145683,
+      "ari": 0.45148049378922905,
+      "f1_macro": 0.5678406654400341,
+      "fmi": 0.5061664110777105,
+      "v_measure": 0.6292471868145684,
+      "homogeneity": 0.6250793253244191,
+      "completeness": 0.6334710017551298,
+      "n_pred_clusters": 15,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "label_leakage": false
+}

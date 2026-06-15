@@ -1,0 +1,15 @@
+Command: /data/luolie/conda/base/bin/python /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/CutAware_NeighborMix_scMAE/run.py --data_path /home/luolie/biopipeline/dimension-reduction/plantnet/data/processed_scmae/Tosches.h5ad --save_dir /home/luolie/biopipeline/dimension-reduction/plantnet/results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42 --dataset_name Tosches --variant_name canm_gated_cut_warm --seed 42 --n_clusters 15 --epochs 80 --batch_size 256 --n_top_genes 1000 --gpu 5 --no_save_h5ad
+
+Using device: cuda:0
+/data/luolie/conda/base/lib/python3.13/functools.py:934: UserWarning: zero-centering a sparse array/matrix densifies it.
+  return dispatch(args[0].__class__)(*args, **kw)
+Epoch 001/80 loss=0.3846 scmae=0.2983 cut=0.0000 ot=0.0000 gate=0.000 mass=[0.000,0.000]
+Epoch 010/80 loss=0.2999 scmae=0.2239 cut=0.0000 ot=0.0000 gate=0.000 mass=[0.000,0.000]
+Epoch 020/80 loss=0.2968 scmae=0.2211 cut=0.0000 ot=0.0000 gate=0.746 mass=[0.000,0.000]
+Epoch 030/80 loss=0.2931 scmae=0.2196 cut=0.0000 ot=0.0000 gate=0.725 mass=[0.000,0.000]
+Epoch 040/80 loss=0.2890 scmae=0.2170 cut=0.0000 ot=0.0000 gate=0.737 mass=[0.000,0.000]
+Epoch 050/80 loss=0.2866 scmae=0.2152 cut=0.0000 ot=0.0000 gate=0.739 mass=[0.000,0.000]
+Epoch 060/80 loss=0.2851 scmae=0.2143 cut=0.0000 ot=0.0000 gate=0.741 mass=[0.000,0.000]
+Epoch 070/80 loss=0.2850 scmae=0.2141 cut=0.0000 ot=0.0000 gate=0.741 mass=[0.000,0.000]
+Epoch 080/80 loss=0.2839 scmae=0.2133 cut=0.0000 ot=0.0000 gate=0.741 mass=[0.000,0.000]
+Results saved to: /home/luolie/biopipeline/dimension-reduction/plantnet/results/experimental/cutaware_neighbormix_20260615/Tosches/canm_gated_cut_warm/seed42

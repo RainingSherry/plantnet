@@ -1,0 +1,15 @@
+Command: /data/luolie/conda/base/bin/python /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/CutAware_NeighborMix_scMAE/run.py --data_path /home/luolie/biopipeline/dimension-reduction/plantnet/data/processed_scmae/Melanoma_5K.h5ad --save_dir /home/luolie/biopipeline/dimension-reduction/plantnet/results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42 --dataset_name Melanoma_5K --variant_name canm_cut_ot_warm --seed 42 --n_clusters 9 --epochs 80 --batch_size 256 --n_top_genes 1000 --gpu 4 --no_save_h5ad
+
+Using device: cuda:0
+/data/luolie/conda/base/lib/python3.13/functools.py:934: UserWarning: zero-centering a sparse array/matrix densifies it.
+  return dispatch(args[0].__class__)(*args, **kw)
+Epoch 001/80 loss=0.4486 scmae=0.4486 cut=0.0000 ot=0.0000 mass=[0.000,0.000]
+Epoch 010/80 loss=0.2160 scmae=0.2160 cut=0.0000 ot=0.0000 mass=[0.000,0.000]
+Epoch 020/80 loss=0.2803 scmae=0.2122 cut=0.8004 ot=1.4017 mass=[0.049,0.214]
+Epoch 030/80 loss=0.2324 scmae=0.2112 cut=0.3492 ot=0.1886 mass=[0.013,0.224]
+Epoch 040/80 loss=0.2301 scmae=0.2073 cut=0.3154 ot=0.3480 mass=[0.018,0.245]
+Epoch 050/80 loss=0.2303 scmae=0.2051 cut=0.3161 ot=0.4694 mass=[0.015,0.247]
+Epoch 060/80 loss=0.2334 scmae=0.2032 cut=0.3291 ot=0.6887 mass=[0.018,0.255]
+Epoch 070/80 loss=0.2381 scmae=0.2015 cut=0.3688 ot=0.9067 mass=[0.030,0.218]
+Epoch 080/80 loss=0.2341 scmae=0.2013 cut=0.3263 ot=0.8264 mass=[0.018,0.245]
+Results saved to: /home/luolie/biopipeline/dimension-reduction/plantnet/results/experimental/cutaware_neighbormix_20260615/Melanoma_5K/canm_cut_ot_warm/seed42

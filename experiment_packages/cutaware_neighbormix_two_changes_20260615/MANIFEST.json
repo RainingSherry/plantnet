@@ -1,0 +1,36 @@
+{
+  "package_name": "cutaware_neighbormix_two_changes_20260615",
+  "package_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/experiment_packages/cutaware_neighbormix_two_changes_20260615",
+  "source_code_dir": "methods/DeepLearning/CutAware_NeighborMix_scMAE",
+  "full_results_dir": "results/experimental/cutaware_neighbormix_20260615",
+  "previous_report_dir": "experiment_reports/cutaware_neighbormix_20260615",
+  "change_groups": {
+    "change_1_direct_cut_ot": [
+      "canm_diagnostic_only",
+      "canm_cut_ot",
+      "canm_mix_plus_cut",
+      "canm_cut_ot_warm",
+      "canm_mix_plus_cut_warm",
+      "canm_attention_fusion_probe"
+    ],
+    "change_2_cut_neighbor_mix": [
+      "canm_cut_reweighted_mix",
+      "canm_gated_cut_mix",
+      "canm_gated_cut_warm"
+    ]
+  },
+  "omitted_large_artifact_count": 575,
+  "tables": [
+    "results/tables/all_variant_eval_fixed_with_diagnostics.csv",
+    "results/tables/cutaware_vs_rg_detail.csv",
+    "results/tables/cutaware_vs_rg_summary.csv",
+    "results/tables/gated_cut_scgpt_comparison.csv",
+    "results/tables/gated_warm_scgpt_comparison.csv",
+    "results/tables/report_canm_cut_reweighted_mix_per_dataset.csv",
+    "results/tables/report_cutaware_vs_rg_detail.csv",
+    "results/tables/report_cutaware_vs_rg_summary.csv",
+    "results/tables/report_representative_ari_matrix.csv",
+    "results/tables/representative_ari_matrix_all_available.csv",
+    "results/tables/variant_summary_all_available_runs.csv"
+  ]
+}

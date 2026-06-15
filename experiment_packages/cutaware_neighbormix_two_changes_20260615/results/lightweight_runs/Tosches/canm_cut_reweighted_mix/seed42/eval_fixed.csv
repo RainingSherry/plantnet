@@ -1,0 +1,2 @@
+dataset,method,seed,variant,cut_weight,ot_weight,pseudo_weight,cut_cross_weight,neighbor_k,edge_prune_quantile,graph_refresh_interval,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Tosches,CutAware_NeighborMix_scMAE,42,canm_cut_reweighted_mix,0.0,0.0,0.2,0.05,10,0.0,0,0.7430347192456065,0.770778720917153,0.7389076207884887,0.7118947534910398,0.7834142510571392,0.770778720917153,0.7772888128137166,0.7643767723115459,15,,fixed,kmeans_known_k,True

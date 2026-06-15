@@ -1,0 +1,10 @@
+{
+  "cut_reweight_enabled": true,
+  "cut_partition_source": "kmeans_on_graph_embedding",
+  "cut_cross_weight": 0.05,
+  "cut_partition_n_clusters": 12,
+  "fraction_candidate_cross_edges": 0.11170549901803249,
+  "cross_edge_mass_before": 0.10896913707256317,
+  "cross_edge_mass_after": 0.014794358983635902,
+  "cross_edge_mass_reduction": 0.09417477808892727
+}

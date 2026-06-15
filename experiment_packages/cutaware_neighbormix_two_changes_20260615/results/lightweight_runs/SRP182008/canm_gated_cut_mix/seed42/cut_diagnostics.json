@@ -1,0 +1,9 @@
+{
+  "soft_cut": 3.514807394822128e-05,
+  "soft_association": 0.9999648928642273,
+  "ncut_surrogate": 0.9333313703536987,
+  "cluster_mass_min": 2.561560563663079e-07,
+  "cluster_mass_max": 0.9999979138374329,
+  "assignment_entropy": 0.0002222377370344475,
+  "max_cluster_fraction": 1.0
+}

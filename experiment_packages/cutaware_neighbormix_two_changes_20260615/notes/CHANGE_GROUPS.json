@@ -1,0 +1,15 @@
+{
+  "change_1_direct_cut_ot": [
+    "canm_diagnostic_only",
+    "canm_cut_ot",
+    "canm_mix_plus_cut",
+    "canm_cut_ot_warm",
+    "canm_mix_plus_cut_warm",
+    "canm_attention_fusion_probe"
+  ],
+  "change_2_cut_neighbor_mix": [
+    "canm_cut_reweighted_mix",
+    "canm_gated_cut_mix",
+    "canm_gated_cut_warm"
+  ]
+}

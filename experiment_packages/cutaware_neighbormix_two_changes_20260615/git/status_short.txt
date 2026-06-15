@@ -1,0 +1,34 @@
+ M BDD/260612_0024数学可解释性.md
+ M methods/method_manifest.yaml
+?? .codegraph/
+?? OtherMode/scMAE-main/res/
+?? _gpu2.stderr.log
+?? _gpu2.stdout.log
+?? _gpu3.stderr.log
+?? _gpu3.stdout.log
+?? _gpu4.stderr.log
+?? _gpu4.stdout.log
+?? _gpu5.stderr.log
+?? _gpu5.stdout.log
+?? _gpu6.stderr.log
+?? _gpu6.stdout.log
+?? configs/smoke/
+?? data
+?? experiment_packages/cutaware_neighbormix_two_changes_20260615/
+?? logs/
+?? methods/DeepLearning/RA_NeighborMix_scMAE/
+?? methods/DeepLearning/RC_NeighborMix/
+?? methods/DeepLearning/RG_NeighborMix_scMAE/
+?? scripts/analyze_ra_neighbormix_ablation.py
+?? scripts/analyze_rc_nm_checkpoint.py
+?? scripts/create_smoke_subset.py
+?? scripts/patch_h5ad_null_encoding.py
+?? scripts/prepare_scmae_11datasets.sh
+?? scripts/run_migration_smoke_parallel.py
+?? scripts/run_missing_methods.py
+?? scripts/run_new_models_multigpu.sh
+?? scripts/run_ra_rg_phase.py
+?? scripts/run_rc_nm_checkpoint.py
+?? scripts/run_remaining_new_models.sh
+?? scripts/run_scmae_batch.sh
+?? scripts/run_scmae_multigpu.sh

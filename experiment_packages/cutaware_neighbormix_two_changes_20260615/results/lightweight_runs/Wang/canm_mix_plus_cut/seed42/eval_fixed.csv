@@ -1,0 +1,2 @@
+dataset,method,seed,variant,cut_weight,ot_weight,pseudo_weight,neighbor_k,edge_prune_quantile,graph_refresh_interval,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Wang,CutAware_NeighborMix_scMAE,42,canm_mix_plus_cut,0.2,0.1,0.2,10,0.0,0,0.9329761529572435,0.6559951676971513,0.7346703091316307,0.9113810790949932,0.9010336291680195,0.6559951676971514,0.7009641870758716,0.6164481155572814,2,,fixed,kmeans_known_k,True

@@ -1,0 +1,25 @@
+{
+  "dataset": "Tosches",
+  "method": "CutAware_NeighborMix_scMAE",
+  "seed": 42,
+  "n_clusters": 15,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6284826403771967,
+      "nmi": 0.7203884628716325,
+      "ari": 0.5211912275080864,
+      "f1_macro": 0.6840303871385982,
+      "fmi": 0.6038678163092732,
+      "v_measure": 0.7203884628716325,
+      "homogeneity": 0.7754360172322692,
+      "completeness": 0.6726384237051257,
+      "n_pred_clusters": 15,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

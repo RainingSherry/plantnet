@@ -1,0 +1,25 @@
+{
+  "dataset": "SRP182008",
+  "method": "CutAware_NeighborMix_scMAE",
+  "seed": 42,
+  "n_clusters": 15,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6089240787331656,
+      "nmi": 0.6292471868145683,
+      "ari": 0.45148049378922905,
+      "f1_macro": 0.5678406654400341,
+      "fmi": 0.5061664110777105,
+      "v_measure": 0.6292471868145684,
+      "homogeneity": 0.6250793253244191,
+      "completeness": 0.6334710017551298,
+      "n_pred_clusters": 15,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

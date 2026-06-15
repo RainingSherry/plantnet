@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "CutAware_NeighborMix_scMAE",
+  "seed": 42,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.4431574718800214,
+      "nmi": 0.5662881511847346,
+      "ari": 0.2923443703710783,
+      "f1_macro": 0.4613750548175777,
+      "fmi": 0.526493378070134,
+      "v_measure": 0.5662881511847346,
+      "homogeneity": 0.7921664528345014,
+      "completeness": 0.4406431780432608,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

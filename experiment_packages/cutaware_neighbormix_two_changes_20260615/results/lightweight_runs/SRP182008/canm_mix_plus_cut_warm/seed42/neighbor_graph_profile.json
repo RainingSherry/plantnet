@@ -1,0 +1,10 @@
+{
+  "graph_source": "pca_input",
+  "neighbor_k": 10,
+  "tau": 0.2,
+  "knn_pca_dim": 50,
+  "mean_neighbor_similarity": 0.8723499178886414,
+  "mean_mutual_ratio": 0.30688175225691877,
+  "mean_snn": 0.20551906526088715,
+  "mean_max_neighbor_prob": 0.11552673578262329
+}

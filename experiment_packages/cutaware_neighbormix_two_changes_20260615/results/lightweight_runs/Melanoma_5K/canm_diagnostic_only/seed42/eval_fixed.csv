@@ -1,0 +1,2 @@
+dataset,method,seed,variant,cut_weight,ot_weight,pseudo_weight,neighbor_k,edge_prune_quantile,graph_refresh_interval,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,CutAware_NeighborMix_scMAE,42,canm_diagnostic_only,0.0,0.0,0.0,10,0.0,0,0.7374252160425437,0.7353389707886173,0.6656458656897767,0.6515268801333248,0.7319574158076804,0.7353389707886173,0.765722723941511,0.7072744361880594,9,,fixed,kmeans_known_k,True

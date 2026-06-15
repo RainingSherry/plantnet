@@ -1,0 +1,9 @@
+{
+  "soft_cut": NaN,
+  "soft_association": NaN,
+  "ncut_surrogate": NaN,
+  "cluster_mass_min": NaN,
+  "cluster_mass_max": NaN,
+  "assignment_entropy": NaN,
+  "max_cluster_fraction": 1.0
+}

@@ -1,0 +1,17 @@
+{
+  "archive": "experiment_reports/cutaware_neighbormix_20260615",
+  "method_source": "methods/DeepLearning/CutAware_NeighborMix_scMAE",
+  "full_result_dir": "results/experimental/cutaware_neighbormix_20260615",
+  "excluded_large_patterns": [
+    "*.pt",
+    "*.npy",
+    "*.h5",
+    "*.h5ad"
+  ],
+  "summary_files": [
+    "tables/cutaware_vs_rg_summary.csv",
+    "tables/cutaware_vs_rg_detail.csv",
+    "tables/canm_cut_reweighted_mix_per_dataset.csv",
+    "tables/representative_ari_matrix.csv"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "dataset": "Macosko",
+  "method": "CutAware_NeighborMix_scMAE",
+  "variant": "canm_mix_plus_cut",
+  "seed": 42,
+  "n_cells": 44808,
+  "n_genes": 1000,
+  "n_clusters": 12,
+  "pseudo_enabled": true,
+  "cut_enabled": true,
+  "ot_enabled": true,
+  "attention_probe_enabled": false,
+  "edge_weight_summary": {
+    "edge_reliability_mode": "sim_mutual_snn_distance",
+    "edge_weight_entropy": 2.2433526515960693,
+    "effective_neighbor_count": 9.436885833740234,
+    "max_edge_weight_mean": 0.16513627767562866,
+    "max_edge_weight_p95": 0.23006495833396912,
+    "fraction_effective_neighbors_lt_2": 8.926977325477593e-05,
+    "prune_quantile": 0.0,
+    "pruned_fraction": 0.0
+  },
+  "cut_diagnostics": {
+    "soft_cut": NaN,
+    "soft_association": NaN,
+    "ncut_surrogate": NaN,
+    "cluster_mass_min": NaN,
+    "cluster_mass_max": NaN,
+    "assignment_entropy": NaN,
+    "max_cluster_fraction": 1.0
+  },
+  "embedding_similarity_diagnostics": {
+    "mean_cosine": 0.0,
+    "p95_cosine": 0.0,
+    "fraction_cosine_gt_0p9": 0.0
+  },
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6561328334226031,
+      "nmi": 0.0,
+      "ari": 0.0,
+      "f1_macro": 0.06603061664510565,
+      "fmi": 0.6805487167810241,
+      "v_measure": 0.0,
+      "homogeneity": 0.0,
+      "completeness": 1.0,
+      "n_pred_clusters": 1,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "label_leakage": false
+}

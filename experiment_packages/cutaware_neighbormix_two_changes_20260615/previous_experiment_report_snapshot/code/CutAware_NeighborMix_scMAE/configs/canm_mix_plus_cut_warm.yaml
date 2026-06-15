@@ -1,0 +1,16 @@
+method_name: CutAware_NeighborMix_scMAE
+variant_name: canm_mix_plus_cut_warm
+neighbor_k: 10
+cut_neighbors: 10
+mix_neighbors: 4
+mix_alpha: 0.8
+edge_reliability_mode: sim_mutual_snn_distance
+edge_prune_quantile: 0.0
+cut_weight: 0.05
+ot_weight: 0.02
+ot_temperature: 0.2
+ot_iterations: 3
+cut_start_epoch: 20
+ot_start_epoch: 20
+pseudo_weight: 0.1
+graph_refresh_interval: 0

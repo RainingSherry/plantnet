@@ -1,0 +1,18 @@
+{
+  "edge_reliability_mode": "sim_mutual_snn_distance",
+  "edge_weight_entropy": 2.2433524131774902,
+  "effective_neighbor_count": 9.436883926391602,
+  "max_edge_weight_mean": 0.16513608396053314,
+  "max_edge_weight_p95": 0.23006503283977509,
+  "fraction_effective_neighbors_lt_2": 8.926977325477593e-05,
+  "prune_quantile": 0.0,
+  "pruned_fraction": 0.0,
+  "cut_reweight_enabled": true,
+  "cut_partition_source": "kmeans_on_graph_embedding",
+  "cut_cross_weight": 0.05,
+  "cut_partition_n_clusters": 12,
+  "fraction_candidate_cross_edges": 0.11170549901803249,
+  "cross_edge_mass_before": 0.10896913707256317,
+  "cross_edge_mass_after": 0.014794358983635902,
+  "cross_edge_mass_reduction": 0.09417477808892727
+}
