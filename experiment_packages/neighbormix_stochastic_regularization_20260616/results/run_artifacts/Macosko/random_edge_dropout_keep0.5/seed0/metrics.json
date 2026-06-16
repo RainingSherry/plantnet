@@ -1,0 +1,17 @@
+{
+  "kmeans_known_k": {
+    "acc": 0.6474067130869487,
+    "nmi": 0.6624489678628642,
+    "ari": 0.5395218282835764,
+    "f1_macro": 0.4987080658552863,
+    "fmi": 0.7220725539384774,
+    "v_measure": 0.6624489678628643,
+    "homogeneity": 0.816269088221883,
+    "completeness": 0.5574091642375509,
+    "n_pred_clusters": 12,
+    "silhouette": NaN,
+    "protocol": "fixed",
+    "cluster_method": "kmeans_known_k",
+    "uses_known_k": true
+  }
+}

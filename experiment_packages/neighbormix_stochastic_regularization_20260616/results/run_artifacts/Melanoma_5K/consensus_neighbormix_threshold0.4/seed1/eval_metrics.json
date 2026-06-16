@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "consensus_neighbormix_threshold0.4",
+  "seed": 1,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7363173055617106,
+      "nmi": 0.7317608977695609,
+      "ari": 0.6627912723453586,
+      "f1_macro": 0.6524494805333535,
+      "fmi": 0.7296369773038939,
+      "v_measure": 0.7317608977695609,
+      "homogeneity": 0.7620011240431548,
+      "completeness": 0.7038292389160151,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

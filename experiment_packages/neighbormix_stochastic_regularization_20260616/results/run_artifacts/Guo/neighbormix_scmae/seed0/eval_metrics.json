@@ -1,0 +1,25 @@
+{
+  "dataset": "Guo",
+  "method": "neighbormix_scmae",
+  "seed": 0,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.8710323574730354,
+      "nmi": 0.8554820723681416,
+      "ari": 0.842181915987195,
+      "f1_macro": 0.8050776136757233,
+      "fmi": 0.8648544020142742,
+      "v_measure": 0.8554820723681416,
+      "homogeneity": 0.8664290077640656,
+      "completeness": 0.8448083046958067,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

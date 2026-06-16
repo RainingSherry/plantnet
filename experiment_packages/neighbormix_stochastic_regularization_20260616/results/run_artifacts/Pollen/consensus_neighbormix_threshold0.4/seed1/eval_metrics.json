@@ -1,0 +1,25 @@
+{
+  "dataset": "Pollen",
+  "method": "consensus_neighbormix_threshold0.4",
+  "seed": 1,
+  "n_clusters": 11,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.8770764119601329,
+      "nmi": 0.9278341875956972,
+      "ari": 0.9079614013909725,
+      "f1_macro": 0.7541862550789209,
+      "fmi": 0.9190206645506246,
+      "v_measure": 0.9278341875956972,
+      "homogeneity": 0.9137369263164615,
+      "completeness": 0.942373254151642,
+      "n_pred_clusters": 11,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

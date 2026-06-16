@@ -1,0 +1,23 @@
+{
+  "neighbor_backend": "multi_metric_consensus_threshold_0.4",
+  "neighbor_k": 5,
+  "effective_neighbor_count": 4.795042037963867,
+  "edge_keep_rate": 1.0,
+  "neighbor_similarity_mean": 0.8002274036407471,
+  "neighbor_similarity_std": 0.1244559958577156,
+  "mutual_ratio": 0.32341137123745817,
+  "snn_mean": 0.18967363238334656,
+  "snn_std": 0.17057865858078003,
+  "consensus_mean": 0.529278576374054,
+  "consensus_std": 0.18803153932094574,
+  "fallback_rate": 0.10907787864309604,
+  "fallback_cell_rate": 0.35570950788342093,
+  "hubness_mean": 5.0,
+  "hubness_max": 56.0,
+  "hubness_p95": 16.0,
+  "knn_pca_dim": 50,
+  "consensus_threshold": 0.4,
+  "same_label_edge_ratio": 0.839369326325848,
+  "same_label_edge_ratio_weighted": 0.8404446244239807,
+  "minority_class_neighbor_purity": 0.9475857814153036
+}

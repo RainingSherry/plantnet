@@ -1,0 +1,25 @@
+{
+  "dataset": "Pollen",
+  "method": "nm_scmae_nomix",
+  "seed": 2,
+  "n_clusters": 11,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.8637873754152824,
+      "nmi": 0.9195521622173656,
+      "ari": 0.910607240445616,
+      "f1_macro": 0.7475385386970753,
+      "fmi": 0.920800659695286,
+      "v_measure": 0.9195521622173656,
+      "homogeneity": 0.9138935805389838,
+      "completeness": 0.9252812532829676,
+      "n_pred_clusters": 11,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

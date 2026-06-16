@@ -1,0 +1,25 @@
+{
+  "dataset": "Wang",
+  "method": "snn_neighbormix",
+  "seed": 1,
+  "n_clusters": 2,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.9858178380081941,
+      "nmi": 0.867952238889851,
+      "ari": 0.9382855119195851,
+      "f1_macro": 0.9795565627535564,
+      "fmi": 0.9786077250912267,
+      "v_measure": 0.867952238889851,
+      "homogeneity": 0.8749655001908536,
+      "completeness": 0.861050512778183,
+      "n_pred_clusters": 2,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

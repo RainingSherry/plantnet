@@ -1,0 +1,25 @@
+{
+  "dataset": "Guo",
+  "method": "consensus_neighbormix_threshold0.4",
+  "seed": 0,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.8674884437596302,
+      "nmi": 0.8510465265392726,
+      "ari": 0.8375958546626208,
+      "f1_macro": 0.8257073931876473,
+      "fmi": 0.8609379938304699,
+      "v_measure": 0.8510465265392726,
+      "homogeneity": 0.8573178938045207,
+      "completeness": 0.8448662443514996,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

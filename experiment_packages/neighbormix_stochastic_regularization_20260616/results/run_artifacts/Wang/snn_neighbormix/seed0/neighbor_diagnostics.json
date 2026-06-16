@@ -1,0 +1,23 @@
+{
+  "neighbor_backend": "snn_jaccard_weighted_knn",
+  "neighbor_k": 5,
+  "effective_neighbor_count": 3.142064332962036,
+  "edge_keep_rate": 0.6612039079735267,
+  "neighbor_similarity_mean": 0.947519838809967,
+  "neighbor_similarity_std": 0.0467977412045002,
+  "mutual_ratio": 0.2693980460132367,
+  "snn_mean": 0.11721879243850708,
+  "snn_std": 0.13448145985603333,
+  "consensus_mean": 0.11721879243850708,
+  "consensus_std": 0.13448145985603333,
+  "fallback_rate": 0.051160836222292255,
+  "fallback_cell_rate": 0.051160836222292255,
+  "hubness_mean": 5.0,
+  "hubness_max": 63.0,
+  "hubness_p95": 17.0,
+  "knn_pca_dim": 50,
+  "snn_zero_row_fallback_rate": 0.051160836222292255,
+  "same_label_edge_ratio": 0.9948313898518752,
+  "same_label_edge_ratio_weighted": 0.9956214427947998,
+  "minority_class_neighbor_purity": 0.9947961568832397
+}

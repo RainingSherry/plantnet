@@ -1,0 +1,25 @@
+{
+  "dataset": "Shekhar",
+  "method": "consensus_neighbormix_threshold0.4",
+  "seed": 1,
+  "n_clusters": 18,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7685054043980619,
+      "nmi": 0.8742584468698632,
+      "ari": 0.6650379775226358,
+      "f1_macro": 0.8164138903070349,
+      "fmi": 0.7407275323447975,
+      "v_measure": 0.8742584468698631,
+      "homogeneity": 0.936422838269129,
+      "completeness": 0.8198338130866133,
+      "n_pred_clusters": 18,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

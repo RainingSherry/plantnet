@@ -1,0 +1,25 @@
+{
+  "dataset": "Wang",
+  "method": "random_pseudo_gate_p0.5",
+  "seed": 2,
+  "n_clusters": 2,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.9676436600483244,
+      "nmi": 0.7689106391673263,
+      "ari": 0.8637291726112979,
+      "f1_macro": 0.9547375391959969,
+      "fmi": 0.9515193580541543,
+      "v_measure": 0.7689106391673263,
+      "homogeneity": 0.7917573690656132,
+      "completeness": 0.7473454473013404,
+      "n_pred_clusters": 2,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

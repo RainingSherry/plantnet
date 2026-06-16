@@ -1,0 +1,23 @@
+{
+  "neighbor_backend": "mutual_knn_with_topk_fallback",
+  "neighbor_k": 5,
+  "effective_neighbor_count": 4.9886369705200195,
+  "edge_keep_rate": 1.0,
+  "neighbor_similarity_mean": 0.8721168041229248,
+  "neighbor_similarity_std": 0.06308941543102264,
+  "mutual_ratio": 0.2189340290719344,
+  "snn_mean": 0.08124484866857529,
+  "snn_std": 0.11267057806253433,
+  "consensus_mean": 0.21893402934074402,
+  "consensus_std": 0.41352379322052,
+  "fallback_rate": 0.7810659709280656,
+  "fallback_cell_rate": 0.9692508386134924,
+  "hubness_mean": 5.0,
+  "hubness_max": 106.0,
+  "hubness_p95": 18.0,
+  "knn_pca_dim": 50,
+  "fallback_slot_rate": 0.7810659709280656,
+  "same_label_edge_ratio": 0.9728960119269474,
+  "same_label_edge_ratio_weighted": 0.9732828140258789,
+  "minority_class_neighbor_purity": 0.9436135530471802
+}

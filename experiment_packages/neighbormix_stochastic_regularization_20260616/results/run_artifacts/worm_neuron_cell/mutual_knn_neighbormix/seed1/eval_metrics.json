@@ -1,0 +1,25 @@
+{
+  "dataset": "worm_neuron_cell",
+  "method": "mutual_knn_neighbormix",
+  "seed": 1,
+  "n_clusters": 10,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6251791686574295,
+      "nmi": 0.6040254332899925,
+      "ari": 0.4157653688339894,
+      "f1_macro": 0.5904861206044336,
+      "fmi": 0.4975366464654826,
+      "v_measure": 0.6040254332899925,
+      "homogeneity": 0.607648375556369,
+      "completeness": 0.600445436636416,
+      "n_pred_clusters": 10,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

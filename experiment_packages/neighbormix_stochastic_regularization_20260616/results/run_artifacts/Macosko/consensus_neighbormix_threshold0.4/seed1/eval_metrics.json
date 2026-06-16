@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "consensus_neighbormix_threshold0.4",
+  "seed": 1,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.5009596500624889,
+      "nmi": 0.6234985239749075,
+      "ari": 0.37992233234113393,
+      "f1_macro": 0.5150097056032671,
+      "fmi": 0.6021601976398736,
+      "v_measure": 0.6234985239749075,
+      "homogeneity": 0.8317973994773519,
+      "completeness": 0.4986311972229393,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

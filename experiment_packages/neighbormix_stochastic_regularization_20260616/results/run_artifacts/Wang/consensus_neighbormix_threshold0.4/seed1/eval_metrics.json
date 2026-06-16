@@ -1,0 +1,25 @@
+{
+  "dataset": "Wang",
+  "method": "consensus_neighbormix_threshold0.4",
+  "seed": 1,
+  "n_clusters": 2,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.985712784956403,
+      "nmi": 0.8672411765336752,
+      "ari": 0.9378399360410157,
+      "f1_macro": 0.979408580922255,
+      "fmi": 0.9784500466471081,
+      "v_measure": 0.8672411765336752,
+      "homogeneity": 0.8743547779263388,
+      "completeness": 0.8602423911139061,
+      "n_pred_clusters": 2,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

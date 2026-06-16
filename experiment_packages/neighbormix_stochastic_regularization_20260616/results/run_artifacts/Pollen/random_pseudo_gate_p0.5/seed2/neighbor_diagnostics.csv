@@ -1,0 +1,2 @@
+neighbor_backend,neighbor_k,effective_neighbor_count,edge_keep_rate,neighbor_similarity_mean,neighbor_similarity_std,mutual_ratio,snn_mean,snn_std,consensus_mean,consensus_std,fallback_rate,fallback_cell_rate,hubness_mean,hubness_max,hubness_p95,knn_pca_dim,same_label_edge_ratio,same_label_edge_ratio_weighted,minority_class_neighbor_purity
+pca_cosine_knn,5,4.9565019607543945,1.0,0.8189609050750732,0.2462056428194046,0.3667774086378738,0.2456362545490265,0.1657811850309372,1.0,0.0,0.0,0.0,5.0,31.0,17.0,50,0.8916943521594685,0.8931140303611755,0.7822647169232368

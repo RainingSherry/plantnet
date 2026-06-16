@@ -1,0 +1,25 @@
+{
+  "dataset": "Pollen",
+  "method": "mutual_knn_neighbormix",
+  "seed": 0,
+  "n_clusters": 11,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.8770764119601329,
+      "nmi": 0.9237620871160371,
+      "ari": 0.905287513612575,
+      "f1_macro": 0.7673841881281301,
+      "fmi": 0.9165749607718637,
+      "v_measure": 0.923762087116037,
+      "homogeneity": 0.9100878968393954,
+      "completeness": 0.9378534586078987,
+      "n_pred_clusters": 11,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}
