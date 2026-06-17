@@ -1,0 +1,33 @@
+{
+  "dataset_name": "Shekhar",
+  "n_cells": 26830,
+  "n_genes_original": 13166,
+  "n_genes": 1000,
+  "label_key": "resolved_label",
+  "n_cell_types": 18,
+  "cell_type_counts": {
+    "AC (Amacrine cell)": 252,
+    "BC1A": 1091,
+    "BC1B": 792,
+    "BC2": 558,
+    "BC3A": 535,
+    "BC3B": 817,
+    "BC4": 398,
+    "BC5A (Cone Bipolar cell 5A)": 2237,
+    "BC5B": 479,
+    "BC5C": 1372,
+    "BC5D": 553,
+    "BC6": 1702,
+    "BC7 (Cone Bipolar cell 7)": 1759,
+    "BC8 or 9 (mixture of BC8 and BC9)": 313,
+    "Cone Photoreceptors": 48,
+    "MG (Mueller Glia)": 2945,
+    "RBC (Rod Bipolar cell)": 10888,
+    "Rod Photoreceptors": 91
+  },
+  "counts_source": "adata.X",
+  "input_mode": "raw",
+  "has_raw": false,
+  "has_layers_counts": false,
+  "scale_input": true
+}

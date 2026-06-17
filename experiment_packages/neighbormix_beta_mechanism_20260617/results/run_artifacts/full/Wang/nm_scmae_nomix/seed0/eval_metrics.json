@@ -1,0 +1,25 @@
+{
+  "dataset": "Wang",
+  "method": "nm_scmae_nomix",
+  "seed": 0,
+  "n_clusters": 2,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.9614455299926463,
+      "nmi": 0.7493814049279532,
+      "ari": 0.8396856828233105,
+      "f1_macro": 0.9468036772518295,
+      "fmi": 0.9423172744164044,
+      "v_measure": 0.7493814049279532,
+      "homogeneity": 0.7789258765698724,
+      "completeness": 0.7219962599862175,
+      "n_pred_clusters": 2,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

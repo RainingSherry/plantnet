@@ -1,0 +1,25 @@
+{
+  "dataset": "Pollen",
+  "method": "fixed_beta_0.1",
+  "seed": 2,
+  "n_clusters": 11,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.8870431893687708,
+      "nmi": 0.9177037655873539,
+      "ari": 0.9106583361832092,
+      "f1_macro": 0.7808794466403163,
+      "fmi": 0.9210327178851673,
+      "v_measure": 0.9177037655873538,
+      "homogeneity": 0.9093124240147971,
+      "completeness": 0.9262514240998948,
+      "n_pred_clusters": 11,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

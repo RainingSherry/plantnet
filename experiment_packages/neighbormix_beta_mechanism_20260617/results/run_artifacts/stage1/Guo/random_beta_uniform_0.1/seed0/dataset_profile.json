@@ -1,0 +1,27 @@
+{
+  "dataset_name": "Guo",
+  "n_cells": 6490,
+  "n_genes_original": 27477,
+  "n_genes": 1000,
+  "label_key": "resolved_label",
+  "n_cell_types": 12,
+  "cell_type_counts": {
+    "SSC": 294,
+    "differentiating S'gonia": 320,
+    "early primary S'cytes": 560,
+    "elongated S'tids": 876,
+    "endothelial cell": 353,
+    "late primary S'cytes": 319,
+    "leydig cell": 607,
+    "macrophage": 341,
+    "myoid cell": 338,
+    "round S'tids": 509,
+    "sertoli cell": 28,
+    "sperm": 1945
+  },
+  "counts_source": "adata.X",
+  "input_mode": "raw",
+  "has_raw": false,
+  "has_layers_counts": false,
+  "scale_input": true
+}

@@ -1,0 +1,25 @@
+{
+  "dataset": "Shekhar",
+  "method": "nm_scmae_nomix",
+  "seed": 1,
+  "n_clusters": 18,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6920611256056654,
+      "nmi": 0.8470238547149882,
+      "ari": 0.5458699179711232,
+      "f1_macro": 0.8198057388396296,
+      "fmi": 0.648011051571043,
+      "v_measure": 0.8470238547149882,
+      "homogeneity": 0.920048853297748,
+      "completeness": 0.7847385416207027,
+      "n_pred_clusters": 18,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

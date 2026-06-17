@@ -1,0 +1,25 @@
+{
+  "dataset": "Guo",
+  "method": "global_random_mix_anchor_target",
+  "seed": 2,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.8650231124807396,
+      "nmi": 0.847380802308022,
+      "ari": 0.8352556868928727,
+      "f1_macro": 0.7793714299602553,
+      "fmi": 0.8590779260867306,
+      "v_measure": 0.847380802308022,
+      "homogeneity": 0.8499501991084559,
+      "completeness": 0.8448268932452303,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

@@ -1,0 +1,25 @@
+{
+  "dataset": "Shekhar",
+  "method": "bernoulli_beta_0_or_0.1_p0.5",
+  "seed": 0,
+  "n_clusters": 18,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.8106969809914275,
+      "nmi": 0.8861179641031004,
+      "ari": 0.6922177336872043,
+      "f1_macro": 0.8944755280002293,
+      "fmi": 0.760512602041994,
+      "v_measure": 0.8861179641031002,
+      "homogeneity": 0.9325013367550519,
+      "completeness": 0.8441302413941806,
+      "n_pred_clusters": 18,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

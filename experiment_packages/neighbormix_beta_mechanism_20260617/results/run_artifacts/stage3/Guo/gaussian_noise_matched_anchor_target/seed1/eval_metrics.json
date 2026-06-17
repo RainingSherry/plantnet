@@ -1,0 +1,25 @@
+{
+  "dataset": "Guo",
+  "method": "gaussian_noise_matched_anchor_target",
+  "seed": 1,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.886748844375963,
+      "nmi": 0.856082296182423,
+      "ari": 0.843963566973413,
+      "f1_macro": 0.7985368912173089,
+      "fmi": 0.8672655674659673,
+      "v_measure": 0.856082296182423,
+      "homogeneity": 0.8538605076540684,
+      "completeness": 0.8583156772890714,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

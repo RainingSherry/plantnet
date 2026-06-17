@@ -1,0 +1,25 @@
+{
+  "dataset": "Tosches",
+  "method": "anchor_target_local_mix",
+  "seed": 2,
+  "n_clusters": 15,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6494320617231033,
+      "nmi": 0.7591059174775686,
+      "ari": 0.5406979034914068,
+      "f1_macro": 0.638030783972509,
+      "fmi": 0.6158839531745872,
+      "v_measure": 0.7591059174775686,
+      "homogeneity": 0.7774267164185241,
+      "completeness": 0.7416287320380219,
+      "n_pred_clusters": 15,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

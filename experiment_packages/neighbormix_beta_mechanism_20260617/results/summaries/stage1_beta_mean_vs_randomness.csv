@@ -1,0 +1,4 @@
+mean_beta,fixed_variant,random_variant,n_pairs,random_minus_fixed_ari_mean,random_minus_fixed_f1_mean,random_wins_run_count,fixed_wins_run_count,ties_run_count,core_random_minus_fixed_ari_mean,core_random_wins_dataset_count
+0.025,fixed_beta_0.025,random_beta_uniform_0.05,18,0.05892468676530149,0.01286871535431018,12,6,0,0.05892468676530149,4
+0.05,fixed_beta_0.05,random_beta_uniform_0.1,18,0.06375307805337062,0.02568601005870602,12,6,0,0.06375307805337062,5
+0.1,fixed_beta_0.1,random_beta_uniform_0.2,18,-0.022243476046290695,-0.008414100700895717,7,11,0,-0.022243476046290695,2

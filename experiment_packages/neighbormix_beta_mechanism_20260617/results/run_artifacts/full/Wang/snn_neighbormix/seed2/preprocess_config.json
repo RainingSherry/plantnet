@@ -1,0 +1,14 @@
+{
+  "file_path": "data/processed/Wang.h5ad",
+  "counts_source": "adata.X_log1p_fallback",
+  "input_mode": "log1p",
+  "normalization": "normalize_total(target_sum=10000.0) + log1p when raw",
+  "hvg": {
+    "n_top_genes": 1000,
+    "flavor": "seurat"
+  },
+  "scale_input": true,
+  "selected_n_genes": 1000,
+  "seed": 2,
+  "label_key": "resolved_label"
+}

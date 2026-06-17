@@ -1,0 +1,25 @@
+{
+  "dataset": "Shekhar",
+  "method": "global_random_mix_anchor_target",
+  "seed": 1,
+  "n_clusters": 18,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.9306000745434215,
+      "nmi": 0.9209987668027239,
+      "ari": 0.9491389747224421,
+      "f1_macro": 0.8968466880429212,
+      "fmi": 0.9593479243760237,
+      "v_measure": 0.9209987668027241,
+      "homogeneity": 0.9231744824932007,
+      "completeness": 0.9188332823496211,
+      "n_pred_clusters": 18,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

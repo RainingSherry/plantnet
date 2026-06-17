@@ -1,0 +1,3 @@
+label,n_cells,same_label_edge_ratio,same_label_edge_ratio_weighted,is_minority_q25
+0,7426,0.7772959870724482,0.7772958874702454,False
+1,2093,0.21576684185379838,0.21576683223247528,True

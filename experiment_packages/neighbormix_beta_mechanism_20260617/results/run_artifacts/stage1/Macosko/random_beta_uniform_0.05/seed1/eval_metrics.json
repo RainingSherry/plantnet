@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "random_beta_uniform_0.05",
+  "seed": 1,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7173495804320656,
+      "nmi": 0.6896165918433895,
+      "ari": 0.5514309213805696,
+      "f1_macro": 0.7479605238441067,
+      "fmi": 0.7309076336648749,
+      "v_measure": 0.6896165918433896,
+      "homogeneity": 0.817257897460576,
+      "completeness": 0.5964600288243387,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

@@ -1,0 +1,25 @@
+{
+  "dataset_name": "worm_neuron_cell",
+  "n_cells": 4186,
+  "n_genes_original": 13488,
+  "n_genes": 1000,
+  "label_key": "resolved_label",
+  "n_cell_types": 10,
+  "cell_type_counts": {
+    "1.0": 842,
+    "10.0": 70,
+    "2.0": 334,
+    "3.0": 1015,
+    "4.0": 443,
+    "5.0": 400,
+    "6.0": 314,
+    "7.0": 305,
+    "8.0": 224,
+    "9.0": 239
+  },
+  "counts_source": "adata.X",
+  "input_mode": "raw",
+  "has_raw": false,
+  "has_layers_counts": false,
+  "scale_input": true
+}

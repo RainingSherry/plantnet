@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "beta_distribution_mean0.05_lowvar",
+  "seed": 2,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7349878129847108,
+      "nmi": 0.732975828872368,
+      "ari": 0.6595846860515705,
+      "f1_macro": 0.6503711056570978,
+      "fmi": 0.7270327204629484,
+      "v_measure": 0.732975828872368,
+      "homogeneity": 0.7633911570779012,
+      "completeness": 0.7048912757537126,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}
