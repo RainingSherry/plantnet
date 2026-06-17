@@ -1,0 +1,150 @@
+# Model Core Card: scMAE
+# Masked Autoencoder for Single-Cell RNA-seq
+
+model_key: scmae
+name: scMAE
+full_name: scMAE (Masked Autoencoder for Single-Cell Expression)
+paper: "Masked Autoencoder for Single-Cell Expression (scMAE)"
+source_path: methods/DeepLearning/scMAE
+target_path: methods/DeepLearning/scMAE
+category: DeepLearning
+status: VERIFIED
+authenticity_status: VERIFIED
+smoke_status: PASS
+framework: PyTorch
+gpu_policy: PASS
+role: baseline  # proposed method baseline (no NeighborMix)
+
+# ── File Classification ────────────────────────────────────────────────────────
+
+core_source_files:
+  - run.py
+  - model.py   # AutoEncoder class, loss_mask
+  - ../scMAE_family.py  # apply_scmae_noise, extract_embedding, shared utilities
+
+support_files: []
+
+adapter_files:
+  - run.py
+
+generated_or_output_files:
+  - embedding_final.npy
+  - labels.npy
+  - metrics.json
+  - args.json
+
+# ── Core Components ────────────────────────────────────────────────────────────
+
+core_classes:
+  - name: AutoEncoder
+    file: model.py
+    description: Masked autoencoder for single-cell expression
+    must_preserve:
+      - self.encoder
+      - self.mask_predictor
+      - self.decoder
+      - loss_mask
+
+core_functions:
+  - name: apply_scmae_noise
+    file: ""  # imported from scMAE_family in run.py, searched across all files
+    description: Apply scMAE mask noise (mask_prob fraction of genes)
+    must_preserve:
+      - Mask sampling and replacement logic
+
+  - name: loss_mask
+    file: model.py
+    description: Compute masked reconstruction loss
+    must_preserve:
+      - BCE for mask prediction
+      - Weighted MSE for reconstruction
+
+  - name: extract_embedding
+    file: ""  # imported from scMAE_family in run.py, searched across all files
+    description: Extract latent embedding from encoder
+    must_preserve:
+      - Uses model.feature() method
+
+core_losses:
+  - name: L_reconstruction (weighted MSE)
+    stage: training
+    formula: MSE(reconstructed, original) on masked positions
+    search_patterns:
+      - F.mse_loss
+      - mse_loss
+      - loss_recon
+    weight: masked_data_weight (default 0.75)
+
+  - name: L_mask (BCE)
+    stage: training
+    formula: BCE(predict_mask, was_masked) on masked positions
+    search_patterns:
+      - F.binary_cross_entropy
+      - BCE
+      - loss_mask
+    weight: mask_loss_weight (default 0.7)
+
+  - name: total_loss
+    formula: L_reconstruction + L_mask
+    search_patterns:
+      - total_loss
+      - loss\.backward
+
+# ── Training Stages ─────────────────────────────────────────────────────────────
+
+required_training_stages:
+  - name: pretrain_mae
+    order: 1
+    description: Masked autoencoder training with combined loss
+    evidence:
+      - apply_scmae_noise in training loop
+      - loss_mask computed on masked positions
+      - total_loss = reconstruction + mask_loss
+      - backward() and optimizer.step()
+
+  - name: extract_embedding
+    order: 2
+    description: Extract encoder latent for clustering
+
+  - name: kmeans_clustering
+    order: 3
+    description: KMeans on latent embedding for cluster assignment
+
+# ── Data Flow ──────────────────────────────────────────────────────────────────
+
+core_data_flow:
+  - X (gene expression, float)
+  - apply_scmae_noise → masked_x, mask, target
+  - Encoder(masked_x) → latent
+  - MaskPredictor(latent) → predicted_mask
+  - Decoder(concat(latent, predicted_mask)) → x_recon
+  - loss_mask → L_reconstruction + L_mask
+  - KMeans(embedding) → cluster labels
+
+final_output_rule:
+  latent_embedding: encoder output
+  cluster_labels: KMeans on embedding
+
+# ── Forbidden Changes ──────────────────────────────────────────────────────────
+
+forbidden_changes:
+  - Remove mask predictor (scMAE identity depends on masking)
+  - Remove encoder or decoder architecture
+  - Replace masked loss with full-matrix MSE
+  - Remove BCE mask prediction loss
+  - Use ground truth labels to select best epoch
+  - Replace KMeans with Leiden/Louvain unless auto-resolution
+
+# ── Compatibility Changes (Documented) ────────────────────────────────────────
+
+compatibility_changes: []
+
+core_logic_changes: []
+
+unsafe_substitutions: []
+
+# ── Core Card Version ──────────────────────────────────────────────────────────
+
+card_version: "1.0"
+created_date: "2026-06-09"
+verified_by: model_core_card_generation

@@ -1,7 +1,14 @@
 MANIFEST.files
 MANIFEST.sha256
 README.md
+code/docs/model_core_cards/neighbormix_scmae.yaml
+code/docs/model_core_cards/nm_scmae_nomix.yaml
+code/docs/model_core_cards/scmae.yaml
+code/methods/DeepLearning/NeighborMix_scMAE/README.md
+code/methods/DeepLearning/NeighborMix_scMAE/model.py
 code/methods/DeepLearning/NeighborMix_scMAE/run_beta_mechanism.py
+code/methods/DeepLearning/scMAE_family.py
+code/methods/shared_utils.py
 code/scripts/run_beta_mechanism.py
 code/scripts/summarize_beta_mechanism.py
 notes/experiment_readme.md

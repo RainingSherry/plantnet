@@ -39,7 +39,15 @@ Runs were scheduled on GPU 1-6.
 
 ```text
 code/
+  docs/model_core_cards/
+    neighbormix_scmae.yaml
+    nm_scmae_nomix.yaml
+    scmae.yaml
+  methods/shared_utils.py
+  methods/DeepLearning/scMAE_family.py
   methods/DeepLearning/NeighborMix_scMAE/run_beta_mechanism.py
+  methods/DeepLearning/NeighborMix_scMAE/model.py
+  methods/DeepLearning/NeighborMix_scMAE/README.md
   scripts/run_beta_mechanism.py
   scripts/summarize_beta_mechanism.py
 
@@ -72,6 +80,8 @@ notes/
   experiment_readme.md
   paper_claim_tracker.md
 ```
+
+The model/support snapshots are included so the package records the concrete NeighborMix-scMAE model class, scMAE preprocessing/evaluation helpers, JSON/AnnData utility helpers, and model-core cards used by the experiment.
 
 Excluded by design:
 
