@@ -193,7 +193,7 @@ methods:
     path: methods/DeepLearning/CAAM_scMAE/run.py
     category: DeepLearning
     authenticity: PENDING
-    smoke: UNKNOWN
+    smoke: PASS
     gpu_policy: PASS
     default_in_formal: false
     framework: PyTorch

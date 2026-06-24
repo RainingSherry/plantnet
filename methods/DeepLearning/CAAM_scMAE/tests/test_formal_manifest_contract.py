@@ -20,7 +20,7 @@ def test_caam_formal_manifest_entry_is_full_variant_only():
     assert entry["path"] == "methods/DeepLearning/CAAM_scMAE/run.py"
     assert entry["default_in_formal"] is False
     assert entry["authenticity"] == "PENDING"
-    assert entry["smoke"] == "UNKNOWN"
+    assert entry["smoke"] == "PASS"
     assert "artifact_manifest.json" in entry["required_artifacts"]
     assert entry["extra_args"] == [
         "--variant",
