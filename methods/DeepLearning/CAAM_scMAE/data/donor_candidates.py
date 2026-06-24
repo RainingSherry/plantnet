@@ -8,7 +8,11 @@ import torch
 
 
 class DonorCandidateProvider:
-    """Label-free matched donor candidate provider."""
+    """Label-free matched donor candidate provider.
+
+    The provider is intentionally label-free. It may use batch code, library-size bins,
+    and zero-ratio bins, but it must never use true cell-type labels or cluster labels.
+    """
 
     def __init__(
         self,
@@ -26,6 +30,11 @@ class DonorCandidateProvider:
     ) -> None:
         self.x_np = np.asarray(x, dtype=np.float32)
         self.n_cells, self.n_genes = self.x_np.shape
+        if self.n_cells <= 1:
+            raise ValueError(
+                "CAAM matched donor corruption requires at least two cells; "
+                "self-donor fallback is forbidden by the BDD."
+            )
         self.atol = float(atol)
         self.rtol = float(rtol)
         self.rng = np.random.default_rng(seed)
@@ -33,6 +42,8 @@ class DonorCandidateProvider:
         self.library_bin = self._bin(library_size, library_size_bins)
         self.zero_bin = self._bin(zero_ratio, zero_ratio_bins)
         self.candidate_pool_size = int(candidate_pool_size)
+        if self.candidate_pool_size <= 0:
+            raise ValueError("candidate_pool_size must be positive.")
         self.candidates, self.stats = self._build_candidates()
 
     @staticmethod
@@ -74,16 +85,17 @@ class DonorCandidateProvider:
         return not_self, "global"
 
     def _build_candidates(self) -> tuple[np.ndarray, dict]:
-        if self.n_cells <= 1:
-            candidates = np.zeros((self.n_cells, self.candidate_pool_size), dtype=np.int64)
-            return candidates, {"fallback_levels": {"global": int(self.n_cells)}, "single_cell": True}
         candidates = np.zeros((self.n_cells, self.candidate_pool_size), dtype=np.int64)
         levels: dict[str, int] = {"matched": 0, "batch": 0, "global": 0}
         for i in range(self.n_cells):
             pool, level = self._pool_for(i)
+            if np.any(pool == i):
+                raise RuntimeError("Internal donor-pool error: self index appears in donor pool.")
             levels[level] = levels.get(level, 0) + 1
             candidates[i] = self._sample_from_pool(pool, self.candidate_pool_size)
-        return candidates, {"fallback_levels": levels, "single_cell": False}
+        if np.any(candidates == np.arange(self.n_cells, dtype=np.int64)[:, None]):
+            raise RuntimeError("Internal donor-candidate error: self donor was sampled.")
+        return candidates, {"fallback_levels": levels, "single_cell": False, "self_donor_forbidden": True}
 
     def save(self, save_dir: Path) -> None:
         save_dir.mkdir(parents=True, exist_ok=True)
@@ -108,6 +120,8 @@ class DonorCandidateProvider:
         )
         cand = torch.as_tensor(self.candidates[idx_cpu], dtype=torch.long, device=device)
         donor_indices = torch.gather(cand, dim=1, index=slot)
+        if torch.any(donor_indices == batch_indices.to(device).long().view(-1, 1)):
+            raise RuntimeError("Matched donor corruption selected self donor, which is forbidden.")
         gene_ids = torch.arange(g, device=device).view(1, g).expand(b, g)
         replacement = x_full[donor_indices, gene_ids]
         original = x_full[batch_indices.to(device).long()]
@@ -117,4 +131,3 @@ class DonorCandidateProvider:
             "eligibility": eligibility,
             "donor_indices": donor_indices,
         }
-
