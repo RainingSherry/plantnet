@@ -34,7 +34,14 @@ class AdversarialMaskGenerator(nn.Module):
         logits = self.score_mlp(torch.tanh(cell_context + gene + value)).squeeze(-1)
         logits = logits.masked_fill(~eligibility.bool(), -1.0e9)
         base_k = int(round(self.mask_ratio * g))
-        k_i = torch.minimum(eligibility.long().sum(dim=1), torch.full((b,), base_k, dtype=torch.long, device=x.device))
+        eligible_count = eligibility.long().sum(dim=1)
+        k_i = torch.minimum(eligible_count, torch.full((b,), base_k, dtype=torch.long, device=x.device))
         hard, soft, st = relaxed_topk_straight_through(logits, k_i, tau, eligibility, add_gumbel=add_gumbel)
-        return logits, hard, soft, st, {"mask_type": "adversarial", "budget_per_cell": base_k, "k_i": k_i.detach()}
-
+        deficit = (base_k - k_i).clamp_min(0)
+        return logits, hard, soft, st, {
+            "mask_type": "adversarial",
+            "budget_per_cell": base_k,
+            "k_i": k_i.detach(),
+            "budget_deficit": deficit.detach(),
+            "budget_deficit_rate": float((deficit > 0).float().mean().detach().cpu()),
+        }
