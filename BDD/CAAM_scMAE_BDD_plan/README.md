@@ -38,7 +38,7 @@ Model 0/A/B/C 用于 CAAM 内部消融，不进入正式 benchmark 主方法列�
 执行时按以下优先级理解需求：
 
 ```text
-addendum_formal_benchmark_interface.md > 补充说明 > CAAM-scMAE 完整 BDD v1.0 > 早期 BDD > 早期模型设想说明
+addendum_formal_benchmark_interface.md > 补充说明 > CAAM-scMAE 完整 BDD v1.0 > natural_language_model_overview.md > 早期 BDD > 早期模型设想说明
 ```
 
 `addendum_formal_benchmark_interface.md` 已经修正正式 benchmark 的实际接口：
@@ -58,6 +58,9 @@ Model 0/A/B 仅用于内部 ablation
 ```text
 addendum_formal_benchmark_interface.md
   当前正式 benchmark 接口补丁；进入 Phase 11 前必须满足，也约束 run.py 的早期 CLI/artifact 设计
+
+natural_language_model_overview.md
+  CAAM-scMAE 的任务、目标、模型框架、理论支撑与重点风险的自然语言说明；用于帮助 Codex 理解研究思想，不替代工程约束
 
 execution_order.md
   11 个开发阶段的总顺序与验收边界
