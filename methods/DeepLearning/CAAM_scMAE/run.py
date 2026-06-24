@@ -4,9 +4,7 @@ from __future__ import annotations
 import json
 import os
 import random
-import subprocess
 import sys
-import traceback
 from pathlib import Path
 from typing import Any
 
@@ -38,32 +36,7 @@ def set_seed(seed: int, deterministic: bool = True) -> None:
         torch.backends.cudnn.benchmark = False
 
 
-def git_commit() -> str:
-    try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=PROJECT_ROOT, text=True).strip()
-    except Exception:
-        return "unknown"
-
-
-def write_environment(path: Path) -> None:
-    try:
-        import torch
-
-        torch_version = torch.__version__
-        cuda_available = torch.cuda.is_available()
-    except Exception as exc:
-        torch_version = f"unavailable: {exc}"
-        cuda_available = False
-    lines = [
-        f"python={sys.version.split()[0]}",
-        f"executable={sys.executable}",
-        f"torch={torch_version}",
-        f"cuda_available={cuda_available}",
-    ]
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
-
-def resolve_device(config: dict[str, Any]) -> tuple[torch.device, dict[str, Any]]:
+def resolve_device(config: dict[str, Any]):
     import torch
 
     runtime = config["runtime"]
@@ -80,24 +53,33 @@ def resolve_device(config: dict[str, Any]) -> tuple[torch.device, dict[str, Any]
         if bad:
             raise ValueError(f"CUDA_VISIBLE_DEVICES={visible!r} contains forbidden GPU(s): {sorted(bad)}")
         physical = int(visible_ids[0]) if len(visible_ids) == 1 and visible_ids[0].isdigit() else None
-        return torch.device("cuda:0"), {
-            "physical_gpu": physical,
-            "cuda_visible_devices": visible,
-            "logical_device": "cuda:0",
-        }
+        return torch.device("cuda:0"), {"physical_gpu": physical, "cuda_visible_devices": visible, "logical_device": "cuda:0"}
     if gpu not in allowed or str(gpu) in forbidden:
         raise ValueError(f"Physical GPU {gpu} is not allowed; use 1-6 or --no_cuda.")
     return torch.device(f"cuda:{gpu}"), {"physical_gpu": gpu, "cuda_visible_devices": "", "logical_device": f"cuda:{gpu}"}
 
 
-def prepare_artifact_manifest(save_dir: Path, config: dict[str, Any], embedding: np.ndarray) -> dict[str, Any]:
-    required = [
-        "metrics.json",
-        "embedding_final.npy",
-        "labels.npy",
-        "args.json",
-        "artifact_manifest.json",
-    ]
+def write_environment(path: Path) -> None:
+    try:
+        import torch
+        torch_version = torch.__version__
+        cuda_available = torch.cuda.is_available()
+    except Exception as exc:
+        torch_version = f"unavailable: {exc}"
+        cuda_available = False
+    path.write_text(
+        "\n".join([
+            f"python={sys.version.split()[0]}",
+            f"executable={sys.executable}",
+            f"torch={torch_version}",
+            f"cuda_available={cuda_available}",
+        ]) + "\n",
+        encoding="utf-8",
+    )
+
+
+def artifact_manifest(config: dict[str, Any], embedding_shape: tuple[int, int]) -> dict[str, Any]:
+    required = ["metrics.json", "embedding_final.npy", "labels.npy", "args.json", "artifact_manifest.json"]
     return {
         "status": "complete",
         "dataset": config.get("dataset_name"),
@@ -105,8 +87,8 @@ def prepare_artifact_manifest(save_dir: Path, config: dict[str, Any], embedding:
         "variant": config.get("variant"),
         "seed": int(config["seed"]),
         "config_hash": config_hash(config),
-        "git_commit": git_commit(),
-        "embedding_shape": [int(embedding.shape[0]), int(embedding.shape[1])],
+        "git_commit": "unknown",
+        "embedding_shape": [int(embedding_shape[0]), int(embedding_shape[1])],
         "required_files": required,
         "data_path": config.get("data_path"),
     }
@@ -118,6 +100,7 @@ def main() -> int:
     save_dir = Path(args.save_dir)
     save_dir.mkdir(parents=True, exist_ok=True)
     save_json(save_dir / "args.json", vars(args))
+
     try:
         import numpy as np
         import torch
@@ -129,7 +112,7 @@ def main() -> int:
         from methods.DeepLearning.CAAM_scMAE.data.preprocessing import load_caam_data
         from methods.DeepLearning.CAAM_scMAE.diagnostics.embedding_stats import embedding_stats
         from methods.DeepLearning.CAAM_scMAE.evaluation.embedding import extract_embeddings
-        from methods.DeepLearning.CAAM_scMAE.evaluation.local_metrics import kmeans_known_k
+        from methods.DeepLearning.CAAM_scMAE.evaluation.local_metrics import kmeans_known_k, leiden_fixed
         from methods.DeepLearning.CAAM_scMAE.models.caam_model import build_student
         from methods.DeepLearning.CAAM_scMAE.models.common import trainable_parameter_count
         from methods.DeepLearning.CAAM_scMAE.trainers.common import CAAMTrainer
@@ -141,7 +124,6 @@ def main() -> int:
         runtime_info.update({"amp": bool(config["runtime"]["amp"]), "num_workers": int(config["runtime"]["num_workers"])})
         save_json(save_dir / "runtime.json", runtime_info)
         write_environment(save_dir / "environment.txt")
-        (save_dir / "git_commit.txt").write_text(git_commit() + "\n", encoding="utf-8")
         write_yaml(save_dir / "resolved_config.yaml", config)
 
         bundle = load_caam_data(
@@ -156,8 +138,7 @@ def main() -> int:
         save_json(save_dir / "dataset_profile.json", bundle.profile)
         save_json(save_dir / "preprocess_config.json", bundle.preprocess_config)
         with open(save_dir / "selected_genes.txt", "w", encoding="utf-8") as handle:
-            for gene in bundle.gene_names:
-                handle.write(f"{gene}\n")
+            handle.write("\n".join(map(str, bundle.gene_names)) + "\n")
 
         train_dataset = CAAMExpressionDataset(bundle.x, bundle.batch_code, bundle.library_size, bundle.zero_ratio)
         donor = DonorCandidateProvider(
@@ -177,7 +158,7 @@ def main() -> int:
         assignment = None
         context_indices = None
         if config["model"]["encoder_type"] == "axial":
-            _module_ids, sparse_assignment = build_gene_modules(
+            _, sparse_assignment = build_gene_modules(
                 bundle.x,
                 int(config["axial"]["n_gene_modules"]),
                 int(config["axial"]["module_svd_dim"]),
@@ -221,22 +202,28 @@ def main() -> int:
             context_x=context_tensor,
             context_indices=context_idx_tensor,
         )
-        np.save(save_dir / "embedding_final.npy", embedding.astype(np.float32))
-        np.save(save_dir / "embeddings_base.npy", embedding.astype(np.float32))
-        np.save(save_dir / "labels.npy", bundle.evaluation.labels.astype(np.int64))
+        embedding = embedding.astype(np.float32)
+        labels = bundle.evaluation.labels.astype(np.int64)
+        np.save(save_dir / "embedding_final.npy", embedding)
+        np.save(save_dir / "embeddings_base.npy", embedding)
+        np.save(save_dir / "labels.npy", labels)
 
         n_clusters = int(config["n_clusters"])
         if n_clusters <= 0:
-            n_clusters = int(len(np.unique(bundle.evaluation.labels)))
-        metrics, pred = kmeans_known_k(embedding, bundle.evaluation.labels, n_clusters, int(config["seed"]))
-        np.save(save_dir / "eval_kmeans_known_k.npy", pred)
-        metrics_payload = {
-            "kmeans_known_k": metrics,
-            "leiden_fixed": {},
-            "diagnostics": {"embedding": embedding_stats(embedding)},
-        }
-        save_json(save_dir / "metrics.json", metrics_payload)
-        save_json(save_dir / "embedding_stats.json", embedding_stats(embedding))
+            n_clusters = int(len(np.unique(labels)))
+        metrics_kmeans, pred_kmeans = kmeans_known_k(embedding, labels, n_clusters, int(config["seed"]))
+        metrics_leiden, pred_leiden = leiden_fixed(
+            embedding,
+            labels,
+            resolution=float(config["evaluation"]["leiden_fixed_resolution"]),
+            n_neighbors=int(config["evaluation"]["n_neighbors"]),
+            seed=int(config["seed"]),
+        )
+        np.save(save_dir / "eval_kmeans_known_k.npy", pred_kmeans)
+        np.save(save_dir / "eval_leiden_fixed.npy", pred_leiden)
+        emb_stats = embedding_stats(embedding)
+        save_json(save_dir / "metrics.json", {"kmeans_known_k": metrics_kmeans, "leiden_fixed": metrics_leiden, "diagnostics": {"embedding": emb_stats}})
+        save_json(save_dir / "embedding_stats.json", emb_stats)
         torch.save(
             {
                 "student": trainer.student.state_dict(),
@@ -252,8 +239,7 @@ def main() -> int:
             },
             save_dir / "model_checkpoint_last.pt",
         )
-        manifest = prepare_artifact_manifest(save_dir, config, embedding)
-        save_json(save_dir / "artifact_manifest.json", manifest)
+        save_json(save_dir / "artifact_manifest.json", artifact_manifest(config, embedding.shape))
         save_json(
             save_dir / "run_manifest.json",
             {
@@ -265,15 +251,8 @@ def main() -> int:
         )
         return 0
     except Exception as exc:
-        save_json(
-            save_dir / "run_manifest.json",
-            {
-                "status": "failed",
-                "error": str(exc),
-                "traceback": traceback.format_exc(),
-            },
-        )
-        print(traceback.format_exc(), file=sys.stderr)
+        save_json(save_dir / "run_manifest.json", {"status": "failed", "error": str(exc)})
+        print(f"CAAM-scMAE failed: {exc}", file=sys.stderr)
         return 1
 
 
