@@ -21,13 +21,20 @@ def _load_yaml(path: Path) -> dict[str, Any]:
 
 
 def _candidate_run_dirs(path: Path) -> list[Path]:
+    """Return CAAM run directories under a single run dir, dataset dir, or output root.
+
+    scripts/run_formal_benchmark.py may write either:
+      out_dir/run_id/
+    or, more commonly:
+      out_dir/dataset_name/run_id/
+
+    Therefore this validator searches recursively for artifact_manifest.json while
+    still accepting a single run directory directly.
+    """
     if (path / "artifact_manifest.json").exists():
         return [path]
-    return sorted(
-        child
-        for child in path.iterdir()
-        if child.is_dir() and (child / "artifact_manifest.json").exists()
-    )
+    run_dirs = {manifest.parent for manifest in path.rglob("artifact_manifest.json")}
+    return sorted(run_dirs)
 
 
 def _require(condition: bool, message: str, failures: list[str]) -> None:
@@ -85,7 +92,7 @@ def validate_run_dir(run_dir: Path) -> list[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate CAAM-scMAE formal smoke outputs.")
-    parser.add_argument("output_dir", type=Path, help="Formal smoke root directory or a single CAAM run directory.")
+    parser.add_argument("output_dir", type=Path, help="Formal smoke root, dataset directory, or a single CAAM run directory.")
     args = parser.parse_args()
 
     output_dir = args.output_dir
