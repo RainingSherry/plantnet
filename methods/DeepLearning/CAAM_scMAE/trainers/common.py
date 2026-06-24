@@ -85,6 +85,7 @@ class CAAMTrainer:
         self.last_attention_stats: dict[str, Any] = {}
         self.last_gradient_stats: dict[str, Any] = {}
         self.last_generator_stats: dict[str, Any] = {}
+        self.first_batch_artifacts: dict[str, np.ndarray] = {}
 
     def _loader(self) -> DataLoader:
         generator = torch.Generator()
@@ -165,8 +166,16 @@ class CAAMTrainer:
         self.last_attention_stats = summarize_attention(out.get("gene_attn"), out.get("cell_attn"))
         self.last_gradient_stats = collect_gradient_stats(self.student, self.generator)
         if batch_id == 0 and epoch == 1:
+            first_batch_indices = idx.detach().cpu().numpy().astype(np.int64)
+            first_mask_hard = mask.detach().cpu().numpy().astype(np.float32)
+            first_donor_indices = donor["donor_indices"].detach().cpu().numpy().astype(np.int64)
+            self.first_batch_artifacts = {
+                "first_batch_indices": first_batch_indices,
+                "first_mask_hard": first_mask_hard,
+                "first_donor_indices": first_donor_indices,
+            }
             self.last_batch_debug = {
-                "first_batch_indices": idx.detach().cpu().numpy().astype(int).tolist(),
+                "first_batch_indices": first_batch_indices.astype(int).tolist(),
                 "first_mask_hard_sum": float(mask.detach().sum().cpu()),
                 "first_donor_indices_checksum": int(donor["donor_indices"].detach().sum().cpu()),
                 "first_loss": float(losses["loss_student"].detach().cpu()),
@@ -306,3 +315,5 @@ class CAAMTrainer:
         if self.generator is not None:
             dump("generator_stats.json", self.last_generator_stats)
         dump("reproducibility_debug.json", self.last_batch_debug)
+        for name, array in self.first_batch_artifacts.items():
+            np.save(self.save_dir / f"{name}.npy", array)

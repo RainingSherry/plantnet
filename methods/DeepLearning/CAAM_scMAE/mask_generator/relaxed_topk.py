@@ -29,18 +29,29 @@ def relaxed_topk_straight_through(
             if k > 0:
                 mask_hard[row, torch.topk(logits32[row], k=k).indices] = 1.0
 
-    max_k = int(k_i.max().item()) if k_i.numel() else 0
-    khot = torch.zeros_like(logits32)
-    onehot_approx = []
-    for step in range(max_k):
-        active = (k_i > step).float().view(-1, 1)
-        masked_logits = logits32 + torch.log(torch.clamp(1.0 - khot, min=1.0e-6))
-        probs = torch.softmax(masked_logits / max(float(tau), 1.0e-6), dim=1)
-        probs = probs * eligibility.float() * active
-        khot = khot + probs
-        onehot_approx.append(probs)
-    mask_soft = torch.stack(onehot_approx, dim=0).sum(dim=0) if onehot_approx else torch.zeros_like(logits32)
-    mask_soft = mask_soft * eligibility.float()
+    tau_value = max(float(tau), 1.0e-6)
+    eligibility_f = eligibility.float()
+    valid_counts = eligibility_f.sum(dim=1)
+    target = torch.minimum(k_i.float(), valid_counts).view(-1, 1)
+
+    valid_min = torch.where(eligibility, logits32, torch.full_like(logits32, float("inf"))).amin(dim=1, keepdim=True)
+    valid_max = torch.where(eligibility, logits32, torch.full_like(logits32, float("-inf"))).amax(dim=1, keepdim=True)
+    valid_min = torch.where(torch.isfinite(valid_min), valid_min, torch.zeros_like(valid_min))
+    valid_max = torch.where(torch.isfinite(valid_max), valid_max, torch.zeros_like(valid_max))
+
+    margin = 50.0 * tau_value
+    low = valid_min - margin
+    high = valid_max + margin
+    for _ in range(40):
+        mid = (low + high) * 0.5
+        probs = torch.sigmoid((logits32 - mid) / tau_value) * eligibility_f
+        too_many = probs.sum(dim=1, keepdim=True) > target
+        low = torch.where(too_many, mid, low)
+        high = torch.where(too_many, high, mid)
+
+    threshold = (low + high) * 0.5
+    mask_soft = torch.sigmoid((logits32 - threshold) / tau_value) * eligibility_f
+    mask_soft = torch.where(target <= 0, torch.zeros_like(mask_soft), mask_soft)
+    mask_soft = torch.where(target >= valid_counts.view(-1, 1), eligibility_f, mask_soft)
     mask_st = mask_hard + mask_soft - mask_soft.detach()
     return mask_hard.to(logits.dtype), mask_soft.to(logits.dtype), mask_st.to(logits.dtype)
-

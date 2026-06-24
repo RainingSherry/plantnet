@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 
 from methods.DeepLearning.CAAM_scMAE.data.dataset import CAAMExpressionDataset
@@ -24,4 +25,10 @@ def test_student_step_updates_only_student(tmp_path):
     stats = trainer._student_step(batch_obj, epoch=1, batch_id=0)
     assert stats["student_grad_norm"] > 0
     assert stats["generator_grad_norm"] == 0
-
+    trainer.save_diagnostics()
+    first_batch_indices = np.load(tmp_path / "first_batch_indices.npy")
+    first_mask_hard = np.load(tmp_path / "first_mask_hard.npy")
+    first_donor_indices = np.load(tmp_path / "first_donor_indices.npy")
+    assert first_batch_indices.shape == (6,)
+    assert first_mask_hard.shape == x[:6].shape
+    assert first_donor_indices.shape == x[:6].shape
