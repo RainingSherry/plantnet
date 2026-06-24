@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import math
 from pathlib import Path
 from typing import Any
 
@@ -76,6 +75,7 @@ class CAAMTrainer:
             "loss_rec_masked": [],
             "loss_mask": [],
             "mask_ratio": [],
+            "budget_deficit_rate": [],
             "student_grad_norm": [],
             "generator_grad_norm": [],
             "context_cache_checksum": [],
@@ -111,6 +111,16 @@ class CAAMTrainer:
             context_x = self.full_x[self.context_indices]
             self.student.refresh_context_cache(context_x, self.context_indices)
 
+    def _check_budget_deficit(self, mask_info: dict[str, Any], *, where: str) -> float:
+        rate = float(mask_info.get("budget_deficit_rate", 0.0) or 0.0)
+        max_rate = float(self.config["corruption"].get("max_budget_deficit_fraction", 0.01))
+        if rate > max_rate and bool(self.config["runtime"].get("fail_fast", True)):
+            raise RuntimeError(
+                f"effective mask budget deficit rate {rate:.4f} exceeds allowed {max_rate:.4f} during {where}; "
+                "this usually means donor replacement does not produce enough eligible changed positions."
+            )
+        return rate
+
     def _student_mask(self, x: torch.Tensor, eligibility: torch.Tensor, epoch: int):
         if self.generator is None or epoch <= int(self.config["training"]["student_warmup_epochs"]):
             return self.random_mask(x, eligibility)
@@ -126,6 +136,7 @@ class CAAMTrainer:
         x = batch["x"].to(self.device)
         donor = self.donor_provider.sample_batch(idx, self.full_x, self.device)
         logits, mask, mask_info = self._student_mask(x, donor["eligibility"], epoch)
+        deficit_rate = self._check_budget_deficit(mask_info, where="student step")
         corrupt = self.corruption.corrupt(x, mask, donor["replacement"], donor["eligibility"], donor["donor_indices"])
         self.student.train()
         self.student_optimizer.zero_grad(set_to_none=True)
@@ -150,6 +161,7 @@ class CAAMTrainer:
         if self.generator is not None and g_grad != 0.0 and bool(self.config["runtime"]["fail_fast"]):
             raise RuntimeError("generator received gradient during student step")
         self.last_mask_stats = summarize_mask(mask, donor["eligibility"])
+        self.last_mask_stats["budget_deficit_rate"] = float(deficit_rate)
         self.last_attention_stats = summarize_attention(out.get("gene_attn"), out.get("cell_attn"))
         self.last_gradient_stats = collect_gradient_stats(self.student, self.generator)
         if batch_id == 0 and epoch == 1:
@@ -158,15 +170,16 @@ class CAAMTrainer:
                 "first_mask_hard_sum": float(mask.detach().sum().cpu()),
                 "first_donor_indices_checksum": int(donor["donor_indices"].detach().sum().cpu()),
                 "first_loss": float(losses["loss_student"].detach().cpu()),
+                "first_budget_deficit_rate": float(deficit_rate),
             }
         return {
             "loss_student": float(losses["loss_student"].detach().cpu()),
             "loss_rec_masked": float(losses["loss_rec_masked"].detach().cpu()),
             "loss_mask": float(losses["loss_mask"].detach().cpu()),
             "mask_ratio": float(mask.detach().mean().cpu()),
+            "budget_deficit_rate": float(deficit_rate),
             "student_grad_norm": float(s_grad),
             "generator_grad_norm": float(g_grad),
-            **mask_info,
         }
 
     def _generator_step(self, batch: dict, epoch: int) -> dict[str, float]:
@@ -182,7 +195,8 @@ class CAAMTrainer:
         self.student.zero_grad(set_to_none=True)
         with freeze_module(self.student):
             self.student.eval()
-            logits, hard, soft, st, _info = self.generator(x, donor["eligibility"], tau, add_gumbel=True)
+            logits, hard, soft, st, info = self.generator(x, donor["eligibility"], tau, add_gumbel=True)
+            deficit_rate = self._check_budget_deficit(info, where="generator step")
             x_tilde = x * (1.0 - st) + donor["replacement"].detach() * st
             out = self.student(x_tilde, mask=hard, indices=idx)
             losses = student_loss_bundle(
@@ -229,6 +243,7 @@ class CAAMTrainer:
             "generator_grad_norm": float(g_grad),
             "student_grad_norm_during_generator_step": float(s_grad),
             "temperature": float(tau),
+            "budget_deficit_rate": float(deficit_rate),
             "coverage_loss": float(regs["coverage_loss"].detach().cpu()),
             "distortion_loss": float(regs["distortion_loss"].detach().cpu()),
             "entropy_loss": float(regs["entropy_loss"].detach().cpu()),
@@ -246,7 +261,15 @@ class CAAMTrainer:
             n_batches = 0
             for batch_id, batch in enumerate(loader):
                 step = self._student_step(batch, epoch, batch_id)
-                for key in ("loss_student", "loss_rec_masked", "loss_mask", "mask_ratio", "student_grad_norm", "generator_grad_norm"):
+                for key in (
+                    "loss_student",
+                    "loss_rec_masked",
+                    "loss_mask",
+                    "mask_ratio",
+                    "budget_deficit_rate",
+                    "student_grad_norm",
+                    "generator_grad_norm",
+                ):
                     totals[key] = totals.get(key, 0.0) + float(step.get(key, 0.0))
                 n_batches += 1
                 if (
@@ -257,7 +280,15 @@ class CAAMTrainer:
                     g_step = self._generator_step(batch, epoch)
                     if g_step:
                         totals["loss_generator"] = totals.get("loss_generator", 0.0) + float(g_step["loss_generator"])
-            for key in ("loss_student", "loss_rec_masked", "loss_mask", "mask_ratio", "student_grad_norm", "generator_grad_norm"):
+            for key in (
+                "loss_student",
+                "loss_rec_masked",
+                "loss_mask",
+                "mask_ratio",
+                "budget_deficit_rate",
+                "student_grad_norm",
+                "generator_grad_norm",
+            ):
                 self.history[key].append(totals.get(key, 0.0) / max(1, n_batches))
             self.history["loss_generator"].append(totals.get("loss_generator", 0.0) / max(1, n_batches))
             self.history["context_cache_checksum"].append(float(self.student.context_cache_checksum()))
