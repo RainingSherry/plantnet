@@ -45,6 +45,7 @@ def infer_param_matched_hidden_dim(data_path: str) -> tuple[int, float]:
     assignment = normalized_assignment_dense(sparse_assignment)
     axial_cfg = apply_variant(base, "axial")
     target = trainable_parameter_count(build_student(n_genes=bundle.x.shape[1], config=axial_cfg, assignment=assignment))
+
     def count_for(hidden: int) -> int:
         cfg = apply_variant(copy.deepcopy(base), "control")
         cfg["model"]["mlp_hidden_dim"] = int(hidden)
@@ -120,6 +121,14 @@ def main() -> int:
             variant,
             "--method_name",
             method_name,
+            "--benchmark_mode",
+            "true",
+            "--input_mode",
+            "log1p",
+            "--n_top_genes",
+            "0",
+            "--scale_input",
+            "false",
         ]
         cmd.extend(extra)
         if args.no_cuda:
