@@ -22,7 +22,8 @@ resolved_config.yaml 可保存
 验收重点：
 
 ```text
-benchmark_mode 不重新 normalize/log1p/HVG/scale
+主 benchmark 默认使用 log1p + HVG 2000，而不是 full-gene input
+n_top_genes=0 只作为 full-gene stress test 或 external_hvg 输入
 standalone raw count 执行 normalize_total -> log1p -> HVG
 scale_input 默认 false
 training DataLoader 不含 label/cell_type/true_cluster/n_clusters
@@ -30,7 +31,7 @@ training DataLoader 不含 label/cell_type/true_cluster/n_clusters
 
 ## Phase 3: Donor 与 corruption 基础
 
-实现 DonorCandidateProvider、eligibility、matched gene-wise donor replacement、corruption 输出契约。
+实现 DonorCandidateProvider、corruption 输出契约和 corruption diagnostics。历史 matched donor 仍保留，但不再默认视为正确。
 
 验收重点：
 
@@ -38,13 +39,13 @@ training DataLoader 不含 label/cell_type/true_cluster/n_clusters
 donor r != i
 replacement value 来自同一 gene
 不同 masked gene 独立采样 donor
-selector 只能选择 eligible 位置
-budget deficit 可记录并可 fail-fast
+记录 zero_to_zero_rate/effective_corruption_rate/budget_deficit_rate
+budget deficit 默认不 fail-fast，除非 strict_effective_budget=true
 ```
 
 ## Phase 4: 共同 student、random mask 与 loss
 
-实现随机固定预算 mask、MLP encoder、共同 Decoder、MaskHead、mask conditioning 与 student loss。
+实现随机 mask、MLP encoder、共同 Decoder、MaskHead、mask conditioning 与 student loss。
 
 验收重点：
 
@@ -61,7 +62,7 @@ decoder/mask head/loss 在四个模型中共享
 验收重点：
 
 ```text
-MLP encoder + random fixed-budget mask + matched gene-wise donor
+MLP encoder + random mask + configurable corruption
 无 AxialEncoder
 无 AdversarialMaskGenerator
 embedding_final.npy shape = [N, latent_dim]
@@ -144,3 +145,66 @@ scripts/run_formal_benchmark.py 能调用 CAAM run.py
 正式输出目录只出现 caam_scmae
 ```
 
+## Phase 12: Correction 1 — 协议修正
+
+修正主 benchmark feature space、strict budget 和 smoke validator，不跑 sealed test。
+
+验收重点：
+
+```text
+benchmark_mode 不再强制 n_top_genes=0
+默认主协议 n_top_genes=2000
+strict_effective_budget 默认 false
+zero-to-zero 和 effective corruption 只记录，不默认 fail-fast
+旧 protocol smoke 被标记或重新 smoke
+```
+
+## Phase 13: Correction 2 — Corruption triad
+
+实现并比较三种 corruption：scMAE-style gene-wise shuffle、matched donor、nonzero-aware donor。
+
+验收重点：
+
+```text
+只改变 corruption_type，固定其它训练设置
+先只跑 MLP + random mask
+输出 ARI/NMI/ACC/F1 与 corruption diagnostics
+若 matched donor 弱于 scMAE-style shuffle，不得坚持 matched donor 主线
+```
+
+## Phase 14: Correction 3 — AdvMask triage
+
+在最佳或前两名 corruption 上比较 random mask 与 AdvMask。
+
+验收重点：
+
+```text
+只跑 control vs advmask
+不跑 Axial/full
+若 advmask_minus_control 不稳定为正，则删除或降级 AdvMask
+```
+
+## Phase 15: Correction 4 — Axial re-entry
+
+只有 AdvMask 通过 triage 后，才允许 Axial 重新进入实验。
+
+验收重点：
+
+```text
+先证明 Axial 优于 parameter-matched MLP
+再恢复 2x2 factorial
+若 full 无正交互，不得声称 synergy
+```
+
+## Phase 16: Publication decision
+
+根据 corrected protocol 的结果决定论文路线。
+
+验收重点：
+
+```text
+方法论文：必须多数据集稳定优于强基线并有生物解释
+分析论文：若主要贡献是发现 corruption/preprocessing 协议问题
+停止路线：若 best corrected method 仍无稳定增益
+sealed test 只在 final frozen protocol 后运行一次
+```
