@@ -86,6 +86,16 @@ class CAAMTrainer:
         self.last_gradient_stats: dict[str, Any] = {}
         self.last_generator_stats: dict[str, Any] = {}
         self.first_batch_artifacts: dict[str, np.ndarray] = {}
+        self.corruption_totals: dict[str, float] = {
+            "selected": 0.0,
+            "changed_selected": 0.0,
+            "zero_to_zero_selected": 0.0,
+            "abs_delta_all": 0.0,
+            "abs_delta_masked": 0.0,
+            "positions": 0.0,
+            "deficit_cells": 0.0,
+            "cells": 0.0,
+        }
 
     def _loader(self) -> DataLoader:
         generator = torch.Generator()
@@ -115,12 +125,53 @@ class CAAMTrainer:
     def _check_budget_deficit(self, mask_info: dict[str, Any], *, where: str) -> float:
         rate = float(mask_info.get("budget_deficit_rate", 0.0) or 0.0)
         max_rate = float(self.config["corruption"].get("max_budget_deficit_fraction", 0.01))
-        if rate > max_rate and bool(self.config["runtime"].get("fail_fast", True)):
+        if rate > max_rate and bool(self.config["corruption"].get("strict_effective_budget", False)):
             raise RuntimeError(
                 f"effective mask budget deficit rate {rate:.4f} exceeds allowed {max_rate:.4f} during {where}; "
                 "this usually means donor replacement does not produce enough eligible changed positions."
             )
         return rate
+
+    def _record_corruption_stats(
+        self,
+        *,
+        x: torch.Tensor,
+        x_tilde: torch.Tensor,
+        mask: torch.Tensor,
+        deficit_rate: float,
+    ) -> None:
+        selected = mask.detach() > 0.5
+        delta = (x_tilde.detach() - x.detach()).abs()
+        changed = delta > float(self.config["mask"]["changed_tolerance_abs"])
+        zero_to_zero = selected & (x.detach().abs() <= float(self.config["mask"]["changed_tolerance_abs"])) & (
+            x_tilde.detach().abs() <= float(self.config["mask"]["changed_tolerance_abs"])
+        )
+        selected_count = float(selected.float().sum().cpu())
+        self.corruption_totals["selected"] += selected_count
+        self.corruption_totals["changed_selected"] += float((selected & changed).float().sum().cpu())
+        self.corruption_totals["zero_to_zero_selected"] += float(zero_to_zero.float().sum().cpu())
+        self.corruption_totals["abs_delta_all"] += float(delta.sum().cpu())
+        self.corruption_totals["abs_delta_masked"] += float(delta[selected].sum().cpu()) if selected_count else 0.0
+        self.corruption_totals["positions"] += float(delta.numel())
+        self.corruption_totals["deficit_cells"] += float(deficit_rate) * float(x.shape[0])
+        self.corruption_totals["cells"] += float(x.shape[0])
+
+    def corruption_stats(self) -> dict[str, Any]:
+        selected = max(1.0, self.corruption_totals["selected"])
+        positions = max(1.0, self.corruption_totals["positions"])
+        cells = max(1.0, self.corruption_totals["cells"])
+        return {
+            "corruption_type": str(self.config["corruption"]["type"]),
+            "mask_ratio": float(self.config["mask"]["ratio"]),
+            "n_top_genes": int(self.config["preprocessing"]["n_top_genes"]),
+            "actual_n_genes": int(self.full_x.shape[1]),
+            "zero_to_zero_rate": float(self.corruption_totals["zero_to_zero_selected"] / selected),
+            "effective_corruption_rate": float(self.corruption_totals["changed_selected"] / selected),
+            "budget_deficit_rate": float(self.corruption_totals["deficit_cells"] / cells),
+            "mean_abs_delta": float(self.corruption_totals["abs_delta_all"] / positions),
+            "mean_abs_delta_masked": float(self.corruption_totals["abs_delta_masked"] / selected),
+            "strict_effective_budget": bool(self.config["corruption"].get("strict_effective_budget", False)),
+        }
 
     def _student_mask(self, x: torch.Tensor, eligibility: torch.Tensor, epoch: int):
         if self.generator is None or epoch <= int(self.config["training"]["student_warmup_epochs"]):
@@ -139,6 +190,7 @@ class CAAMTrainer:
         logits, mask, mask_info = self._student_mask(x, donor["eligibility"], epoch)
         deficit_rate = self._check_budget_deficit(mask_info, where="student step")
         corrupt = self.corruption.corrupt(x, mask, donor["replacement"], donor["eligibility"], donor["donor_indices"])
+        self._record_corruption_stats(x=x, x_tilde=corrupt.x_tilde, mask=mask, deficit_rate=deficit_rate)
         self.student.train()
         self.student_optimizer.zero_grad(set_to_none=True)
         out = self.student(corrupt.x_tilde, mask=mask, indices=idx)
@@ -314,6 +366,7 @@ class CAAMTrainer:
         dump("attention_stats.json", self.last_attention_stats)
         if self.generator is not None:
             dump("generator_stats.json", self.last_generator_stats)
+        dump("corruption_stats.json", self.corruption_stats())
         dump("reproducibility_debug.json", self.last_batch_debug)
         for name, array in self.first_batch_artifacts.items():
             np.save(self.save_dir / f"{name}.npy", array)

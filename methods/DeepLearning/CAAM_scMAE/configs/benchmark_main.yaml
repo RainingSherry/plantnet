@@ -3,6 +3,5 @@ variant: full
 method_name: caam_scmae
 preprocessing:
   input_mode: log1p
-  n_top_genes: 0
+  n_top_genes: 2000
   scale_input: false
-

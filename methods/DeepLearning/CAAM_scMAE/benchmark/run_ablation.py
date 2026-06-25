@@ -22,7 +22,7 @@ def infer_param_matched_hidden_dim(data_path: str) -> tuple[int, float]:
 
     base = copy.deepcopy(DEFAULT_CONFIG)
     base["preprocessing"]["input_mode"] = "log1p"
-    base["preprocessing"]["n_top_genes"] = 0
+    base["preprocessing"]["n_top_genes"] = 2000
     base["preprocessing"]["scale_input"] = False
     base["benchmark_mode"] = True
     base["seed"] = 0
@@ -30,7 +30,7 @@ def infer_param_matched_hidden_dim(data_path: str) -> tuple[int, float]:
         data_path,
         input_mode="log1p",
         target_sum=float(base["preprocessing"]["target_sum"]),
-        n_top_genes=0,
+        n_top_genes=2000,
         scale_input=False,
         benchmark_mode=True,
         seed=0,
@@ -126,7 +126,7 @@ def main() -> int:
             "--input_mode",
             "log1p",
             "--n_top_genes",
-            "0",
+            "2000",
             "--scale_input",
             "false",
         ]

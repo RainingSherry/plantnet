@@ -79,7 +79,17 @@ def write_environment(path: Path) -> None:
 
 
 def artifact_manifest(config: dict[str, Any], embedding_shape: tuple[int, int]) -> dict[str, Any]:
-    required = ["metrics.json", "embedding_final.npy", "labels.npy", "args.json", "artifact_manifest.json"]
+    required = [
+        "metrics.json",
+        "embedding_final.npy",
+        "labels.npy",
+        "args.json",
+        "artifact_manifest.json",
+        "preprocess_config.json",
+        "selected_gene_indices.npy",
+        "selected_genes.txt",
+        "corruption_stats.json",
+    ]
     return {
         "status": "complete",
         "dataset": config.get("dataset_name"),
@@ -124,7 +134,6 @@ def main() -> int:
         runtime_info.update({"amp": bool(config["runtime"]["amp"]), "num_workers": int(config["runtime"]["num_workers"])})
         save_json(save_dir / "runtime.json", runtime_info)
         write_environment(save_dir / "environment.txt")
-        write_yaml(save_dir / "resolved_config.yaml", config)
 
         bundle = load_caam_data(
             config["data_path"],
@@ -135,8 +144,18 @@ def main() -> int:
             benchmark_mode=bool(config.get("benchmark_mode", False)),
             seed=int(config["seed"]),
         )
+        config["preprocessing"].update(
+            {
+                "feature_space_source": bundle.preprocess_config["feature_space_source"],
+                "actual_n_genes_after_selection": int(bundle.x.shape[1]),
+                "selected_gene_indices_path": "selected_gene_indices.npy",
+                "selected_gene_names_path": "selected_genes.txt",
+            }
+        )
+        write_yaml(save_dir / "resolved_config.yaml", config)
         save_json(save_dir / "dataset_profile.json", bundle.profile)
         save_json(save_dir / "preprocess_config.json", bundle.preprocess_config)
+        np.save(save_dir / "selected_gene_indices.npy", bundle.selected_gene_indices.astype(np.int64, copy=False))
         with open(save_dir / "selected_genes.txt", "w", encoding="utf-8") as handle:
             handle.write("\n".join(map(str, bundle.gene_names)) + "\n")
 

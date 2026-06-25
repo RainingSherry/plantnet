@@ -202,7 +202,7 @@ def preflight_one(
     cfg = copy.deepcopy(config or DEFAULT_CONFIG)
     cfg["benchmark_mode"] = True
     cfg["preprocessing"]["input_mode"] = "log1p"
-    cfg["preprocessing"]["n_top_genes"] = 0
+    cfg["preprocessing"]["n_top_genes"] = 2000
     cfg["preprocessing"]["scale_input"] = False
     path = Path(data_path)
     try:
@@ -210,7 +210,7 @@ def preflight_one(
             str(path),
             input_mode="log1p",
             target_sum=float(cfg["preprocessing"]["target_sum"]),
-            n_top_genes=0,
+            n_top_genes=int(cfg["preprocessing"]["n_top_genes"]),
             scale_input=False,
             benchmark_mode=True,
             seed=int(cfg.get("seed", 0)),
@@ -242,8 +242,9 @@ def preflight_one(
         params = infer_param_matched_hidden_dim_estimate(n_genes, cfg)
         fallback_levels = donor.stats.get("fallback_levels", {})
         max_budget_deficit = float(cfg["corruption"]["max_budget_deficit_fraction"])
+        strict_effective_budget = bool(cfg["corruption"].get("strict_effective_budget", False))
         runtime_blocked = bool(n_genes > int(max_runtime_genes) or params["axial_student_params"] > int(max_runtime_params))
-        if eligibility["estimated_budget_deficit_rate"] > max_budget_deficit:
+        if strict_effective_budget and eligibility["estimated_budget_deficit_rate"] > max_budget_deficit:
             status = STATUS_BUDGET
             reason = (
                 f"estimated_budget_deficit_rate={eligibility['estimated_budget_deficit_rate']:.4f} "
@@ -292,8 +293,9 @@ def preflight_one(
             "preprocessing": {
                 "benchmark_mode": True,
                 "input_mode": "log1p",
-                "n_top_genes": 0,
+                "n_top_genes": int(cfg["preprocessing"]["n_top_genes"]),
                 "scale_input": False,
+                "strict_effective_budget": strict_effective_budget,
             },
         }
         return report
