@@ -62,6 +62,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "zero_ratio_bins": 10,
         "donor_resample_attempts": 8,
         "max_budget_deficit_fraction": 0.01,
+        "strict_effective_budget": False,
     },
     "axial": {
         "n_gene_modules": 64,
@@ -183,6 +184,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mask_ratio", type=float, default=None)
     parser.add_argument("--latent_dim", type=int, default=None)
     parser.add_argument("--mlp_hidden_dim", type=int, default=None)
+    parser.add_argument("--strict_effective_budget", type=str2bool, default=None)
     return parser
 
 
@@ -227,11 +229,12 @@ def resolve_config(args: argparse.Namespace) -> dict[str, Any]:
         cli.setdefault("model", {})["latent_dim"] = int(args.latent_dim)
     if args.mlp_hidden_dim is not None:
         cli.setdefault("model", {})["mlp_hidden_dim"] = int(args.mlp_hidden_dim)
+    if args.strict_effective_budget is not None:
+        cli.setdefault("corruption", {})["strict_effective_budget"] = bool(args.strict_effective_budget)
 
     cfg = deep_update(cfg, cli)
     if cfg.get("benchmark_mode"):
         cfg["preprocessing"]["input_mode"] = "log1p"
-        cfg["preprocessing"]["n_top_genes"] = 0
         cfg["preprocessing"]["scale_input"] = False
         cfg["preprocessing"]["canonical_input"] = True
     return apply_variant(cfg, args.variant)

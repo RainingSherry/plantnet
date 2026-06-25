@@ -34,6 +34,7 @@ LABEL_CANDIDATES = [
 class CAAMDataBundle:
     x: np.ndarray
     gene_names: np.ndarray
+    selected_gene_indices: np.ndarray
     batch_code: np.ndarray
     library_size: np.ndarray
     zero_ratio: np.ndarray
@@ -119,29 +120,46 @@ def load_caam_data(
 ) -> CAAMDataBundle:
     adata = sc.read_h5ad(data_path)
     work = adata.copy()
+    original_index_key = "_caam_original_gene_index"
+    work.var[original_index_key] = np.arange(work.n_vars, dtype=np.int64)
     source, source_name, inferred_mode = _select_matrix(work, input_mode)
     work.X = source.copy() if sp.issparse(source) else np.asarray(source).copy()
 
     if benchmark_mode:
         inferred_mode = "log1p"
-        n_top_genes = 0
         scale_input = False
     else:
         if inferred_mode == "raw" or (_looks_like_raw_counts(work.X) and input_mode in {"auto", "raw"}):
             sc.pp.normalize_total(work, target_sum=target_sum)
             sc.pp.log1p(work)
             inferred_mode = "raw->log1p"
-        if n_top_genes and n_top_genes > 0 and work.n_vars > n_top_genes:
-            sc.pp.highly_variable_genes(work, flavor="seurat", n_top_genes=n_top_genes, subset=True)
-        if scale_input:
-            warnings.warn(
-                "WARNING: scale_input=True changes the semantic meaning of zero values.",
-                RuntimeWarning,
-            )
-            sc.pp.scale(work)
+
+    if n_top_genes and n_top_genes > 0:
+        if work.n_vars > n_top_genes:
+            sc.pp.highly_variable_genes(work, flavor="seurat", n_top_genes=n_top_genes, subset=False)
+            score_key = "dispersions_norm" if "dispersions_norm" in work.var.columns else "dispersions"
+            scores = work.var[score_key].to_numpy(dtype=np.float64)
+            scores = np.nan_to_num(scores, nan=-np.inf, posinf=np.inf, neginf=-np.inf)
+            selected = np.argsort(-scores, kind="mergesort")[: int(n_top_genes)]
+            keep = np.zeros(work.n_vars, dtype=bool)
+            keep[selected] = True
+            work = work[:, keep].copy()
+            feature_space_source = "hvg"
+        else:
+            feature_space_source = "all_genes_below_hvg_target"
+    else:
+        feature_space_source = "full_gene_stress" if benchmark_mode else "all_genes"
+
+    if scale_input:
+        warnings.warn(
+            "WARNING: scale_input=True changes the semantic meaning of zero values.",
+            RuntimeWarning,
+        )
+        sc.pp.scale(work)
 
     x = _dense_float32(work.X)
     gene_names = _var_names(work)
+    selected_gene_indices = work.var[original_index_key].to_numpy(dtype=np.int64)
     batch_code = _batch_code(work)
     library_size = x.sum(axis=1).astype(np.float32)
     zero_ratio = (x <= 0.0).mean(axis=1).astype(np.float32)
@@ -159,6 +177,8 @@ def load_caam_data(
         "input_mode": inferred_mode,
         "benchmark_mode": bool(benchmark_mode),
         "scale_input": bool(scale_input),
+        "feature_space_source": feature_space_source,
+        "actual_n_genes_after_selection": int(work.n_vars),
         "label_key": evaluation.label_key,
         "n_cell_types": int(len(evaluation.label_names)),
         "cell_type_counts": label_counts,
@@ -171,11 +191,14 @@ def load_caam_data(
         "n_top_genes": int(n_top_genes),
         "scale_input": bool(scale_input),
         "benchmark_mode": bool(benchmark_mode),
+        "feature_space_source": feature_space_source,
+        "actual_n_genes_after_selection": int(work.n_vars),
         "seed": int(seed),
     }
     return CAAMDataBundle(
         x=x,
         gene_names=gene_names,
+        selected_gene_indices=selected_gene_indices,
         batch_code=batch_code,
         library_size=library_size,
         zero_ratio=zero_ratio,
@@ -184,4 +207,3 @@ def load_caam_data(
         preprocess_config=preprocess_config,
         adata=work,
     )
-
