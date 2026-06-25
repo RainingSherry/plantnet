@@ -38,9 +38,31 @@ methods/DeepLearning/CAAM_scMAE/run.py --variant full
 caam_scmae_control
 caam_scmae_axial
 caam_scmae_advmask
+caam_scmae_scmae_shuffle
+caam_scmae_matched_donor
+caam_scmae_nonzero_aware
 ```
 
-这些模型只用于 CAAM 内部消融。
+这些模型或 corruption settings 只用于 CAAM 内部消融、correction pipeline 或 supplementary analysis。
+
+## 主 feature-space 协议
+
+主 benchmark / quick ablation / development ablation 默认使用：
+
+```text
+input_mode = log1p
+n_top_genes = 2000
+scale_input = false
+```
+
+`n_top_genes=0` 只允许用于：
+
+```text
+1. full-gene stress test
+2. 上游已提供 external_hvg matrix，并且 artifact 明确记录 feature_space_source=external_hvg
+```
+
+不得把 full-gene stress test 结果放入主表，不得用 full-gene stress test 决定模型机制是否成立。
 
 ## 内部消融
 
@@ -56,7 +78,7 @@ methods/DeepLearning/CAAM_scMAE/benchmark/run_ablation.py
 results/CAAM_scMAE_ablation/
 ```
 
-内部消融必须包含：
+历史 2x2 factorial 内部消融包含：
 
 ```text
 Model 0: control
@@ -65,6 +87,8 @@ Model B: advmask
 Model C: full
 parameter-matched MLP
 ```
+
+Correction Pipeline 中，必须先执行 corruption triad 和 AdvMask triage，再决定是否恢复 2x2 factorial。
 
 正式 benchmark 输出目录只应出现：
 
@@ -107,6 +131,9 @@ python methods/DeepLearning/CAAM_scMAE/run.py \
 --skip_eval
 --resume
 --overwrite
+--epochs
+--corruption_type scmae_shuffle|matched_donor|nonzero_aware_donor
+--strict_effective_budget true|false
 ```
 
 配置优先级：
@@ -120,6 +147,33 @@ python methods/DeepLearning/CAAM_scMAE/run.py \
 ```text
 resolved_config.yaml
 ```
+
+## Corruption contract
+
+必须支持三种 corruption：
+
+```text
+A. scmae_shuffle: gene-wise shuffle，接近 scMAE/scNAME 的经验分布替换。
+B. matched_donor: 当前匹配 batch/library_size/zero_ratio 的 donor 替换。
+C. nonzero_aware_donor: 在 donor 值中优先选择能产生非零或数值变化的位置。
+```
+
+共同约束：
+
+```text
+replacement value 必须来自同一 gene
+不得由 generator 生成 replacement value
+不得使用 label/cell_type/n_clusters 选择 donor
+必须记录 zero_to_zero_rate、effective_corruption_rate、mean_abs_delta、budget_deficit_rate
+```
+
+`budget_deficit_rate` 默认是 diagnostic metric，不得默认 fail-fast。只有显式设置：
+
+```text
+--strict_effective_budget true
+```
+
+才允许因为 effective budget deficit 超阈值而退出。
 
 ## GPU 语义
 
@@ -209,3 +263,24 @@ required_files 全部存在
 
 只存在 `embedding_final.npy` 不足以认定运行完整。
 
+## 协议变更后的 smoke 规则
+
+如果任何修改改变以下行为：
+
+```text
+n_top_genes 默认值
+corruption_type 默认值
+strict_effective_budget 默认值
+artifact schema
+formal manifest extra_args
+```
+
+则旧 smoke 只能标记为 old-protocol smoke。必须重新运行：
+
+```text
+1-seed GPU formal smoke
+3-seed GPU formal smoke
+validate_formal_smoke.py
+```
+
+之后才允许维持或恢复 `smoke: PASS`。
