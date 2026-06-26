@@ -53,6 +53,7 @@ def test_matched_donor_never_selects_self_donor():
     idx = torch.tensor([0, 1, 2, 3])
     out = provider.sample_batch(idx, torch.as_tensor(x), torch.device("cpu"))
     assert torch.all(out["donor_indices"] != idx.view(-1, 1))
+    assert torch.equal(out["mask_eligibility"], out["eligibility"])
 
 
 def test_nonzero_aware_prioritizes_changed_donor():

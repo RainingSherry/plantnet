@@ -12,6 +12,8 @@ from typing import Any
 import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parents[4]
+PHASE13_DATASETS = ("Quake_Smart-seq2_Lung", "Mouse_Pancreas_1", "Limb_Muscle")
+PHASE13_SEEDS = (42, 2024, 3407)
 CORRUPTION_TYPES = ("scmae_shuffle", "matched_donor", "nonzero_aware_donor")
 PRIMARY_METRIC = "kmeans_known_k.ari"
 METRIC_KEYS = (
@@ -55,6 +57,26 @@ def flatten_metrics(metrics: dict[str, Any]) -> dict[str, float]:
     return out
 
 
+def parse_csv(value: str) -> list[str]:
+    return [part.strip() for part in value.split(",") if part.strip()]
+
+
+def require_phase13_protocol(run_dir: Path, row: dict[str, Any]) -> None:
+    expected = {
+        "variant": "control",
+        "encoder_type": "mlp",
+        "mask_selector": "random",
+        "benchmark_mode": True,
+        "input_mode": "log1p",
+        "n_top_genes": 2000,
+        "scale_input": False,
+        "strict_effective_budget": False,
+    }
+    bad = {key: (row.get(key), value) for key, value in expected.items() if row.get(key) != value}
+    if bad:
+        raise ValueError(f"{run_dir}: off-protocol Phase 13 run: {bad}")
+
+
 def discover_runs(root: Path, run_label: str) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     if not root.exists():
@@ -65,6 +87,10 @@ def discover_runs(root: Path, run_label: str) -> list[dict[str, Any]]:
         config = load_yaml(run_dir / "resolved_config.yaml")
         corruption = load_json(run_dir / "corruption_stats.json")
         run_manifest = load_json(run_dir / "run_manifest.json")
+        run_status = str(run_manifest.get("status", ""))
+        artifact_status = str(artifact.get("status", ""))
+        if run_status != "complete" or artifact_status != "complete":
+            continue
         row: dict[str, Any] = {
             "run_label": run_label,
             "dataset": str(artifact.get("dataset") or config.get("dataset_name") or run_dir.name),
@@ -74,15 +100,54 @@ def discover_runs(root: Path, run_label: str) -> list[dict[str, Any]]:
             "variant": str(config.get("variant", "")),
             "encoder_type": str(config.get("model", {}).get("encoder_type", "")),
             "mask_selector": str(config.get("model", {}).get("mask_selector", "")),
-            "run_status": str(run_manifest.get("status", artifact.get("status", ""))),
+            "benchmark_mode": bool(config.get("benchmark_mode", False)),
+            "input_mode": str(config.get("preprocessing", {}).get("input_mode", "")),
+            "n_top_genes": int(config.get("preprocessing", {}).get("n_top_genes", -1)),
+            "scale_input": bool(config.get("preprocessing", {}).get("scale_input", True)),
+            "strict_effective_budget": bool(corruption.get("strict_effective_budget", True)),
+            "run_status": run_status,
+            "artifact_status": artifact_status,
             "run_dir": str(run_dir),
         }
+        require_phase13_protocol(run_dir, row)
         row.update(flatten_metrics(load_json(metrics_path)))
         for key in DIAGNOSTIC_KEYS:
             value = corruption.get(key)
             row[key] = float(value) if value is not None else math.nan
         rows.append(row)
     return rows
+
+
+def validate_expected_grid(
+    rows: list[dict[str, Any]],
+    *,
+    expected_datasets: list[str],
+    expected_corruption_types: tuple[str, ...],
+    expected_seeds: list[int],
+) -> None:
+    expected = {
+        (dataset, corruption_type, int(seed))
+        for dataset in expected_datasets
+        for corruption_type in expected_corruption_types
+        for seed in expected_seeds
+    }
+    seen: dict[tuple[str, str, int], int] = {}
+    for row in rows:
+        key = (str(row["dataset"]), str(row["corruption_type"]), int(row["seed"]))
+        seen[key] = seen.get(key, 0) + 1
+    actual = set(seen)
+    missing = sorted(expected - actual)
+    unexpected = sorted(actual - expected)
+    duplicates = sorted(key for key, count in seen.items() if count > 1)
+    if missing or unexpected or duplicates:
+        details = {
+            "missing": missing,
+            "unexpected": unexpected,
+            "duplicates": duplicates,
+            "expected_runs": len(expected),
+            "complete_runs": len(rows),
+        }
+        raise ValueError(f"Formal Phase 13 grid is incomplete or contaminated: {details}")
 
 
 def mean_std(values: list[float]) -> tuple[float, float]:
@@ -283,6 +348,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Summarize Phase 13 CAAM corruption triad runs.")
     parser.add_argument("--formal_root", type=Path, required=True)
     parser.add_argument("--smoke_root", type=Path, default=None)
+    parser.add_argument("--expected_datasets", type=str, default=",".join(PHASE13_DATASETS))
+    parser.add_argument("--expected_seeds", type=str, default=",".join(str(seed) for seed in PHASE13_SEEDS))
     parser.add_argument("--output_dir", type=Path, default=PROJECT_ROOT / "results/CAAM_scMAE_correction")
     parser.add_argument(
         "--report_path",
@@ -293,6 +360,12 @@ def main() -> int:
 
     formal_rows = discover_runs(args.formal_root, "formal")
     smoke_rows = discover_runs(args.smoke_root, "smoke") if args.smoke_root is not None else []
+    validate_expected_grid(
+        formal_rows,
+        expected_datasets=parse_csv(args.expected_datasets),
+        expected_corruption_types=CORRUPTION_TYPES,
+        expected_seeds=[int(seed) for seed in parse_csv(args.expected_seeds)],
+    )
     aggregate_rows = aggregate(formal_rows)
     differences = build_differences(aggregate_rows)
     nonzero_aware_assessment = assess_nonzero_aware(aggregate_rows)

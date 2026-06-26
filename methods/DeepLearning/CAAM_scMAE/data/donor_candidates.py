@@ -165,7 +165,7 @@ class DonorCandidateProvider:
             "replacement": replacement,
             "eligibility": eligibility,
             "donor_indices": donor_indices,
-            "mask_eligibility": torch.ones_like(eligibility, dtype=torch.bool),
+            "mask_eligibility": eligibility,
             "replacement_info": {},
         }
 
