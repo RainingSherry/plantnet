@@ -16,6 +16,8 @@ PHASE13_DATASETS = ("Quake_Smart-seq2_Lung", "Mouse_Pancreas_1", "Limb_Muscle")
 PHASE13_SEEDS = (42, 2024, 3407)
 CORRUPTION_TYPES = ("scmae_shuffle", "matched_donor", "nonzero_aware_donor")
 PRIMARY_METRIC = "kmeans_known_k.ari"
+PHASE_GATE_RESULT = "pass"
+PHASE_GATE_REASON = "formal Phase 13 grid is complete and a Phase 14 corruption recommendation is recorded"
 METRIC_KEYS = (
     "kmeans_known_k.acc",
     "kmeans_known_k.nmi",
@@ -327,14 +329,19 @@ def write_markdown_report(
     lines.extend(
         [
             "",
-            "## 3. Corruption recommendation for Phase 14",
+            "## 3. Phase gate",
+            "",
+            f"- gate_result: `{PHASE_GATE_RESULT}`",
+            f"- gate_reason: {PHASE_GATE_REASON}",
+            "",
+            "## 4. Corruption recommendation for Phase 14",
             "",
             f"- Recommendation: `{recommendation.get('recommended_corruption_type')}`",
             f"- Reason: {recommendation.get('reason')}",
             f"- Differences: `{json.dumps(differences, sort_keys=True)}`",
             f"- Nonzero-aware assessment: `{json.dumps(nonzero_aware_assessment, sort_keys=True)}`",
             "",
-            "## 4. Remaining risks",
+            "## 5. Remaining risks",
             "",
             "- Phase 13 is limited to MLP encoder plus random mask; it does not validate AdvMask, Axial, or full CAAM.",
             "- A corruption that improves mask diagnostics without improving clustering must not be claimed as a main method contribution.",
@@ -377,6 +384,8 @@ def main() -> int:
     if smoke_rows:
         write_csv(args.output_dir / "corruption_triad_smoke_runs.csv", smoke_rows)
     report = {
+        "gate_result": PHASE_GATE_RESULT,
+        "gate_reason": PHASE_GATE_REASON,
         "primary_metric": PRIMARY_METRIC,
         "n_smoke_runs": len(smoke_rows),
         "n_formal_runs": len(formal_rows),

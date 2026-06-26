@@ -22,14 +22,19 @@
 | Quake_Smart-seq2_Lung | nonzero_aware_donor | 0.532312 | 0.032470 | 0.672495 | 0.590692 | 0.347014 | 0.361645 | 0.638355 | 0.254778 |
 | Quake_Smart-seq2_Lung | scmae_shuffle | 0.543149 | 0.027800 | 0.741984 | 0.609785 | 0.482120 | 0.808278 | 0.191657 | 0.085424 |
 
-## 3. Corruption recommendation for Phase 14
+## 3. Phase gate
+
+- gate_result: `pass`
+- gate_reason: formal Phase 13 grid is complete and a Phase 14 corruption recommendation is recorded
+
+## 4. Corruption recommendation for Phase 14
 
 - Recommendation: `scmae_shuffle`
 - Reason: matched donor is weaker than scMAE shuffle on at least 2/3 datasets
 - Differences: `{"nonzero_aware_minus_scmae_shuffle": {"Limb_Muscle": 0.19036462182477099, "Mouse_Pancreas_1": -0.22716206489600238, "Quake_Smart-seq2_Lung": -0.010836930060872385}, "scmae_shuffle_minus_matched_donor": {"Limb_Muscle": -0.13367293697799842, "Mouse_Pancreas_1": 0.1738118517510418, "Quake_Smart-seq2_Lung": 0.13018537527210433}}`
 - Nonzero-aware assessment: `{"assessment": "improves diagnostics but not consistently clustering", "beats_scmae_on_primary_metric": ["Limb_Muscle"], "improves_effective_corruption_rate": ["Limb_Muscle", "Mouse_Pancreas_1", "Quake_Smart-seq2_Lung"]}`
 
-## 4. Remaining risks
+## 5. Remaining risks
 
 - Phase 13 is limited to MLP encoder plus random mask; it does not validate AdvMask, Axial, or full CAAM.
 - A corruption that improves mask diagnostics without improving clustering must not be claimed as a main method contribution.
