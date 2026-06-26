@@ -236,11 +236,44 @@ def assess_nonzero_aware(aggregate_rows: list[dict[str, Any]]) -> dict[str, Any]
     }
 
 
-def recommend(aggregate_rows: list[dict[str, Any]]) -> dict[str, Any]:
+def recommend(
+    aggregate_rows: list[dict[str, Any]],
+    *,
+    expected_datasets: list[str],
+    expected_corruption_types: tuple[str, ...],
+    expected_seeds: list[int],
+) -> dict[str, Any]:
     grouped = by_dataset_corruption(aggregate_rows)
-    complete = all(set(rows) >= set(CORRUPTION_TYPES) for rows in grouped.values())
-    if not complete:
-        return {"recommended_corruption_type": None, "reason": "formal results are incomplete"}
+    expected_dataset_set = set(expected_datasets)
+    actual_dataset_set = set(grouped)
+    expected_corruption_set = set(expected_corruption_types)
+    missing_datasets = sorted(expected_dataset_set - actual_dataset_set)
+    unexpected_datasets = sorted(actual_dataset_set - expected_dataset_set)
+    incomplete_cells = {
+        dataset: sorted(expected_corruption_set - set(rows))
+        for dataset, rows in grouped.items()
+        if expected_corruption_set - set(rows)
+    }
+    wrong_seed_counts = [
+        {
+            "dataset": row["dataset"],
+            "corruption_type": row["corruption_type"],
+            "n_runs": int(row.get("n_runs", -1)),
+        }
+        for row in aggregate_rows
+        if int(row.get("n_runs", -1)) != len(expected_seeds)
+    ]
+    if missing_datasets or unexpected_datasets or incomplete_cells or wrong_seed_counts:
+        return {
+            "recommended_corruption_type": None,
+            "reason": "formal results are incomplete",
+            "grid_details": {
+                "missing_datasets": missing_datasets,
+                "unexpected_datasets": unexpected_datasets,
+                "incomplete_dataset_corruptions": incomplete_cells,
+                "wrong_seed_counts": wrong_seed_counts,
+            },
+        }
 
     means_by_type: dict[str, list[float]] = {key: [] for key in CORRUPTION_TYPES}
     stds_by_type: dict[str, list[float]] = {key: [] for key in CORRUPTION_TYPES}
@@ -376,7 +409,14 @@ def main() -> int:
     aggregate_rows = aggregate(formal_rows)
     differences = build_differences(aggregate_rows)
     nonzero_aware_assessment = assess_nonzero_aware(aggregate_rows)
-    recommendation = recommend(aggregate_rows)
+    expected_datasets = parse_csv(args.expected_datasets)
+    expected_seeds = [int(seed) for seed in parse_csv(args.expected_seeds)]
+    recommendation = recommend(
+        aggregate_rows,
+        expected_datasets=expected_datasets,
+        expected_corruption_types=CORRUPTION_TYPES,
+        expected_seeds=expected_seeds,
+    )
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     write_csv(args.output_dir / "corruption_triad_runs.csv", formal_rows)

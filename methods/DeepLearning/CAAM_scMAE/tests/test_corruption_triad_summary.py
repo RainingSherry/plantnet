@@ -6,6 +6,7 @@ import yaml
 from methods.DeepLearning.CAAM_scMAE.benchmark.summarize_corruption_triad import (
     CORRUPTION_TYPES,
     discover_runs,
+    recommend,
     validate_expected_grid,
     write_markdown_report,
 )
@@ -100,6 +101,25 @@ def test_summary_requires_full_expected_dataset_corruption_seed_grid(tmp_path):
             expected_corruption_types=CORRUPTION_TYPES,
             expected_seeds=[42, 2024],
         )
+
+
+def test_recommend_requires_full_expected_aggregate_grid():
+    aggregate_rows = [
+        {"dataset": "D1", "corruption_type": corruption_type, "n_runs": 1}
+        for corruption_type in CORRUPTION_TYPES
+    ]
+
+    result = recommend(
+        aggregate_rows,
+        expected_datasets=["D1", "D2"],
+        expected_corruption_types=CORRUPTION_TYPES,
+        expected_seeds=[42, 2024],
+    )
+
+    assert result["recommended_corruption_type"] is None
+    assert result["reason"] == "formal results are incomplete"
+    assert result["grid_details"]["missing_datasets"] == ["D2"]
+    assert result["grid_details"]["wrong_seed_counts"]
 
 
 def test_markdown_report_includes_phase_gate_result(tmp_path):
