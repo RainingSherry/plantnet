@@ -3,7 +3,7 @@ import json
 import pytest
 import yaml
 
-from methods.DeepLearning.CAAM_scMAE.benchmark.run_advmask_triage import build_run_commands
+from methods.DeepLearning.CAAM_scMAE.benchmark.run_advmask_triage import build_run_commands, write_phase14_config
 from methods.DeepLearning.CAAM_scMAE.benchmark.summarize_advmask_triage import (
     build_differences,
     discover_runs,
@@ -86,6 +86,7 @@ def test_advmask_triage_runner_only_builds_control_and_advmask_commands(tmp_path
 
     commands = build_run_commands(
         runner=tmp_path / "run.py",
+        config_path=tmp_path / "phase14_config.json",
         run_root=tmp_path / "runs",
         data_root=data_root,
         dataset_names=["Quake_Smart-seq2_Lung"],
@@ -102,6 +103,20 @@ def test_advmask_triage_runner_only_builds_control_and_advmask_commands(tmp_path
     assert "--variant axial" not in flattened
     assert "--variant full" not in flattened
     assert "method_manifest.yaml" not in flattened
+    assert "--config" in flattened
+
+
+def test_advmask_triage_config_activates_generator_within_three_epochs(tmp_path):
+    config_path = write_phase14_config(
+        tmp_path / "phase14_advmask_triage_config.json",
+        student_warmup_epochs=1,
+        generator_update_interval=5,
+    )
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+
+    assert config["training"]["student_warmup_epochs"] == 1
+    assert config["training"]["student_warmup_epochs"] < 3
+    assert config["training"]["generator_update_interval"] == 5
 
 
 def test_advmask_triage_summary_calculates_advmask_minus_control(tmp_path):
@@ -125,6 +140,28 @@ def test_advmask_triage_summary_calculates_advmask_minus_control(tmp_path):
     value = differences["D1|scmae_shuffle"]["advmask_minus_control.kmeans_known_k.ari"]
     assert round(value, 6) == 0.15
     assert any(row["variant"] == "advmask" and row["generator_grad_norm"] == 1.2 for row in rows)
+
+
+def test_advmask_triage_gate_requires_mean_delta_above_seed_noise(tmp_path):
+    for dataset, delta in (("D1", 0.01), ("D2", 0.01), ("D3", -0.01)):
+        _write_run(tmp_path, dataset=dataset, variant="control", seed=1, ari=0.4)
+        _write_run(tmp_path, dataset=dataset, variant="control", seed=2, ari=0.8)
+        _write_run(tmp_path, dataset=dataset, variant="advmask", seed=1, ari=0.4 + delta, generator_grad_norm=1.0)
+        _write_run(tmp_path, dataset=dataset, variant="advmask", seed=2, ari=0.8 + delta, generator_grad_norm=1.0)
+
+    _summary_path, report_json_path, _report_md_path = summarize(
+        tmp_path,
+        output_dir=tmp_path / "out",
+        report_path=tmp_path / "PHASE14_ADVMASK_TRIAGE_REPORT.md",
+        expected_datasets=["D1", "D2", "D3"],
+        expected_corruption_types=["scmae_shuffle"],
+        expected_seeds=[1, 2],
+    )
+    gate = json.loads(report_json_path.read_text(encoding="utf-8"))["gate"]
+
+    assert len(gate["positive_ari_dataset_corruptions"]) == 2
+    assert gate["effect_size_gate_pass"] is False
+    assert gate["gate_result"] == "fail"
 
 
 def test_advmask_triage_rejects_axial_or_full_runs(tmp_path):

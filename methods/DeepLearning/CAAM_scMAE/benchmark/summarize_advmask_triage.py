@@ -226,6 +226,32 @@ def build_differences(aggregate_rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def assess_gate(aggregate_rows: list[dict[str, Any]], differences: dict[str, Any]) -> dict[str, Any]:
+    grouped: dict[tuple[str, str], dict[str, dict[str, Any]]] = {}
+    for row in aggregate_rows:
+        grouped.setdefault((row["dataset"], row["corruption_type"]), {})[row["variant"]] = row
+    ari_deltas: list[float] = []
+    seed_std_refs: list[float] = []
+    for key, values in differences.items():
+        dataset, corruption_type = key.split("|", 1)
+        delta = float(values.get(f"advmask_minus_control.{PRIMARY_METRIC}", math.nan))
+        if not math.isnan(delta):
+            ari_deltas.append(delta)
+        pair = grouped.get((dataset, corruption_type), {})
+        std_values = [
+            float(pair[variant].get(f"{PRIMARY_METRIC}.std", math.nan))
+            for variant in PHASE14_VARIANTS
+            if variant in pair
+        ]
+        clean_std = [value for value in std_values if not math.isnan(value)]
+        if clean_std:
+            seed_std_refs.append(mean(clean_std))
+    mean_ari_delta = mean(ari_deltas) if ari_deltas else math.nan
+    mean_seed_std_reference = mean(seed_std_refs) if seed_std_refs else math.nan
+    effect_size_gate_pass = (
+        not math.isnan(mean_ari_delta)
+        and not math.isnan(mean_seed_std_reference)
+        and mean_ari_delta > 0.5 * mean_seed_std_reference
+    )
     positive_ari = [
         key
         for key, values in differences.items()
@@ -248,11 +274,20 @@ def assess_gate(aggregate_rows: list[dict[str, Any]], differences: dict[str, Any
         if float(row.get("mean_pairwise_cosine.mean", 0.0)) > 0.95
         or float(row.get("min_per_dimension_variance.mean", 1.0)) < 1e-4
     ]
-    keep = len(positive_ari) >= 2 and len(generator_positive) == len(advmask_rows) and not concentrated and not collapsed
+    keep = (
+        len(positive_ari) >= 2
+        and effect_size_gate_pass
+        and len(generator_positive) == len(advmask_rows)
+        and not concentrated
+        and not collapsed
+    )
     return {
         "gate_result": "pass" if keep else "fail",
         "recommendation": "keep_advmask" if keep else "drop_or_downgrade_advmask",
         "positive_ari_dataset_corruptions": positive_ari,
+        "mean_ari_delta": mean_ari_delta,
+        "mean_seed_std_reference": mean_seed_std_reference,
+        "effect_size_gate_pass": effect_size_gate_pass,
         "generator_grad_norm_positive": generator_positive,
         "mask_concentration_flags": concentrated,
         "embedding_collapse_flags": collapsed,
@@ -312,6 +347,9 @@ def write_markdown_report(
             f"- gate_result: `{gate['gate_result']}`",
             f"- recommendation: `{gate['recommendation']}`",
             f"- positive_ari_dataset_corruptions: `{json.dumps(gate['positive_ari_dataset_corruptions'])}`",
+            f"- mean_ari_delta: `{gate['mean_ari_delta']:.6f}`",
+            f"- mean_seed_std_reference: `{gate['mean_seed_std_reference']:.6f}`",
+            f"- effect_size_gate_pass: `{gate['effect_size_gate_pass']}`",
             f"- generator_grad_norm_positive: `{json.dumps(gate['generator_grad_norm_positive'])}`",
             f"- mask_concentration_flags: `{json.dumps(gate['mask_concentration_flags'])}`",
             f"- embedding_collapse_flags: `{json.dumps(gate['embedding_collapse_flags'])}`",

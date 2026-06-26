@@ -55,9 +55,38 @@ def load_recommended_corruptions(report_path: Path) -> list[str]:
     return out
 
 
+def write_phase14_config(
+    path: Path,
+    *,
+    student_warmup_epochs: int,
+    generator_update_interval: int,
+) -> Path:
+    if int(student_warmup_epochs) < 0:
+        raise ValueError("student_warmup_epochs must be non-negative.")
+    if int(generator_update_interval) < 1:
+        raise ValueError("generator_update_interval must be at least 1.")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(
+            {
+                "training": {
+                    "student_warmup_epochs": int(student_warmup_epochs),
+                    "generator_update_interval": int(generator_update_interval),
+                }
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
 def build_run_commands(
     *,
     runner: Path,
+    config_path: Path | None,
     run_root: Path,
     data_root: Path | None,
     dataset_names: list[str],
@@ -77,6 +106,11 @@ def build_run_commands(
                     cmd = [
                         sys.executable,
                         str(runner),
+                    ]
+                    if config_path is not None:
+                        cmd.extend(["--config", str(config_path)])
+                    cmd.extend(
+                        [
                         "--data_path",
                         str(data_path),
                         "--save_dir",
@@ -105,7 +139,8 @@ def build_run_commands(
                         corruption_type,
                         "--strict_effective_budget",
                         "false",
-                    ]
+                        ]
+                    )
                     if no_cuda:
                         cmd.append("--no_cuda")
                     else:
@@ -126,6 +161,8 @@ def main() -> int:
     parser.add_argument("--run_label", choices=("smoke", "formal"), default="formal")
     parser.add_argument("--gpu", type=int, default=1)
     parser.add_argument("--no_cuda", action="store_true")
+    parser.add_argument("--student_warmup_epochs", type=int, default=None)
+    parser.add_argument("--generator_update_interval", type=int, default=5)
     args = parser.parse_args()
 
     if not args.no_cuda and int(args.gpu) not in {1, 2, 3, 4, 5, 6}:
@@ -138,8 +175,17 @@ def main() -> int:
     )
     if len(corruption_types) > 2:
         raise ValueError("Phase 14 may triage at most two corruption types.")
+    warmup_epochs = int(args.student_warmup_epochs) if args.student_warmup_epochs is not None else min(1, int(args.epochs) - 1)
+    if warmup_epochs < 0 or warmup_epochs >= int(args.epochs):
+        raise ValueError("Phase 14 AdvMask triage requires student_warmup_epochs < epochs.")
 
     runner = PROJECT_ROOT / "methods/DeepLearning/CAAM_scMAE/run.py"
+    args.save_root.mkdir(parents=True, exist_ok=True)
+    config_path = write_phase14_config(
+        args.save_root / "phase14_advmask_triage_config.json",
+        student_warmup_epochs=warmup_epochs,
+        generator_update_interval=int(args.generator_update_interval),
+    )
     run_root = args.save_root / args.run_label
     run_root.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
@@ -148,6 +194,7 @@ def main() -> int:
 
     commands = build_run_commands(
         runner=runner,
+        config_path=config_path,
         run_root=run_root,
         data_root=args.data_root,
         dataset_names=parse_csv(args.datasets),
