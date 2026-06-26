@@ -9,6 +9,7 @@ from typing import Any
 
 
 VARIANTS = ("control", "axial", "advmask", "full")
+CORRUPTION_TYPES = ("scmae_shuffle", "matched_donor", "nonzero_aware_donor")
 
 
 DEFAULT_CONFIG: dict[str, Any] = {
@@ -184,6 +185,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mask_ratio", type=float, default=None)
     parser.add_argument("--latent_dim", type=int, default=None)
     parser.add_argument("--mlp_hidden_dim", type=int, default=None)
+    parser.add_argument("--corruption_type", type=str, default=None, choices=CORRUPTION_TYPES)
     parser.add_argument("--strict_effective_budget", type=str2bool, default=None)
     return parser
 
@@ -229,6 +231,8 @@ def resolve_config(args: argparse.Namespace) -> dict[str, Any]:
         cli.setdefault("model", {})["latent_dim"] = int(args.latent_dim)
     if args.mlp_hidden_dim is not None:
         cli.setdefault("model", {})["mlp_hidden_dim"] = int(args.mlp_hidden_dim)
+    if args.corruption_type is not None:
+        cli.setdefault("corruption", {})["type"] = str(args.corruption_type)
     if args.strict_effective_budget is not None:
         cli.setdefault("corruption", {})["strict_effective_budget"] = bool(args.strict_effective_budget)
 

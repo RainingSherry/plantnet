@@ -5,8 +5,8 @@ import torch
 from .base import CorruptionResult, hard_corruption, straight_through_corruption
 
 
-class MatchedDonorCorruption:
-    corruption_type = "matched_donor"
+class ScMAEShuffleCorruption:
+    corruption_type = "scmae_shuffle"
 
     def corrupt(
         self,
@@ -20,17 +20,13 @@ class MatchedDonorCorruption:
         replacement_info: dict | None = None,
     ) -> CorruptionResult:
         x_tilde = straight_through_corruption(x, mask, replacement) if straight_through else hard_corruption(x, mask, replacement)
-        effective = (mask > 0).float() * eligibility.float()
-        if torch.any((mask > 0.5) & (~eligibility)):
-            warning = "selected_mask differs from effective_mask because ineligible positions were selected"
-        else:
-            warning = ""
+        delta = (x_tilde.detach() - x.detach()).abs()
+        effective = (mask > 0).float() * (delta > 0).float()
         budget_deficit = torch.zeros(x.shape[0], dtype=torch.float32, device=x.device)
         info = {
-            "selected_mask_rate": float(mask.detach().mean().cpu()),
-            "effective_changed_rate": float(((x_tilde.detach() - x).abs() > 0).float().mean().cpu()),
             "corruption_type": self.corruption_type,
-            "warning": warning,
+            "selected_mask_rate": float(mask.detach().mean().cpu()),
+            "effective_changed_rate": float((effective > 0).float().mean().cpu()),
         }
         if replacement_info:
             info.update({k: v for k, v in replacement_info.items() if not torch.is_tensor(v)})

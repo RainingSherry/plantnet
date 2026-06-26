@@ -88,6 +88,27 @@ def test_selected_gene_indices_reproducible_same_seed(tmp_path):
     assert first.preprocess_config["actual_n_genes_after_selection"] == 5
 
 
+def test_benchmark_mode_log1p_transforms_raw_like_counts(tmp_path):
+    x = np.random.default_rng(11).poisson(5.0, size=(30, 20)).astype(np.float32)
+    adata = ad.AnnData(X=x)
+    adata.var_names = [f"gene_{i}" for i in range(20)]
+    path = tmp_path / "raw_counts.h5ad"
+    adata.write_h5ad(path)
+
+    bundle = load_caam_data(
+        str(path),
+        input_mode="log1p",
+        target_sum=10000.0,
+        n_top_genes=5,
+        scale_input=False,
+        benchmark_mode=True,
+        seed=123,
+    )
+    assert bundle.preprocess_config["resolved_input_mode"] == "raw->log1p"
+    assert bundle.x.max() < x.max()
+    assert bundle.preprocess_config["feature_space_source"] == "hvg"
+
+
 def test_validate_formal_smoke_accepts_hvg_protocol(tmp_path):
     run_dir = tmp_path / "run"
     run_dir.mkdir()

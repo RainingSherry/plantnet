@@ -126,7 +126,12 @@ def load_caam_data(
     work.X = source.copy() if sp.issparse(source) else np.asarray(source).copy()
 
     if benchmark_mode:
-        inferred_mode = "log1p"
+        if _looks_like_raw_counts(work.X):
+            sc.pp.normalize_total(work, target_sum=target_sum)
+            sc.pp.log1p(work)
+            inferred_mode = "raw->log1p"
+        else:
+            inferred_mode = "log1p"
         scale_input = False
     else:
         if inferred_mode == "raw" or (_looks_like_raw_counts(work.X) and input_mode in {"auto", "raw"}):

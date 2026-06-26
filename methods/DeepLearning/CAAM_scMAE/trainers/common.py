@@ -9,6 +9,8 @@ import torch
 from torch.utils.data import DataLoader
 
 from methods.DeepLearning.CAAM_scMAE.corruption.matched_donor import MatchedDonorCorruption
+from methods.DeepLearning.CAAM_scMAE.corruption.nonzero_aware_donor import NonzeroAwareDonorCorruption
+from methods.DeepLearning.CAAM_scMAE.corruption.scmae_shuffle import ScMAEShuffleCorruption
 from methods.DeepLearning.CAAM_scMAE.data.dataset import CAAMExpressionDataset, assert_no_training_labels
 from methods.DeepLearning.CAAM_scMAE.data.donor_candidates import DonorCandidateProvider
 from methods.DeepLearning.CAAM_scMAE.diagnostics.attention_stats import summarize_attention
@@ -20,6 +22,16 @@ from methods.DeepLearning.CAAM_scMAE.mask_generator.adversarial_mask import Adve
 from methods.DeepLearning.CAAM_scMAE.mask_generator.random_mask import RandomFixedBudgetMask
 from methods.DeepLearning.CAAM_scMAE.mask_generator.regularizers import generator_regularization
 from methods.DeepLearning.CAAM_scMAE.models.common import freeze_module, grad_norm
+
+
+def build_corruption(corruption_type: str):
+    if corruption_type == "scmae_shuffle":
+        return ScMAEShuffleCorruption()
+    if corruption_type == "matched_donor":
+        return MatchedDonorCorruption()
+    if corruption_type == "nonzero_aware_donor":
+        return NonzeroAwareDonorCorruption()
+    raise ValueError(f"Unknown corruption_type {corruption_type!r}")
 
 
 class CAAMTrainer:
@@ -44,7 +56,7 @@ class CAAMTrainer:
         self.save_dir = save_dir
         self.context_indices = torch.as_tensor(context_indices, dtype=torch.long, device=device) if context_indices is not None else None
         self.random_mask = RandomFixedBudgetMask(float(config["mask"]["ratio"]))
-        self.corruption = MatchedDonorCorruption()
+        self.corruption = build_corruption(str(config["corruption"]["type"]))
         self.generator = None
         if config["model"]["mask_selector"] == "adversarial":
             self.generator = AdversarialMaskGenerator(
@@ -96,6 +108,11 @@ class CAAMTrainer:
             "deficit_cells": 0.0,
             "cells": 0.0,
         }
+        self.corruption_source_totals: dict[str, float] = {
+            "nonzero_aware_success": 0.0,
+            "fallback_to_matched": 0.0,
+            "fallback_to_scmae_shuffle": 0.0,
+        }
 
     def _loader(self) -> DataLoader:
         generator = torch.Generator()
@@ -132,6 +149,16 @@ class CAAMTrainer:
             )
         return rate
 
+    def _sample_replacement(self, idx: torch.Tensor) -> dict[str, Any]:
+        corruption_type = str(self.config["corruption"]["type"])
+        if corruption_type == "scmae_shuffle":
+            return self.donor_provider.sample_scmae_shuffle_batch(idx, self.full_x, self.device)
+        if corruption_type == "matched_donor":
+            return self.donor_provider.sample_batch(idx, self.full_x, self.device)
+        if corruption_type == "nonzero_aware_donor":
+            return self.donor_provider.sample_nonzero_aware_batch(idx, self.full_x, self.device)
+        raise ValueError(f"Unknown corruption_type {corruption_type!r}")
+
     def _record_corruption_stats(
         self,
         *,
@@ -139,6 +166,7 @@ class CAAMTrainer:
         x_tilde: torch.Tensor,
         mask: torch.Tensor,
         deficit_rate: float,
+        replacement_info: dict[str, Any] | None = None,
     ) -> None:
         selected = mask.detach() > 0.5
         delta = (x_tilde.detach() - x.detach()).abs()
@@ -155,12 +183,17 @@ class CAAMTrainer:
         self.corruption_totals["positions"] += float(delta.numel())
         self.corruption_totals["deficit_cells"] += float(deficit_rate) * float(x.shape[0])
         self.corruption_totals["cells"] += float(x.shape[0])
+        info = replacement_info or {}
+        for key in ("nonzero_aware_success", "fallback_to_matched", "fallback_to_scmae_shuffle"):
+            value = info.get(key)
+            if torch.is_tensor(value):
+                self.corruption_source_totals[key] += float((selected & value.detach().bool()).float().sum().cpu())
 
     def corruption_stats(self) -> dict[str, Any]:
         selected = max(1.0, self.corruption_totals["selected"])
         positions = max(1.0, self.corruption_totals["positions"])
         cells = max(1.0, self.corruption_totals["cells"])
-        return {
+        stats = {
             "corruption_type": str(self.config["corruption"]["type"]),
             "mask_ratio": float(self.config["mask"]["ratio"]),
             "n_top_genes": int(self.config["preprocessing"]["n_top_genes"]),
@@ -172,6 +205,26 @@ class CAAMTrainer:
             "mean_abs_delta_masked": float(self.corruption_totals["abs_delta_masked"] / selected),
             "strict_effective_budget": bool(self.config["corruption"].get("strict_effective_budget", False)),
         }
+        levels = self.donor_provider.stats.get("fallback_levels", {})
+        stats.update(
+            {
+                "donor_fallback_matched": int(levels.get("matched", 0)),
+                "donor_fallback_batch": int(levels.get("batch", 0)),
+                "donor_fallback_global": int(levels.get("global", 0)),
+                "per_gene_permutation_seed": int(self.donor_provider.scmae_permutation_seed),
+            }
+        )
+        if str(self.config["corruption"]["type"]) == "nonzero_aware_donor":
+            stats.update(
+                {
+                    "nonzero_aware_success_rate": float(self.corruption_source_totals["nonzero_aware_success"] / selected),
+                    "fallback_to_matched_rate": float(self.corruption_source_totals["fallback_to_matched"] / selected),
+                    "fallback_to_scmae_shuffle_rate": float(
+                        self.corruption_source_totals["fallback_to_scmae_shuffle"] / selected
+                    ),
+                }
+            )
+        return stats
 
     def _student_mask(self, x: torch.Tensor, eligibility: torch.Tensor, epoch: int):
         if self.generator is None or epoch <= int(self.config["training"]["student_warmup_epochs"]):
@@ -186,11 +239,25 @@ class CAAMTrainer:
             self.generator.zero_grad(set_to_none=True)
         idx = batch["index"].to(self.device).long()
         x = batch["x"].to(self.device)
-        donor = self.donor_provider.sample_batch(idx, self.full_x, self.device)
-        logits, mask, mask_info = self._student_mask(x, donor["eligibility"], epoch)
+        donor = self._sample_replacement(idx)
+        mask_eligibility = donor.get("mask_eligibility", donor["eligibility"])
+        logits, mask, mask_info = self._student_mask(x, mask_eligibility, epoch)
         deficit_rate = self._check_budget_deficit(mask_info, where="student step")
-        corrupt = self.corruption.corrupt(x, mask, donor["replacement"], donor["eligibility"], donor["donor_indices"])
-        self._record_corruption_stats(x=x, x_tilde=corrupt.x_tilde, mask=mask, deficit_rate=deficit_rate)
+        corrupt = self.corruption.corrupt(
+            x,
+            mask,
+            donor["replacement"],
+            donor["eligibility"],
+            donor["donor_indices"],
+            replacement_info=donor.get("replacement_info"),
+        )
+        self._record_corruption_stats(
+            x=x,
+            x_tilde=corrupt.x_tilde,
+            mask=mask,
+            deficit_rate=deficit_rate,
+            replacement_info=donor.get("replacement_info"),
+        )
         self.student.train()
         self.student_optimizer.zero_grad(set_to_none=True)
         out = self.student(corrupt.x_tilde, mask=mask, indices=idx)
@@ -213,7 +280,7 @@ class CAAMTrainer:
         g_grad = grad_norm(self.generator) if self.generator is not None else 0.0
         if self.generator is not None and g_grad != 0.0 and bool(self.config["runtime"]["fail_fast"]):
             raise RuntimeError("generator received gradient during student step")
-        self.last_mask_stats = summarize_mask(mask, donor["eligibility"])
+        self.last_mask_stats = summarize_mask(mask, mask_eligibility)
         self.last_mask_stats["budget_deficit_rate"] = float(deficit_rate)
         self.last_attention_stats = summarize_attention(out.get("gene_attn"), out.get("cell_attn"))
         self.last_gradient_stats = collect_gradient_stats(self.student, self.generator)
@@ -249,14 +316,15 @@ class CAAMTrainer:
         assert_no_training_labels(batch)
         idx = batch["index"].to(self.device).long()
         x = batch["x"].to(self.device)
-        donor = self.donor_provider.sample_batch(idx, self.full_x, self.device)
+        donor = self._sample_replacement(idx)
+        mask_eligibility = donor.get("mask_eligibility", donor["eligibility"])
         tau = self._temperature(epoch)
         self.generator.train()
         self.generator_optimizer.zero_grad(set_to_none=True)
         self.student.zero_grad(set_to_none=True)
         with freeze_module(self.student):
             self.student.eval()
-            logits, hard, soft, st, info = self.generator(x, donor["eligibility"], tau, add_gumbel=True)
+            logits, hard, soft, st, info = self.generator(x, mask_eligibility, tau, add_gumbel=True)
             deficit_rate = self._check_budget_deficit(info, where="generator step")
             x_tilde = x * (1.0 - st) + donor["replacement"].detach() * st
             out = self.student(x_tilde, mask=hard, indices=idx)
@@ -271,7 +339,7 @@ class CAAMTrainer:
             regs = generator_regularization(
                 soft,
                 logits,
-                donor["eligibility"],
+                mask_eligibility,
                 x,
                 donor["replacement"],
                 tau=tau,

@@ -45,6 +45,8 @@ class DonorCandidateProvider:
         if self.candidate_pool_size <= 0:
             raise ValueError("candidate_pool_size must be positive.")
         self.candidates, self.stats = self._build_candidates()
+        self.scmae_permutation_seed = int(seed) + 7919
+        self._scmae_permutations: np.ndarray | None = None
 
     @staticmethod
     def _bin(values: np.ndarray, n_bins: int) -> np.ndarray:
@@ -103,6 +105,39 @@ class DonorCandidateProvider:
         with open(save_dir / "donor_candidate_stats.json", "w", encoding="utf-8") as handle:
             json.dump(self.stats, handle, indent=2)
 
+    def _ensure_scmae_permutations(self) -> np.ndarray:
+        if self._scmae_permutations is None:
+            rng = np.random.default_rng(self.scmae_permutation_seed)
+            perms = np.empty((self.n_cells, self.n_genes), dtype=np.int64)
+            for gene_id in range(self.n_genes):
+                perms[:, gene_id] = rng.permutation(self.n_cells)
+            self._scmae_permutations = perms
+        return self._scmae_permutations
+
+    def sample_scmae_shuffle_batch(
+        self,
+        batch_indices: torch.Tensor,
+        x_full: torch.Tensor,
+        device: torch.device,
+    ) -> dict[str, torch.Tensor]:
+        idx_cpu = batch_indices.detach().cpu().numpy().astype(np.int64)
+        donor_np = self._ensure_scmae_permutations()[idx_cpu]
+        donor_indices = torch.as_tensor(donor_np, dtype=torch.long, device=device)
+        gene_ids = torch.arange(self.n_genes, device=device).view(1, self.n_genes).expand_as(donor_indices)
+        replacement = x_full[donor_indices, gene_ids]
+        original = x_full[batch_indices.to(device).long()]
+        changed = ~torch.isclose(replacement, original, atol=self.atol, rtol=self.rtol)
+        return {
+            "replacement": replacement,
+            "eligibility": changed,
+            "mask_eligibility": torch.ones_like(changed, dtype=torch.bool),
+            "donor_indices": donor_indices,
+            "replacement_info": {
+                "per_gene_permutation_seed": self.scmae_permutation_seed,
+                "source_scmae_shuffle": torch.ones_like(changed, dtype=torch.bool),
+            },
+        }
+
     def sample_batch(
         self,
         batch_indices: torch.Tensor,
@@ -130,4 +165,57 @@ class DonorCandidateProvider:
             "replacement": replacement,
             "eligibility": eligibility,
             "donor_indices": donor_indices,
+            "mask_eligibility": eligibility,
+            "replacement_info": {},
+        }
+
+    def sample_nonzero_aware_batch(
+        self,
+        batch_indices: torch.Tensor,
+        x_full: torch.Tensor,
+        device: torch.device,
+    ) -> dict[str, torch.Tensor]:
+        idx_cpu = batch_indices.detach().cpu().numpy().astype(np.int64)
+        b = int(idx_cpu.shape[0])
+        g = self.n_genes
+        cand = torch.as_tensor(self.candidates[idx_cpu], dtype=torch.long, device=device)
+        gene_ids = torch.arange(g, device=device).view(1, 1, g).expand(b, self.candidate_pool_size, g)
+        candidate_values = x_full[cand.unsqueeze(-1).expand(b, self.candidate_pool_size, g), gene_ids]
+        original = x_full[batch_indices.to(device).long()]
+        changed_candidates = ~torch.isclose(
+            candidate_values,
+            original.unsqueeze(1).expand_as(candidate_values),
+            atol=self.atol,
+            rtol=self.rtol,
+        )
+        has_changed = changed_candidates.any(dim=1)
+        random_scores = torch.rand((b, self.candidate_pool_size, g), device=device).masked_fill(~changed_candidates, -1.0)
+        chosen_slot = random_scores.argmax(dim=1)
+        change_aware_donor = torch.gather(cand, dim=1, index=chosen_slot)
+        change_aware_value = torch.gather(candidate_values, dim=1, index=chosen_slot.unsqueeze(1)).squeeze(1)
+
+        matched = self.sample_batch(batch_indices, x_full, device)
+        matched_replacement = matched["replacement"]
+        matched_changed = matched["eligibility"].bool()
+
+        shuffle = self.sample_scmae_shuffle_batch(batch_indices, x_full, device)
+        shuffle_replacement = shuffle["replacement"]
+        shuffle_donor = shuffle["donor_indices"]
+
+        fallback_to_matched = (~has_changed) & matched_changed
+        fallback_to_shuffle = (~has_changed) & (~matched_changed)
+        replacement = torch.where(has_changed, change_aware_value, torch.where(fallback_to_matched, matched_replacement, shuffle_replacement))
+        donor_indices = torch.where(has_changed, change_aware_donor, torch.where(fallback_to_matched, matched["donor_indices"], shuffle_donor))
+        final_changed = ~torch.isclose(replacement, original, atol=self.atol, rtol=self.rtol)
+        return {
+            "replacement": replacement,
+            "eligibility": final_changed,
+            "mask_eligibility": torch.ones_like(final_changed, dtype=torch.bool),
+            "donor_indices": donor_indices,
+            "replacement_info": {
+                "per_gene_permutation_seed": self.scmae_permutation_seed,
+                "nonzero_aware_success": has_changed,
+                "fallback_to_matched": fallback_to_matched,
+                "fallback_to_scmae_shuffle": fallback_to_shuffle,
+            },
         }
