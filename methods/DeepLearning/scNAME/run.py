@@ -42,6 +42,68 @@ def set_seed(seed):
         pass  # TF not imported yet
 
 
+def _to_dense_float32(matrix):
+    """Convert sparse/dense AnnData matrices to dense float32 arrays."""
+    if hasattr(matrix, 'toarray'):
+        matrix = matrix.toarray()
+    return np.asarray(matrix, dtype=np.float32)
+
+
+def _validate_scname_count_matrix(matrix, expected_shape, source_name):
+    if matrix.shape != expected_shape:
+        raise ValueError(
+            f"scNAME count_X from {source_name} has shape {matrix.shape}, "
+            f"expected {expected_shape}."
+        )
+    if not np.isfinite(matrix).all():
+        raise ValueError(f"scNAME count_X from {source_name} contains NaN or inf values.")
+    if matrix.size and float(np.min(matrix)) < 0:
+        raise ValueError(
+            f"scNAME count_X from {source_name} contains negative values; "
+            "scaled adata.X/adata.to_df() cannot be used as count_X."
+        )
+    return matrix
+
+
+def _get_scname_count_matrix(adata):
+    """Return nonnegative count/count-like input for scNAME NB/ZINB loss."""
+    expected_shape = adata.X.shape
+
+    if adata.raw is not None:
+        try:
+            raw_counts = _to_dense_float32(adata.raw[:, adata.var_names].X)
+            return _validate_scname_count_matrix(
+                raw_counts, expected_shape, "adata.raw[:, adata.var_names].X"
+            )
+        except (KeyError, ValueError, IndexError) as exc:
+            raw_error = exc
+        else:
+            raw_error = None
+    else:
+        raw_error = None
+
+    if 'norm_log' in adata.layers:
+        norm_log = _to_dense_float32(adata.layers['norm_log'])
+        return _validate_scname_count_matrix(norm_log, expected_shape, "adata.layers['norm_log']")
+
+    detail = f" Raw count lookup failed: {raw_error}" if raw_error is not None else ""
+    raise ValueError(
+        "scNAME requires nonnegative count_X from adata.raw[:, adata.var_names].X "
+        "or adata.layers['norm_log']; scaled adata.X/adata.to_df() cannot be used "
+        f"as count_X.{detail}"
+    )
+
+
+def _size_factors_from_counts(raw_counts):
+    total_counts = raw_counts.sum(axis=1).astype(np.float32)
+    if not np.isfinite(total_counts).all():
+        raise ValueError("Cannot compute scNAME size factors: raw_counts row sums are not finite.")
+    median_count = np.median(total_counts)
+    if not np.isfinite(median_count) or median_count <= 0:
+        raise ValueError("Cannot compute scNAME size factors: raw_counts median row sum is not positive.")
+    return (total_counts / median_count).astype(np.float32)
+
+
 def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
@@ -135,23 +197,22 @@ def main():
     X = np.array(X).astype(np.float32)
     Y = np.array(Y)
 
+    raw_counts = _get_scname_count_matrix(adata)
+
     # Compute size factors — always reshape to (n_cells, 1) for TF placeholder
     if sf is None:
-        total_counts = np.array(adata.X.sum(axis=1)).flatten()
-        median_count = np.median(total_counts)
-        sf = (total_counts / median_count).astype(np.float32)
-    sf = np.array(sf).astype(np.float32).reshape(-1, 1)
+        sf = _size_factors_from_counts(raw_counts)
+    else:
+        sf = np.array(sf).astype(np.float32)
+        if not np.isfinite(sf).all():
+            sf = _size_factors_from_counts(raw_counts)
+    sf = sf.reshape(-1, 1)
 
     # Encode labels to integers if needed
     from sklearn.preprocessing import LabelEncoder
     if Y.dtype.kind not in ['i', 'u']:
         le = LabelEncoder()
         Y = le.fit_transform(Y)
-
-    # Get raw counts for ZINB loss — must match adata.X shape (same genes as HVG subset)
-    # adata.raw contains ALL genes; adata.X only has HVG genes after prepare_data_for_model
-    # Use adata.to_df() which matches adata.X
-    raw_counts = np.array(adata.to_df()).astype(np.float32)
 
     # Shuffle data
     n = X.shape[0]
