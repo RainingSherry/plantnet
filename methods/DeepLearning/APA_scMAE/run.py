@@ -59,24 +59,56 @@ def resolve_device(config: dict[str, Any]):
 
 def evaluate_embeddings(embedding: np.ndarray, labels: np.ndarray, n_clusters: int, seed: int) -> dict[str, Any]:
     from sklearn.cluster import KMeans
-    from sklearn.metrics import adjusted_rand_score, completeness_score, f1_score, fowlkes_mallows_score, homogeneity_score
-    from sklearn.metrics.cluster import normalized_mutual_info_score
-
-    from methods.evaluation import cluster_acc
 
     pred = KMeans(n_clusters=int(n_clusters), random_state=int(seed), n_init=20).fit_predict(embedding)
-    acc, f1 = cluster_acc(labels, pred)
-    metrics = {
-        "acc": float(acc),
+    metrics = mapped_clustering_metrics(labels, pred)
+    metrics.update({"uses_known_k": True, "oracle-K": True, "cluster_method": "kmeans_known_k"})
+    return {"metrics": metrics, "pred": pred.astype(np.int64)}
+
+
+def mapped_clustering_metrics(labels: np.ndarray, pred: np.ndarray) -> dict[str, float]:
+    from sklearn.metrics import (
+        accuracy_score,
+        adjusted_rand_score,
+        completeness_score,
+        f1_score,
+        fowlkes_mallows_score,
+        homogeneity_score,
+        v_measure_score,
+    )
+    from sklearn.metrics.cluster import normalized_mutual_info_score
+
+    mapped = hungarian_map(labels, pred)
+    return {
+        "acc": float(accuracy_score(labels, mapped)),
         "nmi": float(normalized_mutual_info_score(labels, pred)),
         "ari": float(adjusted_rand_score(labels, pred)),
-        "f1_macro": float(f1_score(labels, pred, average="macro")),
-        "f1_macro_hungarian": float(f1),
+        "f1_macro": float(f1_score(labels, mapped, average="macro", zero_division=0)),
         "fmi": float(fowlkes_mallows_score(labels, pred)),
+        "v_measure": float(v_measure_score(labels, pred)),
         "homogeneity": float(homogeneity_score(labels, pred)),
         "completeness": float(completeness_score(labels, pred)),
     }
-    return {"metrics": metrics, "pred": pred.astype(np.int64)}
+
+
+def hungarian_map(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
+    from scipy.optimize import linear_sum_assignment
+
+    y_true = np.asarray(y_true).ravel()
+    y_pred = np.asarray(y_pred).ravel()
+    true_values = np.unique(y_true)
+    pred_values = np.unique(y_pred)
+    n = max(len(true_values), len(pred_values))
+    counts = np.zeros((n, n), dtype=np.int64)
+    for i, true_value in enumerate(true_values):
+        for j, pred_value in enumerate(pred_values):
+            counts[i, j] = int(np.sum((y_true == true_value) & (y_pred == pred_value)))
+    rows, cols = linear_sum_assignment(-counts)
+    mapped = np.zeros_like(y_pred, dtype=np.int64)
+    for row, col in zip(rows, cols):
+        if row < len(true_values) and col < len(pred_values):
+            mapped[y_pred == pred_values[col]] = true_values[row]
+    return mapped
 
 
 def try_leiden_fixed(embedding: np.ndarray, labels: np.ndarray, config: dict[str, Any]) -> dict[str, Any]:
@@ -91,7 +123,7 @@ def try_leiden_fixed(embedding: np.ndarray, labels: np.ndarray, config: dict[str
             seed=int(config["seed"]),
         )
         return {"status": "success", "metrics": metrics, "pred": pred.astype(np.int64)}
-    except Exception as exc:
+    except (ImportError, ModuleNotFoundError) as exc:
         return {
             "status": "skipped",
             "reason": str(exc),
@@ -106,6 +138,22 @@ def try_leiden_fixed(embedding: np.ndarray, labels: np.ndarray, config: dict[str
 
 
 def artifact_manifest(config: dict[str, Any], embedding_shape: tuple[int, int]) -> dict[str, Any]:
+    required = [
+        "embedding_final.npy",
+        "pred_labels.npy",
+        "metrics.json",
+        "training_history.json",
+        "corruption_stats.json",
+        "mask_stats.json",
+        "gene_stats.json",
+        "prototypes.npy",
+        "selected_genes.txt",
+        "resolved_config.yaml",
+        "model_checkpoint.pth",
+        "artifact_manifest.json",
+    ]
+    if not bool(config.get("skip_eval", False)):
+        required.insert(1, "labels.npy")
     return {
         "status": "complete",
         "method": config.get("method_name", "apa_scmae"),
@@ -113,21 +161,7 @@ def artifact_manifest(config: dict[str, Any], embedding_shape: tuple[int, int]) 
         "seed": int(config["seed"]),
         "config_hash": config_hash(config),
         "embedding_shape": [int(embedding_shape[0]), int(embedding_shape[1])],
-        "required_files": [
-            "embedding_final.npy",
-            "labels.npy",
-            "pred_labels.npy",
-            "metrics.json",
-            "training_history.json",
-            "corruption_stats.json",
-            "mask_stats.json",
-            "gene_stats.json",
-            "prototypes.npy",
-            "selected_genes.txt",
-            "resolved_config.yaml",
-            "model_checkpoint.pth",
-            "artifact_manifest.json",
-        ],
+        "required_files": required,
     }
 
 
@@ -155,6 +189,7 @@ def main() -> int:
             n_prototypes=int(config["prototype"]["n_prototypes"]),
             pca_dim=int(config["prototype"]["pca_dim"]),
             seed=int(config["seed"]),
+            require_labels=not bool(config.get("skip_eval", False)),
         )
         config["preprocessing"].update(bundle.preprocess_config)
         write_yaml(save_dir / "resolved_config.yaml", config)
@@ -186,12 +221,15 @@ def main() -> int:
         trainer.train()
         trainer.save_diagnostics()
         embedding = trainer.extract_embeddings(batch_size=max(512, int(config["training"]["batch_size"]) * 2))
-        labels = bundle.labels.astype(np.int64)
+        labels = bundle.labels.astype(np.int64) if bundle.labels is not None else None
         np.save(save_dir / "embedding_final.npy", embedding)
-        np.save(save_dir / "labels.npy", labels)
+        if labels is not None:
+            np.save(save_dir / "labels.npy", labels)
         metrics: dict[str, Any] = {"diagnostics": {"embedding_shape": list(embedding.shape)}}
-        pred = np.zeros(labels.shape[0], dtype=np.int64)
+        pred = np.zeros(embedding.shape[0], dtype=np.int64)
         if not bool(config.get("skip_eval", False)):
+            if labels is None:
+                raise ValueError("skip_eval=false requires labels, but no label column was loaded.")
             n_clusters = int(config["n_clusters"]) if int(config["n_clusters"]) > 0 else int(len(np.unique(labels)))
             eval_result = evaluate_embeddings(embedding, labels, n_clusters, int(config["seed"]))
             metrics["kmeans_known_k"] = eval_result["metrics"]

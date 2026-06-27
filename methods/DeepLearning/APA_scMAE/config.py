@@ -11,6 +11,7 @@ from typing import Any
 DEFAULT_CONFIG: dict[str, Any] = {
     "method_name": "apa_scmae",
     "seed": 42,
+    "skip_eval": False,
     "runtime": {
         "no_cuda": False,
         "gpu": 1,
@@ -117,10 +118,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--data_path", type=str, required=True)
     parser.add_argument("--save_dir", type=str, required=True)
     parser.add_argument("--dataset_name", type=str, default=None)
-    parser.add_argument("--method_name", type=str, default="apa_scmae")
+    parser.add_argument("--method_name", type=str, default=None)
     parser.add_argument("--n_clusters", type=int, required=True)
-    parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--gpu", type=int, default=1)
+    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--gpu", type=int, default=None)
     parser.add_argument("--no_cuda", action="store_true")
     parser.add_argument("--input_mode", type=str, default=None, choices=["auto", "raw", "log1p"])
     parser.add_argument("--n_top_genes", type=int, default=None)
@@ -138,22 +139,27 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mask_ratio", type=float, default=None)
     parser.add_argument("--temperature", type=float, default=None)
     parser.add_argument("--corruption_type", type=str, default=None, choices=["scmae_shuffle"])
-    parser.add_argument("--skip_eval", type=str2bool, default=False)
+    parser.add_argument("--skip_eval", type=str2bool, default=None)
     return parser
 
 
 def resolve_config(args: argparse.Namespace) -> dict[str, Any]:
     cfg = deep_update(DEFAULT_CONFIG, load_yaml(args.config))
     cli: dict[str, Any] = {
-        "seed": int(args.seed),
         "data_path": str(args.data_path),
         "save_dir": str(args.save_dir),
-        "dataset_name": args.dataset_name,
-        "method_name": args.method_name,
         "n_clusters": int(args.n_clusters),
-        "skip_eval": bool(args.skip_eval),
     }
-    cli.setdefault("runtime", {})["gpu"] = int(args.gpu)
+    if args.seed is not None:
+        cli["seed"] = int(args.seed)
+    if args.dataset_name is not None:
+        cli["dataset_name"] = args.dataset_name
+    if args.method_name is not None:
+        cli["method_name"] = args.method_name
+    if args.skip_eval is not None:
+        cli["skip_eval"] = bool(args.skip_eval)
+    if args.gpu is not None:
+        cli.setdefault("runtime", {})["gpu"] = int(args.gpu)
     if args.no_cuda:
         cli["runtime"]["no_cuda"] = True
     prep = cli.setdefault("preprocessing", {})

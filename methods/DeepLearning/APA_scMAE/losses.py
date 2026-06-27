@@ -35,7 +35,7 @@ def balance_loss(mask_soft: torch.Tensor) -> torch.Tensor:
 def distortion_loss(mask_soft: torch.Tensor, delta: torch.Tensor) -> torch.Tensor:
     selected_delta = (mask_soft * delta).sum() / (mask_soft.sum() + 1.0e-8)
     all_delta = delta.mean().detach()
-    return -selected_delta / (all_delta + 1.0e-8)
+    return ((selected_delta - all_delta) / (all_delta + 1.0e-8)).pow(2)
 
 
 def coverage_loss(mask_soft: torch.Tensor, target_ratio: float) -> torch.Tensor:

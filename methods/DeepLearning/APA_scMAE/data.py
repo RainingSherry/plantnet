@@ -12,7 +12,8 @@ from torch.utils.data import Dataset
 @dataclass
 class APABundle:
     x: np.ndarray
-    labels: np.ndarray
+    labels: np.ndarray | None
+    label_key: str | None
     gene_stats: np.ndarray
     prototypes: np.ndarray
     selected_gene_indices: np.ndarray
@@ -55,12 +56,57 @@ def _looks_like_counts(x: np.ndarray) -> bool:
     return bool(np.nanmin(sample) >= 0 and np.allclose(sample, np.round(sample), atol=1.0e-6))
 
 
-def _label_array(adata: Any) -> np.ndarray:
-    for key in ("cell_type", "celltype", "CellType", "label", "labels", "type"):
+LABEL_CANDIDATES = (
+    "cell_type",
+    "celltype",
+    "CellType",
+    "cell type",
+    "cell_types",
+    "celltype_l1",
+    "celltype.l1",
+    "celltype_l2",
+    "celltype.l2",
+    "cell_type1",
+    "Cell.type",
+    "Cell Types",
+    "cell_types",
+    "cell_ontology_class",
+    "cell_ontology",
+    "annotation",
+    "annotations",
+    "Annotation",
+    "manual_annotation",
+    "assigned_cell_type",
+    "cell_label",
+    "cell_labels",
+    "label",
+    "labels",
+    "Label",
+    "class",
+    "Class",
+    "type",
+    "y",
+    "Y",
+)
+
+
+def _label_array(adata: Any) -> tuple[np.ndarray | None, str | None]:
+    for key in LABEL_CANDIDATES:
         if key in adata.obs:
             values = np.asarray(adata.obs[key].astype("category").cat.codes, dtype=np.int64)
-            return values
-    return np.zeros(adata.n_obs, dtype=np.int64)
+            return values, key
+    return None, None
+
+
+def _raw_count_source(adata: Any) -> tuple[np.ndarray | None, np.ndarray | None, str | None]:
+    if "counts" in adata.layers:
+        return _dense(adata.layers["counts"]).astype(np.float32), np.asarray(adata.var_names, dtype=str), 'layers["counts"]'
+    if adata.raw is not None:
+        return _dense(adata.raw.X).astype(np.float32), np.asarray(adata.raw.var_names, dtype=str), "adata.raw.X"
+    x = _dense(adata.X).astype(np.float32)
+    if _looks_like_counts(x):
+        return x, np.asarray(adata.var_names, dtype=str), "adata.X"
+    return None, None, None
 
 
 def _hvg_indices(x: np.ndarray, n_top_genes: int) -> np.ndarray:
@@ -114,32 +160,49 @@ def load_apa_data(
     n_prototypes: int,
     pca_dim: int,
     seed: int,
+    require_labels: bool = True,
 ) -> APABundle:
     import anndata as ad
 
     adata = ad.read_h5ad(data_path)
-    x_raw = _dense(adata.X).astype(np.float32)
-    labels = _label_array(adata)
+    x_adata = _dense(adata.X).astype(np.float32)
+    labels, label_key = _label_array(adata)
+    if labels is None and require_labels:
+        raise ValueError(
+            "No label column found in adata.obs. Tried: "
+            + ", ".join(LABEL_CANDIDATES)
+            + ". Use --skip_eval true only when labels are intentionally unavailable."
+        )
+    count_x, count_gene_names, count_source = _raw_count_source(adata)
     mode = input_mode
     if mode == "auto":
-        mode = "raw" if _looks_like_counts(x_raw) else "log1p"
-    x = x_raw.copy()
+        mode = "raw" if count_x is not None else "log1p"
     if mode == "raw":
+        if count_x is None:
+            raise ValueError("input_mode='raw' requested, but no raw count source was found in layers['counts'], adata.raw.X, or adata.X.")
+        x = count_x.copy()
+        source_gene_names = count_gene_names
         totals = x.sum(axis=1, keepdims=True)
         totals[totals <= 0] = 1.0
         x = np.log1p(x / totals * float(target_sum)).astype(np.float32)
-    elif mode != "log1p":
+        matrix_source = count_source
+    elif mode == "log1p":
+        x = x_adata.copy()
+        source_gene_names = np.asarray(adata.var_names, dtype=str)
+        matrix_source = "adata.X"
+    else:
         raise ValueError(f"Unsupported input_mode={input_mode!r}")
     selected = _hvg_indices(x, int(n_top_genes))
     x = x[:, selected].astype(np.float32, copy=False)
     if scale_input:
         x = ((x - x.mean(axis=0, keepdims=True)) / (x.std(axis=0, keepdims=True) + 1.0e-6)).astype(np.float32)
-    gene_names = np.asarray(adata.var_names, dtype=str)[selected]
+    gene_names = np.asarray(source_gene_names, dtype=str)[selected]
     gene_stats = compute_gene_stats(x)
     prototypes = build_prototypes(x, int(n_prototypes), int(pca_dim), int(seed))
     return APABundle(
         x=x,
         labels=labels,
+        label_key=label_key,
         gene_stats=gene_stats,
         prototypes=prototypes,
         selected_gene_indices=selected,
@@ -147,6 +210,9 @@ def load_apa_data(
         preprocess_config={
             "input_mode_requested": input_mode,
             "input_mode_resolved": mode,
+            "raw_count_source": matrix_source if mode == "raw" else None,
+            "label_key": label_key,
+            "labels_available": labels is not None,
             "target_sum": float(target_sum),
             "n_top_genes": int(n_top_genes),
             "actual_n_genes": int(x.shape[1]),
