@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import importlib.util
 import json
+from pathlib import Path
 
 import anndata as ad
 import numpy as np
@@ -23,10 +25,20 @@ from methods.DeepLearning.APA_scMAE.run import (
     attention_guard,
     hungarian_map,
     mapped_clustering_metrics,
+    resolve_device,
     validate_embedding_inputs,
     validate_required_files,
 )
 from methods.DeepLearning.APA_scMAE.trainer import APATrainer
+from methods.DeepLearning.scNAME.run import _get_scname_count_input, _shuffle_scname_inputs
+
+
+_DESC_LABEL_UTILS_PATH = Path(__file__).resolve().parents[2] / "desc" / "desc" / "models" / "label_utils.py"
+_DESC_LABEL_SPEC = importlib.util.spec_from_file_location("desc_label_utils_for_test", _DESC_LABEL_UTILS_PATH)
+assert _DESC_LABEL_SPEC is not None and _DESC_LABEL_SPEC.loader is not None
+_DESC_LABEL_MODULE = importlib.util.module_from_spec(_DESC_LABEL_SPEC)
+_DESC_LABEL_SPEC.loader.exec_module(_DESC_LABEL_MODULE)
+remap_desc_labels = _DESC_LABEL_MODULE.remap_desc_labels
 
 
 def _config(tmp_path):
@@ -122,6 +134,40 @@ def test_label_errors_and_explicit_key(tmp_path):
         load_apa_data(str(nan_path), input_mode="log1p", target_sum=1.0, n_top_genes=0, scale_input=False, n_prototypes=2, pca_dim=2, seed=1)
 
 
+def test_skip_eval_without_explicit_label_key_skips_label_discovery(tmp_path):
+    multi = tmp_path / "multi_skip_eval.h5ad"
+    _write_h5ad(multi, np.ones((3, 4)), obs={"cell_type": ["a", "b", "a"], "maintype": ["x", "y", "x"]})
+    bundle = load_apa_data(
+        str(multi),
+        input_mode="log1p",
+        target_sum=1.0,
+        n_top_genes=0,
+        scale_input=False,
+        n_prototypes=2,
+        pca_dim=2,
+        seed=1,
+        require_labels=False,
+    )
+    assert bundle.labels is None
+    assert bundle.label_key is None
+    assert bundle.preprocess_config["labels_available"] is False
+
+    explicit = load_apa_data(
+        str(multi),
+        input_mode="log1p",
+        target_sum=1.0,
+        n_top_genes=0,
+        scale_input=False,
+        n_prototypes=2,
+        pca_dim=2,
+        seed=1,
+        require_labels=False,
+        label_key="maintype",
+    )
+    assert explicit.labels is not None
+    assert explicit.label_key == "maintype"
+
+
 def test_raw_count_source_modes_and_feature_metadata(tmp_path):
     counts = np.array([[1, 2, 0, 0], [3, 0, 1, 0], [0, 4, 2, 1]], dtype=np.float32)
     log_x = np.log1p(counts / counts.sum(axis=1, keepdims=True) * 10.0)
@@ -173,6 +219,24 @@ def test_config_defaults_do_not_override_yaml_and_no_cuda_works(tmp_path):
     args = parser.parse_args(["--data_path", "dummy.h5ad", "--save_dir", str(tmp_path / "out2"), "--n_clusters", "2", "--no_cuda"])
     cfg = resolve_config(args)
     assert cfg["runtime"]["no_cuda"] is True
+
+
+def test_resolve_device_maps_visible_gpu_to_logical_index(monkeypatch):
+    import torch
+
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "1,2")
+    config = resolve_config(
+        build_arg_parser().parse_args(["--data_path", "dummy.h5ad", "--save_dir", "/tmp/out", "--n_clusters", "2", "--gpu", "2"])
+    )
+    device, runtime = resolve_device(config)
+    assert str(device) == "cuda:1"
+    assert runtime["physical_gpu"] == 2
+    assert runtime["logical_device"] == "cuda:1"
+
+    config["runtime"]["gpu"] = 3
+    with pytest.raises(ValueError, match="CUDA_VISIBLE_DEVICES"):
+        resolve_device(config)
 
 
 def test_cyclic_and_extra_cluster_metrics():
@@ -289,6 +353,26 @@ def test_trainer_forward_backward_and_generator_interval(tmp_path):
     assert "budget_deficit_rate" in stats
 
 
+def test_trainer_forces_generator_update_when_interval_exceeds_batches(tmp_path):
+    rng = np.random.default_rng(2)
+    x = np.log1p(rng.poisson(2.0, size=(6, 10)).astype(np.float32))
+    config = _config(tmp_path)
+    config["training"]["generator_update_interval"] = 99
+    trainer = APATrainer(
+        config=config,
+        model=APAModel(n_genes=10, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+    history = trainer.train()
+    assert history["generator_update_count"][-1] >= 1.0
+    assert history["generator_update_forced"][-1] == 1.0
+
+
 def test_artifact_manifest_required_files(tmp_path):
     config = _config(tmp_path)
     config.update({"dataset_name": "toy", "skip_eval": False})
@@ -305,3 +389,53 @@ def test_artifact_manifest_required_files(tmp_path):
     config["skip_eval"] = True
     manifest_skip = artifact_manifest(config, (3, 2), "prediction_only_no_labels")
     assert "labels.npy" not in manifest_skip["required_files"]
+
+
+def test_desc_remap_labels_are_dense_integer_without_nan():
+    mapped = remap_desc_labels([2, 2, 4])
+    np.testing.assert_array_equal(mapped, np.array([0, 0, 1], dtype=np.int64))
+    assert np.issubdtype(mapped.dtype, np.integer)
+    assert not pd.Series(mapped).isna().any()
+    assert pd.Series(mapped, dtype=np.int64).astype(int).tolist() == [0, 0, 1]
+
+
+def test_scname_count_input_protocol_and_sources():
+    counts = np.array([[1, 2], [0, 3], [4, 0]], dtype=np.float32)
+    scaled_negative = np.array([[-1.0, 0.2], [0.1, -0.4], [0.3, 0.5]], dtype=np.float32)
+    obs = pd.DataFrame(index=[f"c{i}" for i in range(3)])
+    var = pd.DataFrame(index=["g0", "g1"])
+
+    adata = ad.AnnData(X=scaled_negative, obs=obs, var=var)
+    with pytest.raises(ValueError, match="scaled adata.X"):
+        _get_scname_count_input(adata)
+
+    raw_counts = counts + 10
+    adata = ad.AnnData(X=scaled_negative, obs=obs, var=var)
+    adata.layers["counts"] = counts
+    adata.layers["norm_log"] = np.log1p(counts)
+    adata.raw = ad.AnnData(X=raw_counts, obs=obs.copy(), var=var.copy())
+    count_input = _get_scname_count_input(adata)
+    assert count_input.source == "layers_counts"
+    np.testing.assert_array_equal(count_input.matrix, counts)
+
+    adata = ad.AnnData(X=scaled_negative, obs=obs, var=var)
+    adata.raw = ad.AnnData(X=np.log1p(counts), obs=obs.copy(), var=var.copy())
+    with pytest.raises(ValueError, match="not count-like"):
+        _get_scname_count_input(adata)
+    adata.layers["norm_log"] = np.log1p(counts)
+    fallback = _get_scname_count_input(adata)
+    assert fallback.source == "norm_log_nonnegative_fallback"
+    np.testing.assert_allclose(fallback.matrix, np.log1p(counts))
+
+
+def test_scname_shuffle_keeps_X_Y_count_like_sf_aligned():
+    X = np.array([[10], [20], [30]], dtype=np.float32)
+    Y = np.array([1, 2, 3])
+    count_like = np.array([[100], [200], [300]], dtype=np.float32)
+    sf = np.array([[1.0], [2.0], [3.0]], dtype=np.float32)
+    shuffle_ix = np.array([2, 0, 1])
+    X_s, Y_s, count_s, sf_s = _shuffle_scname_inputs(X, Y, count_like, sf, shuffle_ix)
+    np.testing.assert_array_equal(X_s.ravel(), np.array([30, 10, 20], dtype=np.float32))
+    np.testing.assert_array_equal(Y_s, np.array([3, 1, 2]))
+    np.testing.assert_array_equal(count_s.ravel(), np.array([300, 100, 200], dtype=np.float32))
+    np.testing.assert_array_equal(sf_s.ravel(), np.array([3.0, 1.0, 2.0], dtype=np.float32))

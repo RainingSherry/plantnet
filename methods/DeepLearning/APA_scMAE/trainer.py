@@ -70,6 +70,7 @@ class APATrainer:
             "student_grad_norm": [],
             "generator_grad_norm": [],
             "generator_update_count": [],
+            "generator_update_forced": [],
             "batch_seconds": [],
         }
         self.corruption_totals = {
@@ -247,8 +248,11 @@ class APATrainer:
             totals: dict[str, float] = {}
             n_batches = 0
             n_generator_updates = 0
+            generator_update_forced = 0
+            last_batch: dict[str, torch.Tensor] | None = None
             for batch_id, batch in enumerate(loader):
                 start = time.perf_counter()
+                last_batch = batch
                 step = self._student_step(batch)
                 if (batch_id + 1) % int(self.config["training"]["generator_update_interval"]) == 0:
                     gen_step = self._generator_step(batch)
@@ -258,6 +262,12 @@ class APATrainer:
                 for key, value in step.items():
                     totals[key] = totals.get(key, 0.0) + float(value)
                 n_batches += 1
+            if n_batches > 0 and n_generator_updates == 0 and last_batch is not None:
+                gen_step = self._generator_step(last_batch)
+                for key, value in gen_step.items():
+                    totals[key] = totals.get(key, 0.0) + float(value)
+                n_generator_updates += 1
+                generator_update_forced = 1
             for key in self.history:
                 if key == "loss_generator":
                     self.history[key].append(totals.get(key, float("nan")) / n_generator_updates if n_generator_updates else float("nan"))
@@ -265,6 +275,8 @@ class APATrainer:
                     self.history[key].append(totals.get(key, float("nan")) / n_generator_updates if n_generator_updates else float("nan"))
                 elif key == "generator_update_count":
                     self.history[key].append(float(n_generator_updates))
+                elif key == "generator_update_forced":
+                    self.history[key].append(float(generator_update_forced))
                 else:
                     self.history[key].append(totals.get(key, 0.0) / max(1, n_batches))
         return self.history

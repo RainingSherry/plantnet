@@ -35,8 +35,10 @@ import scanpy as sc
 from scipy.sparse import issparse
 try:
     from .network import *
+    from .label_utils import remap_desc_labels
 except:
     from network import *
+    from label_utils import remap_desc_labels
 #or 
 def getdims(x=(10000,200)):
     """
@@ -59,7 +61,6 @@ def getdims(x=(10000,200)):
         dims=[x[-1],16]
     return dims
 
-    
 def train_single(data,dims=None,
         alpha=1.0,
         tol=0.005,
@@ -155,8 +156,7 @@ def train_single(data,dims=None,
         print("The summary of desc model is:")
         desc.model.summary()
     print("The runtime of (resolution="+str(louvain_resolution)+")is:",get_time()-tic)
-    labels = np.argmax(q_pred, axis=1)
-    labels = pd.factorize(labels, sort=True)[0]
+    labels = remap_desc_labels(np.argmax(q_pred, axis=1))
     y_pred = pd.Series(labels, index=adata.obs.index, dtype=np.int64)
     adata.obs['desc_'+str(louvain_resolution)]=y_pred
     adata.obsm['X_Embeded_z'+str(louvain_resolution)]=Embeded_z

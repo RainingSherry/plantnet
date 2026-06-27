@@ -176,7 +176,10 @@ def load_apa_data(
 
     adata = ad.read_h5ad(data_path)
     x_adata = _dense(adata.X).astype(np.float32)
-    labels, resolved_label_key = _label_array(adata, label_key=label_key)
+    if require_labels or label_key is not None:
+        labels, resolved_label_key = _label_array(adata, label_key=label_key)
+    else:
+        labels, resolved_label_key = None, None
     if labels is None and require_labels:
         raise ValueError(
             "No label column found in adata.obs. Tried: "

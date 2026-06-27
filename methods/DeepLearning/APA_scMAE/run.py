@@ -49,8 +49,17 @@ def resolve_device(config: dict[str, Any]):
         bad = set(visible_ids).intersection(forbidden)
         if bad:
             raise ValueError(f"CUDA_VISIBLE_DEVICES={visible!r} contains forbidden GPU(s): {sorted(bad)}")
-        physical = int(visible_ids[0]) if len(visible_ids) == 1 and visible_ids[0].isdigit() else None
-        return torch.device("cuda:0"), {"physical_gpu": physical, "cuda_visible_devices": visible, "logical_device": "cuda:0"}
+        requested_gpu = str(int(runtime.get("gpu", int(visible_ids[0]))))
+        if requested_gpu not in visible_ids:
+            raise ValueError(f"Requested --gpu {requested_gpu} is not in CUDA_VISIBLE_DEVICES={visible!r}.")
+        logical_index = visible_ids.index(requested_gpu)
+        physical = int(requested_gpu) if requested_gpu.isdigit() else None
+        logical_device = f"cuda:{logical_index}"
+        return torch.device(logical_device), {
+            "physical_gpu": physical,
+            "cuda_visible_devices": visible,
+            "logical_device": logical_device,
+        }
     gpu = int(runtime.get("gpu", 1))
     allowed = {int(x) for x in runtime.get("allowed_gpus", [1, 2, 3, 4, 5, 6])}
     if gpu not in allowed or str(gpu) in forbidden:

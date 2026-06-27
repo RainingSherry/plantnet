@@ -12,16 +12,19 @@ import sys
 import argparse
 import numpy as np
 import pandas as pd
+from dataclasses import dataclass
 
 # Add parent directory to path for imports
 _repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, _repo_root)
 
-from preprocess import prepare_data_for_model
-from utils import save
-from scNAME_preprocess import normalize as scNAME_normalize
-
 _TF_READY = False
+
+
+@dataclass(frozen=True)
+class ScNAMECountInput:
+    matrix: np.ndarray
+    source: str
 
 def _ensure_tf():
     """Lazy import TensorFlow only when actually needed (not for --help)."""
@@ -65,43 +68,66 @@ def _validate_scname_count_matrix(matrix, expected_shape, source_name):
     return matrix
 
 
-def _get_scname_count_matrix(adata):
+def _looks_like_counts(matrix):
+    if matrix.size == 0:
+        return False
+    sample = matrix if matrix.size <= 1_000_000 else matrix.reshape(-1)[:1_000_000]
+    return bool(np.nanmin(sample) >= 0 and np.allclose(sample, np.round(sample), atol=1.0e-6))
+
+
+def _get_scname_count_input(adata):
     """Return nonnegative count/count-like input for scNAME NB/ZINB loss."""
     expected_shape = adata.X.shape
+
+    if 'counts' in adata.layers:
+        counts = _to_dense_float32(adata.layers['counts'])
+        return ScNAMECountInput(
+            _validate_scname_count_matrix(counts, expected_shape, 'adata.layers["counts"]'),
+            'layers_counts',
+        )
 
     if adata.raw is not None:
         try:
             raw_counts = _to_dense_float32(adata.raw[:, adata.var_names].X)
-            return _validate_scname_count_matrix(
+            raw_counts = _validate_scname_count_matrix(
                 raw_counts, expected_shape, "adata.raw[:, adata.var_names].X"
             )
+            if _looks_like_counts(raw_counts):
+                return ScNAMECountInput(raw_counts, 'adata_raw_counts')
+            raw_error = "adata.raw[:, adata.var_names].X is nonnegative but not count-like"
         except (KeyError, ValueError, IndexError) as exc:
             raw_error = exc
-        else:
-            raw_error = None
     else:
         raw_error = None
 
     if 'norm_log' in adata.layers:
         norm_log = _to_dense_float32(adata.layers['norm_log'])
-        return _validate_scname_count_matrix(norm_log, expected_shape, "adata.layers['norm_log']")
+        return ScNAMECountInput(
+            _validate_scname_count_matrix(norm_log, expected_shape, 'adata.layers["norm_log"]'),
+            'norm_log_nonnegative_fallback',
+        )
 
     detail = f" Raw count lookup failed: {raw_error}" if raw_error is not None else ""
     raise ValueError(
-        "scNAME requires nonnegative count_X from adata.raw[:, adata.var_names].X "
-        "or adata.layers['norm_log']; scaled adata.X/adata.to_df() cannot be used "
+        "scNAME requires nonnegative count_X/count_like input from adata.layers['counts'], "
+        "count-like adata.raw[:, adata.var_names].X, or adata.layers['norm_log']; "
+        "scaled adata.X/adata.to_df() cannot be used "
         f"as count_X.{detail}"
     )
 
 
-def _size_factors_from_counts(raw_counts):
-    total_counts = raw_counts.sum(axis=1).astype(np.float32)
+def _size_factors_from_counts(count_like):
+    total_counts = count_like.sum(axis=1).astype(np.float32)
     if not np.isfinite(total_counts).all():
-        raise ValueError("Cannot compute scNAME size factors: raw_counts row sums are not finite.")
+        raise ValueError("Cannot compute scNAME size factors: count_like row sums are not finite.")
     median_count = np.median(total_counts)
     if not np.isfinite(median_count) or median_count <= 0:
-        raise ValueError("Cannot compute scNAME size factors: raw_counts median row sum is not positive.")
+        raise ValueError("Cannot compute scNAME size factors: count_like median row sum is not positive.")
     return (total_counts / median_count).astype(np.float32)
+
+
+def _shuffle_scname_inputs(X, Y, count_like, sf, shuffle_ix):
+    return X[shuffle_ix], Y[shuffle_ix], count_like[shuffle_ix], sf[shuffle_ix]
 
 
 def parse_args():
@@ -174,6 +200,8 @@ def main():
 
     # Lazy import TF only when actually running
     _ensure_tf()
+    from preprocess import prepare_data_for_model
+    from utils import save
     set_seed(args.seed)
 
     # Create save directory
@@ -197,15 +225,18 @@ def main():
     X = np.array(X).astype(np.float32)
     Y = np.array(Y)
 
-    raw_counts = _get_scname_count_matrix(adata)
+    count_input = _get_scname_count_input(adata)
+    count_like = count_input.matrix
+    args.count_input_source = count_input.source
+    print(f"scNAME count_like source: {count_input.source}")
 
     # Compute size factors — always reshape to (n_cells, 1) for TF placeholder
     if sf is None:
-        sf = _size_factors_from_counts(raw_counts)
+        sf = _size_factors_from_counts(count_like)
     else:
         sf = np.array(sf).astype(np.float32)
         if not np.isfinite(sf).all():
-            sf = _size_factors_from_counts(raw_counts)
+            sf = _size_factors_from_counts(count_like)
     sf = sf.reshape(-1, 1)
 
     # Encode labels to integers if needed
@@ -217,10 +248,7 @@ def main():
     # Shuffle data
     n = X.shape[0]
     shuffle_ix = np.random.permutation(np.arange(n))
-    X = X[shuffle_ix]
-    Y = Y[shuffle_ix]
-    raw_counts = raw_counts[shuffle_ix]
-    sf = sf[shuffle_ix]
+    X, Y, count_like, sf = _shuffle_scname_inputs(X, Y, count_like, sf, shuffle_ix)
 
     # Get number of clusters from data if not specified
     n_clusters = args.n_clusters if args.n_clusters > 0 else len(np.unique(Y))
@@ -255,7 +283,7 @@ def main():
     gpu_option = "" if args.no_cuda else str(args.gpu)
     model.pretrain(
         X=X,
-        count_X=raw_counts,
+        count_X=count_like,
         p_m=args.p_m,
         size_factor=sf,
         batch_size=args.batch_size,
@@ -269,7 +297,7 @@ def main():
         dataname='scNAME',
         X=X,
         Y=Y,
-        count_X=raw_counts,
+        count_X=count_like,
         p_m=args.p_m,
         size_factor=sf,
         batch_size=args.batch_size,
