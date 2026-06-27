@@ -246,6 +246,10 @@ def attention_guard(config: dict[str, Any], n_genes: int) -> dict[str, Any]:
     return info
 
 
+def embedding_extraction_batch_size(config: dict[str, Any]) -> int:
+    return int(config["training"]["batch_size"])
+
+
 def main() -> int:
     parser = build_arg_parser()
     args = parser.parse_args()
@@ -303,8 +307,7 @@ def main() -> int:
         )
         trainer.train()
         trainer.save_diagnostics()
-        embedding_batch_size = min(int(config["training"]["batch_size"]) * 2, 64)
-        embedding = trainer.extract_embeddings(batch_size=embedding_batch_size)
+        embedding = trainer.extract_embeddings(batch_size=embedding_extraction_batch_size(config))
         labels = bundle.labels.astype(np.int64) if bundle.labels is not None else None
         np.save(save_dir / "embedding_final.npy", embedding)
         if labels is not None:

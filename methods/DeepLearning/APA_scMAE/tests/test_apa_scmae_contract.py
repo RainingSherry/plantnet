@@ -23,6 +23,7 @@ from methods.DeepLearning.APA_scMAE.model import APAModel
 from methods.DeepLearning.APA_scMAE.run import (
     artifact_manifest,
     attention_guard,
+    embedding_extraction_batch_size,
     hungarian_map,
     mapped_clustering_metrics,
     resolve_device,
@@ -468,6 +469,12 @@ def test_artifact_manifest_required_files(tmp_path):
     assert "labels.npy" not in manifest_skip["required_files"]
 
 
+def test_embedding_extraction_uses_training_batch_size():
+    config = _config("/tmp")
+    config["training"]["batch_size"] = 17
+    assert embedding_extraction_batch_size(config) == 17
+
+
 def test_desc_remap_labels_are_dense_integer_without_nan():
     mapped = remap_desc_labels([2, 2, 4])
     np.testing.assert_array_equal(mapped, np.array([0, 0, 1], dtype=np.int64))
@@ -494,15 +501,22 @@ def test_scname_count_input_protocol_and_sources():
     count_input = _get_scname_count_input(adata)
     assert count_input.source == "layers_counts"
     np.testing.assert_array_equal(count_input.matrix, counts)
+    np.testing.assert_array_equal(count_input.size_factor_counts, counts)
 
     adata = ad.AnnData(X=scaled_negative, obs=obs, var=var)
     adata.raw = ad.AnnData(X=np.log1p(counts), obs=obs.copy(), var=var.copy())
     with pytest.raises(ValueError, match="not count-like"):
         _get_scname_count_input(adata)
     adata.layers["norm_log"] = np.log1p(counts)
-    fallback = _get_scname_count_input(adata)
-    assert fallback.source == "norm_log_nonnegative_fallback"
-    np.testing.assert_allclose(fallback.matrix, np.log1p(counts))
+    with pytest.raises(ValueError, match="norm_log"):
+        _get_scname_count_input(adata)
+
+    raw_only = ad.AnnData(X=scaled_negative, obs=obs, var=var)
+    raw_only.raw = ad.AnnData(X=raw_counts, obs=obs.copy(), var=var.copy())
+    raw_input = _get_scname_count_input(raw_only)
+    assert raw_input.source == "adata_raw_counts"
+    np.testing.assert_array_equal(raw_input.matrix, raw_counts)
+    np.testing.assert_array_equal(raw_input.size_factor_counts, raw_counts)
 
 
 def test_scname_shuffle_keeps_X_Y_count_like_sf_aligned():

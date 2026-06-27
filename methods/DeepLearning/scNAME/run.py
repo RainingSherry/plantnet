@@ -24,6 +24,7 @@ _TF_READY = False
 @dataclass(frozen=True)
 class ScNAMECountInput:
     matrix: np.ndarray
+    size_factor_counts: np.ndarray
     source: str
 
 def _ensure_tf():
@@ -75,43 +76,47 @@ def _looks_like_counts(matrix):
     return bool(np.nanmin(sample) >= 0 and np.allclose(sample, np.round(sample), atol=1.0e-6))
 
 
+def _validate_count_like_matrix(matrix, expected_shape, source_name):
+    matrix = _validate_scname_count_matrix(matrix, expected_shape, source_name)
+    if not _looks_like_counts(matrix):
+        raise ValueError(f"scNAME count_X from {source_name} is nonnegative but not count-like.")
+    return matrix
+
+
 def _get_scname_count_input(adata):
     """Return nonnegative count/count-like input for scNAME NB/ZINB loss."""
     expected_shape = adata.X.shape
 
     if 'counts' in adata.layers:
         counts = _to_dense_float32(adata.layers['counts'])
+        counts = _validate_count_like_matrix(counts, expected_shape, 'adata.layers["counts"]')
         return ScNAMECountInput(
-            _validate_scname_count_matrix(counts, expected_shape, 'adata.layers["counts"]'),
+            counts,
+            counts,
             'layers_counts',
         )
 
     if adata.raw is not None:
         try:
-            raw_counts = _to_dense_float32(adata.raw[:, adata.var_names].X)
-            raw_counts = _validate_scname_count_matrix(
-                raw_counts, expected_shape, "adata.raw[:, adata.var_names].X"
+            raw_full_counts = _to_dense_float32(adata.raw.X)
+            raw_full_counts = _validate_count_like_matrix(
+                raw_full_counts, raw_full_counts.shape, "adata.raw.X"
             )
-            if _looks_like_counts(raw_counts):
-                return ScNAMECountInput(raw_counts, 'adata_raw_counts')
-            raw_error = "adata.raw[:, adata.var_names].X is nonnegative but not count-like"
+            raw_hvg_counts = _to_dense_float32(adata.raw[:, adata.var_names].X)
+            raw_hvg_counts = _validate_count_like_matrix(
+                raw_hvg_counts, expected_shape, "adata.raw[:, adata.var_names].X"
+            )
+            return ScNAMECountInput(raw_hvg_counts, raw_full_counts, 'adata_raw_counts')
         except (KeyError, ValueError, IndexError) as exc:
             raw_error = exc
     else:
         raw_error = None
 
-    if 'norm_log' in adata.layers:
-        norm_log = _to_dense_float32(adata.layers['norm_log'])
-        return ScNAMECountInput(
-            _validate_scname_count_matrix(norm_log, expected_shape, 'adata.layers["norm_log"]'),
-            'norm_log_nonnegative_fallback',
-        )
-
     detail = f" Raw count lookup failed: {raw_error}" if raw_error is not None else ""
     raise ValueError(
         "scNAME requires nonnegative count_X/count_like input from adata.layers['counts'], "
-        "count-like adata.raw[:, adata.var_names].X, or adata.layers['norm_log']; "
-        "scaled adata.X/adata.to_df() cannot be used "
+        "or count-like adata.raw[:, adata.var_names].X; scaled adata.X, adata.to_df(), "
+        "or adata.layers['norm_log'] cannot be used "
         f"as count_X.{detail}"
     )
 
@@ -230,8 +235,7 @@ def main():
     args.count_input_source = count_input.source
     print(f"scNAME count_like source: {count_input.source}")
 
-    # Keep size factors in the same input semantics as count_like/count_X.
-    sf = _size_factors_from_counts(count_like).reshape(-1, 1)
+    sf = _size_factors_from_counts(count_input.size_factor_counts).reshape(-1, 1)
 
     # Encode labels to integers if needed
     from sklearn.preprocessing import LabelEncoder
