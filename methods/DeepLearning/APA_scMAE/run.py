@@ -5,6 +5,7 @@ import json
 import os
 import random
 import sys
+import traceback
 from pathlib import Path
 from typing import Any
 
@@ -60,6 +61,7 @@ def resolve_device(config: dict[str, Any]):
 def evaluate_embeddings(embedding: np.ndarray, labels: np.ndarray, n_clusters: int, seed: int) -> dict[str, Any]:
     from sklearn.cluster import KMeans
 
+    validate_embedding_inputs(embedding, labels, n_clusters)
     pred = KMeans(n_clusters=int(n_clusters), random_state=int(seed), n_init=20).fit_predict(embedding)
     metrics = mapped_clustering_metrics(labels, pred)
     metrics.update({"uses_known_k": True, "oracle-K": True, "cluster_method": "kmeans_known_k"})
@@ -79,11 +81,12 @@ def mapped_clustering_metrics(labels: np.ndarray, pred: np.ndarray) -> dict[str,
     from sklearn.metrics.cluster import normalized_mutual_info_score
 
     mapped = hungarian_map(labels, pred)
+    label_values = np.unique(labels)
     return {
         "acc": float(accuracy_score(labels, mapped)),
         "nmi": float(normalized_mutual_info_score(labels, pred)),
         "ari": float(adjusted_rand_score(labels, pred)),
-        "f1_macro": float(f1_score(labels, mapped, average="macro", zero_division=0)),
+        "f1_macro": float(f1_score(labels, mapped, average="macro", labels=label_values, zero_division=0)),
         "fmi": float(fowlkes_mallows_score(labels, pred)),
         "v_measure": float(v_measure_score(labels, pred)),
         "homogeneity": float(homogeneity_score(labels, pred)),
@@ -104,11 +107,32 @@ def hungarian_map(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
         for j, pred_value in enumerate(pred_values):
             counts[i, j] = int(np.sum((y_true == true_value) & (y_pred == pred_value)))
     rows, cols = linear_sum_assignment(-counts)
-    mapped = np.zeros_like(y_pred, dtype=np.int64)
+    mapped = np.full_like(y_pred, fill_value=-1, dtype=np.int64)
     for row, col in zip(rows, cols):
         if row < len(true_values) and col < len(pred_values):
             mapped[y_pred == pred_values[col]] = true_values[row]
     return mapped
+
+
+def validate_embedding_inputs(embedding: np.ndarray, labels: np.ndarray | None, n_clusters: int) -> None:
+    emb = np.asarray(embedding)
+    if emb.ndim != 2:
+        raise ValueError(f"embedding must be 2D, got shape {emb.shape}")
+    if not np.isfinite(emb).all():
+        raise ValueError("embedding contains NaN or Inf values")
+    if int(n_clusters) < 1:
+        raise ValueError(f"n_clusters must be >= 1, got {n_clusters}")
+    if int(n_clusters) > int(emb.shape[0]):
+        raise ValueError(f"n_clusters={n_clusters} cannot exceed n_cells={emb.shape[0]}")
+    if labels is not None and len(labels) != int(emb.shape[0]):
+        raise ValueError(f"labels length {len(labels)} does not match embedding rows {emb.shape[0]}")
+
+
+def predict_clusters(embedding: np.ndarray, n_clusters: int, seed: int) -> np.ndarray:
+    from sklearn.cluster import KMeans
+
+    validate_embedding_inputs(embedding, None, n_clusters)
+    return KMeans(n_clusters=int(n_clusters), random_state=int(seed), n_init=20).fit_predict(embedding).astype(np.int64)
 
 
 def try_leiden_fixed(embedding: np.ndarray, labels: np.ndarray, config: dict[str, Any]) -> dict[str, Any]:
@@ -137,23 +161,29 @@ def try_leiden_fixed(embedding: np.ndarray, labels: np.ndarray, config: dict[str
         }
 
 
-def artifact_manifest(config: dict[str, Any], embedding_shape: tuple[int, int]) -> dict[str, Any]:
+def artifact_manifest(config: dict[str, Any], embedding_shape: tuple[int, int], prediction_status: str) -> dict[str, Any]:
     required = [
+        "args.json",
+        "runtime.json",
         "embedding_final.npy",
-        "pred_labels.npy",
         "metrics.json",
         "training_history.json",
         "corruption_stats.json",
         "mask_stats.json",
+        "gradient_stats.json",
         "gene_stats.json",
+        "gene_stats.npy",
         "prototypes.npy",
+        "selected_gene_indices.npy",
         "selected_genes.txt",
         "resolved_config.yaml",
         "model_checkpoint.pth",
         "artifact_manifest.json",
     ]
+    if prediction_status != "skipped":
+        required.insert(required.index("metrics.json"), "pred_labels.npy")
     if not bool(config.get("skip_eval", False)):
-        required.insert(1, "labels.npy")
+        required.insert(required.index("pred_labels.npy") if "pred_labels.npy" in required else required.index("metrics.json"), "labels.npy")
     return {
         "status": "complete",
         "method": config.get("method_name", "apa_scmae"),
@@ -161,8 +191,44 @@ def artifact_manifest(config: dict[str, Any], embedding_shape: tuple[int, int]) 
         "seed": int(config["seed"]),
         "config_hash": config_hash(config),
         "embedding_shape": [int(embedding_shape[0]), int(embedding_shape[1])],
+        "input_mode_resolved": config.get("preprocessing", {}).get("input_mode_resolved"),
+        "feature_space_source": config.get("preprocessing", {}).get("feature_space_source"),
+        "label_key": config.get("preprocessing", {}).get("label_key"),
+        "labels_available": bool(config.get("preprocessing", {}).get("labels_available", False)),
+        "skip_eval": bool(config.get("skip_eval", False)),
+        "prediction_status": prediction_status,
+        "training_status": "complete",
         "required_files": required,
     }
+
+
+def validate_required_files(save_dir: Path, manifest: dict[str, Any]) -> None:
+    missing = [name for name in manifest["required_files"] if name != "artifact_manifest.json" and not (save_dir / name).exists()]
+    if missing:
+        raise RuntimeError(f"Cannot write complete artifact manifest; missing required files: {missing}")
+
+
+def attention_guard(config: dict[str, Any], n_genes: int) -> dict[str, Any]:
+    batch_size = int(config["training"]["batch_size"])
+    heads = int(config["model"]["attention_heads"])
+    elements = int(batch_size * heads * (int(n_genes) + 1) ** 2)
+    max_elements = int(config["runtime"].get("max_attention_elements", 300_000_000))
+    info = {
+        "attention_elements": elements,
+        "max_attention_elements": max_elements,
+        "force_large_attention": bool(config["runtime"].get("force_large_attention", False)),
+        "warning": None,
+    }
+    if elements > max_elements:
+        message = (
+            f"APA-scMAE gene-axis attention would allocate about {elements} attention elements "
+            f"(batch_size={batch_size}, heads={heads}, n_genes={n_genes}), exceeding limit {max_elements}. "
+            "Lower --batch_size or --n_top_genes, or pass --force_large_attention true."
+        )
+        if not bool(config["runtime"].get("force_large_attention", False)):
+            raise ValueError(message)
+        info["warning"] = message
+    return info
 
 
 def main() -> int:
@@ -178,7 +244,6 @@ def main() -> int:
         config["dataset_name"] = config.get("dataset_name") or Path(config["data_path"]).stem
         set_seed(int(config["seed"]), deterministic=bool(config["runtime"]["deterministic"]))
         device, runtime_info = resolve_device(config)
-        save_json(save_dir / "runtime.json", runtime_info)
 
         bundle = load_apa_data(
             config["data_path"],
@@ -190,8 +255,11 @@ def main() -> int:
             pca_dim=int(config["prototype"]["pca_dim"]),
             seed=int(config["seed"]),
             require_labels=not bool(config.get("skip_eval", False)),
+            label_key=config.get("evaluation", {}).get("label_key"),
         )
         config["preprocessing"].update(bundle.preprocess_config)
+        runtime_info.update(attention_guard(config, int(bundle.x.shape[1])))
+        save_json(save_dir / "runtime.json", runtime_info)
         write_yaml(save_dir / "resolved_config.yaml", config)
         np.save(save_dir / "gene_stats.npy", bundle.gene_stats)
         save_json(save_dir / "gene_stats.json", {"shape": list(bundle.gene_stats.shape), "columns": ["mean", "variance", "zero_rate", "hvg_rank"]})
@@ -212,7 +280,7 @@ def main() -> int:
             config=config,
             model=model,
             train_dataset=dataset,
-            full_x=torch.as_tensor(bundle.x, dtype=torch.float32, device=device),
+            full_x=torch.as_tensor(bundle.x, dtype=torch.float32),
             gene_stats=torch.as_tensor(bundle.gene_stats, dtype=torch.float32, device=device),
             prototypes=torch.as_tensor(bundle.prototypes, dtype=torch.float32, device=device),
             device=device,
@@ -226,7 +294,7 @@ def main() -> int:
         if labels is not None:
             np.save(save_dir / "labels.npy", labels)
         metrics: dict[str, Any] = {"diagnostics": {"embedding_shape": list(embedding.shape)}}
-        pred = np.zeros(embedding.shape[0], dtype=np.int64)
+        prediction_status = "skipped"
         if not bool(config.get("skip_eval", False)):
             if labels is None:
                 raise ValueError("skip_eval=false requires labels, but no label column was loaded.")
@@ -234,13 +302,31 @@ def main() -> int:
             eval_result = evaluate_embeddings(embedding, labels, n_clusters, int(config["seed"]))
             metrics["kmeans_known_k"] = eval_result["metrics"]
             pred = eval_result["pred"]
+            prediction_status = "kmeans_known_k"
             leiden_result = try_leiden_fixed(embedding, labels, config)
             metrics["leiden_fixed"] = leiden_result["metrics"]
             if leiden_result["pred"] is not None:
                 np.save(save_dir / "eval_leiden_fixed.npy", leiden_result["pred"])
             else:
                 metrics["leiden_fixed"]["skip_reason"] = leiden_result["reason"]
-        np.save(save_dir / "pred_labels.npy", pred)
+            np.save(save_dir / "pred_labels.npy", pred)
+        else:
+            n_clusters = int(config["n_clusters"])
+            pred = predict_clusters(embedding, n_clusters, int(config["seed"]))
+            np.save(save_dir / "pred_labels.npy", pred)
+            prediction_status = "prediction_only_no_labels"
+            metrics.update(
+                {
+                    "evaluation_status": "prediction_only_no_labels",
+                    "supervised_metrics": "skipped_no_labels",
+                    "prediction": {
+                        "cluster_method": "kmeans",
+                        "uses_known_k": True,
+                        "oracle-K": False,
+                        "n_clusters": int(n_clusters),
+                    },
+                }
+            )
         save_json(save_dir / "metrics.json", metrics)
         torch.save(
             {
@@ -251,13 +337,15 @@ def main() -> int:
             },
             save_dir / "model_checkpoint.pth",
         )
-        save_json(save_dir / "artifact_manifest.json", artifact_manifest(config, embedding.shape))
+        manifest = artifact_manifest(config, embedding.shape, prediction_status)
+        validate_required_files(save_dir, manifest)
+        save_json(save_dir / "artifact_manifest.json", manifest)
         save_json(save_dir / "run_manifest.json", {"status": "complete", "method": config["method_name"]})
         return 0
     except Exception as exc:
         save_json(save_dir / "run_manifest.json", {"status": "failed", "error": str(exc)})
-        print(f"APA-scMAE failed: {exc}", file=sys.stderr)
-        return 1
+        traceback.print_exc()
+        raise
 
 
 if __name__ == "__main__":

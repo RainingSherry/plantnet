@@ -2,6 +2,8 @@
 
 APA-scMAE is a prototype-aware adversarial masked autoencoder built on the scMAE training idea.
 
+This is an experimental development method, not a verified formal-benchmark method.
+
 The implementation follows the attached model sketch:
 
 - labels are loaded only for final evaluation;
@@ -13,3 +15,10 @@ The implementation follows the attached model sketch:
 - embeddings are extracted from the clean Student path without Generator, mask, or donor replacement.
 
 This package is not registered in the formal benchmark manifest yet.
+
+Notes:
+
+- Do not add APA-scMAE to `methods/method_manifest.yaml` until a separate review approves formal benchmark inclusion.
+- Prototypes are label-free; true labels may only be used by final evaluation code.
+- `kmeans_known_k` uses the supplied `n_clusters` and must be treated as known-K / oracle-K evaluation, not fully unsupervised unknown-K clustering.
+- When `--skip_eval true`, the runner may still save prediction labels from KMeans, but it does not report supervised ACC/NMI/ARI/F1 metrics and does not save `labels.npy`.

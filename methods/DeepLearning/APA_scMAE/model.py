@@ -37,15 +37,38 @@ class PrototypeAttention(nn.Module):
         return torch.matmul(weights, v).squeeze(1)
 
 
-def straight_through_topk(logits: torch.Tensor, mask_ratio: float, temperature: float) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+def straight_through_topk(
+    logits: torch.Tensor,
+    mask_ratio: float,
+    temperature: float,
+    eligibility: torch.Tensor | None = None,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, dict[str, torch.Tensor]]:
     n_genes = int(logits.shape[1])
-    k = max(1, min(n_genes, int(float(mask_ratio) * n_genes)))
-    topk = torch.topk(logits, k=k, dim=1).indices
-    hard = torch.zeros_like(logits).scatter_(1, topk, 1.0)
-    soft = torch.softmax(logits / max(float(temperature), 1.0e-6), dim=1) * float(k)
+    target_k = max(1, min(n_genes, int(float(mask_ratio) * n_genes)))
+    if eligibility is None:
+        eligibility = torch.ones_like(logits, dtype=torch.bool)
+    else:
+        eligibility = eligibility.bool()
+    masked_logits = logits.masked_fill(~eligibility, -1.0e9)
+    hard = torch.zeros_like(logits)
+    eligible_count = eligibility.sum(dim=1)
+    selected_count = torch.minimum(eligible_count, torch.full_like(eligible_count, target_k))
+    for row in range(logits.shape[0]):
+        k = int(selected_count[row].item())
+        if k > 0:
+            topk = torch.topk(masked_logits[row], k=k, dim=0).indices
+            hard[row, topk] = 1.0
+    soft = torch.softmax(masked_logits / max(float(temperature), 1.0e-6), dim=1) * selected_count.clamp_min(1).float().view(-1, 1)
+    soft = torch.where(eligible_count.view(-1, 1) > 0, soft, torch.zeros_like(soft))
     soft = soft.clamp(0.0, 1.0)
     st = hard + soft - soft.detach()
-    return hard, soft, st
+    info = {
+        "target_k": torch.full_like(selected_count, target_k),
+        "selected_count": selected_count,
+        "eligible_count": eligible_count,
+        "budget_deficit": (target_k - selected_count).clamp_min(0),
+    }
+    return hard, soft, st, info
 
 
 class APAGenerator(nn.Module):
@@ -90,6 +113,7 @@ class APAGenerator(nn.Module):
         *,
         mask_ratio: float,
         temperature: float,
+        topk_only_effective: bool = True,
     ) -> dict[str, torch.Tensor]:
         delta = (replacement - x).abs()
         pair_input = torch.stack([x, replacement, delta, effective.float()], dim=-1)
@@ -101,8 +125,9 @@ class APAGenerator(nn.Module):
         proto_context = self.proto_attention(cell_summary, prototypes).unsqueeze(1).expand_as(h_gene)
         h_mask = torch.cat([h_gen, h_gene, proto_context, delta.unsqueeze(-1), effective.float().unsqueeze(-1)], dim=-1)
         logits = self.mask_fusion(h_mask).squeeze(-1)
-        hard, soft, st = straight_through_topk(logits, mask_ratio, temperature)
-        return {"logits": logits, "mask_hard": hard, "mask_soft": soft, "mask_st": st, "delta": delta}
+        eligibility = effective.bool() if topk_only_effective else torch.ones_like(effective, dtype=torch.bool)
+        hard, soft, st, info = straight_through_topk(logits, mask_ratio, temperature, eligibility)
+        return {"logits": logits, "mask_hard": hard, "mask_soft": soft, "mask_st": st, "delta": delta, **info}
 
 
 class APAStudent(nn.Module):

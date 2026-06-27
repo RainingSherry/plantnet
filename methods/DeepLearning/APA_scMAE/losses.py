@@ -15,7 +15,7 @@ def student_losses(
 ) -> dict[str, torch.Tensor]:
     effective_mask = effective_mask.float()
     weights = effective_mask * float(masked_data_weight) + (1.0 - effective_mask) * (1.0 - float(masked_data_weight))
-    rec = (weights * (x_recon - x).pow(2)).mean()
+    rec = (weights * (x_recon - x).pow(2)).sum() / (weights.sum() + 1.0e-8)
     mask = F.binary_cross_entropy_with_logits(pred_mask_logits, effective_mask, reduction="mean")
     loss = (1.0 - float(gamma)) * rec + float(gamma) * mask
     return {"loss_student": loss, "loss_rec": rec, "loss_mask": mask}
@@ -73,7 +73,14 @@ def generator_losses(
     }
 
 
-def mask_diagnostics(mask_hard: torch.Tensor, effective_mask: torch.Tensor, logits: torch.Tensor) -> dict[str, float]:
+def mask_diagnostics(
+    mask_hard: torch.Tensor,
+    effective_mask: torch.Tensor,
+    logits: torch.Tensor,
+    *,
+    target_mask_ratio: float,
+    budget_deficit: torch.Tensor | None = None,
+) -> dict[str, float]:
     mask = mask_hard.detach().float()
     eff = effective_mask.detach().float()
     probs = torch.softmax(logits.detach(), dim=1)
@@ -87,8 +94,11 @@ def mask_diagnostics(mask_hard: torch.Tensor, effective_mask: torch.Tensor, logi
         idx = torch.arange(1, n + 1, device=mask.device, dtype=sorted_vals.dtype)
         gini = (2.0 * (idx * sorted_vals).sum() / (n * sorted_vals.sum())) - (n + 1.0) / n
     return {
+        "target_mask_ratio": float(target_mask_ratio),
         "mask_ratio": float(mask.mean().cpu()),
+        "selected_mask_ratio": float(mask.mean().cpu()),
         "effective_mask_ratio": float(eff.mean().cpu()),
+        "budget_deficit_rate": float(budget_deficit.detach().float().mean().cpu() / mask.shape[1]) if budget_deficit is not None else 0.0,
         "zero_to_zero_rate": float((mask * (1.0 - eff)).sum().cpu() / (mask.sum().cpu() + 1.0e-8)),
         "mask_entropy": float(entropy.cpu()),
         "mask_gini": float(gini.cpu()),

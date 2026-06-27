@@ -35,7 +35,7 @@ class APATrainer:
         self.config = config
         self.model = model.to(device)
         self.dataset = train_dataset
-        self.full_x = full_x.to(device)
+        self.full_x = full_x.detach().cpu().float()
         self.gene_stats = gene_stats.to(device)
         self.prototypes = prototypes.to(device)
         self.device = device
@@ -69,6 +69,7 @@ class APATrainer:
             "top_gene_concentration": [],
             "student_grad_norm": [],
             "generator_grad_norm": [],
+            "generator_update_count": [],
             "batch_seconds": [],
         }
         self.corruption_totals = {
@@ -111,6 +112,7 @@ class APATrainer:
             self.prototypes,
             mask_ratio=float(self.config["mask"]["ratio"]),
             temperature=float(self.config["mask"]["temperature"]),
+            topk_only_effective=bool(self.config["mask"].get("generator_topk_only_effective", True)),
         )
 
     def _student_forward(self, x_tilde: torch.Tensor):
@@ -130,7 +132,7 @@ class APATrainer:
         assert_no_training_labels(batch)
         idx = batch["index"].to(self.device).long()
         x = batch["x"].to(self.device)
-        donor = self.corruption.sample(idx)
+        donor = self.corruption.sample(idx, device=self.device)
         replacement = donor["replacement"]
         effective = donor["effective"]
         self.model.generator.zero_grad(set_to_none=True)
@@ -167,7 +169,13 @@ class APATrainer:
                 raise RuntimeError("generator received gradient during student step")
         self.student_optimizer.step()
         freeze(self.model.generator, False)
-        stats = mask_diagnostics(mask, effective_mask, gen["logits"])
+        stats = mask_diagnostics(
+            mask,
+            effective_mask,
+            gen["logits"],
+            target_mask_ratio=float(self.config["mask"]["ratio"]),
+            budget_deficit=gen.get("budget_deficit"),
+        )
         self._record_corruption(mask, effective_mask, gen["delta"])
         self.last_mask_stats = stats
         return {
@@ -183,7 +191,7 @@ class APATrainer:
         assert_no_training_labels(batch)
         idx = batch["index"].to(self.device).long()
         x = batch["x"].to(self.device)
-        donor = self.corruption.sample(idx)
+        donor = self.corruption.sample(idx, device=self.device)
         replacement = donor["replacement"]
         effective = donor["effective"]
         freeze(self.model.shared, True)
@@ -238,18 +246,27 @@ class APATrainer:
         for _epoch in range(1, epochs + 1):
             totals: dict[str, float] = {}
             n_batches = 0
+            n_generator_updates = 0
             for batch_id, batch in enumerate(loader):
                 start = time.perf_counter()
                 step = self._student_step(batch)
                 if (batch_id + 1) % int(self.config["training"]["generator_update_interval"]) == 0:
                     gen_step = self._generator_step(batch)
                     step.update(gen_step)
+                    n_generator_updates += 1
                 step["batch_seconds"] = time.perf_counter() - start
                 for key, value in step.items():
                     totals[key] = totals.get(key, 0.0) + float(value)
                 n_batches += 1
             for key in self.history:
-                self.history[key].append(totals.get(key, 0.0) / max(1, n_batches))
+                if key == "loss_generator":
+                    self.history[key].append(totals.get(key, float("nan")) / n_generator_updates if n_generator_updates else float("nan"))
+                elif key == "generator_grad_norm":
+                    self.history[key].append(totals.get(key, float("nan")) / n_generator_updates if n_generator_updates else float("nan"))
+                elif key == "generator_update_count":
+                    self.history[key].append(float(n_generator_updates))
+                else:
+                    self.history[key].append(totals.get(key, 0.0) / max(1, n_batches))
         return self.history
 
     def corruption_stats(self) -> dict[str, float | str]:
@@ -261,6 +278,7 @@ class APATrainer:
             "effective_corruption_rate": float(self.corruption_totals["effective"] / selected),
             "zero_to_zero_rate": float(self.corruption_totals["zero_to_zero"] / selected),
             "mean_abs_delta": float(self.corruption_totals["abs_delta"] / positions),
+            "budget_deficit_rate": float(self.last_mask_stats.get("budget_deficit_rate", 0.0)),
         }
 
     @torch.no_grad()

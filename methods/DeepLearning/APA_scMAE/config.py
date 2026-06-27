@@ -20,6 +20,8 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "deterministic": True,
         "num_workers": 0,
         "fail_fast": True,
+        "max_attention_elements": 300_000_000,
+        "force_large_attention": False,
     },
     "preprocessing": {
         "input_mode": "auto",
@@ -47,10 +49,11 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "ratio": 0.4,
         "temperature": 1.0,
         "masked_data_weight": 0.75,
+        "generator_topk_only_effective": True,
     },
     "training": {
         "epochs": 100,
-        "batch_size": 256,
+        "batch_size": 16,
         "lr_student": 1.0e-3,
         "lr_generator": 1.0e-4,
         "weight_decay": 1.0e-5,
@@ -66,6 +69,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "lambda_coverage": 0.01,
     },
     "evaluation": {
+        "label_key": None,
         "n_neighbors": 15,
         "leiden_fixed_resolution": 1.0,
     },
@@ -140,6 +144,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--temperature", type=float, default=None)
     parser.add_argument("--corruption_type", type=str, default=None, choices=["scmae_shuffle"])
     parser.add_argument("--skip_eval", type=str2bool, default=None)
+    parser.add_argument("--label_key", type=str, default=None)
+    parser.add_argument("--max_attention_elements", type=int, default=None)
+    parser.add_argument("--force_large_attention", type=str2bool, default=None)
+    parser.add_argument("--generator_topk_only_effective", type=str2bool, default=None)
     return parser
 
 
@@ -161,7 +169,11 @@ def resolve_config(args: argparse.Namespace) -> dict[str, Any]:
     if args.gpu is not None:
         cli.setdefault("runtime", {})["gpu"] = int(args.gpu)
     if args.no_cuda:
-        cli["runtime"]["no_cuda"] = True
+        cli.setdefault("runtime", {})["no_cuda"] = True
+    if args.max_attention_elements is not None:
+        cli.setdefault("runtime", {})["max_attention_elements"] = int(args.max_attention_elements)
+    if args.force_large_attention is not None:
+        cli.setdefault("runtime", {})["force_large_attention"] = bool(args.force_large_attention)
     prep = cli.setdefault("preprocessing", {})
     if args.input_mode is not None:
         prep["input_mode"] = args.input_mode
@@ -197,8 +209,12 @@ def resolve_config(args: argparse.Namespace) -> dict[str, Any]:
         mask["ratio"] = float(args.mask_ratio)
     if args.temperature is not None:
         mask["temperature"] = float(args.temperature)
+    if args.generator_topk_only_effective is not None:
+        mask["generator_topk_only_effective"] = bool(args.generator_topk_only_effective)
     if args.corruption_type is not None:
         cli.setdefault("corruption", {})["type"] = str(args.corruption_type)
+    if args.label_key is not None:
+        cli.setdefault("evaluation", {})["label_key"] = str(args.label_key)
     return deep_update(cfg, cli)
 
 

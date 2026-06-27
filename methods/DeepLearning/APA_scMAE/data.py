@@ -60,41 +60,42 @@ LABEL_CANDIDATES = (
     "cell_type",
     "celltype",
     "CellType",
-    "cell type",
-    "cell_types",
-    "celltype_l1",
-    "celltype.l1",
-    "celltype_l2",
-    "celltype.l2",
+    "Celltype",
     "cell_type1",
-    "Cell.type",
-    "Cell Types",
-    "cell_types",
-    "cell_ontology_class",
-    "cell_ontology",
+    "cell_label",
+    "cell_labels",
     "annotation",
     "annotations",
     "Annotation",
     "manual_annotation",
     "assigned_cell_type",
-    "cell_label",
-    "cell_labels",
-    "label",
-    "labels",
-    "Label",
-    "class",
-    "Class",
-    "type",
-    "y",
-    "Y",
+    "cell_ontology_class",
+    "maintype",
+    "resolved_label",
 )
 
 
-def _label_array(adata: Any) -> tuple[np.ndarray | None, str | None]:
-    for key in LABEL_CANDIDATES:
-        if key in adata.obs:
-            values = np.asarray(adata.obs[key].astype("category").cat.codes, dtype=np.int64)
-            return values, key
+def _encode_labels(values: Any, key: str) -> np.ndarray:
+    series = values
+    if hasattr(series, "isna") and bool(series.isna().any()):
+        raise ValueError(f"Label column {key!r} contains missing values.")
+    codes = np.asarray(series.astype("category").cat.codes, dtype=np.int64)
+    if np.any(codes < 0):
+        raise ValueError(f"Label column {key!r} contains missing values.")
+    return codes
+
+
+def _label_array(adata: Any, label_key: str | None = None) -> tuple[np.ndarray | None, str | None]:
+    if label_key:
+        if label_key not in adata.obs:
+            raise ValueError(f"Explicit label_key {label_key!r} was not found in adata.obs.")
+        return _encode_labels(adata.obs[label_key], label_key), label_key
+    matches = [key for key in LABEL_CANDIDATES if key in adata.obs]
+    if len(matches) > 1:
+        raise ValueError(f"Multiple candidate label columns found: {matches}. Pass --label_key explicitly.")
+    if matches:
+        key = matches[0]
+        return _encode_labels(adata.obs[key], key), key
     return None, None
 
 
@@ -115,6 +116,14 @@ def _hvg_indices(x: np.ndarray, n_top_genes: int) -> np.ndarray:
         return np.arange(n_genes, dtype=np.int64)
     var = np.var(x, axis=0)
     return np.argsort(-var, kind="mergesort")[: int(n_top_genes)].astype(np.int64)
+
+
+def feature_space_source(n_top_genes: int, original_n_genes: int) -> str:
+    if int(n_top_genes) <= 0:
+        return "full_gene"
+    if int(n_top_genes) >= int(original_n_genes):
+        return "full_gene_all_available"
+    return "hvg_variance"
 
 
 def compute_gene_stats(x: np.ndarray) -> np.ndarray:
@@ -161,12 +170,13 @@ def load_apa_data(
     pca_dim: int,
     seed: int,
     require_labels: bool = True,
+    label_key: str | None = None,
 ) -> APABundle:
     import anndata as ad
 
     adata = ad.read_h5ad(data_path)
     x_adata = _dense(adata.X).astype(np.float32)
-    labels, label_key = _label_array(adata)
+    labels, resolved_label_key = _label_array(adata, label_key=label_key)
     if labels is None and require_labels:
         raise ValueError(
             "No label column found in adata.obs. Tried: "
@@ -192,17 +202,19 @@ def load_apa_data(
         matrix_source = "adata.X"
     else:
         raise ValueError(f"Unsupported input_mode={input_mode!r}")
+    original_n_genes = int(x.shape[1])
     selected = _hvg_indices(x, int(n_top_genes))
-    x = x[:, selected].astype(np.float32, copy=False)
+    x_prescale = x[:, selected].astype(np.float32, copy=False)
+    gene_stats = compute_gene_stats(x_prescale)
+    x = x_prescale
     if scale_input:
         x = ((x - x.mean(axis=0, keepdims=True)) / (x.std(axis=0, keepdims=True) + 1.0e-6)).astype(np.float32)
     gene_names = np.asarray(source_gene_names, dtype=str)[selected]
-    gene_stats = compute_gene_stats(x)
     prototypes = build_prototypes(x, int(n_prototypes), int(pca_dim), int(seed))
     return APABundle(
         x=x,
         labels=labels,
-        label_key=label_key,
+        label_key=resolved_label_key,
         gene_stats=gene_stats,
         prototypes=prototypes,
         selected_gene_indices=selected,
@@ -211,13 +223,14 @@ def load_apa_data(
             "input_mode_requested": input_mode,
             "input_mode_resolved": mode,
             "raw_count_source": matrix_source if mode == "raw" else None,
-            "label_key": label_key,
+            "label_key": resolved_label_key,
             "labels_available": labels is not None,
             "target_sum": float(target_sum),
             "n_top_genes": int(n_top_genes),
             "actual_n_genes": int(x.shape[1]),
             "scale_input": bool(scale_input),
-            "feature_space_source": "hvg_variance",
+            "feature_space_source": feature_space_source(int(n_top_genes), original_n_genes),
+            "gene_stats_source": "pre_scale_log1p",
         },
     )
 
@@ -226,22 +239,33 @@ class ScMAEShuffleCorruption:
     """Gene-wise scMAE-style replacement values; the generator never creates V."""
 
     def __init__(self, x_full: torch.Tensor, *, seed: int, atol: float, rtol: float) -> None:
-        self.x_full = x_full
+        self.x_full = x_full.detach().cpu().float()
         self.n_cells, self.n_genes = [int(v) for v in x_full.shape]
+        if self.n_cells <= 1:
+            raise ValueError("ScMAEShuffleCorruption requires at least two cells.")
         self.atol = float(atol)
         self.rtol = float(rtol)
-        rng = np.random.default_rng(int(seed) + 7919)
-        perms = np.empty((self.n_cells, self.n_genes), dtype=np.int64)
-        for gene_id in range(self.n_genes):
-            perms[:, gene_id] = rng.permutation(self.n_cells)
-        self.permutations = torch.as_tensor(perms, dtype=torch.long, device=x_full.device)
+        self.seed = int(seed) + 7919
+        self.generator = torch.Generator(device="cpu")
+        self.generator.manual_seed(self.seed)
 
-    def sample(self, batch_indices: torch.Tensor) -> dict[str, torch.Tensor]:
-        idx = batch_indices.long().to(self.x_full.device)
-        donor = self.permutations[idx]
-        gene_ids = torch.arange(self.n_genes, device=self.x_full.device).view(1, self.n_genes).expand_as(donor)
-        replacement = self.x_full[donor, gene_ids]
-        original = self.x_full[idx]
+    def sample(self, batch_indices: torch.Tensor, device: torch.device | str | None = None) -> dict[str, torch.Tensor]:
+        target_device = torch.device(device) if device is not None else batch_indices.device
+        idx_cpu = batch_indices.detach().cpu().long()
+        donor_cpu = torch.randint(
+            low=0,
+            high=self.n_cells - 1,
+            size=(int(idx_cpu.shape[0]), self.n_genes),
+            generator=self.generator,
+            device="cpu",
+        )
+        donor_cpu = donor_cpu + (donor_cpu >= idx_cpu.view(-1, 1)).long()
+        gene_ids = torch.arange(self.n_genes, device="cpu").view(1, self.n_genes).expand_as(donor_cpu)
+        replacement_cpu = self.x_full[donor_cpu, gene_ids]
+        original_cpu = self.x_full[idx_cpu]
+        donor = donor_cpu.to(target_device)
+        replacement = replacement_cpu.to(target_device)
+        original = original_cpu.to(target_device)
         effective = ~torch.isclose(replacement, original, atol=self.atol, rtol=self.rtol)
         return {"replacement": replacement, "effective": effective.float(), "donor_indices": donor}
 
