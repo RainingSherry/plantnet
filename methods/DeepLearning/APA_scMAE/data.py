@@ -56,6 +56,16 @@ def _looks_like_counts(x: np.ndarray) -> bool:
     return bool(np.nanmin(sample) >= 0 and np.allclose(sample, np.round(sample), atol=1.0e-6))
 
 
+def _finite_nonnegative(x: np.ndarray) -> bool:
+    if x.size == 0:
+        return False
+    return bool(np.isfinite(x).all() and float(np.nanmin(x)) >= 0)
+
+
+def _valid_count_matrix(x: np.ndarray) -> bool:
+    return _finite_nonnegative(x) and _looks_like_counts(x)
+
+
 LABEL_CANDIDATES = (
     "cell_type",
     "celltype",
@@ -101,11 +111,15 @@ def _label_array(adata: Any, label_key: str | None = None) -> tuple[np.ndarray |
 
 def _raw_count_source(adata: Any) -> tuple[np.ndarray | None, np.ndarray | None, str | None]:
     if "counts" in adata.layers:
-        return _dense(adata.layers["counts"]).astype(np.float32), np.asarray(adata.var_names, dtype=str), 'layers["counts"]'
+        x = _dense(adata.layers["counts"]).astype(np.float32)
+        if _valid_count_matrix(x):
+            return x, np.asarray(adata.var_names, dtype=str), 'layers["counts"]'
     if adata.raw is not None:
-        return _dense(adata.raw.X).astype(np.float32), np.asarray(adata.raw.var_names, dtype=str), "adata.raw.X"
+        x = _dense(adata.raw.X).astype(np.float32)
+        if _valid_count_matrix(x):
+            return x, np.asarray(adata.raw.var_names, dtype=str), "adata.raw.X"
     x = _dense(adata.X).astype(np.float32)
-    if _looks_like_counts(x):
+    if _valid_count_matrix(x):
         return x, np.asarray(adata.var_names, dtype=str), "adata.X"
     return None, None, None
 
@@ -186,25 +200,33 @@ def load_apa_data(
             + ", ".join(LABEL_CANDIDATES)
             + ". Use --skip_eval true only when labels are intentionally unavailable."
         )
-    count_x, count_gene_names, count_source = _raw_count_source(adata)
     mode = input_mode
-    if mode == "auto":
-        mode = "raw" if count_x is not None else "log1p"
-    if mode == "raw":
-        if count_x is None:
-            raise ValueError("input_mode='raw' requested, but no raw count source was found in layers['counts'], adata.raw.X, or adata.X.")
-        x = count_x.copy()
-        source_gene_names = count_gene_names
-        totals = x.sum(axis=1, keepdims=True)
-        totals[totals <= 0] = 1.0
-        x = np.log1p(x / totals * float(target_sum)).astype(np.float32)
-        matrix_source = count_source
-    elif mode == "log1p":
+    if mode == "log1p":
         x = x_adata.copy()
         source_gene_names = np.asarray(adata.var_names, dtype=str)
         matrix_source = "adata.X"
     else:
-        raise ValueError(f"Unsupported input_mode={input_mode!r}")
+        count_x, count_gene_names, count_source = _raw_count_source(adata)
+        if mode == "auto":
+            mode = "raw" if count_x is not None else "log1p"
+        if mode == "raw":
+            if count_x is None:
+                raise ValueError(
+                    "input_mode='raw' requested, but no valid count-like raw source was found "
+                    "in layers['counts'], adata.raw.X, or adata.X."
+                )
+            x = count_x.copy()
+            source_gene_names = count_gene_names
+            totals = x.sum(axis=1, keepdims=True)
+            totals[totals <= 0] = 1.0
+            x = np.log1p(x / totals * float(target_sum)).astype(np.float32)
+            matrix_source = count_source
+        elif mode == "log1p":
+            x = x_adata.copy()
+            source_gene_names = np.asarray(adata.var_names, dtype=str)
+            matrix_source = "adata.X"
+        else:
+            raise ValueError(f"Unsupported input_mode={input_mode!r}")
     original_n_genes = int(x.shape[1])
     selected = _hvg_indices(x, int(n_top_genes))
     x_prescale = x[:, selected].astype(np.float32, copy=False)

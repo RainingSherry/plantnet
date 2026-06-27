@@ -189,11 +189,73 @@ def test_raw_count_source_modes_and_feature_metadata(tmp_path):
 
     log_path = tmp_path / "log.h5ad"
     _write_h5ad(log_path, log_x, obs=obs)
-    with pytest.raises(ValueError, match="no raw count source"):
+    with pytest.raises(ValueError, match="no valid count-like raw source"):
         load_apa_data(str(log_path), input_mode="raw", target_sum=10.0, n_top_genes=0, scale_input=False, n_prototypes=2, pca_dim=2, seed=1)
     auto_log = load_apa_data(str(log_path), input_mode="auto", target_sum=10.0, n_top_genes=2, scale_input=False, n_prototypes=2, pca_dim=2, seed=1)
     assert auto_log.preprocess_config["input_mode_resolved"] == "log1p"
     assert auto_log.preprocess_config["feature_space_source"] == "hvg_variance"
+
+
+def test_raw_source_rejects_log_normalized_raw_in_auto_and_raw_modes(tmp_path):
+    counts = np.array([[1, 2], [3, 0], [0, 4]], dtype=np.float32)
+    log_x = np.log1p(counts / counts.sum(axis=1, keepdims=True) * 10.0)
+    obs = {"cell_type": ["a", "b", "a"]}
+
+    data_path = tmp_path / "raw_log1p.h5ad"
+    _write_h5ad(data_path, log_x, obs=obs, raw_x=log_x)
+    bundle = load_apa_data(str(data_path), input_mode="auto", target_sum=10.0, n_top_genes=0, scale_input=False, n_prototypes=2, pca_dim=2, seed=1)
+    assert bundle.preprocess_config["input_mode_resolved"] == "log1p"
+    assert bundle.preprocess_config["raw_count_source"] is None
+
+    with pytest.raises(ValueError, match="no valid count-like raw source"):
+        load_apa_data(str(data_path), input_mode="raw", target_sum=10.0, n_top_genes=0, scale_input=False, n_prototypes=2, pca_dim=2, seed=1)
+
+    counts_path = tmp_path / "counts_override_bad_raw.h5ad"
+    _write_h5ad(counts_path, log_x, obs=obs, layers={"counts": counts}, raw_x=log_x)
+    raw_bundle = load_apa_data(str(counts_path), input_mode="raw", target_sum=10.0, n_top_genes=0, scale_input=False, n_prototypes=2, pca_dim=2, seed=1)
+    assert raw_bundle.preprocess_config["raw_count_source"] == 'layers["counts"]'
+
+
+def test_log1p_mode_does_not_probe_raw_source(tmp_path, monkeypatch):
+    counts = np.array([[1, 2], [3, 0], [0, 4]], dtype=np.float32)
+    log_x = np.log1p(counts)
+    data_path = tmp_path / "log1p_no_probe.h5ad"
+    _write_h5ad(data_path, log_x, obs={"cell_type": ["a", "b", "a"]}, raw_x=counts)
+
+    import methods.DeepLearning.APA_scMAE.data as apa_data
+
+    def fail_if_called(_adata):
+        raise AssertionError("_raw_count_source should not be called for input_mode='log1p'")
+
+    monkeypatch.setattr(apa_data, "_raw_count_source", fail_if_called)
+    bundle = apa_data.load_apa_data(
+        str(data_path),
+        input_mode="log1p",
+        target_sum=10.0,
+        n_top_genes=0,
+        scale_input=False,
+        n_prototypes=2,
+        pca_dim=2,
+        seed=1,
+    )
+    assert bundle.preprocess_config["input_mode_resolved"] == "log1p"
+
+
+def test_layers_counts_priority_requires_count_like_values(tmp_path):
+    counts = np.array([[1, 2], [3, 0], [0, 4]], dtype=np.float32)
+    bad_counts_layer = np.log1p(counts)
+    obs = {"cell_type": ["a", "b", "a"]}
+
+    valid_path = tmp_path / "valid_counts_layer.h5ad"
+    _write_h5ad(valid_path, np.log1p(counts), obs=obs, layers={"counts": counts}, raw_x=counts + 10)
+    valid = load_apa_data(str(valid_path), input_mode="auto", target_sum=10.0, n_top_genes=0, scale_input=False, n_prototypes=2, pca_dim=2, seed=1)
+    assert valid.preprocess_config["raw_count_source"] == 'layers["counts"]'
+
+    invalid_path = tmp_path / "invalid_counts_layer.h5ad"
+    _write_h5ad(invalid_path, np.log1p(counts), obs=obs, layers={"counts": bad_counts_layer})
+    invalid = load_apa_data(str(invalid_path), input_mode="auto", target_sum=10.0, n_top_genes=0, scale_input=False, n_prototypes=2, pca_dim=2, seed=1)
+    assert invalid.preprocess_config["input_mode_resolved"] == "log1p"
+    assert invalid.preprocess_config["raw_count_source"] is None
 
 
 def test_gene_stats_zero_rate_uses_prescale_values(tmp_path):
@@ -237,6 +299,21 @@ def test_resolve_device_maps_visible_gpu_to_logical_index(monkeypatch):
     config["runtime"]["gpu"] = 3
     with pytest.raises(ValueError, match="CUDA_VISIBLE_DEVICES"):
         resolve_device(config)
+
+
+def test_resolve_device_uses_first_visible_gpu_without_explicit_gpu(monkeypatch):
+    import torch
+
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "2")
+    config = resolve_config(build_arg_parser().parse_args(["--data_path", "dummy.h5ad", "--save_dir", "/tmp/out", "--n_clusters", "2"]))
+    assert config["runtime"]["gpu"] == 1
+    assert config["runtime"]["gpu_explicit"] is False
+    device, runtime = resolve_device(config)
+    assert str(device) == "cuda:0"
+    assert runtime["physical_gpu"] == 2
+    assert runtime["logical_device"] == "cuda:0"
+    assert runtime["gpu_explicit"] is False
 
 
 def test_cyclic_and_extra_cluster_metrics():

@@ -15,6 +15,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "runtime": {
         "no_cuda": False,
         "gpu": 1,
+        "gpu_explicit": False,
         "allowed_gpus": [1, 2, 3, 4, 5, 6],
         "forbidden_gpus": [0, 7],
         "deterministic": True,
@@ -166,6 +167,7 @@ def resolve_config(args: argparse.Namespace) -> dict[str, Any]:
         cli["method_name"] = args.method_name
     if args.skip_eval is not None:
         cli["skip_eval"] = bool(args.skip_eval)
+    cli.setdefault("runtime", {})["gpu_explicit"] = args.gpu is not None
     if args.gpu is not None:
         cli.setdefault("runtime", {})["gpu"] = int(args.gpu)
     if args.no_cuda:
