@@ -230,14 +230,8 @@ def main():
     args.count_input_source = count_input.source
     print(f"scNAME count_like source: {count_input.source}")
 
-    # Compute size factors — always reshape to (n_cells, 1) for TF placeholder
-    if sf is None:
-        sf = _size_factors_from_counts(count_like)
-    else:
-        sf = np.array(sf).astype(np.float32)
-        if not np.isfinite(sf).all():
-            sf = _size_factors_from_counts(count_like)
-    sf = sf.reshape(-1, 1)
+    # Keep size factors in the same input semantics as count_like/count_X.
+    sf = _size_factors_from_counts(count_like).reshape(-1, 1)
 
     # Encode labels to integers if needed
     from sklearn.preprocessing import LabelEncoder

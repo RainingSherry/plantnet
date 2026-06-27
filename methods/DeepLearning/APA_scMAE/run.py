@@ -303,7 +303,8 @@ def main() -> int:
         )
         trainer.train()
         trainer.save_diagnostics()
-        embedding = trainer.extract_embeddings(batch_size=max(512, int(config["training"]["batch_size"]) * 2))
+        embedding_batch_size = min(int(config["training"]["batch_size"]) * 2, 64)
+        embedding = trainer.extract_embeddings(batch_size=embedding_batch_size)
         labels = bundle.labels.astype(np.int64) if bundle.labels is not None else None
         np.save(save_dir / "embedding_final.npy", embedding)
         if labels is not None:
