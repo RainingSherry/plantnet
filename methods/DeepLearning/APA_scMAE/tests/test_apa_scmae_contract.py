@@ -35,6 +35,7 @@ from methods.DeepLearning.APA_scMAE.run import (
     hungarian_map,
     mapped_clustering_metrics,
     resolve_device,
+    validate_runtime_config,
     validate_embedding_inputs,
     validate_required_files,
 )
@@ -352,6 +353,11 @@ def test_config_defaults_do_not_override_yaml_and_no_cuda_works(tmp_path):
     assert cfg["training"]["student_warmup_epochs"] == 0
     assert cfg["model"]["decoder_mode"] == "current"
 
+    cfg["skip_eval"] = True
+    cfg["n_clusters"] = 0
+    with pytest.raises(ValueError, match="skip_eval=true requires n_clusters"):
+        validate_runtime_config(cfg)
+
 
 def test_resolve_device_maps_visible_gpu_to_logical_index(monkeypatch):
     import torch
@@ -480,6 +486,24 @@ def test_decoder_modes_forward_shapes():
         assert model.student.encode_masked(x, gene_vec, stat_vec, prototypes).shape == (2, 4)
 
 
+def test_decoder_bottleneck_detaches_mask_logits_for_v2_modes():
+    x = torch.ones(2, 6)
+    gene_stats = torch.as_tensor(compute_gene_stats(x.numpy()), dtype=torch.float32)
+    prototypes = torch.randn(2, 3)
+    for decoder_mode in ["z_only", "z_with_stopgrad_h"]:
+        model = APAModel(n_genes=6, token_dim=6, cell_dim=4, proto_dim=3, attention_heads=2, dropout=0.0, decoder_mode=decoder_mode)
+        gene_vec, stat_vec = model.shared_context(gene_stats)
+        out = model.student(x, gene_vec, stat_vec, prototypes)
+        out["x_recon"].sum().backward()
+        assert all(param.grad is None for param in model.student.mask_head.parameters())
+
+    model = APAModel(n_genes=6, token_dim=6, cell_dim=4, proto_dim=3, attention_heads=2, dropout=0.0, decoder_mode="current")
+    gene_vec, stat_vec = model.shared_context(gene_stats)
+    out = model.student(x, gene_vec, stat_vec, prototypes)
+    out["x_recon"].sum().backward()
+    assert any(param.grad is not None for param in model.student.mask_head.parameters())
+
+
 def test_model_shapes_effective_topk_and_budget_deficit():
     x = torch.ones(2, 6)
     replacement = x.clone()
@@ -573,15 +597,18 @@ def test_ema_teacher_is_separate_frozen_and_updates(tmp_path):
     )
     assert trainer.teacher is not None
     student_param = next(trainer.model.student.parameters())
-    teacher_param = next(trainer.teacher.parameters())
+    teacher_param = next(trainer.teacher.student.parameters())
     assert teacher_param is not student_param
     assert all(not param.requires_grad for param in trainer.teacher.parameters())
-    before = [param.detach().clone() for param in trainer.teacher.parameters()]
+    before_student = [param.detach().clone() for param in trainer.teacher.student.parameters()]
+    before_shared = [param.detach().clone() for param in trainer.teacher.shared.parameters()]
     batch = next(iter(trainer._loader()))
     trainer._student_step(batch, warmup=False)
     assert all(param.grad is None for param in trainer.teacher.parameters())
-    after = [param.detach().clone() for param in trainer.teacher.parameters()]
-    assert any(not torch.allclose(a, b) for a, b in zip(after, before))
+    after_student = [param.detach().clone() for param in trainer.teacher.student.parameters()]
+    after_shared = [param.detach().clone() for param in trainer.teacher.shared.parameters()]
+    assert any(not torch.allclose(a, b) for a, b in zip(after_student, before_student))
+    assert any(not torch.allclose(a, b) for a, b in zip(after_shared, before_shared))
 
 
 def test_trainer_forces_generator_update_when_interval_exceeds_batches(tmp_path):
@@ -620,10 +647,14 @@ def test_warmup_skips_generator_and_zero_warmup_enables_it(tmp_path):
         device=torch.device("cpu"),
         save_dir=tmp_path,
     )
+    assert trainer.embedding_prototypes is None
     history = trainer.train()
     assert history["warmup_epoch"][-1] == 1.0
     assert history["generator_enabled"][-1] == 0.0
     assert history["generator_update_count"][-1] == 0.0
+    assert history["loss_generator"][-1] is None
+    assert history["generator_grad_norm"][-1] is None
+    assert trainer.embedding_prototypes is None
 
     no_warmup = _config(tmp_path)
     no_warmup["training"]["student_warmup_epochs"] = 0
@@ -642,6 +673,64 @@ def test_warmup_skips_generator_and_zero_warmup_enables_it(tmp_path):
     assert history["warmup_epoch"][-1] == 0.0
     assert history["generator_enabled"][-1] == 1.0
     assert history["generator_update_count"][-1] > 0.0
+    assert trainer.embedding_prototypes is not None
+
+
+def test_embedding_prototypes_initialize_after_warmup_and_fallback_to_prototype_count(tmp_path):
+    rng = np.random.default_rng(4)
+    x = np.log1p(rng.poisson(2.0, size=(10, 8)).astype(np.float32))
+    config = _config(tmp_path)
+    config["n_clusters"] = 7
+    config["prototype"] = {"n_prototypes": 2}
+    config["prototype_consistency"]["num_embedding_prototypes"] = 0
+    config["training"]["epochs"] = 2
+    config["training"]["student_warmup_epochs"] = 1
+    trainer = APATrainer(
+        config=config,
+        model=APAModel(n_genes=8, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+    assert trainer.embedding_prototypes is None
+    history = trainer.train()
+    assert history["warmup_epoch"] == [1.0, 0.0]
+    assert trainer.embedding_prototypes is not None
+    assert trainer.embedding_prototypes.shape[0] == 2
+    assert history["loss_proto"][0] == pytest.approx(0.0)
+
+
+def test_all_representation_mechanisms_off_does_not_compute_clean_encode(tmp_path, monkeypatch):
+    rng = np.random.default_rng(5)
+    x = np.log1p(rng.poisson(2.0, size=(8, 8)).astype(np.float32))
+    config = _config(tmp_path)
+    config["representation_loss"]["use_repr_loss"] = False
+    config["teacher"]["use_ema_teacher"] = False
+    config["prototype_consistency"]["use_proto_consistency"] = False
+    config["training"]["student_warmup_epochs"] = 0
+    config["training"]["epochs"] = 1
+    trainer = APATrainer(
+        config=config,
+        model=APAModel(n_genes=8, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+
+    def fail_encode_clean(*_args, **_kwargs):
+        raise AssertionError("encode_clean should not run when repr/teacher/proto are all disabled")
+
+    monkeypatch.setattr(trainer.model.student, "encode_clean", fail_encode_clean)
+    history = trainer.train()
+    assert history["loss_repr"][-1] == pytest.approx(0.0)
+    assert history["loss_teacher"][-1] == pytest.approx(0.0)
+    assert history["loss_proto"][-1] == pytest.approx(0.0)
 
 
 def test_artifact_manifest_required_files(tmp_path):

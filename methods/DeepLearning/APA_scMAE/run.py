@@ -250,6 +250,11 @@ def embedding_extraction_batch_size(config: dict[str, Any]) -> int:
     return int(config["training"]["batch_size"])
 
 
+def validate_runtime_config(config: dict[str, Any]) -> None:
+    if bool(config.get("skip_eval", False)) and int(config.get("n_clusters", 0)) <= 0:
+        raise ValueError("skip_eval=true requires n_clusters > 0 because prediction-only mode cannot infer K from labels.")
+
+
 def main() -> int:
     parser = build_arg_parser()
     args = parser.parse_args()
@@ -261,6 +266,7 @@ def main() -> int:
 
         config = resolve_config(args)
         config["dataset_name"] = config.get("dataset_name") or Path(config["data_path"]).stem
+        validate_runtime_config(config)
         set_seed(int(config["seed"]), deterministic=bool(config["runtime"]["deterministic"]))
         device, runtime_info = resolve_device(config)
 

@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 
 from methods.DeepLearning.APA_scMAE.data import APAExpressionDataset, ScMAEShuffleCorruption, assert_no_training_labels
 from methods.DeepLearning.APA_scMAE.losses import generator_losses, mask_diagnostics, student_losses
-from methods.DeepLearning.APA_scMAE.model import APAModel, APAStudent, freeze, grad_norm, straight_through_topk
+from methods.DeepLearning.APA_scMAE.model import APAModel, freeze, grad_norm, straight_through_topk
 from methods.DeepLearning.APA_scMAE.representation_losses import (
     balanced_assignment_loss,
     prototype_kl_loss,
@@ -66,7 +66,7 @@ class APATrainer:
             weight_decay=float(config["training"]["weight_decay"]),
         )
         self.teacher = self._build_teacher()
-        self.embedding_prototypes = self._init_embedding_prototypes()
+        self.embedding_prototypes: torch.Tensor | None = None
         self._pending_proto_update: tuple[torch.Tensor, torch.Tensor] | None = None
         self.history: dict[str, list[float]] = {
             "loss_student": [],
@@ -116,10 +116,10 @@ class APATrainer:
             num_workers=int(self.config["runtime"]["num_workers"]),
         )
 
-    def _build_teacher(self) -> APAStudent | None:
+    def _build_teacher(self) -> APAModel | None:
         if not bool(self.config.get("teacher", {}).get("use_ema_teacher", True)):
             return None
-        teacher = copy.deepcopy(self.model.student).to(self.device)
+        teacher = copy.deepcopy(self.model).to(self.device)
         teacher.eval()
         for param in teacher.parameters():
             param.requires_grad_(False)
@@ -133,7 +133,7 @@ class APATrainer:
         n_cells = len(self.dataset)
         requested = int(proto_cfg.get("num_embedding_prototypes", 0))
         if requested <= 0:
-            requested = int(self.config.get("n_clusters", 0)) or int(self.config.get("prototype", {}).get("n_prototypes", 16))
+            requested = int(self.config.get("prototype", {}).get("n_prototypes", 16))
         n_proto = max(1, min(int(requested), int(n_cells)))
         self.model.eval()
         loader = DataLoader(
@@ -156,8 +156,22 @@ class APATrainer:
             centers = KMeans(n_clusters=n_proto, random_state=int(self.config["seed"]), n_init=10).fit(embedding).cluster_centers_
         return torch.as_tensor(centers, dtype=torch.float32, device=self.device)
 
+    def _ensure_embedding_prototypes_initialized(self) -> None:
+        if self.embedding_prototypes is not None:
+            return
+        if not bool(self.config.get("prototype_consistency", {}).get("use_proto_consistency", True)):
+            return
+        self.embedding_prototypes = self._init_embedding_prototypes()
+
     def _shared(self) -> tuple[torch.Tensor, torch.Tensor]:
         return self.model.shared_context(self.gene_stats)
+
+    def _representation_mechanisms_enabled(self) -> bool:
+        return (
+            bool(self.config.get("representation_loss", {}).get("use_repr_loss", True))
+            or bool(self.config.get("teacher", {}).get("use_ema_teacher", True))
+            or bool(self.config.get("prototype_consistency", {}).get("use_proto_consistency", True))
+        )
 
     def _teacher_momentum(self) -> float:
         teacher_cfg = self.config.get("teacher", {})
@@ -172,7 +186,9 @@ class APATrainer:
         if self.teacher is None:
             return
         momentum = self._teacher_momentum()
-        for teacher_param, student_param in zip(self.teacher.parameters(), self.model.student.parameters()):
+        for teacher_param, student_param in zip(self.teacher.shared.parameters(), self.model.shared.parameters()):
+            teacher_param.data.mul_(momentum).add_(student_param.data, alpha=1.0 - momentum)
+        for teacher_param, student_param in zip(self.teacher.student.parameters(), self.model.student.parameters()):
             teacher_param.data.mul_(momentum).add_(student_param.data, alpha=1.0 - momentum)
 
     def _random_mask(self, x: torch.Tensor, replacement: torch.Tensor, effective: torch.Tensor) -> dict[str, torch.Tensor]:
@@ -214,8 +230,17 @@ class APATrainer:
         teacher_cfg = self.config.get("teacher", {})
         proto_cfg = self.config.get("prototype_consistency", {})
 
-        z_clean = self.model.student.encode_clean(x, gene_vec, stat_vec, self.prototypes)
-        if bool(repr_cfg.get("use_repr_loss", True)):
+        use_repr = bool(repr_cfg.get("use_repr_loss", True))
+        use_teacher = self.teacher is not None and bool(teacher_cfg.get("use_ema_teacher", True))
+        use_proto = self.embedding_prototypes is not None and bool(proto_cfg.get("use_proto_consistency", True))
+        if not (use_repr or use_teacher or use_proto):
+            return losses
+
+        z_clean: torch.Tensor | None = None
+        if use_repr or (use_proto and not use_teacher):
+            z_clean = self.model.student.encode_clean(x, gene_vec, stat_vec, self.prototypes)
+        if use_repr:
+            assert z_clean is not None
             vic = vicreg_losses(
                 z_clean,
                 z_masked,
@@ -229,17 +254,19 @@ class APATrainer:
                 + float(repr_cfg.get("lambda_covariance", 0.01)) * vic["loss_repr_covariance"]
             )
 
-        if self.teacher is not None and bool(teacher_cfg.get("use_ema_teacher", True)):
+        if use_teacher:
             with torch.no_grad():
-                z_clean_teacher = self.teacher.encode_clean(x, gene_vec.detach(), stat_vec.detach(), self.prototypes)
+                teacher_gene_vec, teacher_stat_vec = self.teacher.shared_context(self.gene_stats)
+                z_clean_teacher = self.teacher.student.encode_clean(x, teacher_gene_vec, teacher_stat_vec, self.prototypes)
             losses["loss_teacher"] = float(teacher_cfg.get("teacher_consistency_weight", 1.0)) * teacher_consistency_loss(
                 z_masked,
                 z_clean_teacher,
             )
         else:
+            assert z_clean is not None
             z_clean_teacher = z_clean.detach()
 
-        if self.embedding_prototypes is not None and bool(proto_cfg.get("use_proto_consistency", True)):
+        if use_proto:
             q_clean = soft_assignment(
                 z_clean_teacher.detach(),
                 self.embedding_prototypes.detach(),
@@ -415,8 +442,11 @@ class APATrainer:
         with torch.enable_grad():
             gene_vec, stat_vec = self._shared()
             out = self.model.student(x_tilde, gene_vec.detach(), stat_vec.detach(), self.prototypes)
-            z_clean = self.model.student.encode_clean(x, gene_vec.detach(), stat_vec.detach(), self.prototypes)
-            representation_delta = (out["z"] - z_clean.detach()).pow(2).mean(dim=1)
+            if self._representation_mechanisms_enabled():
+                z_clean = self.model.student.encode_clean(x, gene_vec.detach(), stat_vec.detach(), self.prototypes)
+                representation_delta = (out["z"] - z_clean.detach()).pow(2).mean(dim=1)
+            else:
+                representation_delta = None
         losses = generator_losses(
             x,
             out["x_recon"],
@@ -458,6 +488,8 @@ class APATrainer:
         for _epoch in range(1, epochs + 1):
             warmup = _epoch <= warmup_epochs
             generator_enabled = (not warmup) and bool(self.config["training"].get("enable_generator_after_warmup", True))
+            if not warmup:
+                self._ensure_embedding_prototypes_initialized()
             totals: dict[str, float] = {}
             n_batches = 0
             n_generator_updates = 0
@@ -483,9 +515,9 @@ class APATrainer:
                 generator_update_forced = 1
             for key in self.history:
                 if key == "loss_generator":
-                    self.history[key].append(totals.get(key, float("nan")) / n_generator_updates if n_generator_updates else float("nan"))
+                    self.history[key].append(totals.get(key, 0.0) / n_generator_updates if n_generator_updates else None)
                 elif key == "generator_grad_norm":
-                    self.history[key].append(totals.get(key, float("nan")) / n_generator_updates if n_generator_updates else float("nan"))
+                    self.history[key].append(totals.get(key, 0.0) / n_generator_updates if n_generator_updates else None)
                 elif key == "generator_update_count":
                     self.history[key].append(float(n_generator_updates))
                 elif key == "generator_update_forced":

@@ -227,10 +227,10 @@ class APAStudent(nn.Module):
         pred_mask_logits = self.mask_head(torch.cat([h_gene, z_gene], dim=-1)).squeeze(-1)
         gene_vec_batch = gene_vec.unsqueeze(0).expand(x_tilde.shape[0], -1, -1)
         if self.decoder_mode == "z_only":
-            recon_input = torch.cat([z_gene, pred_mask_logits.unsqueeze(-1), gene_vec_batch], dim=-1)
+            recon_input = torch.cat([z_gene, pred_mask_logits.detach().unsqueeze(-1), gene_vec_batch], dim=-1)
             reconstruction = self.z_only_decoder(recon_input).squeeze(-1)
         elif self.decoder_mode == "z_with_stopgrad_h":
-            recon_input = torch.cat([h_gene.detach(), z_gene, pred_mask_logits.unsqueeze(-1), gene_vec_batch], dim=-1)
+            recon_input = torch.cat([h_gene.detach(), z_gene, pred_mask_logits.detach().unsqueeze(-1), gene_vec_batch], dim=-1)
             reconstruction = self.decoder(recon_input).squeeze(-1)
         else:
             recon_input = torch.cat([h_gene, z_gene, pred_mask_logits.unsqueeze(-1), gene_vec_batch], dim=-1)
