@@ -16,6 +16,25 @@ The implementation follows the attached model sketch:
 
 This package is not registered in the formal benchmark manifest yet.
 
+## v2 objective correction
+
+APA-scMAE v2 keeps the same high-level Student/Generator structure, but changes the training objective so the cell embedding is directly shaped:
+
+- Student warmup is enabled by default for 20 epochs; warmup uses random scMAE-style masks and does not update the Generator.
+- Student training includes clean/masked representation consistency, variance/covariance anti-collapse penalties, EMA Teacher consistency, and embedding-prototype assignment consistency.
+- The default decoder mode is `z_with_stopgrad_h`, so reconstruction may use token context but cannot route reconstruction gradients through token features to bypass the cell embedding.
+- The Generator objective targets moderate corruption difficulty plus mask coverage/diversity/gene balance instead of rewarding the largest reconstruction deltas.
+
+Useful one-command ablations:
+
+```bash
+--use_repr_loss false
+--use_ema_teacher false
+--use_proto_consistency false
+--student_warmup_epochs 0
+--decoder_mode current
+```
+
 Notes:
 
 - Do not add APA-scMAE to `methods/method_manifest.yaml` until a separate review approves formal benchmark inclusion.

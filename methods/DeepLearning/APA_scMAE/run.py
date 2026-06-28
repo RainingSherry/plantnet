@@ -294,6 +294,7 @@ def main() -> int:
             proto_dim=int(bundle.prototypes.shape[1]),
             attention_heads=int(config["model"]["attention_heads"]),
             dropout=float(config["model"]["attention_dropout"]),
+            decoder_mode=str(config["model"]["decoder_mode"]),
         )
         trainer = APATrainer(
             config=config,
@@ -350,6 +351,8 @@ def main() -> int:
         torch.save(
             {
                 "model": trainer.model.state_dict(),
+                "teacher": trainer.teacher.state_dict() if trainer.teacher is not None else None,
+                "embedding_prototypes": trainer.embedding_prototypes.detach().cpu() if trainer.embedding_prototypes is not None else None,
                 "student_optimizer": trainer.student_optimizer.state_dict(),
                 "generator_optimizer": trainer.generator_optimizer.state_dict(),
                 "resolved_config": config,

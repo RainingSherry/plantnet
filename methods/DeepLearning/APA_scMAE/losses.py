@@ -33,9 +33,26 @@ def balance_loss(mask_soft: torch.Tensor) -> torch.Tensor:
 
 
 def distortion_loss(mask_soft: torch.Tensor, delta: torch.Tensor) -> torch.Tensor:
+    return moderate_delta_loss(mask_soft, delta)
+
+
+def moderate_delta_loss(mask_soft: torch.Tensor, delta: torch.Tensor) -> torch.Tensor:
     selected_delta = (mask_soft * delta).sum() / (mask_soft.sum() + 1.0e-8)
     all_delta = delta.mean().detach()
     return ((selected_delta - all_delta) / (all_delta + 1.0e-8)).pow(2)
+
+
+def moderate_value_loss(mask_soft: torch.Tensor, values: torch.Tensor) -> torch.Tensor:
+    selected = (mask_soft * values).sum() / (mask_soft.sum() + 1.0e-8)
+    target = values.mean().detach()
+    return ((selected - target) / (target.abs() + 1.0e-8)).pow(2)
+
+
+def moderate_batch_loss(values: torch.Tensor) -> torch.Tensor:
+    if values.numel() == 0:
+        return values.sum() * 0.0
+    target = values.detach().median()
+    return (values - target).pow(2).mean()
 
 
 def coverage_loss(mask_soft: torch.Tensor, target_ratio: float) -> torch.Tensor:
@@ -55,21 +72,38 @@ def generator_losses(
     lambda_balance: float,
     lambda_distortion: float,
     lambda_coverage: float,
+    lambda_reconstruction_moderate: float = 0.1,
+    lambda_representation_moderate: float = 0.0,
+    representation_delta: torch.Tensor | None = None,
 ) -> dict[str, torch.Tensor]:
     err = (x_recon - x).pow(2)
-    hard = -(effective_mask_st * err).sum() / (effective_mask_st.sum() + 1.0e-8)
+    rec_moderate = moderate_value_loss(effective_mask_st, err)
     ent = mask_entropy(logits)
     bal = balance_loss(mask_soft)
-    dist = distortion_loss(mask_soft, delta)
+    dist = moderate_delta_loss(mask_soft, delta)
     cov = coverage_loss(mask_soft, mask_ratio)
-    total = hard + float(lambda_entropy) * ent + float(lambda_balance) * bal + float(lambda_distortion) * dist + float(lambda_coverage) * cov
+    if representation_delta is None:
+        repr_moderate = err.sum() * 0.0
+    else:
+        repr_moderate = moderate_batch_loss(representation_delta)
+    total = (
+        float(lambda_reconstruction_moderate) * rec_moderate
+        + float(lambda_entropy) * ent
+        + float(lambda_balance) * bal
+        + float(lambda_distortion) * dist
+        + float(lambda_coverage) * cov
+        + float(lambda_representation_moderate) * repr_moderate
+    )
     return {
         "loss_generator": total,
-        "loss_hard": hard,
+        "loss_hard": rec_moderate,
+        "loss_reconstruction_moderate": rec_moderate,
         "loss_entropy": ent,
         "loss_balance": bal,
         "loss_distortion": dist,
+        "loss_moderate_delta": dist,
         "loss_coverage": cov,
+        "loss_representation_moderate": repr_moderate,
     }
 
 

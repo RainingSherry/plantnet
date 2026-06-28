@@ -40,6 +40,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "attention_heads": 4,
         "attention_dropout": 0.1,
         "dropout": 0.0,
+        "decoder_mode": "z_with_stopgrad_h",
     },
     "corruption": {
         "type": "scmae_shuffle",
@@ -61,13 +62,40 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "student_grad_clip": 5.0,
         "generator_grad_clip": 1.0,
         "generator_update_interval": 1,
+        "student_warmup_epochs": 20,
+        "enable_generator_after_warmup": True,
+        "use_random_mask_during_warmup": True,
         "gamma": 0.7,
+    },
+    "representation_loss": {
+        "use_repr_loss": True,
+        "lambda_invariance": 1.0,
+        "lambda_variance": 0.1,
+        "lambda_covariance": 0.01,
+        "variance_margin": 1.0,
+        "eps": 1.0e-4,
+    },
+    "teacher": {
+        "use_ema_teacher": True,
+        "teacher_momentum_start": 0.99,
+        "teacher_momentum_end": 0.999,
+        "teacher_consistency_weight": 1.0,
+    },
+    "prototype_consistency": {
+        "use_proto_consistency": True,
+        "num_embedding_prototypes": 0,
+        "proto_temperature": 0.2,
+        "proto_loss_weight": 0.1,
+        "proto_balance_weight": 0.01,
+        "proto_ema_momentum": 0.95,
     },
     "generator_loss": {
         "lambda_entropy": 0.01,
         "lambda_balance": 0.01,
         "lambda_distortion": 0.01,
         "lambda_coverage": 0.01,
+        "lambda_reconstruction_moderate": 0.1,
+        "lambda_representation_moderate": 0.1,
     },
     "evaluation": {
         "label_key": None,
@@ -124,7 +152,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--save_dir", type=str, required=True)
     parser.add_argument("--dataset_name", type=str, default=None)
     parser.add_argument("--method_name", type=str, default=None)
-    parser.add_argument("--n_clusters", type=int, required=True)
+    parser.add_argument("--n_clusters", type=int, default=0)
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--gpu", type=int, default=None)
     parser.add_argument("--no_cuda", action="store_true")
@@ -137,10 +165,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--token_dim", type=int, default=None)
     parser.add_argument("--cell_dim", type=int, default=None)
     parser.add_argument("--attention_heads", type=int, default=None)
+    parser.add_argument("--decoder_mode", type=str, default=None, choices=["current", "z_only", "z_with_stopgrad_h"])
     parser.add_argument("--epochs", type=int, default=None)
     parser.add_argument("--batch_size", type=int, default=None)
     parser.add_argument("--lr_student", type=float, default=None)
     parser.add_argument("--lr_generator", type=float, default=None)
+    parser.add_argument("--student_warmup_epochs", type=int, default=None)
+    parser.add_argument("--enable_generator_after_warmup", type=str2bool, default=None)
+    parser.add_argument("--use_random_mask_during_warmup", type=str2bool, default=None)
+    parser.add_argument("--use_repr_loss", type=str2bool, default=None)
+    parser.add_argument("--use_ema_teacher", type=str2bool, default=None)
+    parser.add_argument("--use_proto_consistency", type=str2bool, default=None)
     parser.add_argument("--mask_ratio", type=float, default=None)
     parser.add_argument("--temperature", type=float, default=None)
     parser.add_argument("--corruption_type", type=str, default=None, choices=["scmae_shuffle"])
@@ -197,6 +232,8 @@ def resolve_config(args: argparse.Namespace) -> dict[str, Any]:
         model["cell_dim"] = int(args.cell_dim)
     if args.attention_heads is not None:
         model["attention_heads"] = int(args.attention_heads)
+    if args.decoder_mode is not None:
+        model["decoder_mode"] = str(args.decoder_mode)
     train = cli.setdefault("training", {})
     if args.epochs is not None:
         train["epochs"] = int(args.epochs)
@@ -206,6 +243,18 @@ def resolve_config(args: argparse.Namespace) -> dict[str, Any]:
         train["lr_student"] = float(args.lr_student)
     if args.lr_generator is not None:
         train["lr_generator"] = float(args.lr_generator)
+    if args.student_warmup_epochs is not None:
+        train["student_warmup_epochs"] = int(args.student_warmup_epochs)
+    if args.enable_generator_after_warmup is not None:
+        train["enable_generator_after_warmup"] = bool(args.enable_generator_after_warmup)
+    if args.use_random_mask_during_warmup is not None:
+        train["use_random_mask_during_warmup"] = bool(args.use_random_mask_during_warmup)
+    if args.use_repr_loss is not None:
+        cli.setdefault("representation_loss", {})["use_repr_loss"] = bool(args.use_repr_loss)
+    if args.use_ema_teacher is not None:
+        cli.setdefault("teacher", {})["use_ema_teacher"] = bool(args.use_ema_teacher)
+    if args.use_proto_consistency is not None:
+        cli.setdefault("prototype_consistency", {})["use_proto_consistency"] = bool(args.use_proto_consistency)
     mask = cli.setdefault("mask", {})
     if args.mask_ratio is not None:
         mask["ratio"] = float(args.mask_ratio)

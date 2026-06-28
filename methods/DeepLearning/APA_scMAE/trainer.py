@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 import time
 from pathlib import Path
@@ -11,7 +12,14 @@ from torch.utils.data import DataLoader
 
 from methods.DeepLearning.APA_scMAE.data import APAExpressionDataset, ScMAEShuffleCorruption, assert_no_training_labels
 from methods.DeepLearning.APA_scMAE.losses import generator_losses, mask_diagnostics, student_losses
-from methods.DeepLearning.APA_scMAE.model import APAModel, freeze, grad_norm
+from methods.DeepLearning.APA_scMAE.model import APAModel, APAStudent, freeze, grad_norm, straight_through_topk
+from methods.DeepLearning.APA_scMAE.representation_losses import (
+    balanced_assignment_loss,
+    prototype_kl_loss,
+    soft_assignment,
+    teacher_consistency_loss,
+    vicreg_losses,
+)
 
 
 def save_json(path: Path, data: Any) -> None:
@@ -40,6 +48,7 @@ class APATrainer:
         self.prototypes = prototypes.to(device)
         self.device = device
         self.save_dir = save_dir
+        self.global_student_steps = 0
         self.corruption = ScMAEShuffleCorruption(
             self.full_x,
             seed=int(config["seed"]),
@@ -56,11 +65,21 @@ class APATrainer:
             lr=float(config["training"]["lr_generator"]),
             weight_decay=float(config["training"]["weight_decay"]),
         )
+        self.teacher = self._build_teacher()
+        self.embedding_prototypes = self._init_embedding_prototypes()
+        self._pending_proto_update: tuple[torch.Tensor, torch.Tensor] | None = None
         self.history: dict[str, list[float]] = {
             "loss_student": [],
             "loss_generator": [],
             "loss_rec": [],
             "loss_mask": [],
+            "loss_repr": [],
+            "loss_repr_invariance": [],
+            "loss_repr_variance": [],
+            "loss_repr_covariance": [],
+            "loss_teacher": [],
+            "loss_proto": [],
+            "loss_proto_balance": [],
             "mask_ratio": [],
             "effective_mask_ratio": [],
             "zero_to_zero_rate": [],
@@ -71,6 +90,8 @@ class APATrainer:
             "generator_grad_norm": [],
             "generator_update_count": [],
             "generator_update_forced": [],
+            "warmup_epoch": [],
+            "generator_enabled": [],
             "batch_seconds": [],
         }
         self.corruption_totals = {
@@ -95,8 +116,169 @@ class APATrainer:
             num_workers=int(self.config["runtime"]["num_workers"]),
         )
 
+    def _build_teacher(self) -> APAStudent | None:
+        if not bool(self.config.get("teacher", {}).get("use_ema_teacher", True)):
+            return None
+        teacher = copy.deepcopy(self.model.student).to(self.device)
+        teacher.eval()
+        for param in teacher.parameters():
+            param.requires_grad_(False)
+        return teacher
+
+    @torch.no_grad()
+    def _init_embedding_prototypes(self) -> torch.Tensor | None:
+        proto_cfg = self.config.get("prototype_consistency", {})
+        if not bool(proto_cfg.get("use_proto_consistency", True)):
+            return None
+        n_cells = len(self.dataset)
+        requested = int(proto_cfg.get("num_embedding_prototypes", 0))
+        if requested <= 0:
+            requested = int(self.config.get("n_clusters", 0)) or int(self.config.get("prototype", {}).get("n_prototypes", 16))
+        n_proto = max(1, min(int(requested), int(n_cells)))
+        self.model.eval()
+        loader = DataLoader(
+            self.dataset,
+            batch_size=max(1, int(self.config["training"]["batch_size"])),
+            shuffle=False,
+            drop_last=False,
+        )
+        gene_vec, stat_vec = self._shared()
+        chunks: list[np.ndarray] = []
+        for batch in loader:
+            z = self.model.student.feature(batch["x"].to(self.device), gene_vec, stat_vec, self.prototypes)
+            chunks.append(z.detach().cpu().numpy().astype(np.float32))
+        embedding = np.concatenate(chunks, axis=0)
+        if n_proto == 1:
+            centers = embedding.mean(axis=0, keepdims=True)
+        else:
+            from sklearn.cluster import KMeans
+
+            centers = KMeans(n_clusters=n_proto, random_state=int(self.config["seed"]), n_init=10).fit(embedding).cluster_centers_
+        return torch.as_tensor(centers, dtype=torch.float32, device=self.device)
+
     def _shared(self) -> tuple[torch.Tensor, torch.Tensor]:
         return self.model.shared_context(self.gene_stats)
+
+    def _teacher_momentum(self) -> float:
+        teacher_cfg = self.config.get("teacher", {})
+        start = float(teacher_cfg.get("teacher_momentum_start", 0.99))
+        end = float(teacher_cfg.get("teacher_momentum_end", 0.999))
+        total = max(1, int(self.config["training"]["epochs"]) * max(1, len(self._loader())))
+        progress = min(1.0, float(self.global_student_steps) / float(total))
+        return start + (end - start) * progress
+
+    @torch.no_grad()
+    def _update_teacher(self) -> None:
+        if self.teacher is None:
+            return
+        momentum = self._teacher_momentum()
+        for teacher_param, student_param in zip(self.teacher.parameters(), self.model.student.parameters()):
+            teacher_param.data.mul_(momentum).add_(student_param.data, alpha=1.0 - momentum)
+
+    def _random_mask(self, x: torch.Tensor, replacement: torch.Tensor, effective: torch.Tensor) -> dict[str, torch.Tensor]:
+        logits = torch.rand_like(x)
+        hard, soft, st, info = straight_through_topk(
+            logits,
+            float(self.config["mask"]["ratio"]),
+            float(self.config["mask"]["temperature"]),
+            effective.bool(),
+        )
+        return {
+            "logits": logits,
+            "mask_hard": hard,
+            "mask_soft": soft,
+            "mask_st": st,
+            "delta": (replacement - x).abs(),
+            **info,
+        }
+
+    def _representation_objectives(
+        self,
+        *,
+        x: torch.Tensor,
+        z_masked: torch.Tensor,
+        gene_vec: torch.Tensor,
+        stat_vec: torch.Tensor,
+    ) -> dict[str, torch.Tensor]:
+        device_zero = z_masked.sum() * 0.0
+        losses: dict[str, torch.Tensor] = {
+            "loss_repr": device_zero,
+            "loss_repr_invariance": device_zero,
+            "loss_repr_variance": device_zero,
+            "loss_repr_covariance": device_zero,
+            "loss_teacher": device_zero,
+            "loss_proto": device_zero,
+            "loss_proto_balance": device_zero,
+        }
+        repr_cfg = self.config.get("representation_loss", {})
+        teacher_cfg = self.config.get("teacher", {})
+        proto_cfg = self.config.get("prototype_consistency", {})
+
+        z_clean = self.model.student.encode_clean(x, gene_vec, stat_vec, self.prototypes)
+        if bool(repr_cfg.get("use_repr_loss", True)):
+            vic = vicreg_losses(
+                z_clean,
+                z_masked,
+                variance_margin=float(repr_cfg.get("variance_margin", 1.0)),
+                eps=float(repr_cfg.get("eps", 1.0e-4)),
+            )
+            losses.update(vic)
+            losses["loss_repr"] = (
+                float(repr_cfg.get("lambda_invariance", 1.0)) * vic["loss_repr_invariance"]
+                + float(repr_cfg.get("lambda_variance", 0.1)) * vic["loss_repr_variance"]
+                + float(repr_cfg.get("lambda_covariance", 0.01)) * vic["loss_repr_covariance"]
+            )
+
+        if self.teacher is not None and bool(teacher_cfg.get("use_ema_teacher", True)):
+            with torch.no_grad():
+                z_clean_teacher = self.teacher.encode_clean(x, gene_vec.detach(), stat_vec.detach(), self.prototypes)
+            losses["loss_teacher"] = float(teacher_cfg.get("teacher_consistency_weight", 1.0)) * teacher_consistency_loss(
+                z_masked,
+                z_clean_teacher,
+            )
+        else:
+            z_clean_teacher = z_clean.detach()
+
+        if self.embedding_prototypes is not None and bool(proto_cfg.get("use_proto_consistency", True)):
+            q_clean = soft_assignment(
+                z_clean_teacher.detach(),
+                self.embedding_prototypes.detach(),
+                temperature=float(proto_cfg.get("proto_temperature", 0.2)),
+            )
+            q_masked = soft_assignment(
+                z_masked,
+                self.embedding_prototypes.detach(),
+                temperature=float(proto_cfg.get("proto_temperature", 0.2)),
+            )
+            proto_kl = prototype_kl_loss(q_clean, q_masked)
+            proto_balance = balanced_assignment_loss(q_masked)
+            losses["loss_proto"] = float(proto_cfg.get("proto_loss_weight", 0.1)) * proto_kl
+            losses["loss_proto_balance"] = float(proto_cfg.get("proto_balance_weight", 0.01)) * proto_balance
+            self._pending_proto_update = (z_clean_teacher.detach().clone(), q_clean.detach().clone())
+        return losses
+
+    @torch.no_grad()
+    def _apply_pending_embedding_prototype_update(self) -> None:
+        if self._pending_proto_update is None:
+            return
+        z_clean_teacher, q_clean = self._pending_proto_update
+        self._pending_proto_update = None
+        self._update_embedding_prototypes(z_clean_teacher, q_clean)
+
+    @torch.no_grad()
+    def _update_embedding_prototypes(self, z_clean_teacher: torch.Tensor, q_clean: torch.Tensor) -> None:
+        if self.embedding_prototypes is None:
+            return
+        weights = q_clean.sum(dim=0)
+        centroids = q_clean.T.matmul(z_clean_teacher) / weights.clamp_min(1.0e-8).unsqueeze(1)
+        active = weights > 1.0e-6
+        if not bool(active.any()):
+            return
+        momentum = float(self.config.get("prototype_consistency", {}).get("proto_ema_momentum", 0.95))
+        self.embedding_prototypes[active] = (
+            momentum * self.embedding_prototypes[active]
+            + (1.0 - momentum) * centroids[active]
+        )
 
     def _generator_forward(self, x: torch.Tensor, replacement: torch.Tensor, effective: torch.Tensor, *, detach_shared: bool):
         if detach_shared:
@@ -129,7 +311,7 @@ class APATrainer:
         self.corruption_totals["abs_delta"] += float(delta.detach().sum().cpu())
         self.corruption_totals["positions"] += float(delta.numel())
 
-    def _student_step(self, batch: dict[str, torch.Tensor]) -> dict[str, float]:
+    def _student_step(self, batch: dict[str, torch.Tensor], *, warmup: bool) -> dict[str, float]:
         assert_no_training_labels(batch)
         idx = batch["index"].to(self.device).long()
         x = batch["x"].to(self.device)
@@ -142,12 +324,16 @@ class APATrainer:
         self.model.student.train()
         self.model.generator.eval()
         with torch.no_grad():
-            gen = self._generator_forward(x, replacement, effective, detach_shared=True)
+            if warmup and bool(self.config["training"].get("use_random_mask_during_warmup", True)):
+                gen = self._random_mask(x, replacement, effective)
+            else:
+                gen = self._generator_forward(x, replacement, effective, detach_shared=True)
         mask = gen["mask_hard"].detach()
         effective_mask = mask * effective
         x_tilde = x * (1.0 - mask) + replacement.detach() * mask
         self.student_optimizer.zero_grad(set_to_none=True)
-        out = self._student_forward(x_tilde)
+        gene_vec, stat_vec = self._shared()
+        out = self.model.student(x_tilde, gene_vec, stat_vec, self.prototypes)
         losses = student_losses(
             x,
             out["x_recon"],
@@ -155,6 +341,15 @@ class APATrainer:
             effective_mask,
             masked_data_weight=float(self.config["mask"]["masked_data_weight"]),
             gamma=float(self.config["training"]["gamma"]),
+        )
+        repr_losses = self._representation_objectives(x=x, z_masked=out["z"], gene_vec=gene_vec, stat_vec=stat_vec)
+        losses.update(repr_losses)
+        losses["loss_student"] = (
+            losses["loss_student"]
+            + losses["loss_repr"]
+            + losses["loss_teacher"]
+            + losses["loss_proto"]
+            + losses["loss_proto_balance"]
         )
         losses["loss_student"].backward()
         torch.nn.utils.clip_grad_norm_(
@@ -169,6 +364,9 @@ class APATrainer:
             if g_grad != 0.0:
                 raise RuntimeError("generator received gradient during student step")
         self.student_optimizer.step()
+        self.global_student_steps += 1
+        self._update_teacher()
+        self._apply_pending_embedding_prototype_update()
         freeze(self.model.generator, False)
         stats = mask_diagnostics(
             mask,
@@ -183,6 +381,13 @@ class APATrainer:
             "loss_student": float(losses["loss_student"].detach().cpu()),
             "loss_rec": float(losses["loss_rec"].detach().cpu()),
             "loss_mask": float(losses["loss_mask"].detach().cpu()),
+            "loss_repr": float(losses["loss_repr"].detach().cpu()),
+            "loss_repr_invariance": float(losses["loss_repr_invariance"].detach().cpu()),
+            "loss_repr_variance": float(losses["loss_repr_variance"].detach().cpu()),
+            "loss_repr_covariance": float(losses["loss_repr_covariance"].detach().cpu()),
+            "loss_teacher": float(losses["loss_teacher"].detach().cpu()),
+            "loss_proto": float(losses["loss_proto"].detach().cpu()),
+            "loss_proto_balance": float(losses["loss_proto_balance"].detach().cpu()),
             "student_grad_norm": float(s_grad),
             "generator_grad_norm": float(g_grad),
             **stats,
@@ -210,6 +415,8 @@ class APATrainer:
         with torch.enable_grad():
             gene_vec, stat_vec = self._shared()
             out = self.model.student(x_tilde, gene_vec.detach(), stat_vec.detach(), self.prototypes)
+            z_clean = self.model.student.encode_clean(x, gene_vec.detach(), stat_vec.detach(), self.prototypes)
+            representation_delta = (out["z"] - z_clean.detach()).pow(2).mean(dim=1)
         losses = generator_losses(
             x,
             out["x_recon"],
@@ -222,6 +429,9 @@ class APATrainer:
             lambda_balance=float(self.config["generator_loss"]["lambda_balance"]),
             lambda_distortion=float(self.config["generator_loss"]["lambda_distortion"]),
             lambda_coverage=float(self.config["generator_loss"]["lambda_coverage"]),
+            lambda_reconstruction_moderate=float(self.config["generator_loss"].get("lambda_reconstruction_moderate", 0.1)),
+            lambda_representation_moderate=float(self.config["generator_loss"].get("lambda_representation_moderate", 0.1)),
+            representation_delta=representation_delta,
         )
         losses["loss_generator"].backward()
         torch.nn.utils.clip_grad_norm_(self.model.generator.parameters(), float(self.config["training"]["generator_grad_clip"]))
@@ -244,7 +454,10 @@ class APATrainer:
     def train(self) -> dict[str, list[float]]:
         epochs = max(1, int(self.config["training"]["epochs"]))
         loader = self._loader()
+        warmup_epochs = max(0, int(self.config["training"].get("student_warmup_epochs", 0)))
         for _epoch in range(1, epochs + 1):
+            warmup = _epoch <= warmup_epochs
+            generator_enabled = (not warmup) and bool(self.config["training"].get("enable_generator_after_warmup", True))
             totals: dict[str, float] = {}
             n_batches = 0
             n_generator_updates = 0
@@ -253,8 +466,8 @@ class APATrainer:
             for batch_id, batch in enumerate(loader):
                 start = time.perf_counter()
                 last_batch = batch
-                step = self._student_step(batch)
-                if (batch_id + 1) % int(self.config["training"]["generator_update_interval"]) == 0:
+                step = self._student_step(batch, warmup=warmup)
+                if generator_enabled and (batch_id + 1) % int(self.config["training"]["generator_update_interval"]) == 0:
                     gen_step = self._generator_step(batch)
                     step.update(gen_step)
                     n_generator_updates += 1
@@ -262,7 +475,7 @@ class APATrainer:
                 for key, value in step.items():
                     totals[key] = totals.get(key, 0.0) + float(value)
                 n_batches += 1
-            if n_batches > 0 and n_generator_updates == 0 and last_batch is not None:
+            if generator_enabled and n_batches > 0 and n_generator_updates == 0 and last_batch is not None:
                 gen_step = self._generator_step(last_batch)
                 for key, value in gen_step.items():
                     totals[key] = totals.get(key, 0.0) + float(value)
@@ -277,6 +490,10 @@ class APATrainer:
                     self.history[key].append(float(n_generator_updates))
                 elif key == "generator_update_forced":
                     self.history[key].append(float(generator_update_forced))
+                elif key == "warmup_epoch":
+                    self.history[key].append(1.0 if warmup else 0.0)
+                elif key == "generator_enabled":
+                    self.history[key].append(1.0 if generator_enabled else 0.0)
                 else:
                     self.history[key].append(totals.get(key, 0.0) / max(1, n_batches))
         return self.history
