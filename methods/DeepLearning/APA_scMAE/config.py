@@ -64,7 +64,6 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "generator_update_interval": 1,
         "student_warmup_epochs": 20,
         "enable_generator_after_warmup": True,
-        "use_random_mask_during_warmup": True,
         "gamma": 0.7,
     },
     "representation_loss": {
@@ -172,7 +171,6 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--lr_generator", type=float, default=None)
     parser.add_argument("--student_warmup_epochs", type=int, default=None)
     parser.add_argument("--enable_generator_after_warmup", type=str2bool, default=None)
-    parser.add_argument("--use_random_mask_during_warmup", type=str2bool, default=None)
     parser.add_argument("--use_repr_loss", type=str2bool, default=None)
     parser.add_argument("--use_ema_teacher", type=str2bool, default=None)
     parser.add_argument("--use_proto_consistency", type=str2bool, default=None)
@@ -248,8 +246,6 @@ def resolve_config(args: argparse.Namespace) -> dict[str, Any]:
         train["student_warmup_epochs"] = int(args.student_warmup_epochs)
     if args.enable_generator_after_warmup is not None:
         train["enable_generator_after_warmup"] = bool(args.enable_generator_after_warmup)
-    if args.use_random_mask_during_warmup is not None:
-        train["use_random_mask_during_warmup"] = bool(args.use_random_mask_during_warmup)
     if args.use_repr_loss is not None:
         cli.setdefault("representation_loss", {})["use_repr_loss"] = bool(args.use_repr_loss)
     if args.use_ema_teacher is not None:

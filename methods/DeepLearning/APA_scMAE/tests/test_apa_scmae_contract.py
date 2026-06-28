@@ -80,7 +80,6 @@ def _config(tmp_path):
             "generator_update_interval": 1,
             "student_warmup_epochs": 0,
             "enable_generator_after_warmup": True,
-            "use_random_mask_during_warmup": True,
             "gamma": 0.5,
         },
         "mask": {"ratio": 0.4, "temperature": 1.0, "masked_data_weight": 0.75, "generator_topk_only_effective": True},
@@ -362,6 +361,18 @@ def test_config_defaults_do_not_override_yaml_and_no_cuda_works(tmp_path):
     cfg["n_clusters"] = 0
     with pytest.raises(ValueError, match="skip_eval=true requires n_clusters"):
         validate_runtime_config(cfg)
+
+    with pytest.raises(SystemExit):
+        parser.parse_args(
+            [
+                "--data_path",
+                "dummy.h5ad",
+                "--save_dir",
+                str(tmp_path / "out4"),
+                "--use_random_mask_during_warmup",
+                "false",
+            ]
+        )
 
 
 def test_resolve_device_maps_visible_gpu_to_logical_index(monkeypatch):
@@ -704,6 +715,32 @@ def test_warmup_skips_generator_and_zero_warmup_enables_it(tmp_path):
     assert history["generator_enabled"][-1] == 1.0
     assert history["generator_update_count"][-1] > 0.0
     assert trainer.embedding_prototypes is not None
+
+
+def test_warmup_never_calls_generator_forward(tmp_path, monkeypatch):
+    rng = np.random.default_rng(8)
+    x = np.log1p(rng.poisson(2.0, size=(8, 10)).astype(np.float32))
+    config = _config(tmp_path)
+    config["training"]["epochs"] = 1
+    config["training"]["student_warmup_epochs"] = 1
+    trainer = APATrainer(
+        config=config,
+        model=APAModel(n_genes=10, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+
+    def fail_generator_forward(*_args, **_kwargs):
+        raise AssertionError("_generator_forward should not run during warmup")
+
+    monkeypatch.setattr(trainer, "_generator_forward", fail_generator_forward)
+    history = trainer.train()
+    assert history["warmup_epoch"] == [1.0]
+    assert history["generator_update_count"] == [0.0]
 
 
 def test_generator_disabled_after_warmup_uses_random_mask_without_generator_forward(tmp_path, monkeypatch):
