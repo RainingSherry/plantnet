@@ -84,7 +84,7 @@ def _validate_count_like_matrix(matrix, expected_shape, source_name):
 
 
 def _get_scname_count_input(adata):
-    """Return nonnegative count/count-like input for scNAME NB/ZINB loss."""
+    """Return raw count inputs for scNAME NB/ZINB loss."""
     expected_shape = adata.X.shape
 
     if 'counts' in adata.layers:
@@ -114,7 +114,7 @@ def _get_scname_count_input(adata):
 
     detail = f" Raw count lookup failed: {raw_error}" if raw_error is not None else ""
     raise ValueError(
-        "scNAME requires nonnegative count_X/count_like input from adata.layers['counts'], "
+        "scNAME requires nonnegative count_X/count-like input from adata.layers['counts'], "
         "or count-like adata.raw[:, adata.var_names].X; scaled adata.X, adata.to_df(), "
         "or adata.layers['norm_log'] cannot be used "
         f"as count_X.{detail}"

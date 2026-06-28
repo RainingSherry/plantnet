@@ -483,7 +483,7 @@ def test_desc_remap_labels_are_dense_integer_without_nan():
     assert pd.Series(mapped, dtype=np.int64).astype(int).tolist() == [0, 0, 1]
 
 
-def test_scname_count_input_protocol_and_sources():
+def test_scname_rejects_scaled_X_and_norm_log_without_raw_counts():
     counts = np.array([[1, 2], [0, 3], [4, 0]], dtype=np.float32)
     scaled_negative = np.array([[-1.0, 0.2], [0.1, -0.4], [0.3, 0.5]], dtype=np.float32)
     obs = pd.DataFrame(index=[f"c{i}" for i in range(3)])
@@ -493,29 +493,44 @@ def test_scname_count_input_protocol_and_sources():
     with pytest.raises(ValueError, match="scaled adata.X"):
         _get_scname_count_input(adata)
 
-    raw_counts = counts + 10
+    adata = ad.AnnData(X=np.log1p(counts), obs=obs.copy(), var=var.copy())
+    adata.layers["norm_log"] = np.log1p(counts)
+    with pytest.raises(ValueError, match="norm_log"):
+        _get_scname_count_input(adata)
+
+
+def test_scname_layers_counts_source_is_accepted():
+    counts = np.array([[1, 2], [0, 3], [4, 0]], dtype=np.float32)
+    scaled_negative = np.array([[-1.0, 0.2], [0.1, -0.4], [0.3, 0.5]], dtype=np.float32)
+    obs = pd.DataFrame(index=[f"c{i}" for i in range(3)])
+    var = pd.DataFrame(index=["g0", "g1"])
+
     adata = ad.AnnData(X=scaled_negative, obs=obs, var=var)
     adata.layers["counts"] = counts
-    adata.layers["norm_log"] = np.log1p(counts)
-    adata.raw = ad.AnnData(X=raw_counts, obs=obs.copy(), var=var.copy())
     count_input = _get_scname_count_input(adata)
     assert count_input.source == "layers_counts"
     np.testing.assert_array_equal(count_input.matrix, counts)
     np.testing.assert_array_equal(count_input.size_factor_counts, counts)
 
-    adata = ad.AnnData(X=scaled_negative, obs=obs, var=var)
-    adata.raw = ad.AnnData(X=np.log1p(counts), obs=obs.copy(), var=var.copy())
+
+def test_scname_raw_counts_use_hvg_subset_and_full_counts_for_size_factor():
+    counts = np.array([[1, 2], [0, 3], [4, 0]], dtype=np.float32)
+    scaled_negative = np.array([[-1.0, 0.2], [0.1, -0.4], [0.3, 0.5]], dtype=np.float32)
+    obs = pd.DataFrame(index=[f"c{i}" for i in range(3)])
+    hvg_var = pd.DataFrame(index=["g0", "g1"])
+    raw_var = pd.DataFrame(index=["g0", "g1", "g2"])
+    raw_counts = np.array([[11, 12, 20], [10, 13, 30], [14, 10, 40]], dtype=np.float32)
+
+    adata = ad.AnnData(X=scaled_negative, obs=obs, var=hvg_var.copy())
+    adata.raw = ad.AnnData(X=np.log1p(counts), obs=obs.copy(), var=hvg_var.copy())
     with pytest.raises(ValueError, match="not count-like"):
         _get_scname_count_input(adata)
-    adata.layers["norm_log"] = np.log1p(counts)
-    with pytest.raises(ValueError, match="norm_log"):
-        _get_scname_count_input(adata)
 
-    raw_only = ad.AnnData(X=scaled_negative, obs=obs, var=var)
-    raw_only.raw = ad.AnnData(X=raw_counts, obs=obs.copy(), var=var.copy())
+    raw_only = ad.AnnData(X=scaled_negative, obs=obs, var=hvg_var.copy())
+    raw_only.raw = ad.AnnData(X=raw_counts, obs=obs.copy(), var=raw_var.copy())
     raw_input = _get_scname_count_input(raw_only)
     assert raw_input.source == "adata_raw_counts"
-    np.testing.assert_array_equal(raw_input.matrix, raw_counts)
+    np.testing.assert_array_equal(raw_input.matrix, raw_counts[:, :2])
     np.testing.assert_array_equal(raw_input.size_factor_counts, raw_counts)
 
 
