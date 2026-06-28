@@ -18,8 +18,16 @@ from methods.DeepLearning.APA_scMAE.data import (
     compute_gene_stats,
     load_apa_data,
 )
-from methods.DeepLearning.APA_scMAE.losses import distortion_loss, student_losses
+from methods.DeepLearning.APA_scMAE.losses import balance_loss, distortion_loss, moderate_delta_loss, student_losses
 from methods.DeepLearning.APA_scMAE.model import APAModel
+from methods.DeepLearning.APA_scMAE.representation_losses import (
+    balanced_assignment_loss,
+    covariance_loss,
+    prototype_kl_loss,
+    soft_assignment,
+    variance_loss,
+    vicreg_losses,
+)
 from methods.DeepLearning.APA_scMAE.run import (
     artifact_manifest,
     attention_guard,
@@ -27,6 +35,7 @@ from methods.DeepLearning.APA_scMAE.run import (
     hungarian_map,
     mapped_clustering_metrics,
     resolve_device,
+    validate_runtime_config,
     validate_embedding_inputs,
     validate_required_files,
 )
@@ -58,6 +67,7 @@ def _config(tmp_path):
             "attention_heads": 2,
             "attention_dropout": 0.0,
             "dropout": 0.0,
+            "decoder_mode": "z_with_stopgrad_h",
         },
         "training": {
             "epochs": 1,
@@ -68,11 +78,43 @@ def _config(tmp_path):
             "student_grad_clip": 5.0,
             "generator_grad_clip": 1.0,
             "generator_update_interval": 1,
+            "student_warmup_epochs": 0,
+            "enable_generator_after_warmup": True,
             "gamma": 0.5,
         },
         "mask": {"ratio": 0.4, "temperature": 1.0, "masked_data_weight": 0.75, "generator_topk_only_effective": True},
         "corruption": {"type": "scmae_shuffle", "changed_tolerance_abs": 1.0e-6, "changed_tolerance_rel": 1.0e-5},
-        "generator_loss": {"lambda_entropy": 0.01, "lambda_balance": 0.01, "lambda_distortion": 0.01, "lambda_coverage": 0.01},
+        "representation_loss": {
+            "use_repr_loss": True,
+            "lambda_invariance": 1.0,
+            "lambda_variance": 0.1,
+            "lambda_covariance": 0.01,
+            "variance_margin": 1.0,
+            "eps": 1.0e-4,
+        },
+        "teacher": {
+            "use_ema_teacher": True,
+            "teacher_momentum_start": 0.9,
+            "teacher_momentum_end": 0.99,
+            "teacher_consistency_weight": 1.0,
+        },
+        "prototype_consistency": {
+            "use_proto_consistency": True,
+            "num_embedding_prototypes": 3,
+            "proto_temperature": 0.2,
+            "proto_loss_weight": 0.1,
+            "proto_balance_weight": 0.01,
+            "proto_ema_momentum": 0.95,
+        },
+        "generator_loss": {
+            "lambda_entropy": 0.01,
+            "lambda_balance": 0.01,
+            "lambda_distortion": 0.01,
+            "lambda_coverage": 0.01,
+            "lambda_reconstruction_moderate": 0.1,
+            "lambda_representation_moderate": 0.1,
+        },
+        "n_clusters": 3,
         "save_dir": str(tmp_path),
     }
 
@@ -270,18 +312,67 @@ def test_gene_stats_zero_rate_uses_prescale_values(tmp_path):
 
 def test_config_defaults_do_not_override_yaml_and_no_cuda_works(tmp_path):
     config_path = tmp_path / "config.yaml"
-    config_path.write_text("seed: 123\nmethod_name: yaml_method\nskip_eval: true\nruntime:\n  gpu: 3\n", encoding="utf-8")
+    config_path.write_text("seed: 123\nmethod_name: yaml_method\nskip_eval: true\nn_clusters: 5\nruntime:\n  gpu: 3\n", encoding="utf-8")
     parser = build_arg_parser()
-    args = parser.parse_args(["--config", str(config_path), "--data_path", "dummy.h5ad", "--save_dir", str(tmp_path / "out"), "--n_clusters", "2"])
+    args = parser.parse_args(["--config", str(config_path), "--data_path", "dummy.h5ad", "--save_dir", str(tmp_path / "out")])
     cfg = resolve_config(args)
     assert cfg["seed"] == 123
     assert cfg["method_name"] == "yaml_method"
     assert cfg["skip_eval"] is True
+    assert cfg["n_clusters"] == 5
     assert cfg["runtime"]["gpu"] == 3
+
+    args = parser.parse_args(["--config", str(config_path), "--data_path", "dummy.h5ad", "--save_dir", str(tmp_path / "out_override"), "--n_clusters", "2"])
+    cfg = resolve_config(args)
+    assert cfg["n_clusters"] == 2
 
     args = parser.parse_args(["--data_path", "dummy.h5ad", "--save_dir", str(tmp_path / "out2"), "--n_clusters", "2", "--no_cuda"])
     cfg = resolve_config(args)
     assert cfg["runtime"]["no_cuda"] is True
+
+    args = parser.parse_args(
+        [
+            "--data_path",
+            "dummy.h5ad",
+            "--save_dir",
+            str(tmp_path / "out3"),
+            "--n_clusters",
+            "2",
+            "--use_repr_loss",
+            "false",
+            "--use_ema_teacher",
+            "false",
+            "--use_proto_consistency",
+            "false",
+            "--student_warmup_epochs",
+            "0",
+            "--decoder_mode",
+            "current",
+        ]
+    )
+    cfg = resolve_config(args)
+    assert cfg["representation_loss"]["use_repr_loss"] is False
+    assert cfg["teacher"]["use_ema_teacher"] is False
+    assert cfg["prototype_consistency"]["use_proto_consistency"] is False
+    assert cfg["training"]["student_warmup_epochs"] == 0
+    assert cfg["model"]["decoder_mode"] == "current"
+
+    cfg["skip_eval"] = True
+    cfg["n_clusters"] = 0
+    with pytest.raises(ValueError, match="skip_eval=true requires n_clusters"):
+        validate_runtime_config(cfg)
+
+    with pytest.raises(SystemExit):
+        parser.parse_args(
+            [
+                "--data_path",
+                "dummy.h5ad",
+                "--save_dir",
+                str(tmp_path / "out4"),
+                "--use_random_mask_during_warmup",
+                "false",
+            ]
+        )
 
 
 def test_resolve_device_maps_visible_gpu_to_logical_index(monkeypatch):
@@ -352,6 +443,81 @@ def test_student_loss_and_distortion_contracts():
 
     delta = torch.tensor([[1.0, 100.0, 1.0, 100.0]])
     assert distortion_loss(torch.tensor([[0.0, 1.0, 0.0, 1.0]]), delta) > distortion_loss(torch.tensor([[1.0, 1.0, 0.0, 0.0]]), delta)
+    assert moderate_delta_loss(torch.tensor([[0.0, 1.0, 0.0, 1.0]]), delta) > moderate_delta_loss(torch.tensor([[1.0, 1.0, 0.0, 0.0]]), delta)
+    concentrated = torch.tensor([[1.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
+    balanced = torch.tensor([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
+    assert balance_loss(concentrated) > balance_loss(balanced)
+
+
+def test_representation_losses_are_finite_and_penalize_collapse():
+    z_clean = torch.randn(8, 5)
+    z_masked = z_clean + 0.01 * torch.randn(8, 5)
+    losses = vicreg_losses(z_clean, z_masked)
+    assert all(torch.isfinite(value) for value in losses.values())
+    collapsed = torch.zeros(8, 5)
+    spread = torch.randn(8, 5) * 3.0
+    assert variance_loss(collapsed) > variance_loss(spread)
+    cov = covariance_loss(z_clean)
+    assert cov.ndim == 0
+    assert torch.isfinite(cov)
+
+
+def test_prototype_consistency_shapes_gradients_and_balance():
+    z_clean = torch.randn(6, 4)
+    z_masked = torch.randn(6, 4, requires_grad=True)
+    prototypes = torch.randn(3, 4)
+    q_clean = soft_assignment(z_clean, prototypes, temperature=0.5)
+    q_masked = soft_assignment(z_masked, prototypes, temperature=0.5)
+    assert q_clean.shape == (6, 3)
+    assert q_masked.shape == (6, 3)
+    loss = prototype_kl_loss(q_clean, q_masked)
+    loss.backward()
+    assert z_masked.grad is not None
+    assert torch.isfinite(z_masked.grad).all()
+    collapsed = torch.tensor([[1.0, 0.0, 0.0]]).repeat(6, 1)
+    balanced = torch.eye(3).repeat(2, 1)
+    assert balanced_assignment_loss(collapsed) > balanced_assignment_loss(balanced)
+
+
+def test_decoder_modes_forward_shapes():
+    x = torch.ones(2, 6)
+    gene_stats = torch.as_tensor(compute_gene_stats(x.numpy()), dtype=torch.float32)
+    prototypes = torch.randn(2, 3)
+    for decoder_mode in ["current", "z_only", "z_with_stopgrad_h"]:
+        model = APAModel(
+            n_genes=6,
+            token_dim=6,
+            cell_dim=4,
+            proto_dim=3,
+            attention_heads=2,
+            dropout=0.0,
+            decoder_mode=decoder_mode,
+        )
+        gene_vec, stat_vec = model.shared_context(gene_stats)
+        out = model.student(x, gene_vec, stat_vec, prototypes)
+        assert out["z"].shape == (2, 4)
+        assert out["mask_logits"].shape == (2, 6)
+        assert out["x_recon"].shape == (2, 6)
+        assert model.student.encode_clean(x, gene_vec, stat_vec, prototypes).shape == (2, 4)
+        assert model.student.encode_masked(x, gene_vec, stat_vec, prototypes).shape == (2, 4)
+
+
+def test_decoder_bottleneck_detaches_mask_logits_for_v2_modes():
+    x = torch.ones(2, 6)
+    gene_stats = torch.as_tensor(compute_gene_stats(x.numpy()), dtype=torch.float32)
+    prototypes = torch.randn(2, 3)
+    for decoder_mode in ["z_only", "z_with_stopgrad_h"]:
+        model = APAModel(n_genes=6, token_dim=6, cell_dim=4, proto_dim=3, attention_heads=2, dropout=0.0, decoder_mode=decoder_mode)
+        gene_vec, stat_vec = model.shared_context(gene_stats)
+        out = model.student(x, gene_vec, stat_vec, prototypes)
+        out["x_recon"].sum().backward()
+        assert all(param.grad is None for param in model.student.mask_head.parameters())
+
+    model = APAModel(n_genes=6, token_dim=6, cell_dim=4, proto_dim=3, attention_heads=2, dropout=0.0, decoder_mode="current")
+    gene_vec, stat_vec = model.shared_context(gene_stats)
+    out = model.student(x, gene_vec, stat_vec, prototypes)
+    out["x_recon"].sum().backward()
+    assert any(param.grad is not None for param in model.student.mask_head.parameters())
 
 
 def test_model_shapes_effective_topk_and_budget_deficit():
@@ -390,6 +556,31 @@ def test_dynamic_corruption_no_global_matrix_and_reproducible():
     assert torch.equal(sample_a["donor_indices"], sample_b["donor_indices"])
     large = ScMAEShuffleCorruption(torch.zeros(100_000, 2), seed=4, atol=1e-6, rtol=1e-5)
     assert not hasattr(large, "permutations")
+
+
+def test_random_mask_respects_effective_eligibility_flag(tmp_path):
+    rng = np.random.default_rng(6)
+    x = np.ones((4, 6), dtype=np.float32)
+    config = _config(tmp_path)
+    trainer = APATrainer(
+        config=config,
+        model=APAModel(n_genes=6, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+    effective = torch.tensor([[1, 0, 0, 0, 0, 0]], dtype=torch.float32)
+    random_mask = trainer._random_mask(torch.ones_like(effective), torch.zeros_like(effective), effective)
+    assert torch.all(random_mask["mask_hard"] <= effective)
+    assert random_mask["budget_deficit"][0] > 0
+
+    trainer.config["mask"]["generator_topk_only_effective"] = False
+    random_mask = trainer._random_mask(torch.ones_like(effective), torch.zeros_like(effective), effective)
+    assert random_mask["mask_hard"].sum() == int(float(config["mask"]["ratio"]) * effective.shape[1])
+    assert random_mask["budget_deficit"][0] == 0
 
 
 def test_attention_guard_blocks_large_default_and_allows_force():
@@ -431,6 +622,36 @@ def test_trainer_forward_backward_and_generator_interval(tmp_path):
     assert "budget_deficit_rate" in stats
 
 
+def test_ema_teacher_is_separate_frozen_and_updates(tmp_path):
+    rng = np.random.default_rng(11)
+    x = np.log1p(rng.poisson(2.0, size=(8, 10)).astype(np.float32))
+    config = _config(tmp_path)
+    trainer = APATrainer(
+        config=config,
+        model=APAModel(n_genes=10, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+    assert trainer.teacher is not None
+    student_param = next(trainer.model.student.parameters())
+    teacher_param = next(trainer.teacher.student.parameters())
+    assert teacher_param is not student_param
+    assert all(not param.requires_grad for param in trainer.teacher.parameters())
+    before_student = [param.detach().clone() for param in trainer.teacher.student.parameters()]
+    before_shared = [param.detach().clone() for param in trainer.teacher.shared.parameters()]
+    batch = next(iter(trainer._loader()))
+    trainer._student_step(batch, warmup=False, generator_enabled=True)
+    assert all(param.grad is None for param in trainer.teacher.parameters())
+    after_student = [param.detach().clone() for param in trainer.teacher.student.parameters()]
+    after_shared = [param.detach().clone() for param in trainer.teacher.shared.parameters()]
+    assert any(not torch.allclose(a, b) for a, b in zip(after_student, before_student))
+    assert any(not torch.allclose(a, b) for a, b in zip(after_shared, before_shared))
+
+
 def test_trainer_forces_generator_update_when_interval_exceeds_batches(tmp_path):
     rng = np.random.default_rng(2)
     x = np.log1p(rng.poisson(2.0, size=(6, 10)).astype(np.float32))
@@ -449,6 +670,163 @@ def test_trainer_forces_generator_update_when_interval_exceeds_batches(tmp_path)
     history = trainer.train()
     assert history["generator_update_count"][-1] >= 1.0
     assert history["generator_update_forced"][-1] == 1.0
+
+
+def test_warmup_skips_generator_and_zero_warmup_enables_it(tmp_path):
+    rng = np.random.default_rng(3)
+    x = np.log1p(rng.poisson(2.0, size=(8, 10)).astype(np.float32))
+    config = _config(tmp_path)
+    config["training"]["student_warmup_epochs"] = 1
+    config["training"]["epochs"] = 1
+    trainer = APATrainer(
+        config=config,
+        model=APAModel(n_genes=10, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+    assert trainer.embedding_prototypes is None
+    history = trainer.train()
+    assert history["warmup_epoch"][-1] == 1.0
+    assert history["generator_enabled"][-1] == 0.0
+    assert history["generator_update_count"][-1] == 0.0
+    assert history["loss_generator"][-1] is None
+    assert history["generator_grad_norm"][-1] is None
+    assert trainer.embedding_prototypes is None
+
+    no_warmup = _config(tmp_path)
+    no_warmup["training"]["student_warmup_epochs"] = 0
+    no_warmup["training"]["epochs"] = 1
+    trainer = APATrainer(
+        config=no_warmup,
+        model=APAModel(n_genes=10, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+    history = trainer.train()
+    assert history["warmup_epoch"][-1] == 0.0
+    assert history["generator_enabled"][-1] == 1.0
+    assert history["generator_update_count"][-1] > 0.0
+    assert trainer.embedding_prototypes is not None
+
+
+def test_warmup_never_calls_generator_forward(tmp_path, monkeypatch):
+    rng = np.random.default_rng(8)
+    x = np.log1p(rng.poisson(2.0, size=(8, 10)).astype(np.float32))
+    config = _config(tmp_path)
+    config["training"]["epochs"] = 1
+    config["training"]["student_warmup_epochs"] = 1
+    trainer = APATrainer(
+        config=config,
+        model=APAModel(n_genes=10, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+
+    def fail_generator_forward(*_args, **_kwargs):
+        raise AssertionError("_generator_forward should not run during warmup")
+
+    monkeypatch.setattr(trainer, "_generator_forward", fail_generator_forward)
+    history = trainer.train()
+    assert history["warmup_epoch"] == [1.0]
+    assert history["generator_update_count"] == [0.0]
+
+
+def test_generator_disabled_after_warmup_uses_random_mask_without_generator_forward(tmp_path, monkeypatch):
+    rng = np.random.default_rng(7)
+    x = np.log1p(rng.poisson(2.0, size=(8, 10)).astype(np.float32))
+    config = _config(tmp_path)
+    config["training"]["epochs"] = 2
+    config["training"]["student_warmup_epochs"] = 1
+    config["training"]["enable_generator_after_warmup"] = False
+    trainer = APATrainer(
+        config=config,
+        model=APAModel(n_genes=10, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+
+    def fail_generator_forward(*_args, **_kwargs):
+        raise AssertionError("_generator_forward should not run when generator is disabled after warmup")
+
+    monkeypatch.setattr(trainer, "_generator_forward", fail_generator_forward)
+    history = trainer.train()
+    assert history["warmup_epoch"] == [1.0, 0.0]
+    assert history["generator_enabled"] == [0.0, 0.0]
+    assert history["generator_update_count"] == [0.0, 0.0]
+    assert history["loss_generator"] == [None, None]
+
+
+def test_embedding_prototypes_initialize_after_warmup_and_fallback_to_prototype_count(tmp_path):
+    rng = np.random.default_rng(4)
+    x = np.log1p(rng.poisson(2.0, size=(10, 8)).astype(np.float32))
+    config = _config(tmp_path)
+    config["n_clusters"] = 7
+    config["prototype"] = {"n_prototypes": 2}
+    config["prototype_consistency"]["num_embedding_prototypes"] = 0
+    config["training"]["epochs"] = 2
+    config["training"]["student_warmup_epochs"] = 1
+    trainer = APATrainer(
+        config=config,
+        model=APAModel(n_genes=8, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+    assert trainer.embedding_prototypes is None
+    history = trainer.train()
+    assert history["warmup_epoch"] == [1.0, 0.0]
+    assert trainer.embedding_prototypes is not None
+    assert trainer.embedding_prototypes.shape[0] == 2
+    assert history["loss_proto"][0] == pytest.approx(0.0)
+
+
+def test_all_representation_mechanisms_off_does_not_compute_clean_encode(tmp_path, monkeypatch):
+    rng = np.random.default_rng(5)
+    x = np.log1p(rng.poisson(2.0, size=(8, 8)).astype(np.float32))
+    config = _config(tmp_path)
+    config["representation_loss"]["use_repr_loss"] = False
+    config["teacher"]["use_ema_teacher"] = False
+    config["prototype_consistency"]["use_proto_consistency"] = False
+    config["training"]["student_warmup_epochs"] = 0
+    config["training"]["epochs"] = 1
+    trainer = APATrainer(
+        config=config,
+        model=APAModel(n_genes=8, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+
+    def fail_encode_clean(*_args, **_kwargs):
+        raise AssertionError("encode_clean should not run when repr/teacher/proto are all disabled")
+
+    monkeypatch.setattr(trainer.model.student, "encode_clean", fail_encode_clean)
+    history = trainer.train()
+    assert history["loss_repr"][-1] == pytest.approx(0.0)
+    assert history["loss_teacher"][-1] == pytest.approx(0.0)
+    assert history["loss_proto"][-1] == pytest.approx(0.0)
 
 
 def test_artifact_manifest_required_files(tmp_path):

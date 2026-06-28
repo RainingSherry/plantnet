@@ -250,6 +250,11 @@ def embedding_extraction_batch_size(config: dict[str, Any]) -> int:
     return int(config["training"]["batch_size"])
 
 
+def validate_runtime_config(config: dict[str, Any]) -> None:
+    if bool(config.get("skip_eval", False)) and int(config.get("n_clusters", 0)) <= 0:
+        raise ValueError("skip_eval=true requires n_clusters > 0 because prediction-only mode cannot infer K from labels.")
+
+
 def main() -> int:
     parser = build_arg_parser()
     args = parser.parse_args()
@@ -261,6 +266,7 @@ def main() -> int:
 
         config = resolve_config(args)
         config["dataset_name"] = config.get("dataset_name") or Path(config["data_path"]).stem
+        validate_runtime_config(config)
         set_seed(int(config["seed"]), deterministic=bool(config["runtime"]["deterministic"]))
         device, runtime_info = resolve_device(config)
 
@@ -294,6 +300,7 @@ def main() -> int:
             proto_dim=int(bundle.prototypes.shape[1]),
             attention_heads=int(config["model"]["attention_heads"]),
             dropout=float(config["model"]["attention_dropout"]),
+            decoder_mode=str(config["model"]["decoder_mode"]),
         )
         trainer = APATrainer(
             config=config,
@@ -317,7 +324,8 @@ def main() -> int:
         if not bool(config.get("skip_eval", False)):
             if labels is None:
                 raise ValueError("skip_eval=false requires labels, but no label column was loaded.")
-            n_clusters = int(config["n_clusters"]) if int(config["n_clusters"]) > 0 else int(len(np.unique(labels)))
+            configured_n_clusters = int(config.get("n_clusters", 0))
+            n_clusters = configured_n_clusters if configured_n_clusters > 0 else int(len(np.unique(labels)))
             eval_result = evaluate_embeddings(embedding, labels, n_clusters, int(config["seed"]))
             metrics["kmeans_known_k"] = eval_result["metrics"]
             pred = eval_result["pred"]
@@ -330,7 +338,7 @@ def main() -> int:
                 metrics["leiden_fixed"]["skip_reason"] = leiden_result["reason"]
             np.save(save_dir / "pred_labels.npy", pred)
         else:
-            n_clusters = int(config["n_clusters"])
+            n_clusters = int(config.get("n_clusters", 0))
             pred = predict_clusters(embedding, n_clusters, int(config["seed"]))
             np.save(save_dir / "pred_labels.npy", pred)
             prediction_status = "prediction_only_no_labels"
@@ -350,6 +358,8 @@ def main() -> int:
         torch.save(
             {
                 "model": trainer.model.state_dict(),
+                "teacher": trainer.teacher.state_dict() if trainer.teacher is not None else None,
+                "embedding_prototypes": trainer.embedding_prototypes.detach().cpu() if trainer.embedding_prototypes is not None else None,
                 "student_optimizer": trainer.student_optimizer.state_dict(),
                 "generator_optimizer": trainer.generator_optimizer.state_dict(),
                 "resolved_config": config,
