@@ -324,7 +324,8 @@ def main() -> int:
         if not bool(config.get("skip_eval", False)):
             if labels is None:
                 raise ValueError("skip_eval=false requires labels, but no label column was loaded.")
-            n_clusters = int(config["n_clusters"]) if int(config["n_clusters"]) > 0 else int(len(np.unique(labels)))
+            configured_n_clusters = int(config.get("n_clusters", 0))
+            n_clusters = configured_n_clusters if configured_n_clusters > 0 else int(len(np.unique(labels)))
             eval_result = evaluate_embeddings(embedding, labels, n_clusters, int(config["seed"]))
             metrics["kmeans_known_k"] = eval_result["metrics"]
             pred = eval_result["pred"]
@@ -337,7 +338,7 @@ def main() -> int:
                 metrics["leiden_fixed"]["skip_reason"] = leiden_result["reason"]
             np.save(save_dir / "pred_labels.npy", pred)
         else:
-            n_clusters = int(config["n_clusters"])
+            n_clusters = int(config.get("n_clusters", 0))
             pred = predict_clusters(embedding, n_clusters, int(config["seed"]))
             np.save(save_dir / "pred_labels.npy", pred)
             prediction_status = "prediction_only_no_labels"

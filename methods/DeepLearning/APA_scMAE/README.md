@@ -20,7 +20,8 @@ This package is not registered in the formal benchmark manifest yet.
 
 APA-scMAE v2 keeps the same high-level Student/Generator structure, but changes the training objective so the cell embedding is directly shaped:
 
-- Student warmup is enabled by default for 20 epochs; warmup uses random scMAE-style masks and does not update the Generator.
+- Student warmup is enabled by default for 20 epochs; warmup always uses random scMAE-style masks and does not update or query the Generator.
+- If `enable_generator_after_warmup=false`, post-warmup Student training also continues with random masks.
 - Student training includes clean/masked representation consistency, variance/covariance anti-collapse penalties, EMA Teacher consistency, and embedding-prototype assignment consistency.
 - The default decoder mode is `z_with_stopgrad_h`, so reconstruction may use token context but cannot route reconstruction gradients through token features to bypass the cell embedding.
 - The Generator objective targets moderate corruption difficulty plus mask coverage/diversity/gene balance instead of rewarding the largest reconstruction deltas.

@@ -193,11 +193,15 @@ class APATrainer:
 
     def _random_mask(self, x: torch.Tensor, replacement: torch.Tensor, effective: torch.Tensor) -> dict[str, torch.Tensor]:
         logits = torch.rand_like(x)
+        if bool(self.config["mask"].get("generator_topk_only_effective", True)):
+            eligibility = effective.bool()
+        else:
+            eligibility = torch.ones_like(effective, dtype=torch.bool)
         hard, soft, st, info = straight_through_topk(
             logits,
             float(self.config["mask"]["ratio"]),
             float(self.config["mask"]["temperature"]),
-            effective.bool(),
+            eligibility,
         )
         return {
             "logits": logits,
@@ -338,7 +342,7 @@ class APATrainer:
         self.corruption_totals["abs_delta"] += float(delta.detach().sum().cpu())
         self.corruption_totals["positions"] += float(delta.numel())
 
-    def _student_step(self, batch: dict[str, torch.Tensor], *, warmup: bool) -> dict[str, float]:
+    def _student_step(self, batch: dict[str, torch.Tensor], *, warmup: bool, generator_enabled: bool) -> dict[str, float]:
         assert_no_training_labels(batch)
         idx = batch["index"].to(self.device).long()
         x = batch["x"].to(self.device)
@@ -351,7 +355,7 @@ class APATrainer:
         self.model.student.train()
         self.model.generator.eval()
         with torch.no_grad():
-            if warmup and bool(self.config["training"].get("use_random_mask_during_warmup", True)):
+            if warmup or not generator_enabled:
                 gen = self._random_mask(x, replacement, effective)
             else:
                 gen = self._generator_forward(x, replacement, effective, detach_shared=True)
@@ -498,7 +502,7 @@ class APATrainer:
             for batch_id, batch in enumerate(loader):
                 start = time.perf_counter()
                 last_batch = batch
-                step = self._student_step(batch, warmup=warmup)
+                step = self._student_step(batch, warmup=warmup, generator_enabled=generator_enabled)
                 if generator_enabled and (batch_id + 1) % int(self.config["training"]["generator_update_interval"]) == 0:
                     gen_step = self._generator_step(batch)
                     step.update(gen_step)

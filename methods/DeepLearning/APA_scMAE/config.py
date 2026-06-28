@@ -152,7 +152,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--save_dir", type=str, required=True)
     parser.add_argument("--dataset_name", type=str, default=None)
     parser.add_argument("--method_name", type=str, default=None)
-    parser.add_argument("--n_clusters", type=int, default=0)
+    parser.add_argument("--n_clusters", type=int, default=None)
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--gpu", type=int, default=None)
     parser.add_argument("--no_cuda", action="store_true")
@@ -192,8 +192,9 @@ def resolve_config(args: argparse.Namespace) -> dict[str, Any]:
     cli: dict[str, Any] = {
         "data_path": str(args.data_path),
         "save_dir": str(args.save_dir),
-        "n_clusters": int(args.n_clusters),
     }
+    if args.n_clusters is not None:
+        cli["n_clusters"] = int(args.n_clusters)
     if args.seed is not None:
         cli["seed"] = int(args.seed)
     if args.dataset_name is not None:

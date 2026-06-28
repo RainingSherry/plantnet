@@ -313,14 +313,19 @@ def test_gene_stats_zero_rate_uses_prescale_values(tmp_path):
 
 def test_config_defaults_do_not_override_yaml_and_no_cuda_works(tmp_path):
     config_path = tmp_path / "config.yaml"
-    config_path.write_text("seed: 123\nmethod_name: yaml_method\nskip_eval: true\nruntime:\n  gpu: 3\n", encoding="utf-8")
+    config_path.write_text("seed: 123\nmethod_name: yaml_method\nskip_eval: true\nn_clusters: 5\nruntime:\n  gpu: 3\n", encoding="utf-8")
     parser = build_arg_parser()
-    args = parser.parse_args(["--config", str(config_path), "--data_path", "dummy.h5ad", "--save_dir", str(tmp_path / "out"), "--n_clusters", "2"])
+    args = parser.parse_args(["--config", str(config_path), "--data_path", "dummy.h5ad", "--save_dir", str(tmp_path / "out")])
     cfg = resolve_config(args)
     assert cfg["seed"] == 123
     assert cfg["method_name"] == "yaml_method"
     assert cfg["skip_eval"] is True
+    assert cfg["n_clusters"] == 5
     assert cfg["runtime"]["gpu"] == 3
+
+    args = parser.parse_args(["--config", str(config_path), "--data_path", "dummy.h5ad", "--save_dir", str(tmp_path / "out_override"), "--n_clusters", "2"])
+    cfg = resolve_config(args)
+    assert cfg["n_clusters"] == 2
 
     args = parser.parse_args(["--data_path", "dummy.h5ad", "--save_dir", str(tmp_path / "out2"), "--n_clusters", "2", "--no_cuda"])
     cfg = resolve_config(args)
@@ -542,6 +547,31 @@ def test_dynamic_corruption_no_global_matrix_and_reproducible():
     assert not hasattr(large, "permutations")
 
 
+def test_random_mask_respects_effective_eligibility_flag(tmp_path):
+    rng = np.random.default_rng(6)
+    x = np.ones((4, 6), dtype=np.float32)
+    config = _config(tmp_path)
+    trainer = APATrainer(
+        config=config,
+        model=APAModel(n_genes=6, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+    effective = torch.tensor([[1, 0, 0, 0, 0, 0]], dtype=torch.float32)
+    random_mask = trainer._random_mask(torch.ones_like(effective), torch.zeros_like(effective), effective)
+    assert torch.all(random_mask["mask_hard"] <= effective)
+    assert random_mask["budget_deficit"][0] > 0
+
+    trainer.config["mask"]["generator_topk_only_effective"] = False
+    random_mask = trainer._random_mask(torch.ones_like(effective), torch.zeros_like(effective), effective)
+    assert random_mask["mask_hard"].sum() == int(float(config["mask"]["ratio"]) * effective.shape[1])
+    assert random_mask["budget_deficit"][0] == 0
+
+
 def test_attention_guard_blocks_large_default_and_allows_force():
     config = _config("/tmp")
     config["training"]["batch_size"] = 256
@@ -603,7 +633,7 @@ def test_ema_teacher_is_separate_frozen_and_updates(tmp_path):
     before_student = [param.detach().clone() for param in trainer.teacher.student.parameters()]
     before_shared = [param.detach().clone() for param in trainer.teacher.shared.parameters()]
     batch = next(iter(trainer._loader()))
-    trainer._student_step(batch, warmup=False)
+    trainer._student_step(batch, warmup=False, generator_enabled=True)
     assert all(param.grad is None for param in trainer.teacher.parameters())
     after_student = [param.detach().clone() for param in trainer.teacher.student.parameters()]
     after_shared = [param.detach().clone() for param in trainer.teacher.shared.parameters()]
@@ -674,6 +704,35 @@ def test_warmup_skips_generator_and_zero_warmup_enables_it(tmp_path):
     assert history["generator_enabled"][-1] == 1.0
     assert history["generator_update_count"][-1] > 0.0
     assert trainer.embedding_prototypes is not None
+
+
+def test_generator_disabled_after_warmup_uses_random_mask_without_generator_forward(tmp_path, monkeypatch):
+    rng = np.random.default_rng(7)
+    x = np.log1p(rng.poisson(2.0, size=(8, 10)).astype(np.float32))
+    config = _config(tmp_path)
+    config["training"]["epochs"] = 2
+    config["training"]["student_warmup_epochs"] = 1
+    config["training"]["enable_generator_after_warmup"] = False
+    trainer = APATrainer(
+        config=config,
+        model=APAModel(n_genes=10, token_dim=8, cell_dim=6, proto_dim=4, attention_heads=2, dropout=0.0),
+        train_dataset=APAExpressionDataset(x),
+        full_x=torch.as_tensor(x),
+        gene_stats=torch.as_tensor(compute_gene_stats(x)),
+        prototypes=torch.as_tensor(rng.normal(size=(3, 4)).astype(np.float32)),
+        device=torch.device("cpu"),
+        save_dir=tmp_path,
+    )
+
+    def fail_generator_forward(*_args, **_kwargs):
+        raise AssertionError("_generator_forward should not run when generator is disabled after warmup")
+
+    monkeypatch.setattr(trainer, "_generator_forward", fail_generator_forward)
+    history = trainer.train()
+    assert history["warmup_epoch"] == [1.0, 0.0]
+    assert history["generator_enabled"] == [0.0, 0.0]
+    assert history["generator_update_count"] == [0.0, 0.0]
+    assert history["loss_generator"] == [None, None]
 
 
 def test_embedding_prototypes_initialize_after_warmup_and_fallback_to_prototype_count(tmp_path):
