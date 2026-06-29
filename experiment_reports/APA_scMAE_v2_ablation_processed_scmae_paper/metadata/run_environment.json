@@ -1,0 +1,93 @@
+{
+  "branch": "apa-v2-objective",
+  "commit_sha": "f7c5e765c220f3a2eb7006f3960bbb9a866477bb",
+  "data_root": "/data/luolie/biopipeline/scCluBench/data/processed_scmae",
+  "data_root_resolved": "/data/luolie/biopipeline/scCluBench/data/processed_scmae",
+  "datasets": {
+    "Guo": {
+      "file": "Guo.h5ad",
+      "n_clusters": 12
+    },
+    "Limb_Muscle": {
+      "file": "Limb_Muscle.h5ad",
+      "n_clusters": 6
+    },
+    "Macosko": {
+      "file": "Macosko.h5ad",
+      "n_clusters": 12
+    },
+    "Quake_10x_Spleen": {
+      "file": "Quake_10x_Spleen.h5ad",
+      "n_clusters": 5
+    },
+    "Tosches": {
+      "file": "Tosches.h5ad",
+      "n_clusters": 15
+    },
+    "Young": {
+      "file": "Young.h5ad",
+      "n_clusters": 11
+    }
+  },
+  "hostname": "gpu",
+  "platform": "Linux-5.15.0-94-generic-x86_64-with-glibc2.35",
+  "python": "3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:13:31) [GCC 14.3.0]",
+  "seeds": [
+    42,
+    2024,
+    3407
+  ],
+  "start_time": "2026-06-28T10:34:28.582287+00:00",
+  "variants": {
+    "apa_v2_A_random_student": {
+      "flags": {
+        "enable_generator_after_warmup": "false",
+        "student_warmup_epochs": "20",
+        "use_ema_teacher": "false",
+        "use_proto_consistency": "false",
+        "use_repr_loss": "false"
+      },
+      "label": "A_random_student"
+    },
+    "apa_v2_B_vicreg": {
+      "flags": {
+        "enable_generator_after_warmup": "false",
+        "student_warmup_epochs": "20",
+        "use_ema_teacher": "false",
+        "use_proto_consistency": "false",
+        "use_repr_loss": "true"
+      },
+      "label": "B_vicreg"
+    },
+    "apa_v2_C_ema_teacher": {
+      "flags": {
+        "enable_generator_after_warmup": "false",
+        "student_warmup_epochs": "20",
+        "use_ema_teacher": "true",
+        "use_proto_consistency": "false",
+        "use_repr_loss": "true"
+      },
+      "label": "C_ema_teacher"
+    },
+    "apa_v2_D_proto": {
+      "flags": {
+        "enable_generator_after_warmup": "false",
+        "student_warmup_epochs": "20",
+        "use_ema_teacher": "true",
+        "use_proto_consistency": "true",
+        "use_repr_loss": "true"
+      },
+      "label": "D_proto"
+    },
+    "apa_v2_E_full_generator": {
+      "flags": {
+        "enable_generator_after_warmup": "true",
+        "student_warmup_epochs": "20",
+        "use_ema_teacher": "true",
+        "use_proto_consistency": "true",
+        "use_repr_loss": "true"
+      },
+      "label": "E_full_generator"
+    }
+  }
+}
