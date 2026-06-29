@@ -1,0 +1,12 @@
+benchmark_data/
+benchmark_runs/
+参考文献/01_PDF论文_按推荐程度排序/
+*.h5ad
+*.h5
+*.pth
+*.npy
+*.npz
+*.pt
+*.ckpt
+__pycache__/
+*.pyc
