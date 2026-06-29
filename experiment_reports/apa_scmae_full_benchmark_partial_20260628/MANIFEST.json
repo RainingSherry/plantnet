@@ -1,0 +1,37 @@
+{
+  "created_at_local": "2026-06-28 11:47:12 +0800",
+  "source_output_dir": "benchmark_outputs/APA_scMAE_full_benchmark",
+  "status": "partial_running",
+  "expected_runs": 24,
+  "completed_run_pairs_in_metrics": 22,
+  "metric_rows": 44,
+  "missing_run_pairs": [
+    {
+      "dataset": "CRA007122",
+      "seed": "2"
+    },
+    {
+      "dataset": "CRA007122",
+      "seed": "3"
+    }
+  ],
+  "included_files": [
+    "MANIFEST.json",
+    "README.md",
+    "manifests/task_manifest.json",
+    "related_desc_scname_fix/desc_scname_updated_values_all_runs.csv",
+    "related_desc_scname_fix/desc_scname_updated_values_mean_std.csv",
+    "related_desc_scname_fix/run_desc_scname_updated_benchmark.py",
+    "related_desc_scname_fix/runner.log",
+    "tables/apa_scmae_full_metrics_by_run.csv",
+    "tables/apa_scmae_full_metrics_summary.csv",
+    "tables/completion_status.csv",
+    "tables/current_dataset_metric_means.csv"
+  ],
+  "excluded": [
+    "benchmark run directories containing canonical_hvg.h5ad, embeddings, per-run artifacts, and logs",
+    "experiment_reports/desc_scname_fix_benchmark_20260628/run_artifacts",
+    "__pycache__ files"
+  ],
+  "updated_at_local": "2026-06-28 11:48:32 +0800"
+}

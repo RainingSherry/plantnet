@@ -12,16 +12,20 @@ import sys
 import argparse
 import numpy as np
 import pandas as pd
+from dataclasses import dataclass
 
 # Add parent directory to path for imports
 _repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, _repo_root)
 
-from preprocess import prepare_data_for_model
-from utils import save
-from scNAME_preprocess import normalize as scNAME_normalize
-
 _TF_READY = False
+
+
+@dataclass(frozen=True)
+class ScNAMECountInput:
+    matrix: np.ndarray
+    size_factor_counts: np.ndarray
+    source: str
 
 def _ensure_tf():
     """Lazy import TensorFlow only when actually needed (not for --help)."""
@@ -40,6 +44,95 @@ def set_seed(seed):
         tf.set_random_seed(seed)
     except NameError:
         pass  # TF not imported yet
+
+
+def _to_dense_float32(matrix):
+    """Convert sparse/dense AnnData matrices to dense float32 arrays."""
+    if hasattr(matrix, 'toarray'):
+        matrix = matrix.toarray()
+    return np.asarray(matrix, dtype=np.float32)
+
+
+def _validate_scname_count_matrix(matrix, expected_shape, source_name):
+    if matrix.shape != expected_shape:
+        raise ValueError(
+            f"scNAME count_X from {source_name} has shape {matrix.shape}, "
+            f"expected {expected_shape}."
+        )
+    if not np.isfinite(matrix).all():
+        raise ValueError(f"scNAME count_X from {source_name} contains NaN or inf values.")
+    if matrix.size and float(np.min(matrix)) < 0:
+        raise ValueError(
+            f"scNAME count_X from {source_name} contains negative values; "
+            "scaled adata.X/adata.to_df() cannot be used as count_X."
+        )
+    return matrix
+
+
+def _looks_like_counts(matrix):
+    if matrix.size == 0:
+        return False
+    sample = matrix if matrix.size <= 1_000_000 else matrix.reshape(-1)[:1_000_000]
+    return bool(np.nanmin(sample) >= 0 and np.allclose(sample, np.round(sample), atol=1.0e-6))
+
+
+def _validate_count_like_matrix(matrix, expected_shape, source_name):
+    matrix = _validate_scname_count_matrix(matrix, expected_shape, source_name)
+    if not _looks_like_counts(matrix):
+        raise ValueError(f"scNAME count_X from {source_name} is nonnegative but not count-like.")
+    return matrix
+
+
+def _get_scname_count_input(adata):
+    """Return raw count inputs for scNAME NB/ZINB loss."""
+    expected_shape = adata.X.shape
+
+    if 'counts' in adata.layers:
+        counts = _to_dense_float32(adata.layers['counts'])
+        counts = _validate_count_like_matrix(counts, expected_shape, 'adata.layers["counts"]')
+        return ScNAMECountInput(
+            counts,
+            counts,
+            'layers_counts',
+        )
+
+    if adata.raw is not None:
+        try:
+            raw_full_counts = _to_dense_float32(adata.raw.X)
+            raw_full_counts = _validate_count_like_matrix(
+                raw_full_counts, raw_full_counts.shape, "adata.raw.X"
+            )
+            raw_hvg_counts = _to_dense_float32(adata.raw[:, adata.var_names].X)
+            raw_hvg_counts = _validate_count_like_matrix(
+                raw_hvg_counts, expected_shape, "adata.raw[:, adata.var_names].X"
+            )
+            return ScNAMECountInput(raw_hvg_counts, raw_full_counts, 'adata_raw_counts')
+        except (KeyError, ValueError, IndexError) as exc:
+            raw_error = exc
+    else:
+        raw_error = None
+
+    detail = f" Raw count lookup failed: {raw_error}" if raw_error is not None else ""
+    raise ValueError(
+        "scNAME requires nonnegative count_X/count-like input from adata.layers['counts'], "
+        "or count-like adata.raw[:, adata.var_names].X; scaled adata.X, adata.to_df(), "
+        "or adata.layers['norm_log'] cannot be used "
+        f"as count_X.{detail}"
+    )
+
+
+def _size_factors_from_counts(count_like):
+    total_counts = count_like.sum(axis=1).astype(np.float32)
+    if not np.isfinite(total_counts).all():
+        raise ValueError("Cannot compute scNAME size factors: count_like row sums are not finite.")
+    median_count = np.median(total_counts)
+    if not np.isfinite(median_count) or median_count <= 0:
+        raise ValueError("Cannot compute scNAME size factors: count_like median row sum is not positive.")
+    return (total_counts / median_count).astype(np.float32)
+
+
+def _shuffle_scname_inputs(X, Y, count_like, sf, shuffle_ix):
+    return X[shuffle_ix], Y[shuffle_ix], count_like[shuffle_ix], sf[shuffle_ix]
 
 
 def parse_args():
@@ -112,6 +205,8 @@ def main():
 
     # Lazy import TF only when actually running
     _ensure_tf()
+    from preprocess import prepare_data_for_model
+    from utils import save
     set_seed(args.seed)
 
     # Create save directory
@@ -135,12 +230,12 @@ def main():
     X = np.array(X).astype(np.float32)
     Y = np.array(Y)
 
-    # Compute size factors — always reshape to (n_cells, 1) for TF placeholder
-    if sf is None:
-        total_counts = np.array(adata.X.sum(axis=1)).flatten()
-        median_count = np.median(total_counts)
-        sf = (total_counts / median_count).astype(np.float32)
-    sf = np.array(sf).astype(np.float32).reshape(-1, 1)
+    count_input = _get_scname_count_input(adata)
+    count_like = count_input.matrix
+    args.count_input_source = count_input.source
+    print(f"scNAME count_like source: {count_input.source}")
+
+    sf = _size_factors_from_counts(count_input.size_factor_counts).reshape(-1, 1)
 
     # Encode labels to integers if needed
     from sklearn.preprocessing import LabelEncoder
@@ -148,18 +243,10 @@ def main():
         le = LabelEncoder()
         Y = le.fit_transform(Y)
 
-    # Get raw counts for ZINB loss — must match adata.X shape (same genes as HVG subset)
-    # adata.raw contains ALL genes; adata.X only has HVG genes after prepare_data_for_model
-    # Use adata.to_df() which matches adata.X
-    raw_counts = np.array(adata.to_df()).astype(np.float32)
-
     # Shuffle data
     n = X.shape[0]
     shuffle_ix = np.random.permutation(np.arange(n))
-    X = X[shuffle_ix]
-    Y = Y[shuffle_ix]
-    raw_counts = raw_counts[shuffle_ix]
-    sf = sf[shuffle_ix]
+    X, Y, count_like, sf = _shuffle_scname_inputs(X, Y, count_like, sf, shuffle_ix)
 
     # Get number of clusters from data if not specified
     n_clusters = args.n_clusters if args.n_clusters > 0 else len(np.unique(Y))
@@ -194,7 +281,7 @@ def main():
     gpu_option = "" if args.no_cuda else str(args.gpu)
     model.pretrain(
         X=X,
-        count_X=raw_counts,
+        count_X=count_like,
         p_m=args.p_m,
         size_factor=sf,
         batch_size=args.batch_size,
@@ -208,7 +295,7 @@ def main():
         dataname='scNAME',
         X=X,
         Y=Y,
-        count_X=raw_counts,
+        count_X=count_like,
         p_m=args.p_m,
         size_factor=sf,
         batch_size=args.batch_size,
