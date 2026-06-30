@@ -14,6 +14,8 @@
   - `003_swav_assignment`
   - `004_neighbormix`
   - `005_neighbormix_prototype`
+- Second-stage planned combination:
+  - `006_adaptive_mask_neighbormix_prototype`
 - `benchmark.py` with screen default `80` epochs and default seeds `42, 2024, 3407`.
 - `collect_results.py` for mechanism result aggregation.
 - Legacy independent `run_independent_benchmark.py` screen default changed from `25` to `80`.
@@ -28,6 +30,7 @@ The following checks passed on Melanoma_5K with small smoke settings
 - `003_swav_assignment` with `--swav_start_epoch 1`
 - `004_neighbormix` with `--neighbor_start_epoch 1`
 - `005_neighbormix_prototype` with `--prototype_start_epoch 1 --neighbor_start_epoch 1`
+- `006_adaptive_mask_neighbormix_prototype` with `--prototype_start_epoch 1 --neighbor_start_epoch 1`
 - `benchmark.py --stage screen` dispatch smoke for `001_adaptive_mask`
 - `benchmark.py --stage collect`
 
@@ -112,6 +115,38 @@ Conclusion so far: the only meaningful mean improvement remains
 `004_neighbormix` with first reliable neighbor mixing. Its mean ARI is above
 scMAE, but the std is too large for formal promotion. The stabilizers tested so
 far reduce or erase the gain.
+
+## Second-Batch Combination Check
+
+The planned combination variant `006_adaptive_mask_neighbormix_prototype`
+completed the same Melanoma_5K three-seed, 80-epoch screen:
+
+| variant | ARI mean | ARI std | ACC mean | interpretation |
+|---|---:|---:|---:|---|
+| `006_adaptive_mask_neighbormix_prototype` | 0.654841 | 0.016507 | 0.724426 | below scMAE; adaptive mask plus DEC prototype suppresses the standalone NeighborMix gain |
+
+Seed-level ARI:
+
+```text
+seed 42:   0.661599
+seed 2024: 0.666897
+seed 3407: 0.636028
+```
+
+This does not meet the quick-screen promotion threshold
+`ARI_mean > 0.668`. It has not been appended to `全benchmark结果.csv`.
+The result files now contain:
+
+```text
+机制快筛单次结果.csv: 36 rows
+机制快筛汇总结果.csv: 12 rows
+机制尝试记录.csv: 36 rows
+```
+
+Updated conclusion: the broad three-way combination is not the answer in its
+current form. The useful signal is still reliable NeighborMix itself; adaptive
+masking and DEC prototypes need either tighter confidence gating or a different
+schedule before being recombined.
 
 ## Next Step
 
