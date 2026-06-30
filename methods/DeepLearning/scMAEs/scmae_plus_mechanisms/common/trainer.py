@@ -169,6 +169,18 @@ def build_parser(config: VariantConfig) -> argparse.ArgumentParser:
     )
     parser.add_argument("--neighbor_consensus_window", type=int, default=int(d.get("neighbor_consensus_window", 1)))
     parser.add_argument("--neighbor_consensus_min_hits", type=int, default=int(d.get("neighbor_consensus_min_hits", 1)))
+    parser.add_argument(
+        "--neighbor_adaptive_consensus",
+        type=family.str2bool,
+        default=bool(d.get("neighbor_adaptive_consensus", False)),
+    )
+    parser.add_argument("--neighbor_adaptive_loose_hits", type=int, default=int(d.get("neighbor_adaptive_loose_hits", 2)))
+    parser.add_argument("--neighbor_adaptive_strict_hits", type=int, default=int(d.get("neighbor_adaptive_strict_hits", 3)))
+    parser.add_argument(
+        "--neighbor_adaptive_score_threshold",
+        type=float,
+        default=float(d.get("neighbor_adaptive_score_threshold", 0.84)),
+    )
     parser.add_argument("--neighbor_soft_power", type=float, default=float(d.get("neighbor_soft_power", 1.0)))
     parser.add_argument("--mix_alpha", type=float, default=float(d.get("mix_alpha", 0.9)))
     parser.add_argument("--mix_weight", type=float, default=float(d.get("mix_weight", 0.3)))
@@ -383,7 +395,14 @@ def run_training(config: VariantConfig, build_model: Callable) -> None:
             neighbor_state_history.append(neighbor_state)
             neighbor_state_history = neighbor_state_history[-window:]
             min_hits = max(1, int(args.neighbor_consensus_min_hits))
-            if window > 1 or min_hits > 1:
+            if args.neighbor_adaptive_consensus:
+                neighbor_state = neighbormix.adaptive_consensus_neighbor_state(
+                    neighbor_state_history,
+                    loose_hits=args.neighbor_adaptive_loose_hits,
+                    strict_hits=args.neighbor_adaptive_strict_hits,
+                    score_threshold=args.neighbor_adaptive_score_threshold,
+                )
+            elif window > 1 or min_hits > 1:
                 neighbor_state = neighbormix.consensus_neighbor_state(neighbor_state_history, min_hits=min_hits)
         model.train()
         totals = _loss_components_template()

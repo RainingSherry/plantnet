@@ -21,6 +21,7 @@
   - `008_pseudo_agree_neighbormix`
   - `009_ema_graph_neighbormix`
   - `010_consensus_graph_neighbormix`
+  - `011_confidence_adaptive_neighbormix`
 - `benchmark.py` with screen default `80` epochs and default seeds `42, 2024, 3407`.
 - `collect_results.py` for mechanism result aggregation.
 - Legacy independent `run_independent_benchmark.py` screen default changed from `25` to `80`.
@@ -40,6 +41,7 @@ The following checks passed on Melanoma_5K with small smoke settings
 - `008_pseudo_agree_neighbormix` with `--neighbor_start_epoch 1`
 - `009_ema_graph_neighbormix` with `--neighbor_start_epoch 1`
 - `010_consensus_graph_neighbormix` with `--neighbor_start_epoch 1`
+- `011_confidence_adaptive_neighbormix` with `--neighbor_start_epoch 1 --neighbor_update_interval 1`
 - `benchmark.py --stage screen` dispatch smoke for `001_adaptive_mask`
 - `benchmark.py --stage collect`
 
@@ -279,6 +281,54 @@ The result files now contain:
 机制尝试记录.csv: 66 rows
 ```
 
+## Confidence-Adaptive NeighborMix Check
+
+`011_confidence_adaptive_neighbormix` replaces the fixed hit-count rule with an
+adaptive edge policy: high-reliability 2-of-3 consensus edges are allowed, while
+lower-confidence edges must satisfy strict 3-of-3 consensus. The default then
+uses first-neighbor mixing with the same `mix_alpha = 0.90` strength as
+`004_neighbormix`.
+
+Three 80-epoch, three-seed Melanoma_5K checks were completed:
+
+| variant | ARI mean | ARI std | ACC mean | interpretation |
+|---|---:|---:|---:|---|
+| `011_confidence_adaptive_neighbormix` | 0.665941 | 0.001270 | 0.737351 | stable but below scMAE |
+| `011_confidence_adaptive_neighbormix_first_t084` | 0.666288 | 0.001824 | 0.737942 | best 011 run, still below scMAE |
+| `011_confidence_adaptive_neighbormix_first_t080` | 0.665406 | 0.002917 | 0.736982 | looser reliability threshold does not recover the gain |
+
+Conclusion: confidence-adaptive consensus improves stability, but it still
+behaves like the strict consensus and soft-reliable variants: it removes the
+high-variance positive seed rather than making that gain reproducible.
+
+## NeighborMix Start-Epoch Check
+
+Because the successful but unstable `004_neighbormix` may be caused by early
+graph self-feedback, a small start-epoch sweep was run with the original
+first-neighbor mixing rule:
+
+| variant | ARI mean | ARI std | ACC mean | interpretation |
+|---|---:|---:|---:|---|
+| `004_neighbormix_start25` | 0.664278 | 0.007468 | 0.738681 | still unstable and below scMAE |
+| `004_neighbormix_start29` | 0.659932 | 0.001483 | 0.735357 | poor; update schedule alignment matters |
+| `004_neighbormix_start30` | 0.667711 | 0.003425 | 0.743408 | closest stable result, but just below 0.668029 baseline |
+| `004_neighbormix_start35` | 0.665808 | 0.001381 | 0.740084 | stable but below scMAE |
+| `004_neighbormix_start40` | 0.663076 | 0.005763 | 0.736465 | too late; loses the useful graph signal |
+
+This sweep is important even though it did not produce a promoted result.
+Delaying NeighborMix to epoch 30 almost solves the variance problem without new
+architecture, missing the Melanoma_5K scMAE ARI mean by about `0.00032`. The
+next useful search should combine delayed graph activation with a mechanism
+that protects boundary cells, rather than adding DEC/SwAV/adaptive masking.
+
+The result files now contain:
+
+```text
+机制快筛单次结果.csv: 90 rows
+机制快筛汇总结果.csv: 30 rows
+机制尝试记录.csv: 90 rows
+```
+
 ## Next Step
 
 Do a targeted second pass around NeighborMix, not broad architecture expansion:
@@ -297,14 +347,19 @@ python methods/DeepLearning/scMAEs/scmae_plus_mechanisms/benchmark.py \
 
 Recommended refinements:
 
-- Tune first-neighbor reliability and strength first: `mix_alpha`,
-  `mix_weight`, `neighbor_k`, and `neighbor_start_epoch`.
+- Use `004_neighbormix_start30` as the closest stable anchor, not the unstable
+  default `004_neighbormix`.
+- Tune first-neighbor reliability and strength around this anchor:
+  `mix_alpha`, `mix_weight`, `neighbor_k`, and graph update interval.
 - Add confidence gating for NeighborMix edges before mixing; do not average all
   mutual neighbors by default.
 - The tested hard score gates (`0.78`, `0.82`), soft edge weighting,
   pseudo-cluster agreement, frozen graph, and single-trajectory EMA graph are
-  not sufficient; multi-update consensus is promising but needs adaptive
-  confidence rules rather than a fixed hit-count threshold.
+  not sufficient; multi-update consensus and confidence-adaptive consensus are
+  also stable but below threshold.
+- Add an explicit boundary/rare-cell protection signal next. The current edge
+  filters only use graph reliability; they do not know whether a cell is near a
+  KMeans boundary or belongs to a small pseudo-cluster.
 - Do not add the current DEC prototype to NeighborMix as-is; it reduced mean ARI.
 - Do not combine SwAV or adaptive mask with NeighborMix in their current form;
   both reduced Melanoma_5K ARI in the three-seed screen.

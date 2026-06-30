@@ -230,6 +230,104 @@ def consensus_neighbor_state(states: list[NeighborState], min_hits: int = 2) -> 
     )
 
 
+def adaptive_consensus_neighbor_state(
+    states: list[NeighborState],
+    loose_hits: int = 2,
+    strict_hits: int | None = None,
+    score_threshold: float = 0.84,
+) -> NeighborState:
+    if not states:
+        raise ValueError("At least one NeighborState is required for adaptive consensus NeighborMix.")
+    current = states[-1]
+    window = len(states)
+    strict_hits = window if strict_hits is None else int(strict_hits)
+    loose_hits = max(1, min(int(loose_hits), window))
+    strict_hits = max(loose_hits, min(strict_hits, window))
+    score_threshold = float(score_threshold)
+    if window == 1:
+        current.stats["neighbor_adaptive_consensus_window"] = int(window)
+        current.stats["neighbor_adaptive_loose_hits"] = int(loose_hits)
+        current.stats["neighbor_adaptive_strict_hits"] = int(strict_hits)
+        current.stats["neighbor_adaptive_score_threshold"] = float(score_threshold)
+        current.stats["neighbor_adaptive_score_mean"] = (
+            float(np.mean(current.reliability[current.eligible])) if np.any(current.eligible) else 0.0
+        )
+        current.stats["neighbor_adaptive_hit_mean"] = 1.0
+        current.stats["neighbor_adaptive_core_edge_fraction"] = (
+            float(np.mean(current.eligible)) if current.eligible.size else 0.0
+        )
+        current.stats["neighbor_adaptive_strict_edge_fraction"] = 0.0
+        return current
+
+    n_cells, n_neighbors = current.indices.shape
+    hit_count = np.zeros((n_cells, n_neighbors), dtype=np.int16)
+    reliability_sum = np.zeros((n_cells, n_neighbors), dtype=np.float32)
+
+    for state in states:
+        for i in range(n_cells):
+            keep = state.eligible[i]
+            if not np.any(keep):
+                continue
+            old_ids = state.indices[i, keep]
+            old_rel = state.reliability[i, keep]
+            for pos, neighbor_id in enumerate(current.indices[i]):
+                match = np.where(old_ids == neighbor_id)[0]
+                if match.size:
+                    hit_count[i, pos] += 1
+                    reliability_sum[i, pos] += float(old_rel[int(match[0])])
+
+    reliability_avg = current.reliability.copy()
+    hit_mask = hit_count > 0
+    reliability_avg[hit_mask] = reliability_sum[hit_mask] / np.maximum(hit_count[hit_mask], 1)
+    strict_edges = hit_count >= strict_hits
+    core_edges = (hit_count >= loose_hits) & (reliability_avg >= score_threshold)
+    eligible = current.eligible & (strict_edges | core_edges)
+
+    hit_fraction = hit_count.astype(np.float32) / float(max(1, window))
+    reliability = reliability_avg * np.clip(hit_fraction / max(loose_hits / float(window), 1e-6), 0.0, 1.0)
+    reliability[~eligible] = current.reliability[~eligible]
+
+    first_reliable = np.arange(n_cells, dtype=np.int64)
+    for i in range(n_cells):
+        positions = np.flatnonzero(eligible[i])
+        if positions.size:
+            first_reliable[i] = int(current.indices[i, int(positions[0])])
+
+    eligible_counts = eligible.sum(axis=1).astype(np.float32) if eligible.size else np.zeros(n_cells, dtype=np.float32)
+    eligible_scores = reliability[eligible]
+    eligible_hits = hit_count[eligible].astype(np.float32) if eligible_scores.size else np.array([], dtype=np.float32)
+    adaptive_scores = reliability_avg[eligible]
+    stats = dict(current.stats)
+    stats.update(
+        {
+            "neighbor_adaptive_consensus_window": int(window),
+            "neighbor_adaptive_loose_hits": int(loose_hits),
+            "neighbor_adaptive_strict_hits": int(strict_hits),
+            "neighbor_adaptive_score_threshold": float(score_threshold),
+            "neighbor_adaptive_score_mean": float(np.mean(adaptive_scores)) if adaptive_scores.size else 0.0,
+            "neighbor_adaptive_hit_mean": float(np.mean(eligible_hits)) if eligible_hits.size else 0.0,
+            "neighbor_adaptive_core_edge_fraction": float(np.mean(current.eligible & core_edges)) if eligible.size else 0.0,
+            "neighbor_adaptive_strict_edge_fraction": float(np.mean(current.eligible & strict_edges)) if eligible.size else 0.0,
+            "neighbor_reliability_mean": float(np.mean(eligible_scores)) if eligible_scores.size else 0.0,
+            "neighbor_reliability_min": float(np.min(eligible_scores)) if eligible_scores.size else 0.0,
+            "neighbor_reliable_edge_fraction": float(np.mean(eligible)) if eligible.size else 0.0,
+            "neighbor_reliable_count_mean": float(np.mean(eligible_counts)) if eligible_counts.size else 0.0,
+            "neighbor_reliable_count_min": float(np.min(eligible_counts)) if eligible_counts.size else 0.0,
+            "cells_with_reliable_neighbor": float(np.mean(first_reliable != np.arange(n_cells))),
+        }
+    )
+    return NeighborState(
+        indices=current.indices,
+        reliability=reliability,
+        similarity=current.similarity,
+        shared_score=current.shared_score,
+        eligible=eligible,
+        first_reliable=first_reliable,
+        mean_reliable_count=stats["neighbor_reliable_count_mean"],
+        stats=stats,
+    )
+
+
 def mix_batch(
     batch_indices: torch.Tensor,
     batch_x: torch.Tensor,
