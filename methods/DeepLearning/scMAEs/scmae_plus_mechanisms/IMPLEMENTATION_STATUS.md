@@ -16,6 +16,8 @@
   - `005_neighbormix_prototype`
 - Second-stage planned combination:
   - `006_adaptive_mask_neighbormix_prototype`
+- NeighborMix stabilization pass:
+  - `007_soft_reliable_neighbormix`
 - `benchmark.py` with screen default `80` epochs and default seeds `42, 2024, 3407`.
 - `collect_results.py` for mechanism result aggregation.
 - Legacy independent `run_independent_benchmark.py` screen default changed from `25` to `80`.
@@ -31,6 +33,7 @@ The following checks passed on Melanoma_5K with small smoke settings
 - `004_neighbormix` with `--neighbor_start_epoch 1`
 - `005_neighbormix_prototype` with `--prototype_start_epoch 1 --neighbor_start_epoch 1`
 - `006_adaptive_mask_neighbormix_prototype` with `--prototype_start_epoch 1 --neighbor_start_epoch 1`
+- `007_soft_reliable_neighbormix` with `--neighbor_start_epoch 1`
 - `benchmark.py --stage screen` dispatch smoke for `001_adaptive_mask`
 - `benchmark.py --stage collect`
 
@@ -148,6 +151,37 @@ current form. The useful signal is still reliable NeighborMix itself; adaptive
 masking and DEC prototypes need either tighter confidence gating or a different
 schedule before being recombined.
 
+## Soft Reliable NeighborMix Check
+
+`007_soft_reliable_neighbormix` tests a middle ground between fixed first-neighbor
+mixing and averaging multiple mutual neighbors. It keeps only the first reliable
+neighbor, but scales the neighbor contribution by edge reliability:
+
+```text
+beta_ij = (1 - mix_alpha) * reliability_ij ** neighbor_soft_power
+```
+
+Two 80-epoch, three-seed Melanoma_5K settings were completed:
+
+| variant | ARI mean | ARI std | ACC mean | interpretation |
+|---|---:|---:|---:|---|
+| `007_soft_reliable_neighbormix` | 0.663174 | 0.004279 | 0.736982 | stable but below scMAE; default soft mix over-smooths |
+| `007_soft_reliable_neighbormix_a088` | 0.663165 | 0.002333 | 0.737056 | even more stable but still below scMAE |
+
+This confirms that reliability-weighted soft mixing reduces variance, but it
+also removes the large positive seed seen in `004_neighbormix`. The next
+NeighborMix refinement should not only soften edge strength; it should improve
+edge selection, for example by pseudo-cluster agreement, boundary-aware
+exclusion, or updating the graph from a more stable teacher embedding.
+
+The result files now contain:
+
+```text
+机制快筛单次结果.csv: 42 rows
+机制快筛汇总结果.csv: 14 rows
+机制尝试记录.csv: 42 rows
+```
+
 ## Next Step
 
 Do a targeted second pass around NeighborMix, not broad architecture expansion:
@@ -170,9 +204,9 @@ Recommended refinements:
   `mix_weight`, `neighbor_k`, and `neighbor_start_epoch`.
 - Add confidence gating for NeighborMix edges before mixing; do not average all
   mutual neighbors by default.
-- The tested hard score gates (`0.78`, `0.82`) are not sufficient; future work
-  should use softer edge weighting, pseudo-cluster agreement, or boundary-aware
-  consistency rather than dropping edges outright.
+- The tested hard score gates (`0.78`, `0.82`) and soft edge weighting are not
+  sufficient; future work should use pseudo-cluster agreement, boundary-aware
+  consistency, or a teacher embedding rather than relying on edge score alone.
 - Do not add the current DEC prototype to NeighborMix as-is; it reduced mean ARI.
 - Do not combine SwAV or adaptive mask with NeighborMix in their current form;
   both reduced Melanoma_5K ARI in the three-seed screen.

@@ -120,6 +120,7 @@ def mix_batch(
     state: NeighborState | None,
     alpha: float,
     mode: str = "first",
+    soft_power: float = 1.0,
 ) -> tuple[torch.Tensor, float]:
     if state is None:
         return batch_x, 0.0
@@ -130,6 +131,22 @@ def mix_batch(
         neighbor_x = full_data_cpu[neighbor_idx].to(batch_x.device)
         mixed = float(alpha) * batch_x + (1.0 - float(alpha)) * neighbor_x
         mixed = torch.where(torch.as_tensor(has_neighbor, device=batch_x.device).view(-1, 1), mixed, batch_x)
+        return mixed, float(np.mean(has_neighbor)) if has_neighbor.size else 0.0
+    if mode == "soft_first":
+        neighbor_rows = state.indices[idx_np]
+        reliability_rows = state.reliability[idx_np]
+        eligible_rows = state.eligible[idx_np]
+        has_neighbor = eligible_rows.any(axis=1)
+        first_pos = np.argmax(eligible_rows, axis=1)
+        row_ids = np.arange(len(idx_np))
+        neighbor_idx = neighbor_rows[row_ids, first_pos]
+        neighbor_idx = np.where(has_neighbor, neighbor_idx, idx_np)
+        edge_weight = reliability_rows[row_ids, first_pos]
+        edge_weight = np.where(has_neighbor, edge_weight, 0.0).astype(np.float32)
+        edge_weight = np.power(np.clip(edge_weight, 0.0, 1.0), max(float(soft_power), 1e-6))
+        neighbor_x = full_data_cpu[neighbor_idx].to(batch_x.device)
+        beta = torch.as_tensor((1.0 - float(alpha)) * edge_weight, device=batch_x.device, dtype=batch_x.dtype).view(-1, 1)
+        mixed = (1.0 - beta) * batch_x + beta * neighbor_x
         return mixed, float(np.mean(has_neighbor)) if has_neighbor.size else 0.0
     if mode not in {"mean", "weighted_mean"}:
         raise ValueError(f"Unknown NeighborMix mode: {mode}")

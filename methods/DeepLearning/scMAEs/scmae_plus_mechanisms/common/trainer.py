@@ -135,7 +135,7 @@ def build_parser(config: VariantConfig) -> argparse.ArgumentParser:
         "--neighbor_mix_mode",
         type=str,
         default=d.get("neighbor_mix_mode", "first"),
-        choices=["first", "mean", "weighted_mean"],
+        choices=["first", "soft_first", "mean", "weighted_mean"],
     )
     parser.add_argument("--neighbor_min_similarity", type=float, default=float(d.get("neighbor_min_similarity", -1.0)))
     parser.add_argument("--neighbor_min_shared_score", type=float, default=float(d.get("neighbor_min_shared_score", 0.0)))
@@ -145,7 +145,8 @@ def build_parser(config: VariantConfig) -> argparse.ArgumentParser:
         type=float,
         default=float(d.get("neighbor_score_similarity_weight", 0.7)),
     )
-    parser.add_argument("--mix_alpha", type=float, default=0.9)
+    parser.add_argument("--neighbor_soft_power", type=float, default=float(d.get("neighbor_soft_power", 1.0)))
+    parser.add_argument("--mix_alpha", type=float, default=float(d.get("mix_alpha", 0.9)))
     parser.add_argument("--mix_weight", type=float, default=float(d.get("mix_weight", 0.3)))
     parser.add_argument("--mix_warmup_epochs", type=int, default=10)
     return parser
@@ -379,6 +380,7 @@ def run_training(config: VariantConfig, build_model: Callable) -> None:
                     neighbor_state,
                     alpha=args.mix_alpha,
                     mode=args.neighbor_mix_mode,
+                    soft_power=args.neighbor_soft_power,
                 )
                 x_mix_corrupted, mix_mask = masks.apply_replacement_noise(x_mix, mask_state, args.mask_prob)
                 _, mix_loss = model.scmae_loss(x_mix_corrupted, x, mix_mask)
