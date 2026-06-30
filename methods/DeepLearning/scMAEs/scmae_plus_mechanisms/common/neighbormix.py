@@ -163,6 +163,73 @@ def build_neighbor_state(
     )
 
 
+def consensus_neighbor_state(states: list[NeighborState], min_hits: int = 2) -> NeighborState:
+    if not states:
+        raise ValueError("At least one NeighborState is required for consensus NeighborMix.")
+    current = states[-1]
+    window = len(states)
+    min_hits = max(1, min(int(min_hits), window))
+    if window == 1 or min_hits <= 1:
+        current.stats["neighbor_consensus_window"] = int(window)
+        current.stats["neighbor_consensus_min_hits"] = int(min_hits)
+        current.stats["neighbor_consensus_hit_mean"] = 1.0
+        return current
+
+    n_cells, n_neighbors = current.indices.shape
+    hit_count = np.zeros((n_cells, n_neighbors), dtype=np.int16)
+    reliability_sum = np.zeros((n_cells, n_neighbors), dtype=np.float32)
+
+    for state in states:
+        for i in range(n_cells):
+            keep = state.eligible[i]
+            if not np.any(keep):
+                continue
+            old_ids = state.indices[i, keep]
+            old_rel = state.reliability[i, keep]
+            for pos, neighbor_id in enumerate(current.indices[i]):
+                match = np.where(old_ids == neighbor_id)[0]
+                if match.size:
+                    hit_count[i, pos] += 1
+                    reliability_sum[i, pos] += float(old_rel[int(match[0])])
+
+    eligible = current.eligible & (hit_count >= min_hits)
+    reliability = current.reliability.copy()
+    reliability[eligible] = reliability_sum[eligible] / np.maximum(hit_count[eligible], 1)
+    first_reliable = np.arange(n_cells, dtype=np.int64)
+    for i in range(n_cells):
+        positions = np.flatnonzero(eligible[i])
+        if positions.size:
+            first_reliable[i] = int(current.indices[i, int(positions[0])])
+
+    eligible_counts = eligible.sum(axis=1).astype(np.float32) if eligible.size else np.zeros(n_cells, dtype=np.float32)
+    eligible_scores = reliability[eligible]
+    hit_scores = hit_count[eligible].astype(np.float32) if eligible_scores.size else np.array([], dtype=np.float32)
+    stats = dict(current.stats)
+    stats.update(
+        {
+            "neighbor_consensus_window": int(window),
+            "neighbor_consensus_min_hits": int(min_hits),
+            "neighbor_consensus_hit_mean": float(np.mean(hit_scores)) if hit_scores.size else 0.0,
+            "neighbor_reliability_mean": float(np.mean(eligible_scores)) if eligible_scores.size else 0.0,
+            "neighbor_reliability_min": float(np.min(eligible_scores)) if eligible_scores.size else 0.0,
+            "neighbor_reliable_edge_fraction": float(np.mean(eligible)) if eligible.size else 0.0,
+            "neighbor_reliable_count_mean": float(np.mean(eligible_counts)) if eligible_counts.size else 0.0,
+            "neighbor_reliable_count_min": float(np.min(eligible_counts)) if eligible_counts.size else 0.0,
+            "cells_with_reliable_neighbor": float(np.mean(first_reliable != np.arange(n_cells))),
+        }
+    )
+    return NeighborState(
+        indices=current.indices,
+        reliability=reliability,
+        similarity=current.similarity,
+        shared_score=current.shared_score,
+        eligible=eligible,
+        first_reliable=first_reliable,
+        mean_reliable_count=stats["neighbor_reliable_count_mean"],
+        stats=stats,
+    )
+
+
 def mix_batch(
     batch_indices: torch.Tensor,
     batch_x: torch.Tensor,

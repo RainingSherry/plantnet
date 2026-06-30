@@ -167,6 +167,8 @@ def build_parser(config: VariantConfig) -> argparse.ArgumentParser:
         type=float,
         default=float(d.get("neighbor_embedding_ema_decay", 0.8)),
     )
+    parser.add_argument("--neighbor_consensus_window", type=int, default=int(d.get("neighbor_consensus_window", 1)))
+    parser.add_argument("--neighbor_consensus_min_hits", type=int, default=int(d.get("neighbor_consensus_min_hits", 1)))
     parser.add_argument("--neighbor_soft_power", type=float, default=float(d.get("neighbor_soft_power", 1.0)))
     parser.add_argument("--mix_alpha", type=float, default=float(d.get("mix_alpha", 0.9)))
     parser.add_argument("--mix_weight", type=float, default=float(d.get("mix_weight", 0.3)))
@@ -350,6 +352,7 @@ def run_training(config: VariantConfig, build_model: Callable) -> None:
     proto_initialized = False
     neighbor_state = None
     neighbor_embedding_ema = None
+    neighbor_state_history = []
     last_components = _loss_components_template()
     print(
         f"{config.name}: cells={data_np.shape[0]} genes={data_np.shape[1]} "
@@ -375,6 +378,13 @@ def run_training(config: VariantConfig, build_model: Callable) -> None:
             neighbor_state = _build_neighbor_state_from_embedding(args, neighbor_embedding_ema, n_clusters)
         else:
             neighbor_state = maybe_state
+        if current_neighbor_embedding is not None and neighbor_state is not None:
+            window = max(1, int(args.neighbor_consensus_window))
+            neighbor_state_history.append(neighbor_state)
+            neighbor_state_history = neighbor_state_history[-window:]
+            min_hits = max(1, int(args.neighbor_consensus_min_hits))
+            if window > 1 or min_hits > 1:
+                neighbor_state = neighbormix.consensus_neighbor_state(neighbor_state_history, min_hits=min_hits)
         model.train()
         totals = _loss_components_template()
         n_batches = 0

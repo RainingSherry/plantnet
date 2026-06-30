@@ -261,6 +261,7 @@ def collect_rows(out_dir: Path) -> pd.DataFrame:
                 "neighbor_pseudo_confidence_mean",
                 "neighbor_pseudo_same_cluster_edge_fraction",
                 "neighbor_pseudo_same_cluster_reliable_fraction",
+                "neighbor_consensus_hit_mean",
             ]:
                 row[f"diag_{key}"] = diag.get(key)
         rows.append(row)
@@ -305,6 +306,7 @@ def write_outputs(out_dir: Path) -> None:
             neighbor_pseudo_confidence_mean=("diag_neighbor_pseudo_confidence_mean", "mean"),
             neighbor_pseudo_same_cluster_edge_fraction_mean=("diag_neighbor_pseudo_same_cluster_edge_fraction", "mean"),
             neighbor_pseudo_same_cluster_reliable_fraction_mean=("diag_neighbor_pseudo_same_cluster_reliable_fraction", "mean"),
+            neighbor_consensus_hit_mean=("diag_neighbor_consensus_hit_mean", "mean"),
         )
         .reset_index()
     )

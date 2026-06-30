@@ -20,6 +20,7 @@
   - `007_soft_reliable_neighbormix`
   - `008_pseudo_agree_neighbormix`
   - `009_ema_graph_neighbormix`
+  - `010_consensus_graph_neighbormix`
 - `benchmark.py` with screen default `80` epochs and default seeds `42, 2024, 3407`.
 - `collect_results.py` for mechanism result aggregation.
 - Legacy independent `run_independent_benchmark.py` screen default changed from `25` to `80`.
@@ -38,6 +39,7 @@ The following checks passed on Melanoma_5K with small smoke settings
 - `007_soft_reliable_neighbormix` with `--neighbor_start_epoch 1`
 - `008_pseudo_agree_neighbormix` with `--neighbor_start_epoch 1`
 - `009_ema_graph_neighbormix` with `--neighbor_start_epoch 1`
+- `010_consensus_graph_neighbormix` with `--neighbor_start_epoch 1`
 - `benchmark.py --stage screen` dispatch smoke for `001_adaptive_mask`
 - `benchmark.py --stage collect`
 
@@ -247,6 +249,36 @@ The result files now contain:
 机制尝试记录.csv: 57 rows
 ```
 
+## Consensus Graph NeighborMix Check
+
+`010_consensus_graph_neighbormix` keeps only edges that persist across recent
+graph refreshes. This tests whether multi-update agreement can preserve useful
+dynamic graph refinement while rejecting transient noisy edges.
+
+Three 80-epoch, three-seed Melanoma_5K settings were completed:
+
+| variant | ARI mean | ARI std | ACC mean | interpretation |
+|---|---:|---:|---:|---|
+| `010_consensus_graph_neighbormix` | 0.696944 | 0.056877 | 0.771918 | preserves high mean but remains unstable; high-gain seed shifts from 3407 to 2024 |
+| `010_consensus_graph_neighbormix_m3` | 0.666194 | 0.002646 | 0.738090 | stable and close, but still below scMAE |
+| `010_consensus_graph_neighbormix_m3_a085` | 0.662422 | 0.001301 | 0.736539 | stronger mixing hurts the stable consensus setting |
+
+This is the most informative NeighborMix stabilization result so far. A loose
+2-of-3 consensus keeps the same kind of high-mean behavior as `004_neighbormix`,
+but does not solve seed variance. A strict 3-of-3 consensus solves the variance
+problem but falls just below the `ARI_mean > 0.668` screen threshold. The next
+candidate should use a confidence-adaptive consensus policy, not a fixed
+hit-count rule: permissive for high-confidence core cells and stricter for
+boundary cells.
+
+The result files now contain:
+
+```text
+机制快筛单次结果.csv: 66 rows
+机制快筛汇总结果.csv: 22 rows
+机制尝试记录.csv: 66 rows
+```
+
 ## Next Step
 
 Do a targeted second pass around NeighborMix, not broad architecture expansion:
@@ -271,8 +303,8 @@ Recommended refinements:
   mutual neighbors by default.
 - The tested hard score gates (`0.78`, `0.82`), soft edge weighting,
   pseudo-cluster agreement, frozen graph, and single-trajectory EMA graph are
-  not sufficient; future work should use a teacher or multi-update consensus
-  graph rather than relying on one current-embedding trajectory.
+  not sufficient; multi-update consensus is promising but needs adaptive
+  confidence rules rather than a fixed hit-count threshold.
 - Do not add the current DEC prototype to NeighborMix as-is; it reduced mean ARI.
 - Do not combine SwAV or adaptive mask with NeighborMix in their current form;
   both reduced Melanoma_5K ARI in the three-seed screen.
