@@ -18,6 +18,7 @@
   - `006_adaptive_mask_neighbormix_prototype`
 - NeighborMix stabilization pass:
   - `007_soft_reliable_neighbormix`
+  - `008_pseudo_agree_neighbormix`
 - `benchmark.py` with screen default `80` epochs and default seeds `42, 2024, 3407`.
 - `collect_results.py` for mechanism result aggregation.
 - Legacy independent `run_independent_benchmark.py` screen default changed from `25` to `80`.
@@ -34,6 +35,7 @@ The following checks passed on Melanoma_5K with small smoke settings
 - `005_neighbormix_prototype` with `--prototype_start_epoch 1 --neighbor_start_epoch 1`
 - `006_adaptive_mask_neighbormix_prototype` with `--prototype_start_epoch 1 --neighbor_start_epoch 1`
 - `007_soft_reliable_neighbormix` with `--neighbor_start_epoch 1`
+- `008_pseudo_agree_neighbormix` with `--neighbor_start_epoch 1`
 - `benchmark.py --stage screen` dispatch smoke for `001_adaptive_mask`
 - `benchmark.py --stage collect`
 
@@ -182,6 +184,37 @@ The result files now contain:
 机制尝试记录.csv: 42 rows
 ```
 
+## Pseudo-Cluster Edge Selection Check
+
+`008_pseudo_agree_neighbormix` changes edge selection rather than edge strength.
+At each NeighborMix graph refresh, the current scMAE embedding is clustered with
+KMeans and mutual-KNN edges are kept only when the two cells agree in pseudo
+cluster. A stricter `confq25` run additionally requires both cells to be above
+the 25th percentile of pseudo-cluster confidence.
+
+Three related 80-epoch, three-seed Melanoma_5K checks were completed:
+
+| variant | ARI mean | ARI std | ACC mean | interpretation |
+|---|---:|---:|---:|---|
+| `008_pseudo_agree_neighbormix` | 0.655011 | 0.018839 | 0.726420 | same-cluster filtering is too weak and hurts seed 3407 |
+| `008_pseudo_agree_neighbormix_confq25` | 0.662751 | 0.002924 | 0.736539 | confidence filtering stabilizes but remains below scMAE |
+| `004_neighbormix_frozen_graph` | 0.664380 | 0.005916 | 0.737130 | freezing the warmup graph stabilizes but removes the high-gain seed |
+
+These results sharpen the failure analysis: the strong mean of the original
+`004_neighbormix` comes from dynamic graph updates amplifying a good trajectory
+in one seed. Simple stabilizers, including frozen graph, soft edge strength, and
+pseudo-cluster agreement, all reduce variance but fall back below the scMAE
+threshold. The next plausible mechanism should be a teacher/EMA or consensus
+graph that keeps beneficial graph refinement while avoiding noisy self-feedback.
+
+The result files now contain:
+
+```text
+机制快筛单次结果.csv: 51 rows
+机制快筛汇总结果.csv: 17 rows
+机制尝试记录.csv: 51 rows
+```
+
 ## Next Step
 
 Do a targeted second pass around NeighborMix, not broad architecture expansion:
@@ -204,9 +237,10 @@ Recommended refinements:
   `mix_weight`, `neighbor_k`, and `neighbor_start_epoch`.
 - Add confidence gating for NeighborMix edges before mixing; do not average all
   mutual neighbors by default.
-- The tested hard score gates (`0.78`, `0.82`) and soft edge weighting are not
-  sufficient; future work should use pseudo-cluster agreement, boundary-aware
-  consistency, or a teacher embedding rather than relying on edge score alone.
+- The tested hard score gates (`0.78`, `0.82`), soft edge weighting,
+  pseudo-cluster agreement, and frozen graph are not sufficient; future work
+  should use a teacher/EMA or consensus graph rather than relying on a single
+  current-embedding graph.
 - Do not add the current DEC prototype to NeighborMix as-is; it reduced mean ARI.
 - Do not combine SwAV or adaptive mask with NeighborMix in their current form;
   both reduced Melanoma_5K ARI in the three-seed screen.

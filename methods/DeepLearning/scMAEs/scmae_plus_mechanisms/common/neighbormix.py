@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 import numpy as np
 import torch
+from sklearn.cluster import KMeans
 from sklearn.neighbors import NearestNeighbors
 
 
@@ -36,9 +37,32 @@ def build_neighbor_state(
     min_shared_score: float = 0.0,
     score_threshold: float = 0.0,
     similarity_weight: float = 0.7,
+    pseudo_filter: str = "none",
+    pseudo_n_clusters: int | None = None,
+    pseudo_seed: int = 0,
+    pseudo_confidence_quantile: float = 0.0,
 ) -> NeighborState:
     z = np.nan_to_num(np.asarray(embedding, dtype=np.float32), nan=0.0, posinf=0.0, neginf=0.0)
     n_cells = int(z.shape[0])
+    pseudo_filter = str(pseudo_filter)
+    pseudo_labels = None
+    pseudo_confidence = None
+    pseudo_confidence_threshold = 0.0
+    if pseudo_filter != "none":
+        if pseudo_n_clusters is None or int(pseudo_n_clusters) < 2:
+            raise ValueError("pseudo_n_clusters must be at least 2 when NeighborMix pseudo filtering is enabled.")
+        km = KMeans(n_clusters=int(pseudo_n_clusters), n_init=20, random_state=int(pseudo_seed))
+        pseudo_labels = km.fit_predict(z).astype(np.int64)
+        distances_to_centers = km.transform(z).astype(np.float32)
+        if distances_to_centers.shape[1] > 1:
+            nearest = np.partition(distances_to_centers, kth=1, axis=1)[:, :2]
+            d1 = nearest[:, 0]
+            d2 = np.maximum(nearest[:, 1], 1e-6)
+            pseudo_confidence = np.clip(1.0 - d1 / d2, 0.0, 1.0).astype(np.float32)
+        else:
+            pseudo_confidence = np.ones(n_cells, dtype=np.float32)
+        quantile = float(np.clip(pseudo_confidence_quantile, 0.0, 1.0))
+        pseudo_confidence_threshold = float(np.quantile(pseudo_confidence, quantile))
     n_neighbors = max(2, min(int(k) + 1, n_cells))
     nn = NearestNeighbors(n_neighbors=n_neighbors, metric=metric)
     nn.fit(z)
@@ -72,6 +96,18 @@ def build_neighbor_state(
                     and float(shared) >= float(min_shared_score)
                     and float(score) >= float(score_threshold)
                 )
+                if passes and pseudo_labels is not None:
+                    same_cluster = pseudo_labels[i] == pseudo_labels[int(j)]
+                    confident = (
+                        float(pseudo_confidence[i]) >= pseudo_confidence_threshold
+                        and float(pseudo_confidence[int(j)]) >= pseudo_confidence_threshold
+                    )
+                    if pseudo_filter == "same_cluster":
+                        passes = bool(same_cluster)
+                    elif pseudo_filter == "same_confident_cluster":
+                        passes = bool(same_cluster and confident)
+                    else:
+                        raise ValueError(f"Unknown NeighborMix pseudo filter: {pseudo_filter}")
                 eligible[i, pos] = passes
                 if passes and not found:
                     first_reliable[i] = int(j)
@@ -86,6 +122,13 @@ def build_neighbor_state(
         "neighbor_min_shared_score": float(min_shared_score),
         "neighbor_score_threshold": float(score_threshold),
         "neighbor_score_similarity_weight": float(sim_weight),
+        "neighbor_pseudo_filter": pseudo_filter,
+        "neighbor_pseudo_n_clusters": int(pseudo_n_clusters or 0),
+        "neighbor_pseudo_confidence_quantile": float(np.clip(pseudo_confidence_quantile, 0.0, 1.0)),
+        "neighbor_pseudo_confidence_threshold": float(pseudo_confidence_threshold),
+        "neighbor_pseudo_confidence_mean": (
+            float(np.mean(pseudo_confidence)) if pseudo_confidence is not None else 0.0
+        ),
         "neighbor_reliability_mean": float(np.mean(eligible_scores)) if eligible_scores.size else 0.0,
         "neighbor_reliability_min": float(np.min(eligible_scores)) if eligible_scores.size else 0.0,
         "neighbor_reliability_all_edge_mean": float(np.mean(reliability)) if reliability.size else 0.0,
@@ -101,6 +144,13 @@ def build_neighbor_state(
         "neighbor_shared_score_mean": float(np.mean(shared_score[reliability > 0])) if positive_scores.size else 0.0,
         "cells_with_reliable_neighbor": float(np.mean(first_reliable != np.arange(n_cells))),
     }
+    if pseudo_labels is not None:
+        same_cluster_edges = pseudo_labels[np.arange(n_cells)[:, None]] == pseudo_labels[neigh]
+        stats["neighbor_pseudo_same_cluster_edge_fraction"] = float(np.mean(same_cluster_edges[reliability > 0])) if positive_scores.size else 0.0
+        stats["neighbor_pseudo_same_cluster_reliable_fraction"] = float(np.mean(same_cluster_edges[eligible])) if eligible_scores.size else 0.0
+    else:
+        stats["neighbor_pseudo_same_cluster_edge_fraction"] = 0.0
+        stats["neighbor_pseudo_same_cluster_reliable_fraction"] = 0.0
     return NeighborState(
         indices=neigh,
         reliability=reliability,

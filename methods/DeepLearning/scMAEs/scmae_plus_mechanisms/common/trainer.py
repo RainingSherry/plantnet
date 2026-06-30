@@ -145,6 +145,17 @@ def build_parser(config: VariantConfig) -> argparse.ArgumentParser:
         type=float,
         default=float(d.get("neighbor_score_similarity_weight", 0.7)),
     )
+    parser.add_argument(
+        "--neighbor_pseudo_filter",
+        type=str,
+        default=d.get("neighbor_pseudo_filter", "none"),
+        choices=["none", "same_cluster", "same_confident_cluster"],
+    )
+    parser.add_argument(
+        "--neighbor_pseudo_confidence_quantile",
+        type=float,
+        default=float(d.get("neighbor_pseudo_confidence_quantile", 0.0)),
+    )
     parser.add_argument("--neighbor_soft_power", type=float, default=float(d.get("neighbor_soft_power", 1.0)))
     parser.add_argument("--mix_alpha", type=float, default=float(d.get("mix_alpha", 0.9)))
     parser.add_argument("--mix_weight", type=float, default=float(d.get("mix_weight", 0.3)))
@@ -187,6 +198,7 @@ def _maybe_build_neighbors(
     loader: DataLoader,
     device: torch.device,
     current_state: neighbormix.NeighborState | None,
+    n_clusters: int,
 ) -> neighbormix.NeighborState | None:
     if not args.use_neighbormix or epoch < args.neighbor_start_epoch:
         return current_state
@@ -201,6 +213,10 @@ def _maybe_build_neighbors(
         min_shared_score=args.neighbor_min_shared_score,
         score_threshold=args.neighbor_score_threshold,
         similarity_weight=args.neighbor_score_similarity_weight,
+        pseudo_filter=args.neighbor_pseudo_filter,
+        pseudo_n_clusters=n_clusters,
+        pseudo_seed=args.seed,
+        pseudo_confidence_quantile=args.neighbor_pseudo_confidence_quantile,
     )
 
 
@@ -322,7 +338,7 @@ def run_training(config: VariantConfig, build_model: Callable) -> None:
         proto_initialized = _maybe_initialize_prototypes(
             model, args, epoch, proto_initialized, eval_loader, device, n_clusters
         )
-        neighbor_state = _maybe_build_neighbors(model, args, epoch, eval_loader, device, neighbor_state)
+        neighbor_state = _maybe_build_neighbors(model, args, epoch, eval_loader, device, neighbor_state, n_clusters)
         model.train()
         totals = _loss_components_template()
         n_batches = 0
