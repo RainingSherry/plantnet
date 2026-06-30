@@ -156,6 +156,17 @@ def build_parser(config: VariantConfig) -> argparse.ArgumentParser:
         type=float,
         default=float(d.get("neighbor_pseudo_confidence_quantile", 0.0)),
     )
+    parser.add_argument(
+        "--neighbor_graph_embedding",
+        type=str,
+        default=d.get("neighbor_graph_embedding", "current"),
+        choices=["current", "ema"],
+    )
+    parser.add_argument(
+        "--neighbor_embedding_ema_decay",
+        type=float,
+        default=float(d.get("neighbor_embedding_ema_decay", 0.8)),
+    )
     parser.add_argument("--neighbor_soft_power", type=float, default=float(d.get("neighbor_soft_power", 1.0)))
     parser.add_argument("--mix_alpha", type=float, default=float(d.get("mix_alpha", 0.9)))
     parser.add_argument("--mix_weight", type=float, default=float(d.get("mix_weight", 0.3)))
@@ -199,14 +210,22 @@ def _maybe_build_neighbors(
     device: torch.device,
     current_state: neighbormix.NeighborState | None,
     n_clusters: int,
-) -> neighbormix.NeighborState | None:
+) -> tuple[neighbormix.NeighborState | None, np.ndarray | None]:
     if not args.use_neighbormix or epoch < args.neighbor_start_epoch:
-        return current_state
+        return current_state, None
     if current_state is not None and (epoch - args.neighbor_start_epoch) % max(1, args.neighbor_update_interval) != 0:
-        return current_state
+        return current_state, None
     embedding, _ = _full_embedding(model, loader, device)
-    return neighbormix.build_neighbor_state(
-        embedding,
+    return _build_neighbor_state_from_embedding(args, embedding, n_clusters), embedding
+
+
+def _build_neighbor_state_from_embedding(
+    args,
+    graph_embedding: np.ndarray,
+    n_clusters: int,
+) -> neighbormix.NeighborState:
+    state = neighbormix.build_neighbor_state(
+        graph_embedding,
         k=args.neighbor_k,
         metric=args.neighbor_metric,
         min_similarity=args.neighbor_min_similarity,
@@ -218,6 +237,9 @@ def _maybe_build_neighbors(
         pseudo_seed=args.seed,
         pseudo_confidence_quantile=args.neighbor_pseudo_confidence_quantile,
     )
+    state.stats["neighbor_graph_embedding"] = str(args.neighbor_graph_embedding)
+    state.stats["neighbor_embedding_ema_decay"] = float(args.neighbor_embedding_ema_decay)
+    return state
 
 
 def _loss_components_template() -> dict[str, float]:
@@ -327,6 +349,7 @@ def run_training(config: VariantConfig, build_model: Callable) -> None:
 
     proto_initialized = False
     neighbor_state = None
+    neighbor_embedding_ema = None
     last_components = _loss_components_template()
     print(
         f"{config.name}: cells={data_np.shape[0]} genes={data_np.shape[1]} "
@@ -338,7 +361,20 @@ def run_training(config: VariantConfig, build_model: Callable) -> None:
         proto_initialized = _maybe_initialize_prototypes(
             model, args, epoch, proto_initialized, eval_loader, device, n_clusters
         )
-        neighbor_state = _maybe_build_neighbors(model, args, epoch, eval_loader, device, neighbor_state, n_clusters)
+        maybe_state, current_neighbor_embedding = _maybe_build_neighbors(
+            model, args, epoch, eval_loader, device, neighbor_state, n_clusters
+        )
+        if current_neighbor_embedding is not None and args.neighbor_graph_embedding == "ema":
+            decay = float(np.clip(args.neighbor_embedding_ema_decay, 0.0, 0.999))
+            if neighbor_embedding_ema is None:
+                neighbor_embedding_ema = current_neighbor_embedding.astype(np.float32, copy=True)
+            else:
+                neighbor_embedding_ema = (
+                    decay * neighbor_embedding_ema + (1.0 - decay) * current_neighbor_embedding.astype(np.float32)
+                )
+            neighbor_state = _build_neighbor_state_from_embedding(args, neighbor_embedding_ema, n_clusters)
+        else:
+            neighbor_state = maybe_state
         model.train()
         totals = _loss_components_template()
         n_batches = 0

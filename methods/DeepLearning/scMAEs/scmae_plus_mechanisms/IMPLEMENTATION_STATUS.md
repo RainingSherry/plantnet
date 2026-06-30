@@ -19,6 +19,7 @@
 - NeighborMix stabilization pass:
   - `007_soft_reliable_neighbormix`
   - `008_pseudo_agree_neighbormix`
+  - `009_ema_graph_neighbormix`
 - `benchmark.py` with screen default `80` epochs and default seeds `42, 2024, 3407`.
 - `collect_results.py` for mechanism result aggregation.
 - Legacy independent `run_independent_benchmark.py` screen default changed from `25` to `80`.
@@ -36,6 +37,7 @@ The following checks passed on Melanoma_5K with small smoke settings
 - `006_adaptive_mask_neighbormix_prototype` with `--prototype_start_epoch 1 --neighbor_start_epoch 1`
 - `007_soft_reliable_neighbormix` with `--neighbor_start_epoch 1`
 - `008_pseudo_agree_neighbormix` with `--neighbor_start_epoch 1`
+- `009_ema_graph_neighbormix` with `--neighbor_start_epoch 1`
 - `benchmark.py --stage screen` dispatch smoke for `001_adaptive_mask`
 - `benchmark.py --stage collect`
 
@@ -215,6 +217,36 @@ The result files now contain:
 机制尝试记录.csv: 51 rows
 ```
 
+## EMA Graph NeighborMix Check
+
+`009_ema_graph_neighbormix` smooths the embedding used for KNN graph refreshes:
+
+```text
+z_ema(t) = decay * z_ema(t-1) + (1 - decay) * z_current(t)
+```
+
+Two 80-epoch, three-seed Melanoma_5K settings were completed:
+
+| variant | ARI mean | ARI std | ACC mean | interpretation |
+|---|---:|---:|---:|---|
+| `009_ema_graph_neighbormix` | 0.663759 | 0.003946 | 0.737056 | stable but below scMAE; high decay behaves like a smoothed/frozen graph |
+| `009_ema_graph_neighbormix_d02` | 0.661184 | 0.009852 | 0.730999 | more responsive EMA is noisier and still below scMAE |
+
+This confirms that single-trajectory embedding smoothing is not sufficient.
+It reduces the variance of `004_neighbormix`, but it also removes the positive
+dynamic feedback that produced the best seed. The next mechanism should move
+from a single EMA trajectory to a consensus or teacher graph, for example by
+requiring edges to persist across multiple recent graphs or by using a separate
+teacher embedding rather than the current student embedding alone.
+
+The result files now contain:
+
+```text
+机制快筛单次结果.csv: 57 rows
+机制快筛汇总结果.csv: 19 rows
+机制尝试记录.csv: 57 rows
+```
+
 ## Next Step
 
 Do a targeted second pass around NeighborMix, not broad architecture expansion:
@@ -238,9 +270,9 @@ Recommended refinements:
 - Add confidence gating for NeighborMix edges before mixing; do not average all
   mutual neighbors by default.
 - The tested hard score gates (`0.78`, `0.82`), soft edge weighting,
-  pseudo-cluster agreement, and frozen graph are not sufficient; future work
-  should use a teacher/EMA or consensus graph rather than relying on a single
-  current-embedding graph.
+  pseudo-cluster agreement, frozen graph, and single-trajectory EMA graph are
+  not sufficient; future work should use a teacher or multi-update consensus
+  graph rather than relying on one current-embedding trajectory.
 - Do not add the current DEC prototype to NeighborMix as-is; it reduced mean ARI.
 - Do not combine SwAV or adaptive mask with NeighborMix in their current form;
   both reduced Melanoma_5K ARI in the three-seed screen.
