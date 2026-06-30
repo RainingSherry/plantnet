@@ -1,0 +1,25 @@
+{
+  "rank": 6,
+  "method": "scVGAE_ZINB_Graph_scMAE",
+  "paper": "scVGAE: ZINB-Based Variational Graph Autoencoder for Single-Cell RNA-Seq Imputation",
+  "venue_year": "2024 / arXiv",
+  "pdf": "../参考文献/01_PDF论文_按推荐程度排序/006_高_scVGAE_ZINB-Based_Variational_Graph_Autoencoder_for_Single-Cell_RNA-Seq_Imputation.pdf",
+  "github_url": "https://github.com/STOmics/scVGAE",
+  "external_source_dir": "",
+  "external_source_commit": "",
+  "github_status": "anonymous clone failed: fatal could not read Username for https://github.com",
+  "referenced_sources": [
+    "local PDF method section",
+    "00_scMAE改良方法整理总报告.md rank 006"
+  ],
+  "core_adaptation": [
+    "batch-local KNN cell graph",
+    "GCN encoder with GraphNorm",
+    "variational latent mean/log-variance",
+    "ZINB mean/dropout/dispersion graph heads",
+    "masked scMAE reconstruction branch",
+    "joint ZINB + reconstruction + KL + mask loss"
+  ],
+  "mask_semantics": "1 = expression gene replaced for masked reconstruction branch",
+  "zinb_target": "same selected HVG genes loaded with scale_input=False as nonnegative log-normalized target"
+}

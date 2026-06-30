@@ -1,0 +1,2 @@
+dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,rank05_tabr_retrieval_full,42,5,TabR,1 = expression gene masked before retrieval-augmented reconstruction,0.6997562596942167,0.6765399686003916,0.5692824763380039,0.6330845217736071,0.6544920041992063,0.6765399686003916,0.7015013917966547,0.6532939054614467,9,,fixed,kmeans_known_k,True

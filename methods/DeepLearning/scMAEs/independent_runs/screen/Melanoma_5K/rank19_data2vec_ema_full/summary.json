@@ -1,0 +1,22 @@
+{
+  "dataset": "Melanoma_5K",
+  "rank": 19,
+  "source_manifest": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/rank19_data2vec_ema_full/source_manifest.json",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.4128074451584312,
+      "nmi": 0.25624686573695593,
+      "ari": 0.16132003421385963,
+      "f1_macro": 0.37482253607289395,
+      "fmi": 0.32932238602874636,
+      "v_measure": 0.2562468657369559,
+      "homogeneity": 0.2621390643042135,
+      "completeness": 0.2506137265315358,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  }
+}

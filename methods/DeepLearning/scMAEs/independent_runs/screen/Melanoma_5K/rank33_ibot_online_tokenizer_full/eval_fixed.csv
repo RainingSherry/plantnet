@@ -1,0 +1,2 @@
+dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,rank33_ibot_online_tokenizer_full,42,33,iBOT: Image BERT Pre-Training with Online Tokenizer,1 = expression patch replaced by learned iBOT mask token,0.4241081320629293,0.35538171131365426,0.24321775366951812,0.3051380860851778,0.3741187607796109,0.3553817113136543,0.3945675498699467,0.32327607078846465,9,,fixed,kmeans_known_k,True

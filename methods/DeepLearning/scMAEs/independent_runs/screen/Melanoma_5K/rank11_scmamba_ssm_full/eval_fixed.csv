@@ -1,0 +1,2 @@
+dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,rank11_scmamba_ssm_full,42,11,scMamba,1 = gene belongs to a masked patch replaced by the learned SSM mask token,0.4810547307777532,0.4140056717503611,0.2830585046879166,0.3890790694198124,0.42464010133771146,0.4140056717503611,0.4268526620110521,0.4019093992030255,9,,fixed,kmeans_known_k,True

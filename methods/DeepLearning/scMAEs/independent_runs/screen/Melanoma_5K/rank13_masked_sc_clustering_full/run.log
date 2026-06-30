@@ -1,0 +1,17 @@
+COMMAND: /data/luolie/conda/base/bin/python /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/rank13_masked_sc_clustering_full/run.py --data_path /data/luolie/biopipeline/scCluBench/data/scMAE/Melanoma_5K.h5 --dataset_name Melanoma_5K --save_dir /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/independent_runs/screen/Melanoma_5K/rank13_masked_sc_clustering_full --n_clusters 0 --n_top_genes 1000 --epochs 25 --batch_size 128 --seed 42 --gpu 5
+EXIT_CODE: 0
+ELAPSED_SECONDS: 47.3
+
+STDOUT
+rank13 target_pretrain=001/5 loss=2.7904
+rank13 target_pretrain=005/5 loss=2.5895
+rank13 epoch=001/25 loss=0.0233 recon=0.0226 var=0.0366
+rank13 epoch=010/25 loss=0.0147 recon=0.0147 var=0.0014
+rank13 epoch=020/25 loss=0.0137 recon=0.0136 var=0.0005
+rank13 epoch=025/25 loss=0.0133 recon=0.0133 var=0.0002
+
+STDERR
+/data/luolie/conda/base/lib/python3.13/functools.py:934: UserWarning: zero-centering a sparse array/matrix densifies it.
+  return dispatch(args[0].__class__)(*args, **kw)
+/data/luolie/conda/base/lib/python3.13/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(

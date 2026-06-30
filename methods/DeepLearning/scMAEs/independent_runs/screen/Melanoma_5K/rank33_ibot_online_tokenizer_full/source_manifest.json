@@ -1,0 +1,27 @@
+{
+  "rank": 33,
+  "method": "rank33_ibot_online_tokenizer_full",
+  "paper": "iBOT: Image BERT Pre-Training with Online Tokenizer",
+  "paper_year": "2022",
+  "paper_url": "https://arxiv.org/abs/2111.07832",
+  "pdf": "methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/033_中高_可用_iBOT_Image_BERT_Pre-Training_with_Online_Tokenizer.pdf",
+  "pdf_sha256": "e76c32b28234434443cba27abda926ec7c69c64af240d2d7aa78427131c4273d",
+  "github_url": "https://github.com/bytedance/ibot",
+  "github_commit": "da316d82636a7a7356835ef224b13d5f3ace0489",
+  "source_clone": "methods/DeepLearning/scMAEs/external_sources/rank33_ibot",
+  "implementation_basis": [
+    "Paper Sections 2.1 and 3.1: masked image modeling as teacher-student distillation over masked patch tokens",
+    "Paper Section 2.2: DINO-style class-token self-distillation with EMA teacher",
+    "Paper Section 3.1: shared projection head for class and patch tokens with soft online tokenizer targets",
+    "GitHub main_ibot.py: iBOTLoss centered teacher distributions, class loss, patch loss over masks, and center updates",
+    "GitHub models/head.py: iBOT projection head applied to class and patch tokens"
+  ],
+  "files": [
+    "model.py",
+    "loss.py",
+    "run.py",
+    "README.md",
+    "source_manifest.json"
+  ],
+  "mask_semantics": "1 = expression patch replaced by learned iBOT mask token"
+}

@@ -1,0 +1,24 @@
+{
+  "rank": 5,
+  "method": "TabR_Retrieval_scMAE",
+  "paper": "TabR: Tabular Deep Learning Meets Nearest Neighbors",
+  "venue_year": "2024 / ICLR",
+  "pdf": "../参考文献/01_PDF论文_按推荐程度排序/005_很高_TabR_Tabular_Deep_Learning_Meets_Nearest_Neighbors.pdf",
+  "github_url": "https://github.com/yandex-research/tabular-dl-tabr",
+  "external_source_dir": "../external_sources/rank05_tabr",
+  "external_source_commit": "17baa9082506f8e7a0f8d11bb1e08212926a1507",
+  "referenced_files": [
+    "bin/tabr.py",
+    "bin/tabr_scaling.py",
+    "bin/neighbors.py",
+    "lib/neighbors.py"
+  ],
+  "core_adaptation": [
+    "query/candidate key encoder",
+    "nearest-neighbor context retrieval with self-neighbor removal",
+    "TabR-style value = candidate context value + T(query_key - context_key)",
+    "attention-weighted residual context injection before reconstruction",
+    "masked scMAE reconstruction objective"
+  ],
+  "mask_semantics": "1 = expression gene masked before retrieval-augmented reconstruction"
+}

@@ -1,0 +1,2 @@
+dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,rank29_adaptive_fuzzy_clustering_full,42,29,Deep Adaptive Fuzzy Clustering for Evolutionary Unsupervised Representation Learning,1 = expression feature replaced by another cell's expression value,0.5807666740527365,0.6423143592595043,0.4503756972101711,0.5182665582761329,0.5714742111757577,0.6423143592595044,0.6451442684750037,0.6395091682702666,9,,fixed,kmeans_known_k,True

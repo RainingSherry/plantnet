@@ -1,0 +1,2 @@
+dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,rank06_scvgae_zinb_graph_full,42,6,scVGAE,1 = expression gene replaced for masked reconstruction branch,0.5825393308220695,0.5808438424777226,0.4251445972523187,0.45625841878352613,0.5337647120558946,0.5808438424777225,0.6233176354699002,0.5437892333741374,9,,fixed,kmeans_known_k,True

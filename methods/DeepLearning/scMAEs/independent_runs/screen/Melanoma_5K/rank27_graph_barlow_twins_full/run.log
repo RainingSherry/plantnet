@@ -1,0 +1,18 @@
+COMMAND: /data/luolie/conda/base/bin/python /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/rank27_graph_barlow_twins_full/run.py --data_path /data/luolie/biopipeline/scCluBench/data/scMAE/Melanoma_5K.h5 --dataset_name Melanoma_5K --save_dir /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/independent_runs/screen/Melanoma_5K/rank27_graph_barlow_twins_full --n_clusters 0 --n_top_genes 1000 --epochs 80 --batch_size 128 --seed 42 --gpu 5
+EXIT_CODE: 0
+ELAPSED_SECONDS: 44.5
+
+STDOUT
+rank27 epoch=001/80 loss=0.3162 barlow=12.7999 mask=0.322
+rank27 epoch=010/80 loss=0.1288 barlow=3.7787 mask=0.323
+rank27 epoch=020/80 loss=0.1115 barlow=2.9484 mask=0.325
+rank27 epoch=030/80 loss=0.1045 barlow=2.6132 mask=0.326
+rank27 epoch=040/80 loss=0.0993 barlow=2.3614 mask=0.324
+rank27 epoch=050/80 loss=0.0984 barlow=2.3279 mask=0.324
+rank27 epoch=060/80 loss=0.0969 barlow=2.2520 mask=0.326
+rank27 epoch=070/80 loss=0.0952 barlow=2.1669 mask=0.324
+rank27 epoch=080/80 loss=0.0941 barlow=2.1196 mask=0.326
+
+STDERR
+/data/luolie/conda/base/lib/python3.13/functools.py:934: UserWarning: zero-centering a sparse array/matrix densifies it.
+  return dispatch(args[0].__class__)(*args, **kw)

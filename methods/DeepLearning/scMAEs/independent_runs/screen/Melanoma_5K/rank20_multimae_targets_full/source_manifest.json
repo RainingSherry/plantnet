@@ -1,0 +1,25 @@
+{
+  "rank": 20,
+  "method": "rank20_multimae_targets_full",
+  "paper": "MultiMAE: Multi-modal Multi-task Masked Autoencoders",
+  "paper_pdf": "methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/020_高_MultiMAE_Multi-modal_Multi-task_Masked_Autoencoders.pdf",
+  "paper_pdf_sha256": "1806f7c832716060e0850e83aeae6404d85d832434e65282e892736698f343d3",
+  "github_url": "https://github.com/EPFL-VILAB/MultiMAE",
+  "local_source": "methods/DeepLearning/scMAEs/external_sources/rank20_multimae",
+  "source_commit": "66910f5b5ba236f5e731883db85fe4f24ee01106",
+  "source_files_consulted": [
+    "multimae/multimae.py",
+    "multimae/output_adapters.py",
+    "multimae/criterion.py",
+    "run_pretraining_multimae.py",
+    "README.md",
+    "PRETRAINING.md"
+  ],
+  "adaptation": {
+    "input_tasks": ["expr", "rank", "stat"],
+    "output_tasks": ["expr", "rank", "stat"],
+    "mask_semantics": "1 = removed/masked task token reconstructed by the corresponding decoder",
+    "external_pretrained_weights": false,
+    "fairness_note": "Single-modality scRNA benchmarks do not provide ADT/ATAC. MultiMAE is adapted as RNA-internal multi-task masked modeling with unchanged scMAE-family preprocessing and KMeans evaluation."
+  }
+}

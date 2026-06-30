@@ -1,0 +1,21 @@
+{
+  "rank": 11,
+  "method": "rank11_scmamba_ssm_full",
+  "paper": "scMamba",
+  "github_url": "https://github.com/23AIBox/scMamba",
+  "local_source": "methods/DeepLearning/scMAEs/external_sources/rank11_scmamba",
+  "commit": "4887c0a8ab060b2482384d2294fe265b633d2406",
+  "referenced_files": [
+    "scmamba2/tokenizer/tokenizer.py",
+    "scmamba2/models/scmamba.py",
+    "scmamba2/models/block.py",
+    "scmamba2/models/config_scmamba.py",
+    "requirements.txt"
+  ],
+  "implementation_notes": [
+    "Official mamba_ssm and causal_conv1d dependencies are unavailable in this environment.",
+    "The local implementation uses an explicit selective state-space scan rather than a feed-forward Linear+Sigmoid approximation.",
+    "No external pretrained weights or multi-omics branch are used for benchmark fairness."
+  ],
+  "mask_semantics": "1 = gene belongs to a masked patch replaced by the learned SSM mask token"
+}

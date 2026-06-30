@@ -1,0 +1,31 @@
+{
+  "rank": 23,
+  "method": "rank23_maskgit_iterative_full",
+  "paper": "MaskGIT: Masked Generative Image Transformer",
+  "paper_pdf": "methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/023_高_MaskGIT_Masked_Generative_Image_Transformer.pdf",
+  "paper_pdf_sha256": "dd716a8a8943955b5a1babd0ee41d57f6d5cd81206b59ed8eda4c76038c81ed1",
+  "github_url": "https://github.com/google-research/maskgit",
+  "local_source": "methods/DeepLearning/scMAEs/external_sources/rank23_maskgit",
+  "source_commit": "1db23594e1bd328ee78eadcd148a19281cd0f5b8",
+  "source_files_consulted": [
+    "maskgit/nets/maskgit_transformer.py",
+    "maskgit/libml/mask_schedule.py",
+    "maskgit/libml/parallel_decode.py",
+    "maskgit/libml/losses.py",
+    "maskgit/inference.py",
+    "README.md"
+  ],
+  "adaptation": {
+    "input": "scaled scRNA expression vector split into contiguous gene patches and quantized by dataset-local patch-mean quantiles",
+    "mask_semantics": "1 = quantized expression patch replaced by [MASK] and predicted in parallel",
+    "core_reproduced": [
+      "discrete token prediction",
+      "bidirectional BERT-style token transformer",
+      "cosine high-mask schedule",
+      "masked-token-only cross entropy",
+      "confidence-based iterative remasking during decode"
+    ],
+    "external_pretrained_weights": false,
+    "fairness_note": "No image tokenizer or pretrained visual checkpoint is used; scMAE-family preprocessing and KMeans evaluation are unchanged."
+  }
+}

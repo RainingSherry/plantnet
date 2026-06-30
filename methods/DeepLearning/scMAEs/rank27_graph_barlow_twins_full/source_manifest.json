@@ -1,0 +1,31 @@
+{
+  "rank": 27,
+  "method": "rank27_graph_barlow_twins_full",
+  "paper": "Graph Barlow Twins",
+  "paper_pdf": "methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/027_高_Graph_Barlow_Twins.pdf",
+  "paper_pdf_sha256": "866e6229c93bb28050272ee5a6f821d613cd7e85f55e1b5cf473943835e7d1e8",
+  "github_url": "https://github.com/pbielak/graph-barlow-twins",
+  "local_source": "methods/DeepLearning/scMAEs/external_sources/rank27_graph_barlow_twins",
+  "source_commit": "ec62580aa89bf3f0d20c92e7549031deedc105ab",
+  "source_files_consulted": [
+    "GCL/losses/barlow_twins.py",
+    "gssl/loss.py",
+    "gssl/augment.py",
+    "gssl/full_batch/model.py",
+    "gssl/full_batch/encoders.py",
+    "README.md"
+  ],
+  "adaptation": {
+    "input": "scaled scRNA expression vectors as cell-node features in batch-local KNN graphs",
+    "mask_semantics": "1 = expression feature zeroed by graph-view corruption",
+    "core_reproduced": [
+      "two augmented graph views",
+      "shared graph encoder",
+      "projection head",
+      "batch-normalized cross-correlation matrix",
+      "diagonal invariance and off-diagonal redundancy-reduction losses"
+    ],
+    "external_pretrained_weights": false,
+    "fairness_note": "No pretrained Graph Barlow weights or external labels are used; scMAE-family preprocessing and KMeans evaluation are unchanged."
+  }
+}

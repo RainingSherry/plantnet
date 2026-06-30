@@ -1,0 +1,16 @@
+{
+  "file_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/benchmark_data/Melanoma_5K.h5ad",
+  "counts_source": "adata.X",
+  "input_mode": "raw",
+  "normalization": "normalize_total(target_sum=10000.0) + log1p when raw",
+  "hvg": {
+    "n_top_genes": 1000,
+    "flavor": "seurat"
+  },
+  "scale_input": true,
+  "selected_n_genes": 1000,
+  "seed": 42,
+  "label_key": "resolved_label",
+  "adaptive_fuzzy_clustering": "DAFC-style fuzzy membership over latent bottleneck plus weighted adaptive entropy",
+  "mask_semantics": "1 = expression feature replaced by another cell's expression value"
+}

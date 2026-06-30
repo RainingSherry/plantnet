@@ -1,0 +1,21 @@
+{
+  "rank": 14,
+  "method": "rank14_cicl_iter_contrast_full",
+  "paper": "CICL: scRNA-seq Data Clustering by Cluster-aware Iterative Contrastive Learning",
+  "github_url": "https://github.com/Alunethy/CIRCLE",
+  "local_source": "methods/DeepLearning/scMAEs/external_sources/rank14_circle",
+  "commit": "aba15bc81dc0b4999f56c7a82dd5f13bf109f27c",
+  "pdf": "methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/014_高_CICL_scRNA-seq_Data_Clustering_by_Cluster-aware_Iterative_Contrastive_Learning.pdf",
+  "referenced_files": [
+    "training.py",
+    "trans_model.py",
+    "learner/contrastive_utils.py",
+    "learner/cluster_utils.py"
+  ],
+  "implementation_notes": [
+    "Reproduces iterative KMeans pseudo-labels, Student-t clustering probabilities, projection head, instance contrastive loss, and cluster-aware contrastive loss.",
+    "Adds an auxiliary masked reconstruction branch to keep the method in the scMAE-family benchmark.",
+    "Uses shared fair preprocessing and KMeans-known-k evaluation."
+  ],
+  "mask_semantics": "1 = expression gene replaced for the auxiliary scMAE reconstruction branch"
+}

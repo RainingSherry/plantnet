@@ -1,0 +1,18 @@
+{
+  "rank": 2,
+  "method": "MaskFeat_scMAE",
+  "paper": "MaskFeat: Masked Feature Prediction for Self-Supervised Visual Pre-Training",
+  "pdf": "../参考文献/01_PDF论文_按推荐程度排序/002_很高_MaskFeat_Masked_Feature_Prediction_for_Self-Supervised_Visual_Pre-Training.pdf",
+  "github_url": "https://github.com/facebookresearch/SlowFast/tree/main/projects/maskfeat",
+  "external_source_path": "../external_sources/rank02_slowfast_maskfeat",
+  "external_commit": "287ec0076846560f44a9327e931a5a2360240533",
+  "referenced_source_files": [
+    "slowfast/models/masked.py",
+    "slowfast/datasets/imagenet.py",
+    "slowfast/datasets/kinetics.py",
+    "projects/maskfeat/README.md"
+  ],
+  "implemented_files": ["model.py", "loss.py", "run.py"],
+  "mask_semantics": "1 = masked gene patch replaced by learned mask token",
+  "notes": "Adapts MaskFeat's masked feature prediction to 1D gene patches using deterministic normalized-expression, gradient, and rank targets."
+}

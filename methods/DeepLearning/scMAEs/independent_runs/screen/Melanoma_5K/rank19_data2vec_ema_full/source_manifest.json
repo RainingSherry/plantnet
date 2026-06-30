@@ -1,0 +1,21 @@
+{
+  "rank": 19,
+  "method": "rank19_data2vec_ema_full",
+  "paper": "data2vec: A General Framework for Self-supervised Learning in Speech, Vision and Language",
+  "github_url": "https://github.com/facebookresearch/fairseq/tree/main/examples/data2vec",
+  "local_source": "methods/DeepLearning/scMAEs/external_sources/rank19_fairseq_data2vec",
+  "commit": "3d262bb25690e4eb2e7d3c1309b1e9c406ca4b99",
+  "pdf": "methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/019_高_data2vec_A_General_Framework_for_Self-supervised_Learning_in_Speech,_Vision_and_Language.pdf",
+  "pdf_sha256": "9AB545577568481959F5BA5596385CDF1E6344F5B1A5A821A9779996EBEB0E18",
+  "referenced_files": [
+    "examples/data2vec/models/data2vec_vision.py",
+    "fairseq/modules/ema_module.py"
+  ],
+  "implementation_notes": [
+    "Implements EMA teacher/student latent target regression for expression patches.",
+    "Targets are layer-normalized averages of top-K teacher layers, predicted only at masked patch positions.",
+    "No external pretrained data2vec checkpoint is loaded.",
+    "Auxiliary masked expression reconstruction is retained for scMAE-family fairness."
+  ],
+  "mask_semantics": "1 = expression patch replaced by learned data2vec mask token"
+}

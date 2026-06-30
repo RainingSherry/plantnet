@@ -1,0 +1,2 @@
+dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,rank04_joao_graphcl_full,42,4,JOAO,1 = expression gene masked in scMAE reconstruction branch,0.6128960779968978,0.5814851903727764,0.47374055912530316,0.4819783755478141,0.5731016545580331,0.5814851903727764,0.6283663473876107,0.5411137734716639,9,,fixed,kmeans_known_k,True

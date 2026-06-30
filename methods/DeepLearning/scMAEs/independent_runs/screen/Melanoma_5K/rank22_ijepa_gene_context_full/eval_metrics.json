@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "rank22_ijepa_gene_context_full",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.5878573011300687,
+      "nmi": 0.5965593317573176,
+      "ari": 0.45413137779657353,
+      "f1_macro": 0.49392265928221285,
+      "fmi": 0.5560960928932889,
+      "v_measure": 0.5965593317573176,
+      "homogeneity": 0.6527035094028539,
+      "completeness": 0.5493089369119172,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

@@ -1,0 +1,26 @@
+{
+  "rank": 30,
+  "method": "rank30_fuzzy_rough_boundary_full",
+  "paper": "Fuzzy Rough Sets Based on Fuzzy Quantification",
+  "paper_year": "2023",
+  "paper_url": "https://arxiv.org/abs/2212.04327",
+  "pdf": "methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/030_高_Fuzzy_Rough_Sets_Based_on_Fuzzy_Quantification.pdf",
+  "pdf_sha256": "baec986c62573f3d0fc7e622020482a73b762a67c72e9b906be66fc6549af3e8",
+  "github_url": null,
+  "github_commit": null,
+  "implementation_basis": [
+    "Definition 2.5: fuzzy rough lower and upper approximations",
+    "Definition 2.14 / Example 2.15: RIM quantifiers and S-function quantifier",
+    "Definition 3.2: fuzzy quantifier-based fuzzy rough sets",
+    "Definition 4.9 / Equation 20: Yager Weighted Implication-style binary quantifier",
+    "Section 5.1: classification via largest lower-approximation membership"
+  ],
+  "files": [
+    "model.py",
+    "loss.py",
+    "run.py",
+    "README.md",
+    "source_manifest.json"
+  ],
+  "mask_semantics": "1 = expression feature replaced by another cell's expression value"
+}

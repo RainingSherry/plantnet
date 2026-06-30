@@ -1,0 +1,11 @@
+{
+  "rank": 1,
+  "method": "ScDiVa_scMAE",
+  "paper": "ScDiVa: Masked Discrete Diffusion for Joint Modeling of Single-Cell Identity and Expression",
+  "pdf": "../参考文献/01_PDF论文_按推荐程度排序/001_很高_ScDiVa_Masked_Discrete_Diffusion_for_Joint_Modeling_of_Single-Cell_Identity_and_Expression.pdf",
+  "github_url": "https://github.com/SindiLab/ScDiVa",
+  "github_status": "anonymous clone failed in this environment; implementation is based on local PDF/report description",
+  "implemented_files": ["model.py", "loss.py", "run.py", "run_rank01.py"],
+  "mask_semantics": "1 = expression token replaced by absorbing mask token",
+  "notes": "Implements a time-conditioned masked discrete diffusion denoiser over expression tokens with token, continuous-value, and mask-prediction losses."
+}

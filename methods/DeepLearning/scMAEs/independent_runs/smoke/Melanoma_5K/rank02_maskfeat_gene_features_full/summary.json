@@ -1,0 +1,6 @@
+{
+  "dataset": "Melanoma_5K",
+  "rank": 2,
+  "source_manifest": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/rank02_maskfeat_gene_features_full/source_manifest.json",
+  "fixed_metrics": {}
+}

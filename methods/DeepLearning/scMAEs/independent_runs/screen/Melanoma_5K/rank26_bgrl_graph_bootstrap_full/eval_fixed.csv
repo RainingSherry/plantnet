@@ -1,0 +1,2 @@
+dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,rank26_bgrl_graph_bootstrap_full,42,26,BGRL,1 = expression feature set to zero by BGRL view corruption,0.6082428539773986,0.6375221895642951,0.5182321792812946,0.46491920439286855,0.6107082901343399,0.6375221895642952,0.699964032013303,0.5853084521680623,9,,fixed,kmeans_known_k,True

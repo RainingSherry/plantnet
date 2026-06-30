@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "rank21_audiomae_local_window_full",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.35785508530910703,
+      "nmi": 0.32500663265543095,
+      "ari": 0.19567430443865463,
+      "f1_macro": 0.34807511059696766,
+      "fmi": 0.3524030930929285,
+      "v_measure": 0.325006632655431,
+      "homogeneity": 0.3408229833677715,
+      "completeness": 0.31059313870032945,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

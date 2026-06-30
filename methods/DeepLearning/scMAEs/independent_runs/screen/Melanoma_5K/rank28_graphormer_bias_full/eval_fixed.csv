@@ -1,0 +1,2 @@
+dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,rank28_graphormer_bias_full,42,28,Graphormer,1 = expression feature replaced by another cell's expression value,0.6434744072678927,0.6508697744141598,0.5149852935690064,0.4967224956566773,0.6083520790425312,0.6508697744141599,0.6914196370166484,0.614812698349734,9,,fixed,kmeans_known_k,True

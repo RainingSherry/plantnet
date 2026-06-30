@@ -1,0 +1,2 @@
+dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,rank13_masked_sc_clustering_full,42,13,Masked Modeling for Single-cell Clustering of scRNA-seq Data,1 = expression matrix patch removed from encoder and predicted by sequence-guided decoder,0.5962774207844006,0.6227907985809473,0.4966776509297924,0.45372800017873693,0.5924864315882896,0.6227907985809472,0.6859201099404028,0.570302467213982,9,,fixed,kmeans_known_k,True

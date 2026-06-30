@@ -1,0 +1,13 @@
+COMMAND: /data/luolie/conda/base/bin/python /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/rank03_consistency_models_full/run.py --data_path /data/luolie/biopipeline/scCluBench/data/scMAE/Melanoma_5K.h5 --dataset_name Melanoma_5K --save_dir /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/independent_runs/screen/Melanoma_5K/rank03_consistency_models_full --n_clusters 0 --n_top_genes 1000 --epochs 25 --batch_size 128 --seed 42 --gpu 5
+EXIT_CODE: 0
+ELAPSED_SECONDS: 31.0
+
+STDOUT
+rank03 epoch=001/25 loss=0.0736 consistency=0.0017 recon=0.0039 mask=0.5499
+rank03 epoch=010/25 loss=0.0712 consistency=0.0003 recon=0.0040 mask=0.5503
+rank03 epoch=020/25 loss=0.0709 consistency=0.0002 recon=0.0037 mask=0.5501
+rank03 epoch=025/25 loss=0.0708 consistency=0.0002 recon=0.0036 mask=0.5498
+
+STDERR
+/data/luolie/conda/base/lib/python3.13/functools.py:934: UserWarning: zero-centering a sparse array/matrix densifies it.
+  return dispatch(args[0].__class__)(*args, **kw)

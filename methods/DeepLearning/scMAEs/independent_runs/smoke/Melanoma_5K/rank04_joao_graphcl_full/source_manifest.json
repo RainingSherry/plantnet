@@ -1,0 +1,23 @@
+{
+  "rank": 4,
+  "method": "JOAO_GraphCL_scMAE",
+  "paper": "JOAO: Automated Data Augmentations for Graph Contrastive Learning",
+  "venue_year": "2021 / ICML",
+  "pdf": "../参考文献/01_PDF论文_按推荐程度排序/004_很高_JOAO_Automated_Data_Augmentations_for_Graph_Contrastive_Learning.pdf",
+  "github_url": "https://github.com/Shen-Lab/GraphCL_Automated",
+  "external_source_dir": "../external_sources/rank04_graphcl_automated",
+  "external_source_commit": "8f3c2ac7831b88693e932c924428d0c3fe065894",
+  "referenced_files": [
+    "unsupervised_TU/joao.py",
+    "unsupervised_TU/aug.py",
+    "semisupervised_TU/pretrain_joaov2/tu_dataset.py"
+  ],
+  "core_adaptation": [
+    "batch-local KNN cell graph",
+    "GCN encoder with GraphCL NT-Xent loss",
+    "five graph/expression augmentations",
+    "learned JOAO augmentation probability vector with simplex projection",
+    "masked scMAE reconstruction branch"
+  ],
+  "mask_semantics": "1 = expression gene masked in scMAE reconstruction branch"
+}

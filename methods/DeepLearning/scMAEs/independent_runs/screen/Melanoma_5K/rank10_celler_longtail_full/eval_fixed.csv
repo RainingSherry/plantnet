@@ -1,0 +1,2 @@
+dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,rank10_celler_longtail_full,42,10,Celler,1 = expression gene replaced for masked reconstruction branch,0.6288499889208952,0.6886491840330817,0.5647270392143773,0.5158310821040257,0.6498819081479315,0.6886491840330817,0.7532514585782925,0.6342527781105544,9,,fixed,kmeans_known_k,True
