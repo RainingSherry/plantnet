@@ -33,7 +33,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--datasets", nargs="+", default=None)
     parser.add_argument("--out_dir", default=str(SCMAES_DIR / "independent_runs"))
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--screen_epochs", type=int, default=25)
+    parser.add_argument("--screen_epochs", type=int, default=80)
     parser.add_argument("--formal_epochs", type=int, default=80)
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--n_top_genes", type=int, default=1000)

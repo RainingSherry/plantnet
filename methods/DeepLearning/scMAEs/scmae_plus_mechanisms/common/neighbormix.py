@@ -1,0 +1,159 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+import numpy as np
+import torch
+from sklearn.neighbors import NearestNeighbors
+
+
+@dataclass
+class NeighborState:
+    indices: np.ndarray
+    reliability: np.ndarray
+    similarity: np.ndarray
+    shared_score: np.ndarray
+    eligible: np.ndarray
+    first_reliable: np.ndarray
+    mean_reliable_count: float
+    stats: dict
+
+
+def _similarity_from_distance(distances: np.ndarray, metric: str) -> np.ndarray:
+    if metric == "cosine":
+        return np.clip(1.0 - distances.astype(np.float32), -1.0, 1.0)
+    finite = distances[np.isfinite(distances)]
+    scale = float(np.median(finite)) if finite.size else 1.0
+    scale = max(scale, 1e-6)
+    return np.exp(-distances.astype(np.float32) / scale)
+
+
+def build_neighbor_state(
+    embedding: np.ndarray,
+    k: int,
+    metric: str = "cosine",
+    min_similarity: float = -1.0,
+    min_shared_score: float = 0.0,
+    score_threshold: float = 0.0,
+    similarity_weight: float = 0.7,
+) -> NeighborState:
+    z = np.nan_to_num(np.asarray(embedding, dtype=np.float32), nan=0.0, posinf=0.0, neginf=0.0)
+    n_cells = int(z.shape[0])
+    n_neighbors = max(2, min(int(k) + 1, n_cells))
+    nn = NearestNeighbors(n_neighbors=n_neighbors, metric=metric)
+    nn.fit(z)
+    distances, neigh = nn.kneighbors(z, return_distance=True)
+    rows = []
+    dist_rows = []
+    for i, (row, dist_row) in enumerate(zip(neigh, distances)):
+        keep = row != i
+        rows.append(row[keep][: int(k)])
+        dist_rows.append(dist_row[keep][: int(k)])
+    neigh = np.asarray(rows, dtype=np.int64)
+    distances = np.asarray(dist_rows, dtype=np.float32)
+    similarity = _similarity_from_distance(distances, metric=metric)
+    neigh_sets = [set(row.tolist()) for row in neigh]
+    reliability = np.zeros_like(neigh, dtype=np.float32)
+    shared_score = np.zeros_like(neigh, dtype=np.float32)
+    eligible = np.zeros_like(neigh, dtype=bool)
+    first_reliable = np.arange(n_cells, dtype=np.int64)
+    sim_weight = float(np.clip(similarity_weight, 0.0, 1.0))
+    for i in range(n_cells):
+        found = False
+        for pos, j in enumerate(neigh[i]):
+            if i in neigh_sets[int(j)]:
+                shared = len(neigh_sets[i].intersection(neigh_sets[int(j)])) / max(1, int(k))
+                shared_score[i, pos] = float(shared)
+                sim_norm = 0.5 * (float(similarity[i, pos]) + 1.0) if metric == "cosine" else float(similarity[i, pos])
+                score = sim_weight * sim_norm + (1.0 - sim_weight) * float(shared)
+                reliability[i, pos] = float(score)
+                passes = (
+                    float(similarity[i, pos]) >= float(min_similarity)
+                    and float(shared) >= float(min_shared_score)
+                    and float(score) >= float(score_threshold)
+                )
+                eligible[i, pos] = passes
+                if passes and not found:
+                    first_reliable[i] = int(j)
+                    found = True
+    eligible_counts = eligible.sum(axis=1).astype(np.float32) if eligible.size else np.zeros(n_cells, dtype=np.float32)
+    positive_scores = reliability[reliability > 0]
+    eligible_scores = reliability[eligible]
+    stats = {
+        "neighbor_k": int(k),
+        "neighbor_metric": metric,
+        "neighbor_min_similarity": float(min_similarity),
+        "neighbor_min_shared_score": float(min_shared_score),
+        "neighbor_score_threshold": float(score_threshold),
+        "neighbor_score_similarity_weight": float(sim_weight),
+        "neighbor_reliability_mean": float(np.mean(eligible_scores)) if eligible_scores.size else 0.0,
+        "neighbor_reliability_min": float(np.min(eligible_scores)) if eligible_scores.size else 0.0,
+        "neighbor_reliability_all_edge_mean": float(np.mean(reliability)) if reliability.size else 0.0,
+        "neighbor_mutual_edge_fraction": float(np.mean(reliability > 0)) if reliability.size else 0.0,
+        "neighbor_reliable_edge_fraction": float(np.mean(eligible)) if eligible.size else 0.0,
+        "neighbor_reliable_count_mean": float(np.mean(eligible_counts)) if eligible_counts.size else 0.0,
+        "neighbor_reliable_count_min": float(np.min(eligible_counts)) if eligible_counts.size else 0.0,
+        "neighbor_score_mean": float(np.mean(positive_scores)) if positive_scores.size else 0.0,
+        "neighbor_score_p25": float(np.quantile(positive_scores, 0.25)) if positive_scores.size else 0.0,
+        "neighbor_score_p50": float(np.quantile(positive_scores, 0.50)) if positive_scores.size else 0.0,
+        "neighbor_score_p75": float(np.quantile(positive_scores, 0.75)) if positive_scores.size else 0.0,
+        "neighbor_similarity_mean": float(np.mean(similarity[reliability > 0])) if positive_scores.size else 0.0,
+        "neighbor_shared_score_mean": float(np.mean(shared_score[reliability > 0])) if positive_scores.size else 0.0,
+        "cells_with_reliable_neighbor": float(np.mean(first_reliable != np.arange(n_cells))),
+    }
+    return NeighborState(
+        indices=neigh,
+        reliability=reliability,
+        similarity=similarity,
+        shared_score=shared_score,
+        eligible=eligible,
+        first_reliable=first_reliable,
+        mean_reliable_count=stats["neighbor_reliable_count_mean"],
+        stats=stats,
+    )
+
+
+def mix_batch(
+    batch_indices: torch.Tensor,
+    batch_x: torch.Tensor,
+    full_data_cpu: torch.Tensor,
+    state: NeighborState | None,
+    alpha: float,
+    mode: str = "first",
+) -> tuple[torch.Tensor, float]:
+    if state is None:
+        return batch_x, 0.0
+    idx_np = batch_indices.detach().cpu().numpy().astype(np.int64)
+    if mode == "first":
+        neighbor_idx = state.first_reliable[idx_np]
+        has_neighbor = neighbor_idx != idx_np
+        neighbor_x = full_data_cpu[neighbor_idx].to(batch_x.device)
+        mixed = float(alpha) * batch_x + (1.0 - float(alpha)) * neighbor_x
+        mixed = torch.where(torch.as_tensor(has_neighbor, device=batch_x.device).view(-1, 1), mixed, batch_x)
+        return mixed, float(np.mean(has_neighbor)) if has_neighbor.size else 0.0
+    if mode not in {"mean", "weighted_mean"}:
+        raise ValueError(f"Unknown NeighborMix mode: {mode}")
+    neighbor_rows = state.indices[idx_np]
+    reliability_rows = state.reliability[idx_np]
+    eligible_rows = state.eligible[idx_np]
+    mixed_neighbors = []
+    has_neighbor = []
+    for row, rel, elig in zip(neighbor_rows, reliability_rows, eligible_rows):
+        keep = elig
+        if np.any(keep):
+            selected = full_data_cpu[row[keep]]
+            if mode == "weighted_mean":
+                weights = torch.as_tensor(rel[keep], dtype=selected.dtype).clamp_min(1e-6)
+                weights = weights / weights.sum().clamp_min(1e-6)
+                mixed_neighbors.append(torch.sum(selected * weights.view(-1, 1), dim=0))
+            else:
+                mixed_neighbors.append(selected.mean(dim=0))
+            has_neighbor.append(True)
+        else:
+            mixed_neighbors.append(full_data_cpu[int(row[0])] * 0.0)
+            has_neighbor.append(False)
+    neighbor_x = torch.stack(mixed_neighbors, dim=0).to(batch_x.device)
+    has_neighbor_t = torch.as_tensor(has_neighbor, device=batch_x.device, dtype=torch.bool).view(-1, 1)
+    mixed = float(alpha) * batch_x + (1.0 - float(alpha)) * neighbor_x
+    mixed = torch.where(has_neighbor_t, mixed, batch_x)
+    return mixed, float(np.mean(has_neighbor)) if has_neighbor else 0.0
