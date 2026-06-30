@@ -29,6 +29,7 @@ Melanoma_5K,scMAE_plus_neighbormix,004_neighbormix_start25,3407,56.7,/tmp/scmae_
 Melanoma_5K,scMAE_plus_neighbormix,004_neighbormix_start35,3407,48.6,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed3407/004_neighbormix_start35,success
 Melanoma_5K,scMAE_plus_neighbormix,004_neighbormix_start29,3407,46.4,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed3407/004_neighbormix_start29,success
 Melanoma_5K,scMAE_plus_neighbormix,004_neighbormix_start40,3407,48.1,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed3407/004_neighbormix_start40,success
+Melanoma_5K,scMAE_plus_boundary_protected_neighbormix,012_boundary_protected_neighbormix,3407,56.0,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed3407/012_boundary_protected_neighbormix,success
 Melanoma_5K,scMAE_plus_adaptive_mask,001_adaptive_mask,2024,34.1,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed2024/001_adaptive_mask,success
 Melanoma_5K,scMAE_plus_prototype_dec,002_prototype_dec,2024,36.1,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed2024/002_prototype_dec,success
 Melanoma_5K,scMAE_plus_swav_assignment,003_swav_assignment,2024,45.5,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed2024/003_swav_assignment,success
@@ -59,6 +60,7 @@ Melanoma_5K,scMAE_plus_neighbormix,004_neighbormix_start25,2024,62.9,/tmp/scmae_
 Melanoma_5K,scMAE_plus_neighbormix,004_neighbormix_start35,2024,47.6,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed2024/004_neighbormix_start35,success
 Melanoma_5K,scMAE_plus_neighbormix,004_neighbormix_start29,2024,43.8,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed2024/004_neighbormix_start29,success
 Melanoma_5K,scMAE_plus_neighbormix,004_neighbormix_start40,2024,54.3,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed2024/004_neighbormix_start40,success
+Melanoma_5K,scMAE_plus_boundary_protected_neighbormix,012_boundary_protected_neighbormix,2024,55.9,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed2024/012_boundary_protected_neighbormix,success
 Melanoma_5K,scMAE_plus_adaptive_mask,001_adaptive_mask,42,35.2,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed42/001_adaptive_mask,success
 Melanoma_5K,scMAE_plus_prototype_dec,002_prototype_dec,42,37.0,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed42/002_prototype_dec,success
 Melanoma_5K,scMAE_plus_swav_assignment,003_swav_assignment,42,52.5,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed42/003_swav_assignment,success
@@ -89,3 +91,4 @@ Melanoma_5K,scMAE_plus_neighbormix,004_neighbormix_start25,42,69.6,/tmp/scmae_pl
 Melanoma_5K,scMAE_plus_neighbormix,004_neighbormix_start35,42,47.9,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed42/004_neighbormix_start35,success
 Melanoma_5K,scMAE_plus_neighbormix,004_neighbormix_start29,42,56.5,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed42/004_neighbormix_start29,success
 Melanoma_5K,scMAE_plus_neighbormix,004_neighbormix_start40,42,56.0,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed42/004_neighbormix_start40,success
+Melanoma_5K,scMAE_plus_boundary_protected_neighbormix,012_boundary_protected_neighbormix,42,56.7,/tmp/scmae_plus_screen_80_20260630/screen/Melanoma_5K/seed42/012_boundary_protected_neighbormix,success

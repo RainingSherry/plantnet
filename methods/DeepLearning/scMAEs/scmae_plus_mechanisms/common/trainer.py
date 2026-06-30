@@ -181,6 +181,26 @@ def build_parser(config: VariantConfig) -> argparse.ArgumentParser:
         type=float,
         default=float(d.get("neighbor_adaptive_score_threshold", 0.84)),
     )
+    parser.add_argument(
+        "--neighbor_boundary_protect",
+        type=family.str2bool,
+        default=bool(d.get("neighbor_boundary_protect", False)),
+    )
+    parser.add_argument(
+        "--neighbor_boundary_confidence_quantile",
+        type=float,
+        default=float(d.get("neighbor_boundary_confidence_quantile", 0.20)),
+    )
+    parser.add_argument(
+        "--neighbor_boundary_rare_quantile",
+        type=float,
+        default=float(d.get("neighbor_boundary_rare_quantile", 0.25)),
+    )
+    parser.add_argument(
+        "--neighbor_boundary_score_threshold",
+        type=float,
+        default=float(d.get("neighbor_boundary_score_threshold", 0.84)),
+    )
     parser.add_argument("--neighbor_soft_power", type=float, default=float(d.get("neighbor_soft_power", 1.0)))
     parser.add_argument("--mix_alpha", type=float, default=float(d.get("mix_alpha", 0.9)))
     parser.add_argument("--mix_weight", type=float, default=float(d.get("mix_weight", 0.3)))
@@ -404,6 +424,21 @@ def run_training(config: VariantConfig, build_model: Callable) -> None:
                 )
             elif window > 1 or min_hits > 1:
                 neighbor_state = neighbormix.consensus_neighbor_state(neighbor_state_history, min_hits=min_hits)
+            if args.neighbor_boundary_protect:
+                graph_embedding_for_boundary = (
+                    neighbor_embedding_ema
+                    if args.neighbor_graph_embedding == "ema" and neighbor_embedding_ema is not None
+                    else current_neighbor_embedding
+                )
+                neighbor_state = neighbormix.boundary_protected_neighbor_state(
+                    neighbor_state,
+                    graph_embedding_for_boundary,
+                    n_clusters=n_clusters,
+                    seed=args.seed,
+                    confidence_quantile=args.neighbor_boundary_confidence_quantile,
+                    rare_quantile=args.neighbor_boundary_rare_quantile,
+                    score_threshold=args.neighbor_boundary_score_threshold,
+                )
         model.train()
         totals = _loss_components_template()
         n_batches = 0

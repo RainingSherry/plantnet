@@ -29,6 +29,26 @@ def _similarity_from_distance(distances: np.ndarray, metric: str) -> np.ndarray:
     return np.exp(-distances.astype(np.float32) / scale)
 
 
+def _pseudo_cluster_confidence(
+    embedding: np.ndarray,
+    n_clusters: int,
+    seed: int,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    z = np.nan_to_num(np.asarray(embedding, dtype=np.float32), nan=0.0, posinf=0.0, neginf=0.0)
+    km = KMeans(n_clusters=int(n_clusters), n_init=20, random_state=int(seed))
+    labels = km.fit_predict(z).astype(np.int64)
+    distances_to_centers = km.transform(z).astype(np.float32)
+    if distances_to_centers.shape[1] > 1:
+        nearest = np.partition(distances_to_centers, kth=1, axis=1)[:, :2]
+        d1 = nearest[:, 0]
+        d2 = np.maximum(nearest[:, 1], 1e-6)
+        confidence = np.clip(1.0 - d1 / d2, 0.0, 1.0).astype(np.float32)
+    else:
+        confidence = np.ones(z.shape[0], dtype=np.float32)
+    cluster_counts = np.bincount(labels, minlength=int(n_clusters)).astype(np.float32)
+    return labels, confidence, cluster_counts
+
+
 def build_neighbor_state(
     embedding: np.ndarray,
     k: int,
@@ -51,16 +71,7 @@ def build_neighbor_state(
     if pseudo_filter != "none":
         if pseudo_n_clusters is None or int(pseudo_n_clusters) < 2:
             raise ValueError("pseudo_n_clusters must be at least 2 when NeighborMix pseudo filtering is enabled.")
-        km = KMeans(n_clusters=int(pseudo_n_clusters), n_init=20, random_state=int(pseudo_seed))
-        pseudo_labels = km.fit_predict(z).astype(np.int64)
-        distances_to_centers = km.transform(z).astype(np.float32)
-        if distances_to_centers.shape[1] > 1:
-            nearest = np.partition(distances_to_centers, kth=1, axis=1)[:, :2]
-            d1 = nearest[:, 0]
-            d2 = np.maximum(nearest[:, 1], 1e-6)
-            pseudo_confidence = np.clip(1.0 - d1 / d2, 0.0, 1.0).astype(np.float32)
-        else:
-            pseudo_confidence = np.ones(n_cells, dtype=np.float32)
+        pseudo_labels, pseudo_confidence, _ = _pseudo_cluster_confidence(z, int(pseudo_n_clusters), int(pseudo_seed))
         quantile = float(np.clip(pseudo_confidence_quantile, 0.0, 1.0))
         pseudo_confidence_threshold = float(np.quantile(pseudo_confidence, quantile))
     n_neighbors = max(2, min(int(k) + 1, n_cells))
@@ -156,6 +167,93 @@ def build_neighbor_state(
         reliability=reliability,
         similarity=similarity,
         shared_score=shared_score,
+        eligible=eligible,
+        first_reliable=first_reliable,
+        mean_reliable_count=stats["neighbor_reliable_count_mean"],
+        stats=stats,
+    )
+
+
+def boundary_protected_neighbor_state(
+    state: NeighborState,
+    embedding: np.ndarray,
+    n_clusters: int,
+    seed: int,
+    confidence_quantile: float = 0.20,
+    rare_quantile: float = 0.25,
+    score_threshold: float = 0.84,
+) -> NeighborState:
+    if int(n_clusters) < 2:
+        raise ValueError("n_clusters must be at least 2 for boundary-protected NeighborMix.")
+    labels, confidence, cluster_counts = _pseudo_cluster_confidence(embedding, int(n_clusters), int(seed))
+    confidence_quantile = float(np.clip(confidence_quantile, 0.0, 1.0))
+    rare_quantile = float(np.clip(rare_quantile, 0.0, 1.0))
+    confidence_threshold = float(np.quantile(confidence, confidence_quantile))
+    rare_threshold = float(np.quantile(cluster_counts, rare_quantile))
+    rare_cluster = cluster_counts <= rare_threshold
+    cell_cluster_size = cluster_counts[labels]
+    is_boundary = confidence < confidence_threshold
+    is_rare_cell = rare_cluster[labels]
+
+    src = np.arange(state.indices.shape[0])[:, None]
+    dst = state.indices
+    same_cluster = labels[src] == labels[dst]
+    protected_edge = is_boundary[src] | is_boundary[dst] | is_rare_cell[src] | is_rare_cell[dst]
+    protected_pass = same_cluster & (state.reliability >= float(score_threshold))
+    eligible = state.eligible & (~protected_edge | protected_pass)
+
+    first_reliable = np.arange(state.indices.shape[0], dtype=np.int64)
+    for i in range(state.indices.shape[0]):
+        positions = np.flatnonzero(eligible[i])
+        if positions.size:
+            first_reliable[i] = int(state.indices[i, int(positions[0])])
+
+    eligible_counts = eligible.sum(axis=1).astype(np.float32) if eligible.size else np.zeros(state.indices.shape[0], dtype=np.float32)
+    eligible_scores = state.reliability[eligible]
+    positive_scores = state.reliability[state.reliability > 0]
+    protected_reliable = state.eligible & protected_edge
+    kept_protected = eligible & protected_edge
+    stats = dict(state.stats)
+    stats.update(
+        {
+            "neighbor_boundary_confidence_quantile": float(confidence_quantile),
+            "neighbor_boundary_confidence_threshold": float(confidence_threshold),
+            "neighbor_boundary_confidence_mean": float(np.mean(confidence)) if confidence.size else 0.0,
+            "neighbor_boundary_cell_fraction": float(np.mean(is_boundary)) if is_boundary.size else 0.0,
+            "neighbor_boundary_rare_quantile": float(rare_quantile),
+            "neighbor_boundary_rare_cluster_threshold": float(rare_threshold),
+            "neighbor_boundary_rare_cell_fraction": float(np.mean(is_rare_cell)) if is_rare_cell.size else 0.0,
+            "neighbor_boundary_score_threshold": float(score_threshold),
+            "neighbor_boundary_protected_edge_fraction": float(np.mean(protected_reliable)) if protected_reliable.size else 0.0,
+            "neighbor_boundary_kept_protected_edge_fraction": float(np.mean(kept_protected)) if kept_protected.size else 0.0,
+            "neighbor_boundary_same_cluster_edge_fraction": (
+                float(np.mean(same_cluster[state.reliability > 0])) if positive_scores.size else 0.0
+            ),
+            "neighbor_boundary_same_cluster_reliable_fraction": (
+                float(np.mean(same_cluster[eligible])) if eligible_scores.size else 0.0
+            ),
+            "neighbor_boundary_cluster_size_min": float(np.min(cell_cluster_size)) if cell_cluster_size.size else 0.0,
+            "neighbor_boundary_cluster_size_max": float(np.max(cell_cluster_size)) if cell_cluster_size.size else 0.0,
+            "neighbor_pseudo_confidence_mean": float(np.mean(confidence)) if confidence.size else 0.0,
+            "neighbor_pseudo_same_cluster_edge_fraction": (
+                float(np.mean(same_cluster[state.reliability > 0])) if positive_scores.size else 0.0
+            ),
+            "neighbor_pseudo_same_cluster_reliable_fraction": (
+                float(np.mean(same_cluster[eligible])) if eligible_scores.size else 0.0
+            ),
+            "neighbor_reliability_mean": float(np.mean(eligible_scores)) if eligible_scores.size else 0.0,
+            "neighbor_reliability_min": float(np.min(eligible_scores)) if eligible_scores.size else 0.0,
+            "neighbor_reliable_edge_fraction": float(np.mean(eligible)) if eligible.size else 0.0,
+            "neighbor_reliable_count_mean": float(np.mean(eligible_counts)) if eligible_counts.size else 0.0,
+            "neighbor_reliable_count_min": float(np.min(eligible_counts)) if eligible_counts.size else 0.0,
+            "cells_with_reliable_neighbor": float(np.mean(first_reliable != np.arange(state.indices.shape[0]))),
+        }
+    )
+    return NeighborState(
+        indices=state.indices,
+        reliability=state.reliability,
+        similarity=state.similarity,
+        shared_score=state.shared_score,
         eligible=eligible,
         first_reliable=first_reliable,
         mean_reliable_count=stats["neighbor_reliable_count_mean"],
