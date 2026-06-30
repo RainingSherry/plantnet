@@ -29,3 +29,20 @@ This does not add a prototype loss, SwAV loss, adaptive mask, or count-aware
 branch. The ablation is focused on whether protecting boundary and rare cells
 can keep the stability of delayed NeighborMix while recovering the small
 remaining ARI gap to the original scMAE baseline.
+
+## Melanoma_5K Screen Result
+
+Completed on 2026-06-30 with `seeds = 42, 2024, 3407`, `epochs = 80`,
+`n_top_genes = 1000`, and `batch_size = 128`.
+
+| setting | ARI mean | ARI std | ACC mean |
+|---|---:|---:|---:|
+| default boundary + rare protection | 0.661512 | 0.001316 | 0.736613 |
+| boundary only, rare disabled | 0.662414 | 0.002045 | 0.736391 |
+| boundary only, q10 | 0.660343 | 0.003630 | 0.735653 |
+
+The protected graph is very clean: reliable edges are almost all within the
+same pseudo cluster, and variance stays low. However, the rule is too
+conservative and removes useful NeighborMix signal. This variant is therefore
+not promoted. The next boundary-aware attempt should use soft weighting or an
+auxiliary consistency loss for boundary cells instead of hard edge deletion.

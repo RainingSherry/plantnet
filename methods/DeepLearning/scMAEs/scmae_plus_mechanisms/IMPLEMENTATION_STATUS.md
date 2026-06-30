@@ -329,6 +329,38 @@ The result files now contain:
 机制尝试记录.csv: 90 rows
 ```
 
+## Boundary-Protected NeighborMix Check
+
+`012_boundary_protected_neighbormix` starts from the closest stable anchor,
+`004_neighbormix_start30`, and adds KMeans-based boundary/rare-cell protection.
+Boundary cells are defined by low pseudo-cluster confidence; rare cells are
+defined by membership in small pseudo-clusters. Protected cells are allowed to
+mix only through same-pseudo-cluster edges with high graph reliability.
+
+Three 80-epoch, three-seed Melanoma_5K checks were completed:
+
+| variant | ARI mean | ARI std | ACC mean | interpretation |
+|---|---:|---:|---:|---|
+| `012_boundary_protected_neighbormix` | 0.661512 | 0.001316 | 0.736613 | very stable, but hard boundary+rare protection removes too much signal |
+| `012_boundary_protected_neighbormix_boundary_only` | 0.662414 | 0.002045 | 0.736391 | rare protection is not the only issue; hard boundary protection also hurts |
+| `012_boundary_protected_neighbormix_boundary_q10` | 0.660343 | 0.003630 | 0.735653 | milder boundary protection still does not recover the start30 gain |
+
+Diagnostics confirm that the protected graph is much cleaner:
+same-pseudo-cluster reliable fraction is about `0.999`, compared with no
+pseudo-cluster constraint in `004_start30`. But this purity is not enough for
+KMeans ARI; the hard filter sacrifices useful local expression smoothing. The
+next boundary-aware mechanism should keep the `004_start30` graph but make
+boundary handling soft, for example by reducing per-cell mix strength or adding
+a small two-view consistency term for boundary cells only.
+
+The result files now contain:
+
+```text
+机制快筛单次结果.csv: 99 rows
+机制快筛汇总结果.csv: 33 rows
+机制尝试记录.csv: 99 rows
+```
+
 ## Next Step
 
 Do a targeted second pass around NeighborMix, not broad architecture expansion:
@@ -357,9 +389,10 @@ Recommended refinements:
   pseudo-cluster agreement, frozen graph, and single-trajectory EMA graph are
   not sufficient; multi-update consensus and confidence-adaptive consensus are
   also stable but below threshold.
-- Add an explicit boundary/rare-cell protection signal next. The current edge
-  filters only use graph reliability; they do not know whether a cell is near a
-  KMeans boundary or belongs to a small pseudo-cluster.
+- Do not hard-delete boundary/rare edges by pseudo-cluster purity; `012` shows
+  that a cleaner graph can still be worse. Use soft boundary-aware mixing next:
+  lower per-cell mix strength or add a very small boundary consistency loss
+  while keeping the useful `004_start30` graph.
 - Do not add the current DEC prototype to NeighborMix as-is; it reduced mean ARI.
 - Do not combine SwAV or adaptive mask with NeighborMix in their current form;
   both reduced Melanoma_5K ARI in the three-seed screen.
