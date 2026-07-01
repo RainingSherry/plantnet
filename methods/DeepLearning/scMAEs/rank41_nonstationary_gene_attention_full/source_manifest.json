@@ -1,0 +1,20 @@
+{
+  "method_dir": "rank41_nonstationary_gene_attention_full",
+  "rank": 41,
+  "recommendation_level": "中高/可用",
+  "recommendation_score": 72,
+  "paper": "Non-stationary Transformers: Exploring the Stationarity in Time Series Forecasting",
+  "venue_year": "NeurIPS 2022",
+  "pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/041_中高_可用_Non-stationary_Transformers.pdf",
+  "github_url": "https://github.com/thuml/Nonstationary_Transformers",
+  "github_status": "readable via local clone /tmp/Nonstationary_Transformers_repo during implementation",
+  "implementation_basis": [
+    "Local report section 41: use signal modeling only after constructing gene module/order.",
+    "PDF: Series Stationarization and De-stationary Attention with tau/delta factors.",
+    "GitHub: Projector, DSAttention, and Transformer encoder de-stationary factor flow."
+  ],
+  "scmae_gap_addressed": "semantic target and non-stationary module-context signal",
+  "neighbor_mix_relation": "independent; not used",
+  "independent_full": true,
+  "no_formal_claim": true
+}

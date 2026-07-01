@@ -1,0 +1,22 @@
+{
+  "rank": 55,
+  "method_dir": "rank55_multifacet_vae_uncertainty_full",
+  "paper_title": "Multi-Facet Clustering Variational Autoencoders",
+  "recommendation": "可用",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/055_可用_Multi-Facet_Clustering_Variational_Autoencoders.pdf",
+  "github_url": "https://github.com/FabianFalck/mfcvae",
+  "github_status": "Accessible via git ls-remote and cloned to /tmp/mfcvae_repo for read-only inspection.",
+  "github_files_inspected": [
+    "README.md",
+    "mfcvae.py",
+    "models_fc.py"
+  ],
+  "implemented_from": [
+    "MFCVAE multi-facet latent variables with per-facet Mixture-of-Gaussians priors",
+    "Variational ladder/progressive idea simplified to independent facets on top of scMAE encoder",
+    "scMAE improvement report rank55 notes"
+  ],
+  "scmae_gap": "robust loss/uncertainty",
+  "core_mechanism": "Multi-facet variational latent heads with MoG priors, posterior uncertainty diagnostics, and optional raw-count NB likelihood while retaining scMAE mask prediction and masked log-expression reconstruction.",
+  "neighbor_mix_relation": "independent and complementary; this candidate does not use NeighborMix and does not mix cells."
+}

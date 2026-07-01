@@ -1,0 +1,16 @@
+{
+  "rank": 57,
+  "method_dir": "rank57_scvaeder_latent_diffusion_full",
+  "paper_title": "scVAEDer: integrating deep diffusion models and variational autoencoders for single-cell transcriptomics analysis",
+  "recommendation": "可用",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/057_可用_scVAEDer_integrating_deep_diffusion_models_and_variational_autoencoders_for_single-cell_transcriptomics_analysis.pdf",
+  "github_url": "https://github.com/MehrshadSD/scVAEDer",
+  "github_status": "git ls-remote required GitHub credentials in this environment, so anonymous code inspection was not possible; implementation is reconstructed from the PDF and report.",
+  "implemented_from": [
+    "scVAEDer PDF: VAE latent embeddings followed by latent-space diffusion denoising",
+    "methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md rank57 notes"
+  ],
+  "scmae_gap": "robust loss/semantic latent prior",
+  "core_mechanism": "Lightweight VAE latent adapter with a diffusion-time noise predictor trained on latent embeddings, plus optional aligned raw-count ZINB likelihood, while retaining scMAE mask prediction and masked log-expression reconstruction.",
+  "neighbor_mix_relation": "independent and complementary; this candidate does not use NeighborMix and does not mix cells."
+}

@@ -1,21 +1,15 @@
 {
   "rank": 15,
-  "method": "rank15_scagc_adaptive_graph_full",
-  "paper": "scAGC: Learning Adaptive Cell Graphs with Contrastive Guidance for Single-Cell Clustering",
-  "github_url": null,
-  "pdf": "methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/015_高_scAGC_Learning_Adaptive_Cell_Graphs_with_Contrastive_Guidance_for_Single-Cell_Clustering.pdf",
-  "pdf_sha256": "E63386A5EC7B85E74FE71C2102A6318FFFA9A08A0218C78BE9B161AABDAF5D44",
-  "referenced_sections": [
-    "Section IV-A Adaptive Graph Learning via Gumbel-Softmax",
-    "Section IV-B Topology-Aware Graph Autoencoder with ZINB Loss",
-    "Section IV-C Contrastive Guidance and Clustering Objective",
-    "Section IV-D Training Strategy"
-  ],
-  "implementation_notes": [
-    "No GitHub URL or checkpoint is listed in the local index.",
-    "Implements KNN graph initialization, RBF Gumbel-TopK adaptive graph learning, TAGCN-style graph encoder, ZINB decoder, graph contrastive guidance, and KL clustering objective.",
-    "Uses mini-batch adaptive graphs for benchmark scalability and records this in README/preprocess_config.",
-    "Adds auxiliary masked expression reconstruction to remain in the scMAE-family protocol."
-  ],
-  "mask_semantics": "1 = expression gene replaced for the auxiliary scMAE reconstruction branch"
+  "method_dir": "rank15_scagc_adaptive_graph_full",
+  "title": "scAGC: Learning Adaptive Cell Graphs with Contrastive Guidance for Single-Cell Clustering",
+  "pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/015_高_scAGC_Learning_Adaptive_Cell_Graphs_with_Contrastive_Guidance_for_Single-Cell_Clustering.pdf",
+  "report_source": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "index_source": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_urls_checked": [],
+  "github_status": "No github_url is listed in the index for rank15.",
+  "implementation_source": "Independent reconstruction from the PDF and summary report.",
+  "core_mechanism": "Adaptive graph reliability with edge reconstruction, shallow residual graph adapter, DropEdge robustness, and optional confidence-gated local mix.",
+  "scmae_gap": "graph and boundary reliability while preserving mask prediction and masked expression reconstruction",
+  "neighbor_mix_relation": "complementary optional local mix controlled by edge confidence with boundary/rare-cell veto; mixed_cell_fraction is diagnostic"
 }
+

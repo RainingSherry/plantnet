@@ -1,0 +1,22 @@
+{
+  "method_dir": "rank49_amp_drl_mask_policy_full",
+  "rank": 49,
+  "paper_title": "Adaptive-Masking Policy with Deep Reinforcement Learning for Self-Supervised Medical Image Segmentation",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/049_可用_Adaptive-Masking_Policy_with_Deep_Reinforcement_Learning_for_Self-Supervised_Medical_Image_Segmentation.pdf",
+  "local_report": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "local_index": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_url": "",
+  "github_status": "No GitHub URL listed in the index. Implementation reconstructed from PDF and local report.",
+  "implementation_source": "Independent reconstruction and scMAE-specific adaptation from local report and PDF method description.",
+  "scmae_gap": "mask",
+  "core_mechanism": "Tiny dueling-Q adaptive mask controller chooses zero/swap/variance-guided mask strategy and ratio using reconstruction-loss improvement as reward.",
+  "neighbor_mix_relation": "independent; not used in this candidate",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true, otherwise log_expr",
+    "reconstruction_target": "log_expr",
+    "count_target": "none",
+    "token_target": "none",
+    "policy_state": "batch expression statistics and previous reward"
+  },
+  "formal_claims": "No formal improvement is claimed from smoke or screen results."
+}

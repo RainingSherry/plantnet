@@ -1,0 +1,20 @@
+{
+  "method_dir": "rank01_scdiva_absorbing_diffusion_full",
+  "evidence_level": "independent-full candidate",
+  "sort_rank": 1,
+  "title": "ScDiVa: Masked Discrete Diffusion for Joint Modeling of Single-Cell Identity and Expression",
+  "recommendation_level": "很高",
+  "recommendation_score": 92,
+  "pdf": "methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/001_很高_ScDiVa_Masked_Discrete_Diffusion_for_Joint_Modeling_of_Single-Cell_Identity_and_Expression.pdf",
+  "github_url": "https://github.com/SindiLab/ScDiVa",
+  "github_status_checked": "HTTP 404 / anonymous git access unavailable on 2026-06-30",
+  "implementation_source": "Reconstructed from the local PDF and 00_scMAE改良方法整理总报告.md because the indexed GitHub URL is not readable.",
+  "scmae_gap_addressed": "mask/target",
+  "neighbor_mix_relation": "independent and complementary; NeighborMix is not used in this candidate",
+  "forbidden_claims": [
+    "Do not claim full ScDiVa foundation-model reproduction.",
+    "Do not claim formal performance improvement from smoke or screen results.",
+    "Do not append smoke or screen outputs to 全benchmark结果.csv."
+  ]
+}
+

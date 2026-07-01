@@ -1,0 +1,19 @@
+{
+  "rank": 20,
+  "method_dir": "rank20_multimae_multitask_gene_full",
+  "title": "MultiMAE: Multi-modal Multi-task Masked Autoencoders",
+  "pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/020_高_MultiMAE_Multi-modal_Multi-task_Masked_Autoencoders.pdf",
+  "report_source": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "index_source": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_urls_checked": [
+    {
+      "url": "https://github.com/EPFL-VILAB/MultiMAE",
+      "status": "HTTP 200 on 2026-06-30"
+    }
+  ],
+  "implementation_source": "Independent adaptation from MultiMAE PDF/report and accessible repository concept.",
+  "core_mechanism": "Multi-task masked autoencoding with expression, gene-token, and module-summary decoders.",
+  "scmae_gap": "semantic target and robust multi-task reconstruction while preserving mask prediction and masked expression reconstruction",
+  "neighbor_mix_relation": "independent; no NeighborMix operator is used and mixed_cell_fraction remains 0.0"
+}
+

@@ -1,0 +1,20 @@
+{
+  "method_dir": "rank23_maskgit_gene_token_full",
+  "rank": 23,
+  "paper": "MaskGIT: Masked Generative Image Transformer",
+  "paper_year_venue": "2022 / CVPR",
+  "pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/023_高_MaskGIT_Masked_Generative_Image_Transformer.pdf",
+  "report": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "index": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_url": "https://github.com/google-research/maskgit",
+  "github_access": "HTTP 200; README, repository tree, parallel_decode.py, and maskgit_transformer.py inspected via raw.githubusercontent.com",
+  "implementation_source": "Reconstructed for scRNA from report, paper, and released MaskGIT code ideas; no upstream code copied directly.",
+  "scmae_gap": ["mask", "semantic target"],
+  "neighbor_mix_relation": "independent_complementary_not_used",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true, otherwise log_expr",
+    "reconstruction_target": "log_expr",
+    "token_target": "gene-specific log_expr quantile bins",
+    "counts_usage": "No NB/ZINB count likelihood is used"
+  }
+}

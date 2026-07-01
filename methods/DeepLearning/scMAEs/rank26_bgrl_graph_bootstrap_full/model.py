@@ -1,181 +1,139 @@
 from __future__ import annotations
 
 import copy
+import math
 
 import torch
-import torch.nn as nn
+from torch import nn
 import torch.nn.functional as F
 
 
-def normalize_adjacency(adjacency: torch.Tensor) -> torch.Tensor:
-    if adjacency.ndim != 2 or adjacency.shape[0] != adjacency.shape[1]:
-        raise ValueError(f"adjacency must be [cells, cells], got {tuple(adjacency.shape)}")
-    eye = torch.eye(adjacency.shape[0], device=adjacency.device, dtype=adjacency.dtype)
-    a_hat = adjacency + eye
-    degree = a_hat.sum(dim=1).clamp_min(1e-6)
-    d_inv_sqrt = torch.rsqrt(degree)
-    return d_inv_sqrt[:, None] * a_hat * d_inv_sqrt[None, :]
+class ShallowGraphEncoder(nn.Module):
+    """Residual single-hop graph adapter for scRNA cell KNN context."""
 
-
-class DenseSAGELayer(nn.Module):
-    """Dependency-free GraphSAGE-style layer over a dense mini-batch adjacency."""
-
-    def __init__(self, in_features: int, out_features: int, dropout: float) -> None:
+    def __init__(self, num_genes: int, hidden_size: int = 128, dropout: float = 0.05):
         super().__init__()
-        if in_features <= 0 or out_features <= 0:
-            raise ValueError("in_features and out_features must be positive")
-        self.self_linear = nn.Linear(in_features, out_features, bias=False)
-        self.neighbor_linear = nn.Linear(in_features, out_features, bias=False)
-        self.norm = nn.LayerNorm(out_features)
-        self.activation = nn.PReLU(1)
-        self.dropout = nn.Dropout(dropout)
-
-    def reset_parameters(self) -> None:
-        self.self_linear.reset_parameters()
-        self.neighbor_linear.reset_parameters()
-        self.norm.reset_parameters()
-        self.activation.weight.data.fill_(0.25)
-
-    def forward(self, x: torch.Tensor, adjacency: torch.Tensor) -> torch.Tensor:
-        if x.ndim != 2:
-            raise ValueError(f"x must be [cells, features], got {tuple(x.shape)}")
-        if adjacency.shape != (x.shape[0], x.shape[0]):
-            raise ValueError(f"adjacency must be [cells, cells], got {tuple(adjacency.shape)}")
-        norm_adj = normalize_adjacency(adjacency)
-        neighbor = norm_adj @ x
-        out = self.self_linear(x) + self.neighbor_linear(neighbor)
-        return self.dropout(self.activation(self.norm(out)))
-
-
-class BGRLDenseGraphEncoder(nn.Module):
-    def __init__(self, num_genes: int, hidden_size: int, latent_size: int, dropout: float) -> None:
-        super().__init__()
-        if num_genes <= 0 or hidden_size <= 0 or latent_size <= 0:
-            raise ValueError("num_genes, hidden_size, and latent_size must be positive")
         self.num_genes = int(num_genes)
         self.hidden_size = int(hidden_size)
-        self.latent_size = int(latent_size)
-        self.input_norm = nn.LayerNorm(num_genes)
-        self.gnn1 = DenseSAGELayer(num_genes, hidden_size, dropout)
-        self.gnn2 = DenseSAGELayer(hidden_size, hidden_size, dropout)
-        self.gnn3 = DenseSAGELayer(hidden_size, latent_size, dropout)
-        self.skip1 = nn.Linear(num_genes, hidden_size, bias=False)
-        self.skip2 = nn.Linear(num_genes, hidden_size, bias=False)
-
-    def reset_parameters(self) -> None:
-        self.input_norm.reset_parameters()
-        self.gnn1.reset_parameters()
-        self.gnn2.reset_parameters()
-        self.gnn3.reset_parameters()
-        self.skip1.reset_parameters()
-        self.skip2.reset_parameters()
-
-    def forward(self, x: torch.Tensor, adjacency: torch.Tensor) -> torch.Tensor:
-        if x.ndim != 2 or x.shape[1] != self.num_genes:
-            raise ValueError(f"x must be [cells, {self.num_genes}], got {tuple(x.shape)}")
-        x_norm = self.input_norm(x)
-        h1 = self.gnn1(x_norm, adjacency)
-        h2 = self.gnn2(h1 + self.skip1(x_norm), adjacency)
-        return self.gnn3(h1 + h2 + self.skip2(x_norm), adjacency)
-
-
-class MLPPredictor(nn.Module):
-    def __init__(self, latent_size: int, predictor_hidden: int) -> None:
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(latent_size, predictor_hidden),
-            nn.PReLU(1),
-            nn.Linear(predictor_hidden, latent_size),
+        self.cell_encoder = nn.Sequential(
+            nn.Dropout(dropout),
+            nn.Linear(num_genes, 256),
+            nn.LayerNorm(256),
+            nn.PReLU(),
+            nn.Linear(256, hidden_size),
+            nn.LayerNorm(hidden_size),
+            nn.PReLU(),
         )
+        self.neighbor_encoder = nn.Sequential(
+            nn.Linear(num_genes, 256),
+            nn.LayerNorm(256),
+            nn.PReLU(),
+            nn.Linear(256, hidden_size),
+            nn.LayerNorm(hidden_size),
+            nn.PReLU(),
+        )
+        self.gate = nn.Sequential(
+            nn.Linear(hidden_size * 2, hidden_size),
+            nn.Sigmoid(),
+        )
+        self.out_norm = nn.LayerNorm(hidden_size)
 
-    def reset_parameters(self) -> None:
-        for module in self.modules():
-            if isinstance(module, nn.Linear):
-                module.reset_parameters()
-            elif isinstance(module, nn.PReLU):
-                module.weight.data.fill_(0.25)
+    def forward(self, x: torch.Tensor, neighbor_x: torch.Tensor | None = None) -> torch.Tensor:
+        base = self.cell_encoder(x)
+        if neighbor_x is None:
+            return self.out_norm(base)
+        if neighbor_x.dim() == 3:
+            neighbor_x = neighbor_x.mean(dim=1)
+        neigh = self.neighbor_encoder(neighbor_x)
+        gate = self.gate(torch.cat([base, neigh], dim=1))
+        return self.out_norm(base + gate * (neigh - base))
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.net(x)
 
+class BGRLGraphScMAE(nn.Module):
+    """scMAE with BGRL-style online/EMA target graph bootstrapping."""
 
-class BGRLGraphBootstrapScMAE(nn.Module):
-    """BGRL-style online/target graph bootstrap model for scRNA mini-batch graphs."""
-
-    def __init__(
-        self,
-        num_genes: int,
-        hidden_size: int = 128,
-        latent_size: int = 64,
-        predictor_hidden: int = 256,
-        dropout: float = 0.1,
-    ) -> None:
+    def __init__(self, num_genes: int, hidden_size: int = 128, predictor_hidden: int = 256, dropout: float = 0.05):
         super().__init__()
         self.num_genes = int(num_genes)
-        self.latent_size = int(latent_size)
-        self.online_encoder = BGRLDenseGraphEncoder(num_genes, hidden_size, latent_size, dropout)
+        self.hidden_size = int(hidden_size)
+        self.online_encoder = ShallowGraphEncoder(num_genes, hidden_size, dropout)
         self.target_encoder = copy.deepcopy(self.online_encoder)
-        self.target_encoder.reset_parameters()
-        self.target_encoder.requires_grad_(False)
-        self.predictor = MLPPredictor(latent_size, predictor_hidden)
-        self.reconstruction_head = nn.Sequential(
-            nn.Linear(latent_size, hidden_size),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_size, num_genes),
+        for param in self.target_encoder.parameters():
+            param.requires_grad = False
+        self.predictor = nn.Sequential(
+            nn.Linear(hidden_size, predictor_hidden),
+            nn.LayerNorm(predictor_hidden),
+            nn.PReLU(),
+            nn.Linear(predictor_hidden, hidden_size),
         )
-        self.mask_head = nn.Linear(latent_size, num_genes)
+        self.mask_predictor = nn.Linear(hidden_size, num_genes)
+        self.decoder = nn.Sequential(
+            nn.Linear(hidden_size + num_genes, 256),
+            nn.PReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(256, num_genes),
+        )
+        self.edge_head = nn.Sequential(
+            nn.Linear(hidden_size * 3, hidden_size),
+            nn.PReLU(),
+            nn.Linear(hidden_size, 1),
+        )
 
-    def trainable_parameters(self) -> list[nn.Parameter]:
-        return list(self.online_encoder.parameters()) + list(self.predictor.parameters()) + list(self.reconstruction_head.parameters()) + list(self.mask_head.parameters())
+    def encode_online(self, x: torch.Tensor, neighbor_x: torch.Tensor | None = None) -> torch.Tensor:
+        return self.online_encoder(x, neighbor_x)
 
     @torch.no_grad()
-    def update_target_network(self, momentum: float) -> None:
-        if not 0.0 <= float(momentum) <= 1.0:
-            raise ValueError("momentum must be in [0, 1]")
-        for online_param, target_param in zip(self.online_encoder.parameters(), self.target_encoder.parameters()):
-            target_param.data.mul_(float(momentum)).add_(online_param.data, alpha=1.0 - float(momentum))
+    def encode_target(self, x: torch.Tensor, neighbor_x: torch.Tensor | None = None) -> torch.Tensor:
+        return self.target_encoder(x, neighbor_x)
 
-    def encode_online(self, x: torch.Tensor, adjacency: torch.Tensor) -> torch.Tensor:
-        return self.online_encoder(x, adjacency)
+    def forward(self, x: torch.Tensor, neighbor_x: torch.Tensor | None = None) -> dict[str, torch.Tensor]:
+        latent = self.encode_online(x, neighbor_x)
+        mask_logits = self.mask_predictor(latent)
+        reconstruction = self.decoder(torch.cat([latent, mask_logits], dim=1))
+        return {"latent": latent, "mask_logits": mask_logits, "reconstruction": reconstruction}
 
-    @torch.no_grad()
-    def encode_target(self, x: torch.Tensor, adjacency: torch.Tensor) -> torch.Tensor:
-        self.target_encoder.eval()
-        return self.target_encoder(x, adjacency).detach()
-
-    def forward(
-        self,
-        view1: torch.Tensor,
-        adjacency1: torch.Tensor,
-        view2: torch.Tensor,
-        adjacency2: torch.Tensor,
-    ) -> dict[str, torch.Tensor]:
-        online_z1 = self.encode_online(view1, adjacency1)
-        online_z2 = self.encode_online(view2, adjacency2)
-        pred1 = self.predictor(online_z1)
-        pred2 = self.predictor(online_z2)
+    def bootstrap(self, x1: torch.Tensor, n1: torch.Tensor, x2: torch.Tensor, n2: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        online = self.predictor(self.encode_online(x1, n1))
         with torch.no_grad():
-            target_z1 = self.encode_target(view1, adjacency1)
-            target_z2 = self.encode_target(view2, adjacency2)
-        reconstruction1 = self.reconstruction_head(online_z1)
-        reconstruction2 = self.reconstruction_head(online_z2)
-        mask_logits1 = self.mask_head(online_z1)
-        mask_logits2 = self.mask_head(online_z2)
-        return {
-            "embedding": 0.5 * (online_z1 + online_z2),
-            "online_z1": online_z1,
-            "online_z2": online_z2,
-            "prediction1": pred1,
-            "prediction2": pred2,
-            "target_z1": target_z1,
-            "target_z2": target_z2,
-            "reconstruction1": reconstruction1,
-            "reconstruction2": reconstruction2,
-            "mask_logits1": mask_logits1,
-            "mask_logits2": mask_logits2,
-        }
+            target = self.encode_target(x2, n2).detach()
+        return online, target
+
+    def edge_logits(self, z: torch.Tensor, pos_z: torch.Tensor, neg_z: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        pos = self.edge_head(torch.cat([z, pos_z, torch.abs(z - pos_z)], dim=1)).squeeze(-1)
+        neg = self.edge_head(torch.cat([z, neg_z, torch.abs(z - neg_z)], dim=1)).squeeze(-1)
+        return pos, neg
 
     @torch.no_grad()
-    def feature(self, x: torch.Tensor, adjacency: torch.Tensor) -> torch.Tensor:
-        return self.online_encoder(x, adjacency)
+    def update_target(self, momentum: float) -> None:
+        if not 0.0 <= momentum <= 1.0:
+            raise ValueError(f"EMA momentum must be in [0, 1], got {momentum}")
+        for online, target in zip(self.online_encoder.parameters(), self.target_encoder.parameters()):
+            target.data.mul_(momentum).add_(online.data, alpha=1.0 - momentum)
+
+    @torch.no_grad()
+    def feature(self, x: torch.Tensor, neighbor_x: torch.Tensor | None = None) -> torch.Tensor:
+        return self.encode_online(x, neighbor_x)
+
+    def mask_view(self, x: torch.Tensor, mask_prob: float) -> tuple[torch.Tensor, torch.Tensor]:
+        mask = (torch.rand_like(x) < float(mask_prob)).float()
+        empty = mask.sum(dim=1) == 0
+        if bool(empty.any()):
+            cols = torch.randint(0, x.shape[1], (int(empty.sum()),), device=x.device)
+            mask[empty, cols] = 1.0
+        return x.masked_fill(mask.bool(), 0.0), mask
+
+    def feature_drop(self, x: torch.Tensor, drop_prob: float) -> torch.Tensor:
+        if drop_prob <= 0:
+            return x
+        keep = (torch.rand(x.shape[-1], device=x.device, dtype=x.dtype) >= float(drop_prob)).float()
+        if keep.sum() == 0:
+            keep[torch.randint(0, x.shape[-1], (1,), device=x.device)] = 1.0
+        view_shape = [1] * x.dim()
+        view_shape[-1] = x.shape[-1]
+        return x * keep.view(*view_shape)
+
+    @staticmethod
+    def cosine_momentum(base: float, step: int, total_steps: int) -> float:
+        if total_steps <= 1:
+            return 1.0
+        return 1.0 - (1.0 - base) * (math.cos(math.pi * step / total_steps) + 1.0) / 2.0

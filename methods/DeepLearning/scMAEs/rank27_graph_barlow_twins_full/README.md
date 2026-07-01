@@ -1,31 +1,33 @@
-# Rank 27: Graph Barlow Twins scMAE
+# rank27_graph_barlow_twins_full
 
-This folder is an independent scMAE-family adaptation of:
+Independent-full scMAE candidate adapted from **Graph Barlow Twins: A self-supervised representation learning framework for graphs**.
 
-- Paper: Graph Barlow Twins
-- Official code: https://github.com/pbielak/graph-barlow-twins
-- Local source snapshot: `../external_sources/rank27_graph_barlow_twins`
-- Commit: `ec62580aa89bf3f0d20c92e7549031deedc105ab`
+## Method Basis
 
-## scMAE Adaptation
+Graph Barlow Twins trains one symmetric graph encoder on two distorted graph views. Its loss normalizes both embedding batches, computes their cross-correlation matrix, pushes diagonal entries toward one, and pushes off-diagonal entries toward zero. The official GitHub implementation confirms feature masking, edge dropping, and the Barlow Twins loss without negative samples, EMA target encoders, or predictor asymmetry.
 
-Graph Barlow Twins trains graph encoders with two augmented views and a Barlow Twins cross-correlation loss. The scRNA benchmark has one expression vector per cell, so each mini-batch becomes a KNN cell graph and two stochastic graph views are generated.
+## scMAE Gap Addressed
 
-The adapted model keeps the core Graph Barlow structure:
+This candidate targets the **graph / neighbor reliability / robust loss** gap:
 
-- two graph views with edge dropout and feature masking;
-- shared graph encoder for both views;
-- projection head before the Barlow objective;
-- batch-normalized cross-correlation matrix;
-- diagonal invariance loss and off-diagonal redundancy reduction;
-- auxiliary masked-expression reconstruction and mask prediction heads for the scMAE benchmark protocol.
+- scMAE mask prediction is retained.
+- masked expression reconstruction is retained.
+- PCA-KNN supplies a shallow cell graph.
+- Two graph views use feature masking and DropEdge.
+- A symmetric shallow graph adapter avoids deep GNN oversmoothing.
+- The Graph Barlow Twins loss adds invariance plus redundancy reduction.
+- A light edge-confidence head records neighbor reliability diagnostics.
 
-Mask semantics are fixed as `1 = expression feature zeroed by graph-view corruption`.
+## Data Semantics
 
-## Fairness Notes
+- `scaled_expr` is used only as encoder input when `--scale_input true`.
+- `log_expr` is used as masked expression reconstruction target.
+- No count likelihood, NB/ZINB, token, or generated-cell objective is used.
 
-No pretrained graph model or external labels are used. The official code depends on PyTorch Geometric; this implementation ports the Graph Barlow objective and graph augmentations into dense PyTorch operations so preprocessing, dependencies, and KMeans evaluation remain unchanged.
+## NeighborMix Relationship
 
-## Outputs
+NeighborMix is not used. This candidate is independent and potentially complementary: it estimates edge confidence and boundary risk, but never mixes cell expressions. `mixed_cell_fraction=0.0`.
 
-`run.py` writes the standard independent scMAEs artifacts: `args.json`, `source_manifest.json`, `training_history.json`, `model_checkpoint.pth`, `embedding_final.npy`, `labels.npy`, `gene_names.npy`, `embedding.h5`, and `eval_fixed.csv`/`metrics.json` when evaluation is enabled.
+## Screen Caveat
+
+Smoke and screen results are candidate evidence only. They must not be appended to `全benchmark结果.csv` and are not formal performance claims.

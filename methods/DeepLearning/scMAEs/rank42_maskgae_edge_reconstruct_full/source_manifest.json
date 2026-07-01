@@ -1,0 +1,22 @@
+{
+  "method_dir": "rank42_maskgae_edge_reconstruct_full",
+  "rank": 42,
+  "paper_title": "MaskGAE: Masked Graph Modeling Meets Graph Autoencoders",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/042_中高_可用_MaskGAE_Masked_Graph_Modeling_Meets_Graph_Autoencoders.pdf",
+  "local_report": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "local_index": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_url": "https://github.com/EdisonLeeeee/MaskGAE",
+  "github_status": "HTTP 200; README, maskgae/mask.py, maskgae/model.py, and maskgae/loss.py inspected from a temporary clone.",
+  "implementation_source": "Independent reconstruction and scMAE-specific adaptation from local report, PDF method description, and inspected official GitHub code ideas.",
+  "scmae_gap": "graph / neighbor reliability",
+  "core_mechanism": "PCA-KNN shallow residual graph encoder with MaskGAE-style edge masking, positive-vs-random edge reconstruction, degree reconstruction, and neighbor latent consistency.",
+  "neighbor_mix_relation": "independent; not used in this candidate",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true, otherwise log_expr",
+    "reconstruction_target": "log_expr",
+    "count_target": "none",
+    "token_target": "none",
+    "graph_target": "masked PCA-KNN edge labels and masked-edge degree"
+  },
+  "formal_claims": "No formal improvement is claimed from smoke or screen results."
+}

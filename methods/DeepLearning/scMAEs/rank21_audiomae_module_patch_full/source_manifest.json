@@ -1,0 +1,20 @@
+{
+  "method_dir": "rank21_audiomae_module_patch_full",
+  "rank": 21,
+  "paper": "AudioMAE: Masked Autoencoders that Listen",
+  "paper_year_venue": "2022 / NeurIPS",
+  "pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/021_高_AudioMAE_Masked_Autoencoders_that_Listen.pdf",
+  "report": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "index": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_url": "https://github.com/facebookresearch/AudioMAE",
+  "github_access": "HTTP 200; README and models_mae.py inspected via raw.githubusercontent.com",
+  "implementation_source": "Reconstructed for scRNA from report, paper, and released AudioMAE code ideas; no upstream code copied directly into the model.",
+  "scmae_gap": ["mask", "semantic target"],
+  "neighbor_mix_relation": "independent_complementary_not_used",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true, otherwise log_expr",
+    "reconstruction_target": "log_expr ordered by coexpression",
+    "module_target": "log_expr module mean/std/local adjacent-difference energy",
+    "counts_usage": "No NB/ZINB count likelihood is used"
+  }
+}

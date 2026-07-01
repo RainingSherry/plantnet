@@ -1,0 +1,20 @@
+{
+  "method_dir": "rank04_joao_mask_policy_full",
+  "evidence_level": "independent-full candidate",
+  "sort_rank": 4,
+  "title": "JOAO: Automated Data Augmentations for Graph Contrastive Learning",
+  "recommendation_level": "很高",
+  "recommendation_score": 92,
+  "pdf": "methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/004_很高_JOAO_Automated_Data_Augmentations_for_Graph_Contrastive_Learning.pdf",
+  "github_url": "https://github.com/Shen-Lab/GraphCL_Automated",
+  "github_status_checked": "HTTP 200 on 2026-06-30; implementation adapts the policy-search idea rather than copying graph-specific code.",
+  "implementation_source": "Reconstructed for scMAE mask-policy screening from the local PDF, GitHub project availability, and 00_scMAE改良方法整理总报告.md.",
+  "scmae_gap_addressed": "mask policy",
+  "neighbor_mix_relation": "independent and complementary; NeighborMix is not used in this candidate",
+  "forbidden_claims": [
+    "Do not claim full JOAO graph contrastive reproduction.",
+    "Do not claim formal improvement from screen results.",
+    "Do not append smoke or screen outputs to 全benchmark结果.csv."
+  ]
+}
+

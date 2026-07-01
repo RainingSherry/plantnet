@@ -1,22 +1,37 @@
-# Rank 33: iBOT Online Tokenizer scMAE
+# rank33_ibot_online_tokenizer_full
 
-This folder contains an independent full variant for **iBOT: Image BERT Pre-Training with Online Tokenizer**.
+Independent-full scMAE candidate adapted from **iBOT: Image BERT Pre-Training with Online Tokenizer**.
 
-## Source Basis
+## Method Basis
 
-- Local PDF: `methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/033_中高_可用_iBOT_Image_BERT_Pre-Training_with_Online_Tokenizer.pdf`
-- PDF SHA-256: `e76c32b28234434443cba27abda926ec7c69c64af240d2d7aa78427131c4273d`
-- GitHub URL: `https://github.com/bytedance/ibot`
-- Git commit: `da316d82636a7a7356835ef224b13d5f3ace0489`
+The local report recommends iBOT as a teacher-student self-distillation mechanism for stabilizing scMAE targets. The paper describes masked prediction with an online tokenizer: the student sees a masked view, while an EMA teacher sees the clean or weakly augmented view and provides centered, sharpened probability targets for both the class token and masked patch tokens. The official GitHub implementation confirms the key mechanics used here: EMA teacher update, center buffers, teacher sharpening, student-temperature CE, and masked-token CE computed only on masked positions.
 
-The implementation follows the paper's online tokenizer idea: a teacher network produces centered soft targets, the student predicts masked patch token distributions, and the class token is trained with self-distillation. The source files `main_ibot.py` and `models/head.py` provide the original iBOT loss/head structure.
+## scMAE Gap Addressed
 
-## scMAE Adaptation
+This candidate targets the **teacher / semantic target** gap:
 
-- `model.py` implements expression patch embeddings, a student Transformer, an EMA teacher Transformer, shared iBOT projection heads for `[CLS]` and patch tokens, teacher centers, and auxiliary masked expression reconstruction.
-- `loss.py` implements centered teacher soft targets, class-token cross-view self-distillation, masked patch-token distillation, masked reconstruction, and mask prediction. Mask semantics are fixed as `1 = corrupted/replaced/masked target`.
-- `run.py` builds two stochastic expression views per cell by feature dropout plus small Gaussian noise, masks patches independently for both views, updates the EMA teacher and centers after each optimizer step, and writes the standard independent benchmark outputs.
+- scMAE mask prediction is retained.
+- masked expression reconstruction is retained.
+- the student receives a strong gene mask view;
+- the EMA teacher receives a weak expression view;
+- the teacher acts as an online tokenizer for a cell-level class token and masked gene-module tokens;
+- centered/sharpened teacher probabilities provide soft targets instead of fixed offline gene tokens.
 
-## Not Reproduced
+## Data Semantics
 
-The original iBOT uses image crops, ViT patch grids, and very large output vocabularies. This adaptation keeps the core online tokenizer, shared projection head, centered teacher distributions, EMA teacher, class-token self-distillation, and masked patch-token loss, but replaces image crops with expression-vector stochastic views and uses a smaller output dimension suitable for the fixed scRNA quick-screen protocol.
+- `scaled_expr` is used only as encoder input when `--scale_input true`.
+- `log_expr` is used as the masked expression reconstruction target.
+- No NB/ZINB count likelihood is used.
+- No discrete token target is produced from scaled expression; online token distributions come from the EMA teacher.
+
+## NeighborMix Relationship
+
+NeighborMix is not used. This method is independent and complementary: it stabilizes targets via an EMA teacher and never mixes cells. `mixed_cell_fraction=0.0`.
+
+## Difference From Original iBOT
+
+The original iBOT is an image ViT method with image patches and multi-crop augmentations. This implementation reconstructs the mechanism for scRNA-seq by using contiguous gene modules as tokens, a weak expression view for the teacher, and scMAE reconstruction/mask heads for the student.
+
+## Screen Caveat
+
+Smoke and screen results are candidate evidence only. They must not be appended to `全benchmark结果.csv` and are not formal performance claims.
