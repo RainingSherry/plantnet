@@ -47,6 +47,7 @@ screen,rank54_conditional_multi_mask_full,2,2,0.5390128061382635,0.6687709156148
 screen,rank55_multifacet_vae_uncertainty_full,2,2,0.5128502247017735,0.52514011992764,0,2,False,Melanoma_5K;Quake_10x_Spleen
 screen,rank56_scinfovae_mi_zinb_full,2,2,0.574845188708552,0.6817251306229049,0,2,False,Melanoma_5K;Quake_10x_Spleen
 screen,rank57_scvaeder_latent_diffusion_full,2,2,0.5816791586282787,0.7036530665867762,0,2,False,Melanoma_5K;Quake_10x_Spleen
+screen,rank58_fuzzy_rough_core_boundary_full,1,1,0.6186373919405713,0.6830366641812988,0,1,False,Melanoma_5K
 smoke,rank01_scdiva_absorbing_diffusion_full,1,1,0.4465598931604431,0.5802317339039236,0,0,False,Melanoma_5K
 smoke,rank02_maskfeat_gene_module_semantic_full,1,1,0.5423114607075328,0.6631946586487243,0,0,False,Melanoma_5K
 smoke,rank03_consistency_ema_robust_full,1,1,0.3801074995744143,0.5319390565787224,0,0,False,Melanoma_5K
@@ -95,3 +96,4 @@ smoke,rank54_conditional_multi_mask_full,1,1,0.27140492080022,0.3926748147684445
 smoke,rank55_multifacet_vae_uncertainty_full,1,1,0.1434742738092732,0.1925475656974456,0,0,False,Melanoma_5K
 smoke,rank56_scinfovae_mi_zinb_full,1,1,0.4540980598567554,0.5956764652064527,0,0,False,Melanoma_5K
 smoke,rank57_scvaeder_latent_diffusion_full,1,1,0.4801979703408532,0.6059604895918441,0,0,False,Melanoma_5K
+smoke,rank58_fuzzy_rough_core_boundary_full,1,1,0.5686320920380057,0.6639449322081967,0,0,False,Melanoma_5K
