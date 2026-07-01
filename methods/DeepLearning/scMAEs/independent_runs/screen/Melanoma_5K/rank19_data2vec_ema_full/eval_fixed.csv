@@ -1,2 +1,0 @@
-dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,rank19_data2vec_ema_full,42,19,data2vec,1 = expression patch replaced by learned data2vec mask token,0.4128074451584312,0.25624686573695593,0.16132003421385963,0.37482253607289395,0.32932238602874636,0.2562468657369559,0.2621390643042135,0.2506137265315358,9,,fixed,kmeans_known_k,True

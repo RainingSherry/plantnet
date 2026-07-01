@@ -1,2 +1,0 @@
-dataset,method,seed,rank,source_paper,mask_semantics,grid_h,grid_w,patch_h,patch_w,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,rank21_audiomae_local_window_full,42,21,AudioMAE: Masked Autoencoders that Listen,1 = 2D gene-grid patch removed from encoder and reconstructed,32,32,8,8,0.35785508530910703,0.32500663265543095,0.19567430443865463,0.34807511059696766,0.3524030930929285,0.325006632655431,0.3408229833677715,0.31059313870032945,9,,fixed,kmeans_known_k,True

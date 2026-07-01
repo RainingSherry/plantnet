@@ -1,2 +1,0 @@
-dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,rank02_maskfeat_gene_features_full,42,2,MaskFeat,1 = masked gene patch predicted through feature target,0.4037225792155994,0.3671499754298526,0.2518415204107094,0.34104672929136415,0.3817971287815083,0.3671499754298526,0.406149709984803,0.3349838079567579,9,,fixed,kmeans_known_k,True

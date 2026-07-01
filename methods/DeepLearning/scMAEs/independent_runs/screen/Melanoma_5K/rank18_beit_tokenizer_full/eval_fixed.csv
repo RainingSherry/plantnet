@@ -1,2 +1,0 @@
-dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,rank18_beit_tokenizer_full,42,18,BEiT,1 = expression patch replaced by learned BEiT mask token,0.5515178373587414,0.5458711750511885,0.4081178665300242,0.44302967898856477,0.5168053737226059,0.5458711750511885,0.5999094890550524,0.5007636636793418,9,,fixed,kmeans_known_k,True

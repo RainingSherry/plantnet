@@ -1,6 +1,0 @@
-{
-  "dataset": "Melanoma_5K",
-  "rank": 3,
-  "source_manifest": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/rank03_consistency_models_full/source_manifest.json",
-  "fixed_metrics": {}
-}

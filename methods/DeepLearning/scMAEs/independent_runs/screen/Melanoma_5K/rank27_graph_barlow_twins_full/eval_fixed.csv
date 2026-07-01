@@ -1,2 +1,0 @@
-dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,rank27_graph_barlow_twins_full,42,27,Graph Barlow Twins,1 = expression feature zeroed by graph-view corruption,0.6255262574783957,0.558699513495691,0.4873457970682927,0.44082675332611015,0.5858246236931965,0.5586995134956909,0.589285521938198,0.5311318850451495,9,,fixed,kmeans_known_k,True

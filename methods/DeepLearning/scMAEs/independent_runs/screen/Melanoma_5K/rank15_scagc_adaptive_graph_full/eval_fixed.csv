@@ -1,2 +1,0 @@
-dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,rank15_scagc_adaptive_graph_full,42,15,scAGC,1 = expression gene replaced for the auxiliary scMAE reconstruction branch,0.6153334810547307,0.6462862879580585,0.5276868574767402,0.4802683460232598,0.6200632111425798,0.6462862879580585,0.7172371668276281,0.5881090796353734,9,,fixed,kmeans_known_k,True

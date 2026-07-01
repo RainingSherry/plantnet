@@ -1,6 +1,0 @@
-{
-  "dataset": "Melanoma_5K",
-  "rank": 18,
-  "source_manifest": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/rank18_beit_tokenizer_full/source_manifest.json",
-  "fixed_metrics": {}
-}

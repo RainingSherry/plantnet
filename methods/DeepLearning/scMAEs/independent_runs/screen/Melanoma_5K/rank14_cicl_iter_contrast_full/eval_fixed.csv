@@ -1,2 +1,0 @@
-dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,rank14_cicl_iter_contrast_full,42,14,CICL,1 = expression gene replaced for the auxiliary scMAE reconstruction branch,0.5100819853755817,0.5022444539189695,0.370996529705875,0.3737836719179758,0.4844456457382483,0.5022444539189694,0.5649012965871895,0.45209921675014786,9,,fixed,kmeans_known_k,True

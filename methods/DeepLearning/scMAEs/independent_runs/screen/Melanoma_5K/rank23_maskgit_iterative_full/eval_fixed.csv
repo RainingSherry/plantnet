@@ -1,2 +1,0 @@
-dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,rank23_maskgit_iterative_full,42,23,MaskGIT,1 = quantized expression patch replaced by [MASK] and predicted in parallel,0.24329714159095944,0.14856583665336154,0.06272674761824829,0.21185534373668843,0.22985676604242075,0.14856583665336154,0.15951966400310344,0.13901969248832785,9,,fixed,kmeans_known_k,True

@@ -1,2 +1,0 @@
-dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,rank03_consistency_models_full,42,3,Improved Consistency Models,1 = expression gene corrupted by masked Gaussian sigma noise,0.6188787945933969,0.6530050205657075,0.5254318966224818,0.5066494136301741,0.6164566225212581,0.6530050205657075,0.7108865094748922,0.6038394687542851,9,,fixed,kmeans_known_k,True

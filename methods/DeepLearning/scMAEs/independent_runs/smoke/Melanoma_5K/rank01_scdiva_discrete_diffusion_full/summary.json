@@ -1,6 +1,0 @@
-{
-  "dataset": "Melanoma_5K",
-  "rank": 1,
-  "source_manifest": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/rank01_scdiva_discrete_diffusion_full/source_manifest.json",
-  "fixed_metrics": {}
-}

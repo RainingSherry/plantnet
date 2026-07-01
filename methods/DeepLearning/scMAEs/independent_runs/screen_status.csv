@@ -1,2 +1,0 @@
-stage,dataset,method,status,return_code,elapsed_seconds,save_dir
-screen,Melanoma_5K,rank33_ibot_online_tokenizer_full,success,0,762.4896898269653,/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/independent_runs/screen/Melanoma_5K/rank33_ibot_online_tokenizer_full

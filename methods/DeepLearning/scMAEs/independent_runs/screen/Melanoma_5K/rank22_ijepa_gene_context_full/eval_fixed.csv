@@ -1,2 +1,0 @@
-dataset,method,seed,rank,source_paper,mask_semantics,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,rank22_ijepa_gene_context_full,42,22,I-JEPA,1 = target gene patch predicted by predictor from non-overlapping context patches,0.5878573011300687,0.5965593317573176,0.45413137779657353,0.49392265928221285,0.5560960928932889,0.5965593317573176,0.6527035094028539,0.5493089369119172,9,,fixed,kmeans_known_k,True

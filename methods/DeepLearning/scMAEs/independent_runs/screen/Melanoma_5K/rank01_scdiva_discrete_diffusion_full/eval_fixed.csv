@@ -1,2 +1,0 @@
-dataset,method,seed,rank,source_paper,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,rank01_scdiva_discrete_diffusion_full,42,1,ScDiVa,0.6572124972302238,0.6044490118852176,0.5302504953381112,0.5039316491466274,0.620258850515683,0.6044490118852177,0.6504902902289097,0.5644944621469941,9,,fixed,kmeans_known_k,True
