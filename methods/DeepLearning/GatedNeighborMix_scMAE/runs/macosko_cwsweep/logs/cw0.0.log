@@ -1,0 +1,20 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+Building PCA-KNN graph for NeighborMix ...
+Device=cuda:0 dataset=Macosko cells=44808 genes=1000 clusters=12
+Method=GatedNeighborMix_scMAE stage=screen epochs=80 warmup=20
+Epoch 001/80 loss=0.4489 scmae=0.4479 pseudo=0.0000 cluster=0.0000 cons=0.0194 r_mean=1.000 conf=0.000 scale=0.00
+Epoch 010/80 loss=0.4463 scmae=0.4461 pseudo=0.0000 cluster=0.0000 cons=0.0022 r_mean=1.000 conf=0.000 scale=0.00
+Epoch 020/80 loss=0.4461 scmae=0.4460 pseudo=0.0000 cluster=0.0000 cons=0.0019 r_mean=1.000 conf=0.000 scale=0.00
+Epoch 030/80 loss=0.4461 scmae=0.4460 pseudo=0.0000 cluster=0.5855 cons=0.0017 r_mean=0.776 conf=0.146 scale=0.50
+Epoch 040/80 loss=0.4461 scmae=0.4460 pseudo=0.0000 cluster=0.0000 cons=0.0016 r_mean=0.744 conf=0.000 scale=1.00
+Epoch 050/80 loss=0.4460 scmae=0.4459 pseudo=0.0000 cluster=0.0000 cons=0.0016 r_mean=0.767 conf=0.000 scale=1.00
+Epoch 060/80 loss=0.4459 scmae=0.4458 pseudo=0.0000 cluster=0.0000 cons=0.0021 r_mean=0.761 conf=0.000 scale=1.00
+Epoch 070/80 loss=0.4459 scmae=0.4457 pseudo=0.0000 cluster=0.0000 cons=0.0022 r_mean=0.752 conf=0.000 scale=1.00
+Epoch 080/80 loss=0.4457 scmae=0.4455 pseudo=0.0000 cluster=0.0000 cons=0.0028 r_mean=0.726 conf=0.000 scale=1.00
+[RESULT] Macosko NMI=0.5889361107117863 ARI=0.3756986907232344 meets_baseline=False collapse=False r_mean=0.723 core_frac=0.835
+Completed GatedNeighborMix_scMAE. Results saved to: methods/DeepLearning/GatedNeighborMix_scMAE/runs/macosko_cwsweep/cw0.0/seed42

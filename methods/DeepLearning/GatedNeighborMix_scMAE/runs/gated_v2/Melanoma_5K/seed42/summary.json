@@ -1,0 +1,49 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + reliability-gated NeighborMix + gated DEC",
+  "method_dir": "GatedNeighborMix_scMAE",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 35.480141401290894,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.7278971859073787,
+      "nmi": 0.724627654858707,
+      "ari": 0.6493931898180514,
+      "f1_macro": 0.6395162499406676,
+      "fmi": 0.7186763442536465,
+      "v_measure": 0.724627654858707,
+      "homogeneity": 0.7572935717204705,
+      "completeness": 0.6946632996335654,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "neighbor_purity_proxy": 0.8393972966984268,
+    "mixed_cell_fraction": 0.9499224462663417,
+    "embedding_variance": 0.5079426765441895,
+    "cluster_mass_min": 0.01883447817416353,
+    "cluster_mass_max": 0.2528251717261245,
+    "collapse_warning": false,
+    "reliability_mean": 0.8812400698661804,
+    "reliability_min": 0.0,
+    "reliability_max": 1.0,
+    "core_fraction": 0.9062707733215156,
+    "agree_mean": 0.9529950513331856,
+    "density_mean": 0.8881078310027869,
+    "confidence_mean": 0.9466999767493863
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Independent candidate; NOT appended to \u5168benchmark\u7ed3\u679c.csv."
+}

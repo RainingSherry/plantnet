@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + reliability-gated NeighborMix + gated DEC",
+  "seed": 42,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6888609715242882,
+      "nmi": 0.6350979273714766,
+      "ari": 0.48003066766249464,
+      "f1_macro": 0.6305528819092783,
+      "fmi": 0.7183386601555825,
+      "v_measure": 0.6350979273714765,
+      "homogeneity": 0.8394250033500124,
+      "completeness": 0.5107698373682236,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}
