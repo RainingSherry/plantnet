@@ -1,0 +1,2 @@
+"""Diagnostics for CAAM-scMAE."""
+

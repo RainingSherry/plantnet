@@ -12,6 +12,10 @@
 8. Attention 学到 batch/library size/zero ratio 等技术因素。
 9. Axial 提升来自参数量而非结构。
 10. 旧 artifact 污染 benchmark skip 逻辑。
+11. 主 benchmark 错用 full-gene input，导致参数量和 mask budget 结论偏离领域常规。
+12. 把 zero-to-zero corruption 当作默认硬失败，造成比 scMAE/scNAME 更严格且不公平的协议。
+13. matched donor 被未经验证地当作更优 corruption。
+14. 在 AdvMask 尚未证明有效前继续推进 Axial+AdvMask synergy 叙事。
 
 ## Generator gradient 硬约束
 
@@ -84,6 +88,9 @@ gene module builder
 donor pool
 early stopping
 resolution selection
+HVG selection
+corruption_type selection
+mask_ratio selection
 ```
 
 ## Fail-fast 条件
@@ -94,7 +101,6 @@ resolution selection
 loss NaN/Inf
 generator gradient 为 0
 student gradient 为 0
-effective mask deficit cells > 1%
 normalized mask entropy < 0.2 持续 5 次检查
 top 10% genes 获得 >80% mask 持续 5 次检查
 mask Gini > 0.85 持续 5 次检查
@@ -104,6 +110,23 @@ per-dimension mean variance < 1e-4
 generator grad norm > 10 * student grad norm 持续 3 次
 ```
 
+`effective mask deficit cells > 1%` 不再是默认 fail-fast 条件。它现在是 diagnostic metric，必须记录为：
+
+```text
+budget_deficit_rate
+effective_corruption_rate
+zero_to_zero_rate
+mean_abs_delta
+```
+
+只有在显式设置：
+
+```text
+strict_effective_budget = true
+```
+
+时，才允许因为 effective mask deficit 退出。
+
 Fail-fast 不得使用：
 
 ```text
@@ -111,13 +134,16 @@ ARI
 NMI
 真实类别
 rare-cell label
+marker-overlap score
 ```
 
-## 止损条件
+## Correction Pipeline 止损条件
 
 出现以下情况时停止继续加模块：
 
 ```text
+scMAE-style shuffle、matched donor、nonzero-aware donor 三者均不能稳定优于原始 control
+AdvMask 在最佳 corruption 下不稳定优于 random mask
 A/B 都没有单独效果
 C 没有正交互项
 generator 持续坍缩
@@ -125,6 +151,16 @@ shortcut probe 很高
 attention 强依赖 batch
 参数匹配 MLP 达到同样结果
 提升小于 seed 波动
+```
+
+更具体地：
+
+```text
+1. 若 matched donor 在 2/3 development datasets 上弱于 scMAE-style shuffle，则不得把 matched donor 写成主贡献。
+2. 若 nonzero-aware donor 只提高 mask prediction 但不提高 ARI/NMI/biological interpretation，则不得把它写成 clustering 改进。
+3. 若 AdvMask 在 2/3 development datasets 上 advmask_minus_control <= 0，则删除或降级 AdvMask。
+4. 若 Axial 不优于 parameter-matched MLP，则删除或降级 Axial。
+5. 若 full 模型没有正 Delta_AB 和 paired CI 支持，不得声称 synergy。
 ```
 
 ## Synergy 声称条件
@@ -155,3 +191,20 @@ paired confidence interval of Delta_AB excludes 0
 
 才允许声称 axial encoder 与 adversarial masking 存在 synergy。
 
+## 论文路线止损
+
+若 Correction Pipeline 后仍出现：
+
+```text
+1. corrected protocol 下 no_positive_interaction 仍占多数；
+2. best corruption 不能稳定超过 scMAE-style shuffle baseline；
+3. AdvMask 无增益；
+4. Axial 无增益或只带来参数量；
+```
+
+则停止把 CAAM 作为正向新方法推进，转为以下二选一：
+
+```text
+A. 写 masked corruption protocol analysis / negative diagnostic paper；
+B. 放弃 CAAM 路线，回到更强基线或其他明确机制。
+```

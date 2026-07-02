@@ -187,6 +187,35 @@ methods:
     framework: PyTorch
     required_artifacts: *canonical_artifacts
 
+  - key: caam_scmae
+    name: CAAM-scMAE
+    full_name: Constrained Adversarial Axial Masked Autoencoder
+    path: methods/DeepLearning/CAAM_scMAE/run.py
+    category: DeepLearning
+    authenticity: PENDING
+    smoke: PASS
+    gpu_policy: PASS
+    default_in_formal: false
+    framework: PyTorch
+    required_artifacts:
+      - metrics.json
+      - embedding_final.npy
+      - labels.npy
+      - args.json
+      - artifact_manifest.json
+    role: proposed
+    runtime:
+      env_name: plantnet-core
+      backend: conda
+      description: "PyTorch + Scanpy runtime for CAAM-scMAE"
+    extra_args:
+      - --variant
+      - full
+      - --benchmark_mode
+      - "true"
+      - --method_name
+      - caam_scmae
+
   # ── ENV-GATED: blocked by environment ──
   - key: scdeepcluster
     name: scDeepCluster
