@@ -1,0 +1,16 @@
+{
+  "rank": 51,
+  "method_dir": "rank51_trajectory_guided_token_selection_full",
+  "paper_title": "Reinforcement Learning meets Masked Video Modeling: Trajectory-Guided Adaptive Token Selection",
+  "recommendation": "可用",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/051_可用_Reinforcement_Learning_meets_Masked_Video_Modeling_Trajectory-Guided_Adaptive_Token_Selection.pdf",
+  "github_url": null,
+  "github_status": "02_整理索引.csv does not provide a GitHub URL for rank51; implementation is reconstructed from the PDF and the scMAE improvement report.",
+  "implemented_from": [
+    "methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md rank51 notes",
+    "rank51 PDF text: trajectory-guided adaptive token selection, warmup random masking, sampler/policy-style token scores"
+  ],
+  "scmae_gap": "mask/target",
+  "core_mechanism": "Per-gene reconstruction-error trajectory states guide adaptive mask token selection after a random warmup, while retaining mask prediction and masked expression reconstruction.",
+  "neighbor_mix_relation": "independent and complementary; this candidate does not use NeighborMix and does not mix cells."
+}

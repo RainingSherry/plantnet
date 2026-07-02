@@ -1,0 +1,23 @@
+{
+  "rank": 11,
+  "method_dir": "rank11_scmamba_module_sequence_full",
+  "title": "scMamba: Scalable Foundation Model for Single-Cell Multi-Omics Integration",
+  "pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/011_高_scMamba_Scalable_Foundation_Model_for_Single-Cell_Multi-Omics_Integration.pdf",
+  "report_source": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "index_source": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_urls_checked": [
+    {
+      "url": "https://github.com/23AIBox/scMamba",
+      "status": "HTTP 200 on 2026-06-30"
+    },
+    {
+      "url": "https://github.com/ZhengYu-AI-Lab/scMamba",
+      "status": "listed in report; not used because index URL was reachable"
+    }
+  ],
+  "implementation_source": "Independent adaptation from PDF/report and accessible repository concept. The benchmark data lacks genomic coordinates, so genes are ordered by data-driven co-expression anchor assignment instead of random HVG index.",
+  "core_mechanism": "Gene module sequence modeling with patch tokenization and SSM-style gated depthwise mixer.",
+  "scmae_gap": "graph-free long-range gene/module dependency modeling while preserving mask prediction and masked expression reconstruction",
+  "neighbor_mix_relation": "independent; no NeighborMix operator is used and mixed_cell_fraction remains 0.0"
+}
+

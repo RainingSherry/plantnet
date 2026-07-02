@@ -1,0 +1,21 @@
+{
+  "method_dir": "rank44_molebert_context_token_full",
+  "rank": 44,
+  "paper_title": "Mole-BERT: Rethinking Pre-training Graph Neural Networks for Molecules",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/044_中高_可用_Mole-BERT_Rethinking_Pre-training_Graph_Neural_Networks_for_Molecules.pdf",
+  "local_report": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "local_index": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_url": "https://github.com/junxia97/Mole-BERT",
+  "github_status": "HTTP 200; README, vqvae.py, pretrain.py, model.py, util.py, and dataloader.py inspected from a temporary clone.",
+  "implementation_source": "Independent reconstruction and scMAE-specific adaptation from local report, PDF method description, and inspected official GitHub code ideas.",
+  "scmae_gap": "semantic target / graph-neighbor context",
+  "core_mechanism": "Mole-BERT-style context-aware discrete cell tokens plus masked token prediction, while preserving scMAE masked expression reconstruction and mask prediction.",
+  "neighbor_mix_relation": "independent; not used in this candidate",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true, otherwise log_expr",
+    "reconstruction_target": "log_expr",
+    "count_target": "none",
+    "token_target": "MiniBatchKMeans labels over SVD cell features and KNN context features"
+  },
+  "formal_claims": "No formal improvement is claimed from smoke or screen results."
+}

@@ -1,0 +1,23 @@
+{
+  "rank": 10,
+  "method_dir": "rank10_celler_longtail_protection_full",
+  "title": "Celler: A Genomic Language Model for Long-Tailed Single-Cell Annotation",
+  "pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/010_高_Celler_A_Genomic_Language_Model_for_Long-Tailed_Single-Cell_Annotation.pdf",
+  "report_source": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "index_source": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_urls_checked": [
+    {
+      "url": "https://github.com/AI4science-ym/HiCeller",
+      "status": "HTTP 200 on 2026-06-30"
+    },
+    {
+      "url": "https://github.com/ckqqqq/PyCeller",
+      "status": "HTTP 404 on 2026-06-30"
+    }
+  ],
+  "implementation_source": "Independent reimplementation from the PDF, summary report, and accessible HiCeller repository concept. No supervised cell-type labels are used for training.",
+  "core_mechanism": "Rare-cell / long-tail protection through density and entropy risk, Gaussian Inflation prototype loss, and hard data mining.",
+  "scmae_gap": "rare-cell and boundary robustness while preserving mask prediction and masked expression reconstruction",
+  "neighbor_mix_relation": "independent; no NeighborMix operator is used and mixed_cell_fraction remains 0.0"
+}
+
