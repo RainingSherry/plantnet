@@ -66,6 +66,7 @@ build/
 *.tmp
 *.temp
 .cache/
+.codegraph/
 
 # Large PDFs
 0/普林斯顿数学指南.pdf
