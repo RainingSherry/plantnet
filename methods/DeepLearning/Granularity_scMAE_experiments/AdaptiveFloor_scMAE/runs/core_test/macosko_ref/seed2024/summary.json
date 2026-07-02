@@ -1,0 +1,33 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + DEC + theory-driven adaptive variance floor",
+  "stage": "screen",
+  "seed": 2024,
+  "n_clusters": 12,
+  "floor_mode": "ref",
+  "floor_scale": 1.0,
+  "eff_dim_final": 97.66204783421225,
+  "runtime_seconds": 281.6040484905243,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.7085341903231566,
+      "nmi": 0.6246903740138298,
+      "ari": 0.6018234880374178,
+      "f1_macro": 0.41370469860646963,
+      "fmi": 0.7643929172418171,
+      "v_measure": 0.6246903740138299,
+      "homogeneity": 0.7761201488996489,
+      "completeness": 0.5227047878103518,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "baseline": {
+    "nmi": 0.657465,
+    "ari": 0.494268
+  },
+  "meets_screen_baseline_any": true
+}

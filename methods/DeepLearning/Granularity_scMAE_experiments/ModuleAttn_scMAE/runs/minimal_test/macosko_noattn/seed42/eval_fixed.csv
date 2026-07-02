@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + gene-module attention + DEC + variance floor,42,ModuleAttn_scMAE,screen,0.5095965006248884,0.5544193739280318,0.3012533923903229,0.3709511233814014,0.5345457546196317,0.5544193739280319,0.7844893438849854,0.428694591785775,12,,fixed,kmeans_known_k,True

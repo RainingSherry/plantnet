@@ -18,9 +18,16 @@ Granularity_scMAE_experiments/
 每个子网络内有独立 `README.md`（当前模型的流程与思路）。
 
 ## 一句话结论
-**赢家 = `AdaptiveSwitch_scMAE`**，配置 `--var_mode hinge --variance_weight 0.02 --force_gate 1.0`。
-机制：DEC 锐化在细粒度数据上导致**每维方差坍缩**；VICReg 每维 std 下限是精确解药。
+**当前赢家 = `AdaptiveSwitch_scMAE`**，配置 `--var_mode hinge --variance_weight 0.02 --force_gate 1.0`。
+机制定位应写成诊断型：在 scMAE+DEC 组合中，DEC 锐化会在细粒度数据上诱发**每维方差坍缩**；VICReg 式 std-floor 是验证该诊断的有效干预项，但 std-floor 本身不 novel。
 多 seed（42/2024/3407）：Melanoma ARI 0.648±0.003 / Quake 0.920±0.001 / Macosko 0.576±0.087（最好 0.695）。首个三数据集同时达标的配置。
+
+### 2026-07-02 纯 DEC 普适性检查
+`../dec_with_floor/runs/universality_test/` 在 Macosko 上跑了纯 DEC baseline vs DEC+floor：
+
+- 默认早停 (`tol=0.001`)：两组在 epoch 1 收敛，ARI 都是 0.239，基本只评估到 KMeans 初始化后的状态，不可作为 floor 证据。
+- 强制训练 (`tol=0.0`, 300 epochs)：baseline 与 floor 逐元素完全相同，ARI 都是 0.457；DEC+floor 日志中 `Floor: 0.000000`，最终 embedding 每维 std 最小值约 2.27，32/32 维有效。
+- 结论：当前纯 DEC 实现**没有出现方差坍缩，也没有触发 floor**。因此不能声称“floor 普适救活纯 DEC”；更稳妥的论文 claim 是“scMAE+DEC 的诊断性失败模式 + 多数据集 benchmark + std-floor 作为诊断干预”。
 
 ## 运行环境
 ```

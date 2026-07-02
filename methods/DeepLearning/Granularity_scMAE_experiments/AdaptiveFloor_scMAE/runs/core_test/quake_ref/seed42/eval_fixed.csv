@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + DEC + theory-driven adaptive variance floor,42,AdaptiveFloor_scMAE,screen,0.9524706867671692,0.8386385390898999,0.9204480218772677,0.7050746429601102,0.9645127965292262,0.8386385390898998,0.8700696005860054,0.8093991823108831,5,,fixed,kmeans_known_k,True

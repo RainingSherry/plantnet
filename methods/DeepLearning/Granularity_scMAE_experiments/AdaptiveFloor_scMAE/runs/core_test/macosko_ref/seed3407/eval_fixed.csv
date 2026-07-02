@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + DEC + theory-driven adaptive variance floor,3407,AdaptiveFloor_scMAE,screen,0.6592572754865202,0.6030689343455243,0.5010016377066191,0.4225784130530165,0.6948094942435713,0.6030689343455243,0.773022545657974,0.49437716891249106,12,,fixed,kmeans_known_k,True

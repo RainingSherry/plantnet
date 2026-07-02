@@ -1,0 +1,19 @@
+{
+    "data_path": "methods/DeepLearning/scMAEs/benchmark_data/Macosko.h5ad",
+    "save_dir": "methods/DeepLearning/dec_with_floor/runs/universality_test/with_floor_forced_tol0",
+    "n_clusters": 12,
+    "n_z": 32,
+    "dims": "256,128",
+    "alpha": 1.0,
+    "pretrain_epochs": 200,
+    "epochs": 300,
+    "batch_size": 256,
+    "lr": 0.001,
+    "tol": 0.0,
+    "update_interval": 1,
+    "seed": 42,
+    "gpu": 2,
+    "no_cuda": false,
+    "floor_weight": 0.02,
+    "cuda": true
+}

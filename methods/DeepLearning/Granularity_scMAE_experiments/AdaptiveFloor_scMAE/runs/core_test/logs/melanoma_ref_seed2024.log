@@ -1,0 +1,18 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+Device=cuda:0 dataset=Melanoma_5K cells=4513 clusters=9 floor_mode=ref floor_scale=1.0
+Epoch 001/80 loss=0.4736 scmae=0.4523 cluster=0.0000 floor=0.7027 scale=0.00
+Epoch 010/80 loss=0.4439 scmae=0.4436 cluster=0.0000 floor=0.0003 scale=0.00
+Epoch 020/80 loss=0.4435 scmae=0.4433 cluster=0.0000 floor=0.0019 scale=0.00
+  [REF CAPTURED] post-warmup per-dim std mean=1.060 min/max=1.008/1.165 eff_dim=127.6/128
+Epoch 030/80 loss=0.4581 scmae=0.4435 cluster=0.0824 floor=0.0041 scale=0.50
+Epoch 040/80 loss=0.4758 scmae=0.4434 cluster=0.0920 floor=0.0019 scale=1.00
+Epoch 050/80 loss=0.4728 scmae=0.4433 cluster=0.0834 floor=0.0012 scale=1.00
+Epoch 060/80 loss=0.4682 scmae=0.4433 cluster=0.0704 floor=0.0010 scale=1.00
+Epoch 070/80 loss=0.4677 scmae=0.4435 cluster=0.0687 floor=0.0003 scale=1.00
+Epoch 080/80 loss=0.4643 scmae=0.4433 cluster=0.0595 floor=0.0004 scale=1.00
+[RESULT] Melanoma_5K NMI=0.7244459142004388 ARI=0.655497757610285 meets=False floor_mode=ref eff_dim=127.0/128

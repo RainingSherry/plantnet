@@ -1,0 +1,33 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + DEC + theory-driven adaptive variance floor",
+  "stage": "screen",
+  "seed": 2024,
+  "n_clusters": 5,
+  "floor_mode": "fixed",
+  "floor_scale": 1.0,
+  "eff_dim_final": 127.77229585241167,
+  "runtime_seconds": 52.13606882095337,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.9516331658291457,
+      "nmi": 0.8344712457550989,
+      "ari": 0.9200397252383165,
+      "f1_macro": 0.7028694525029777,
+      "fmi": 0.9643209837042918,
+      "v_measure": 0.8344712457550988,
+      "homogeneity": 0.8676283347556303,
+      "completeness": 0.8037551210996716,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false
+}

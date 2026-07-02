@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + DEC + theory-driven adaptive variance floor,2024,AdaptiveFloor_scMAE,screen,0.7281187680035454,0.7244459142004388,0.655497757610285,0.6356881850979881,0.7236354255563375,0.7244459142004388,0.7578087330032469,0.6938968408512636,9,,fixed,kmeans_known_k,True

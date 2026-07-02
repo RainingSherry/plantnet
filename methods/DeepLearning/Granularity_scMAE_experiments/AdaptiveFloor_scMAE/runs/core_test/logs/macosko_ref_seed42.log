@@ -1,0 +1,18 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+Device=cuda:0 dataset=Macosko cells=44808 clusters=12 floor_mode=ref floor_scale=1.0
+Epoch 001/80 loss=0.4546 scmae=0.4485 cluster=0.0000 floor=0.2051 scale=0.00
+Epoch 010/80 loss=0.4473 scmae=0.4468 cluster=0.0000 floor=0.0029 scale=0.00
+Epoch 020/80 loss=0.4470 scmae=0.4466 cluster=0.0000 floor=0.0018 scale=0.00
+  [REF CAPTURED] post-warmup per-dim std mean=1.100 min/max=1.030/2.670 eff_dim=100.9/128
+Epoch 030/80 loss=0.4812 scmae=0.4467 cluster=0.1900 floor=0.0226 scale=0.50
+Epoch 040/80 loss=0.5100 scmae=0.4469 cluster=0.1771 floor=0.0128 scale=1.00
+Epoch 050/80 loss=0.5065 scmae=0.4468 cluster=0.1672 floor=0.0107 scale=1.00
+Epoch 060/80 loss=0.5056 scmae=0.4468 cluster=0.1646 floor=0.0083 scale=1.00
+Epoch 070/80 loss=0.5055 scmae=0.4469 cluster=0.1640 floor=0.0079 scale=1.00
+Epoch 080/80 loss=0.5071 scmae=0.4469 cluster=0.1683 floor=0.0091 scale=1.00
+[RESULT] Macosko NMI=0.6828179136571669 ARI=0.7921500397180137 meets=True floor_mode=ref eff_dim=108.2/128

@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + gene-module attention + DEC + variance floor",
+  "seed": 42,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7152071058739511,
+      "nmi": 0.5757528742989902,
+      "ari": 0.49838856088807154,
+      "f1_macro": 0.3427119623759854,
+      "fmi": 0.6928412653001064,
+      "v_measure": 0.5757528742989902,
+      "homogeneity": 0.7409775142655503,
+      "completeness": 0.4707778850854941,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}
