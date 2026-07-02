@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + adaptive-granularity cluster target,42,AdaptiveGranularity_scMAE,screen,0.6658291457286433,0.604316946027486,0.4470657687507558,0.6129706080897044,0.6953481557237952,0.6043169460274861,0.8105828396840001,0.4817323660038288,5,,fixed,kmeans_known_k,True

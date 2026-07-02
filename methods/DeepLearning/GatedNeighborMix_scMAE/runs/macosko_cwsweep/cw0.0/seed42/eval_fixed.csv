@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + reliability-gated NeighborMix + gated DEC,42,GatedNeighborMix_scMAE,screen,0.5385199071594358,0.5889361107117863,0.3756986907232344,0.42460886792443,0.598681649975601,0.5889361107117863,0.7937932780890425,0.4681252865096694,12,,fixed,kmeans_known_k,True

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + reliability-gated NeighborMix + gated DEC,42,GatedNeighborMix_scMAE,screen,0.9521566164154104,0.8312093675337973,0.9118332687600418,0.7129179736146958,0.9605235790300822,0.8312093675337971,0.8666237445193662,0.7985757557229496,5,,fixed,kmeans_known_k,True

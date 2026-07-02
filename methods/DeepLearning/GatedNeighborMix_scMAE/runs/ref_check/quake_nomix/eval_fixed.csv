@@ -1,2 +1,0 @@
-dataset,method,seed,variant,use_pseudo,pseudo_weight,alpha,neighbor_k,mix_neighbors,mask_ratio,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,NeighborMix_scMAE,42,nm_scmae_mid,False,0.3,0.9,5,4,0.4,0.9613693467336684,0.858313006067654,0.9177211441415859,0.7434010731473997,0.9637153503997489,0.8583130060676539,0.8687258842361089,0.8481467966536389,5,,fixed,kmeans_known_k,True

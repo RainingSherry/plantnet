@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + reliability-gated NeighborMix + gated DEC,42,GatedNeighborMix_scMAE,screen,0.6864613339242189,0.6897177705121672,0.6280403267002411,0.499462019955783,0.7010828539123121,0.6897177705121672,0.7314966296326946,0.6524534035611179,9,,fixed,kmeans_known_k,True

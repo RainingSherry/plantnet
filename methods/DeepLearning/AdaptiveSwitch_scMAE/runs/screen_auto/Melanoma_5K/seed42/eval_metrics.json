@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + adaptive sharp/soft switch",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7250166186572125,
+      "nmi": 0.721747561792145,
+      "ari": 0.6479849283461504,
+      "f1_macro": 0.6341111408940939,
+      "fmi": 0.7174909228948351,
+      "v_measure": 0.7217475617921449,
+      "homogeneity": 0.7559516555861151,
+      "completeness": 0.6905047070530944,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}
