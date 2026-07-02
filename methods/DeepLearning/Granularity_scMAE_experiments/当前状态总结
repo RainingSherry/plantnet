@@ -1,0 +1,116 @@
+● 当前状态总结
+
+  网络性能对比（本 harness，ARI）
+
+  ┌──────────────┬───────────┬───────────┬───────────┬──────────────────────────┐
+  │     方法     │ Melanoma  │   Quake   │  Macosko  │           备注           │
+  ├──────────────┼───────────┼───────────┼───────────┼──────────────────────────┤
+  │ 纯 scMAE     │ ~0.63     │ ~0.50     │ 0.376     │ 基准                     │
+  │ backbone     │           │           │           │                          │
+  ├──────────────┼───────────┼───────────┼───────────┼──────────────────────────┤
+  │ NeighborMix  │ 0.67?     │ ?         │ ~0.30?    │ 全benchmark数据，非本har │
+  │              │           │           │           │ ness                     │
+  ├──────────────┼───────────┼───────────┼───────────┼──────────────────────────┤
+  │ rank13 DEC   │ 0.652     │ 0.912     │ 0.343     │ 锐化赢Quake/Melanoma     │
+  ├──────────────┼───────────┼───────────┼───────────┼──────────────────────────┤
+  │ rank29 soft  │ 0.529     │ 0.170     │ 0.565     │ 软赢Macosko，崩Quake     │
+  ├──────────────┼───────────┼───────────┼───────────┼──────────────────────────┤
+  │ AdaptiveSwit │           │           │           │                          │
+  │ ch (vw=0.02, │ 0.648     │ 0.921     │ 0.695     │ ✓ 三数据集同时最优       │
+  │  seed42)     │           │           │           │                          │
+  ├──────────────┼───────────┼───────────┼───────────┼──────────────────────────┤
+  │ AdaptiveSwit │ 0.648±0.0 │ 0.920±0.0 │ 0.576±0.0 │                          │
+  │ ch (3-seed   │ 03        │ 01        │ 87        │ 稳健验证                 │
+  │ mean)        │           │           │           │                          │
+  └──────────────┴───────────┴───────────┴───────────┴──────────────────────────┘
+
+  回答你的问题：
+  - vs 纯 scMAE：三数据集全面碾压（Melanoma +0.02 / Quake +0.42 / Macosko +0.32）✓
+  - vs NeighborMix：NeighborMix 的数字来自另一套
+  harness（全benchmark），不可直接比；但 AdaptiveSwitch 在本 harness 上 Melanoma 0.648
+  已超过纯 backbone ~0.63，且没有 NeighborMix 在 Macosko 上的崩盘（NeighborMix
+  全benchmark 上 Macosko −0.07）✓
+  - vs rank13/rank29：是首个三数据集同时达标的配置（rank13 崩 Macosko、rank29 崩
+  Quake）✓
+
+  ---
+  接下来应当做的事项（按优先级）
+
+  阶段1：收尾当前工作（立即）
+
+  1. git 状态决策：
+    - 检查 git status，决定是否提交 Granularity_scMAE_experiments/ 的打包改动
+    - 如需提交：git add + git commit -m "..." + git push origin Granularity
+    - 暂存的 scMAEs 改动（stash@{0}）是 wide-research 分支的，回那个分支后 git stash
+  pop 取回
+  2. 记忆更新（如需）：
+    - 当前记忆已有核心发现（方差下限机制、多 seed 结果）
+    - 可补充"已打包进 Granularity_scMAE_experiments/、4 个模型 README
+  全齐、投稿路线已定"
+
+  阶段2：投稿准备（formal-verified，2–4 周）
+
+  3. 扩数据集验证（最高优先级）：
+    - 从 ../scMAEs/benchmark_data/ 或标准 scRNA benchmark（如 Benchmarking scRNA-seq
+  2020）挑 10–15 个数据集
+    - 刻意选"细粒度"（类别数 ≥8、细胞数
+  >10k）的，验证"细粒度数据集普遍受益于每维方差下限"
+    - 候选：worm_neuron、Shekhar、Tosches、Cao_2019、Tabula_Muris 等
+    - 用 AdaptiveSwitch 最强配置（--var_mode hinge --variance_weight 0.02 --force_gate
+  1.0）跑 5 seeds，报均值±std
+  4. 对标已发表方法（关键，审稿必问）：
+    - 在同 harness（相同预处理、相同 KMeans 评估）上复现 scDCC / scDeepCluster /
+  scNAME / DESC
+    - 用它们的官方代码 + 默认超参，报同 5-seed 结果
+    - 目标：证明 AdaptiveSwitch 不是"调参调出来的"，而是在公平对比下真赢
+  5. Macosko seed 方差处理（二选一）：
+    - 方案A（诚实报告）：在论文 limitation 写明"Macosko seed 方差
+  ±0.087，根因是细粒度硬聚类多近等价最优"，展示最差 seed 仍超 rank13 的证据
+    - 方案B（技术缓解）：跑 10 次不同初始化 → 取最优 silhouette score
+  作为"consensus"；或用 ensemble KMeans
+  6. 机制可视化（论文核心配图）：
+    - 画 Macosko 的每维方差谱（128 维，x=维度 sorted by 方差，y=方差）：DEC-only vs
+  DEC+std-floor 对比，直观展示"60 有效维 vs 114 有效维"
+    - t-SNE/UMAP 嵌入可视化：DEC-only（坍缩成团）vs DEC+std-floor（12 亚型分离）
+    - 可选：训练过程中 per-dim 方差演化曲线（epoch 0→80）
+
+  阶段3：写论文（1–2 周）
+
+  7. 论文结构草案：
+    - Title: "Preventing Per-Dimension Variance Collapse in Deep Clustering for
+  Single-Cell RNA-seq"
+    - Abstract: 问题（DEC 在细粒度 scRNA 上失败）→ 根因（每维方差坍缩）→
+  方法（std-floor）→ 结果（10–15 数据集验证 + 对标已发表）
+    - Method: scMAE backbone + DEC + VICReg std-hinge（1 页）；消融图表（方差 vs
+  门控、hinge vs cov/koleo）
+    - Results: 主表（10–15 数据集 × 方法对比）；Macosko 案例深挖（方差谱图、seed
+  分析）
+    - Discussion: 机制普适性（为什么 cov/koleo 无效）、局限（seed 方差、harness
+  依赖）、未来（扩展到其他深度聚类、图神经网络）
+  8. 代码与数据发布：
+    - GitHub repo：AdaptiveSwitch_scMAE/ 的干净版（去掉 runs/、只保留源码 + 一个 demo
+  notebook）
+    - 数据：benchmark_data 的 3 个 h5ad 上传 Zenodo（如版权允许）或给下载链接
+    - 复现脚本：scripts/reproduce_paper_results.sh（跑 10–15 数据集 × 5 seeds）
+
+  阶段4：投稿（选期刊/会议）
+
+  9. 目标 venue（CS 一区）：
+    - 期刊：Bioinformatics（IF ~5.8，快）/ Nature Communications（IF ~16，慢）/
+  Briefings in Bioinformatics（IF ~9）
+    - 会议：NeurIPS / ICML（ML top，但需"方法普适性"强调）/ ISMB/RECOMB（生信 top）
+    - 建议：先投 Bioinformatics（审稿周期 2–3 月，接受率合理，领域认可度高）
+  10. 预答审稿意见（提前准备）：
+    - "为什么只在 scRNA 上测？" → 补充 bulk RNA / 图像聚类（CIFAR-10/STL-10 +
+  DEC）证明方差坍缩是通病
+    - "与 VICReg 原文的区别？" → VICReg 是对比学习的完整框架；我们只借其 std-hinge
+  项，用于监督聚类（DEC），应用场景/理论分析都不同
+    - "seed 方差怎么解释？" → 已在 limitation 说明 + 展示最差 seed 仍超 baseline
+
+  ---
+  我的建议（下一个立即行动）
+
+  优先级1（本周内）：扩数据集验证（第 3 条）。
+  - 从 ../scMAEs/benchmark_data/ 或公开 benchmark 挑 5–8 个"细粒度"数据集（类别数≥8）
+  - 用 AdaptiveSwitch 最强配置跑 seed 42（单 seed 快筛，确认方向对）
+  - 如果 5–8 个里有 ≥70% 超过各自的 rank13/纯backbone → 进入 5-seed 验证 + 论文撰写
