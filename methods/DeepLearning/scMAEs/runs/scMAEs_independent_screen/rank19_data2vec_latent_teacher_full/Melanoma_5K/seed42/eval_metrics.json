@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + data2vec latent teacher",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6414801684023931,
+      "nmi": 0.6822319085981512,
+      "ari": 0.5703153687693299,
+      "f1_macro": 0.5097800296680245,
+      "fmi": 0.6543348982567317,
+      "v_measure": 0.6822319085981512,
+      "homogeneity": 0.7423508367579923,
+      "completeness": 0.6311208849877312,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

@@ -1,0 +1,65 @@
+Command: /data/luolie/conda/envs/scssl_bench_py310/bin/python /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scNAME/run.py --data_path /data/luolie/biopipeline/scCluBench/data/CRA007122.h5ad --save_dir /home/luolie/biopipeline/dimension-reduction/plantnet/experiment_reports/desc_scname_fix_benchmark_20260628/run_artifacts/CRA007122/scname__seed42 --n_clusters 7 --seed 42 --epochs 80 --pretrain_epochs 80 --gpu 4
+Exit code: 0
+
+=== STDOUT ===
+Loading data...
+是否归一化: True, 是否 log1p 变换: True, 是否标准化: False
+数据未标准化，进行 scale 处理
+Data ready (normalized, log-transformed, scaled, HVG-selected).
+scNAME count_like source: layers_norm_log
+Number of cells: 25121, Number of genes: 2000
+Number of clusters: 7
+Initializing scNAME model...
+Pretraining...
+begin the pretraining
+epoch: 0/80, iteration: 196, Current likelihood loss: 0.1042903, Current mask loss: 0.05329153
+epoch: 10/80, iteration: 196, Current likelihood loss: 0.08627912, Current mask loss: 0.04771302
+epoch: 20/80, iteration: 196, Current likelihood loss: 0.08159498, Current mask loss: 0.0464509
+epoch: 30/80, iteration: 196, Current likelihood loss: 0.07851098, Current mask loss: 0.04619286
+epoch: 40/80, iteration: 196, Current likelihood loss: 0.07613052, Current mask loss: 0.04528548
+epoch: 50/80, iteration: 196, Current likelihood loss: 0.07421424, Current mask loss: 0.04578991
+epoch: 60/80, iteration: 196, Current likelihood loss: 0.07286742, Current mask loss: 0.0452038
+epoch: 70/80, iteration: 196, Current likelihood loss: 0.07179477, Current mask loss: 0.04477464
+Fine-tuning...
+kmean_ARI: 0.20176
+begin the funetraining
+epoch: 1/80, iteration: 196, Current likelihood loss: 0.08692607, Current mask loss: 0.04682902, Current neighbor loss: 7.5343385, Current kmeans loss: 112.29339, Current total loss: 12.116528
+current clustering ARI: 0.19646
+epoch: 11/80, iteration: 196, Current likelihood loss: 0.09316005, Current mask loss: 0.046867, Current neighbor loss: 7.5009956, Current kmeans loss: 16.642408, Current total loss: 2.5543675
+current clustering ARI: 0.18686
+epoch: 21/80, iteration: 196, Current likelihood loss: 0.09449904, Current mask loss: 0.04533932, Current neighbor loss: 7.5023355, Current kmeans loss: 9.505624, Current total loss: 1.8406343
+current clustering ARI: 0.18683
+epoch: 31/80, iteration: 196, Current likelihood loss: 0.09510594, Current mask loss: 0.04409484, Current neighbor loss: 7.511953, Current kmeans loss: 5.187194, Current total loss: 1.4091153
+current clustering ARI: 0.18685
+epoch: 41/80, iteration: 196, Current likelihood loss: 0.09565048, Current mask loss: 0.04500453, Current neighbor loss: 7.5131006, Current kmeans loss: 3.8845892, Current total loss: 1.280424
+current clustering ARI: 0.18679
+current_error: 0.12503483141594682
+epoch: 51/80, iteration: 196, Current likelihood loss: 0.09564166, Current mask loss: 0.04523264, Current neighbor loss: 7.514982, Current kmeans loss: 2.7580292, Current total loss: 1.1681755
+current clustering ARI: 0.18685
+epoch: 61/80, iteration: 196, Current likelihood loss: 0.09591477, Current mask loss: 0.04456176, Current neighbor loss: 7.5192947, Current kmeans loss: 3.6919756, Current total loss: 1.2616036
+current clustering ARI: 0.1867
+epoch: 71/80, iteration: 196, Current likelihood loss: 0.09606576, Current mask loss: 0.04358032, Current neighbor loss: 7.523481, Current kmeans loss: 2.3716567, Current total loss: 1.1291599
+current clustering ARI: 0.18679
+Epoch 80: acc: 0.4070, nmi: 0.2767, ari: 0.1869, f1_macro: 0.3980, fmi: 0.3379, v_measure: 0.2767, homogeneity: 0.2767, completeness: 0.2767
+Training completed.
+Results saved to: /home/luolie/biopipeline/dimension-reduction/plantnet/experiment_reports/desc_scname_fix_benchmark_20260628/run_artifacts/CRA007122/scname__seed42
+
+
+=== STDERR ===
+2026-06-28 01:30:22.724339: I tensorflow/core/util/port.cc:113] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-06-28 01:30:22.810412: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2026-06-28 01:30:22.810674: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2026-06-28 01:30:22.813333: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2026-06-28 01:30:22.829672: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 AVX_VNNI AMX_TILE AMX_INT8 AMX_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-06-28 01:30:24.347159: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+WARNING:tensorflow:From /data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/tensorflow/python/compat/v2_compat.py:108: disable_resource_variables (from tensorflow.python.ops.variable_scope) is deprecated and will be removed in a future version.
+Instructions for updating:
+non-resource variables are not supported in the long term
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+2026-06-28 01:34:13.802859: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:274] failed call to cuInit: CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected
+2026-06-28 01:34:13.851431: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:388] MLIR V1 optimization pass is not enabled
+

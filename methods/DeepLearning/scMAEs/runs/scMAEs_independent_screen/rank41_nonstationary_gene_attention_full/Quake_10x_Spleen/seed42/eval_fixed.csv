@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + non-stationary gene-module attention,42,rank41_nonstationary_gene_attention_full,screen,scaled encoder + log-expression SVD gene-module non-stationary attention,0.7064489112227805,0.5879660444430149,0.4723546036861476,0.5972741908536385,0.7136282061017395,0.5879660444430148,0.7831171763434336,0.4706748696956218,5,,fixed,kmeans_known_k,True

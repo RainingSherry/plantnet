@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + TabR retrieval context",
+  "seed": 42,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.692001675041876,
+      "nmi": 0.6320913695987822,
+      "ari": 0.4796667903289537,
+      "f1_macro": 0.6406782465474589,
+      "fmi": 0.7183510599855448,
+      "v_measure": 0.6320913695987821,
+      "homogeneity": 0.8330569397801133,
+      "completeness": 0.5092423974783838,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

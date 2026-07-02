@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + DAP-MAE domain adapter",
+  "seed": 42,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.926926298157454,
+      "nmi": 0.7656326904643799,
+      "ari": 0.8994363947939258,
+      "f1_macro": 0.6356141027757719,
+      "fmi": 0.9551972000318367,
+      "v_measure": 0.7656326904643799,
+      "homogeneity": 0.7985307621202364,
+      "completeness": 0.7353380481694187,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

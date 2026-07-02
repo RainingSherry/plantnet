@@ -1,0 +1,49 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + local Graphormer structural bias",
+  "method_dir": "rank28_graphormer_structural_bias_full",
+  "stage": "smoke",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 4.3758392333984375,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_smoke/rank28_graphormer_structural_bias_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5196100155107467,
+      "nmi": 0.628131076680625,
+      "ari": 0.4628239610534082,
+      "f1_macro": 0.4055122265249267,
+      "fmi": 0.5657118772517904,
+      "v_measure": 0.6281310766806251,
+      "homogeneity": 0.7067769906362279,
+      "completeness": 0.5652350975582223,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.8514859501053306,
+    "neighbor_purity_proxy": 0.8628849988920895,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9872225760663944,
+    "rare_risk_fraction": 0.10015510746731664,
+    "embedding_variance": 0.27633440494537354,
+    "cluster_mass_min": 0.06935519610015511,
+    "cluster_mass_max": 0.1668513184134722,
+    "collapse_warning": false,
+    "edge_confidence_mean": 0.9823281764984131,
+    "edge_confidence_std": 0.04920102655887604,
+    "diagnostic_note": "No NeighborMix is used. Local Graphormer uses centrality encoding, KNN-rank spatial attention bias, edge confidence, and DropEdge robustness around the scMAE objective."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

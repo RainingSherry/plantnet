@@ -1,0 +1,49 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + BGRL graph bootstrap",
+  "method_dir": "rank26_bgrl_graph_bootstrap_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 44808,
+  "n_genes": 1000,
+  "n_clusters": 12,
+  "runtime_seconds": 626.008145570755,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank26_bgrl_graph_bootstrap_full/Macosko/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.4009328691305124,
+      "nmi": 0.537222114289802,
+      "ari": 0.2175463623752834,
+      "f1_macro": 0.34494355159422335,
+      "fmi": 0.4528530273732996,
+      "v_measure": 0.5372221142898019,
+      "homogeneity": 0.7978176637840396,
+      "completeness": 0.404950813896466,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.8001131364277431,
+    "neighbor_purity_proxy": 0.9628481521156936,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.931867214325808,
+    "rare_risk_fraction": 0.10000446348866274,
+    "embedding_variance": 0.33221015334129333,
+    "cluster_mass_min": 0.020643635065166935,
+    "cluster_mass_max": 0.16776022138903768,
+    "collapse_warning": false,
+    "edge_confidence_mean": 0.9972501397132874,
+    "edge_confidence_std": 0.020899251103401184,
+    "diagnostic_note": "No NeighborMix is used. BGRL supplies shallow graph bootstrap, edge confidence, and DropEdge robustness around the scMAE objective."
+  },
+  "baseline": {
+    "nmi": 0.657465,
+    "ari": 0.494268
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

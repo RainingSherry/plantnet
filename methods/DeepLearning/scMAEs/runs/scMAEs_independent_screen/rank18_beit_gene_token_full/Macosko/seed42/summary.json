@@ -1,0 +1,48 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + BEiT gene-token target",
+  "method_dir": "rank18_beit_gene_token_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 44808,
+  "n_genes": 1000,
+  "n_clusters": 12,
+  "runtime_seconds": 204.80379343032837,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank18_beit_gene_token_full/Macosko/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.440055347259418,
+      "nmi": 0.5621111661653556,
+      "ari": 0.2967852610498912,
+      "f1_macro": 0.37481131498378245,
+      "fmi": 0.5304791025021371,
+      "v_measure": 0.5621111661653556,
+      "homogeneity": 0.7989705795997469,
+      "completeness": 0.4335752847965876,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9617300482056775,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.8716034300600644,
+    "rare_risk_fraction": 0.02689251919300125,
+    "embedding_variance": 0.280544638633728,
+    "cluster_mass_min": 0.0107570076772005,
+    "cluster_mass_max": 0.25642742367434385,
+    "collapse_warning": false,
+    "replaced_expression_fraction": 0.14000926921516657,
+    "diagnostic_note": "No NeighborMix graph is used; BEiT-style gene-specific discrete token prediction is used."
+  },
+  "baseline": {
+    "nmi": 0.657465,
+    "ari": 0.494268
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

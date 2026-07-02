@@ -1,0 +1,16 @@
+{
+  "edge_survival": 0.5999195593244889,
+  "neighbor_purity_proxy": 0.8740527365388877,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.8496818917132579,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.04336046427488327,
+  "cluster_mass_min": 0.01617549302016397,
+  "cluster_mass_max": 0.27298914247728784,
+  "collapse_warning": false,
+  "mask_score_mean": 0.4010101854801178,
+  "posterior_variance_mean": 0.03842421993613243,
+  "posterior_variance_p95": 0.050680357962846756,
+  "raw_counts_available": true,
+  "diagnostic_note": "No NeighborMix is used. ZINB uses aligned raw counts only; scaled expression is never used as count data."
+}

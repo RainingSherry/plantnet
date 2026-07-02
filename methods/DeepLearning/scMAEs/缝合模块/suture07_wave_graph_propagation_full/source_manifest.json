@@ -1,0 +1,17 @@
+{
+  "method_dir": "suture07_wave_graph_propagation_full",
+  "candidate_order": 7,
+  "reference_module": "/home/luolie/biopipeline/dimension-reduction/plantnet/缝合模块/即插即用/217 Wave Propagation Operator(AAAI 2026 Oral).py",
+  "reference_title": "WaveFormer: Frequency-Time Decoupled Vision Modeling with Wave Equation",
+  "reference_url": "https://arxiv.org/pdf/2601.08602",
+  "implementation_source": "Rewritten as graph wave propagation over log-expression KNN; no image DCT/FFT or 2D reshape is used.",
+  "scmae_gap": "graph-aware robust latent denoising without heat-style over-smoothing",
+  "core_mechanism": "first- and second-order graph wave context used by a weak latent adapter",
+  "neighbor_mix_relation": "independent; no cell mixing is used",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true",
+    "graph_source": "log_expr",
+    "reconstruction_target": "log_expr",
+    "scaled_expression_not_used_as": ["counts", "tokens", "NB target", "ZINB target", "diffusion target"]
+  }
+}

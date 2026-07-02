@@ -1,0 +1,34 @@
+{
+  "dataset": "Macosko",
+  "method": "rank10_celler_longtail_protection_full",
+  "stage": "screen",
+  "seed": 42,
+  "status": "failed",
+  "failure": "process exited with code 139 before training logs",
+  "observed_stderr": [
+    "UserWarning: zero-centering a sparse array/matrix densifies it.",
+    "OpenBLAS warning: precompiled NUM_THREADS exceeded, adding auxiliary array for thread metadata."
+  ],
+  "retries": [
+    {
+      "save_dir": "seed42",
+      "scale_input": true,
+      "openblas_num_threads": 1,
+      "exit_code": 139
+    },
+    {
+      "save_dir": "seed42",
+      "scale_input": true,
+      "openblas_num_threads": 64,
+      "exit_code": 139
+    },
+    {
+      "save_dir": "seed42_log_encoder",
+      "scale_input": false,
+      "openblas_num_threads": 64,
+      "exit_code": 139
+    }
+  ],
+  "note": "No Macosko metric was fabricated or appended for this run."
+}
+

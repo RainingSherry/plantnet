@@ -1,0 +1,2 @@
+dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,suture05_token_statistics_aux_full,42,smoke,0.6191003766895635,0.6791202980358875,0.5566560417887669,0.5083001035112079,0.64266702831338,0.6791202980358875,0.737892691091316,0.629019539408021,9,,fixed,kmeans_known_k,True

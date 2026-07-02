@@ -1,0 +1,15 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.9103530619532226,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9537188704702596,
+  "rare_risk_fraction": 0.02689251919300125,
+  "embedding_variance": 0.8124102354049683,
+  "cluster_mass_min": 0.045081235493661845,
+  "cluster_mass_max": 0.17325031244420638,
+  "collapse_warning": false,
+  "teacher_embedding_variance": 0.8022128343582153,
+  "teacher_cls_confidence_mean": 0.29735974412171967,
+  "teacher_patch_confidence_mean": 0.7523458336762019,
+  "diagnostic_note": "No NeighborMix is used. The EMA teacher acts as an online tokenizer for class and masked gene-module tokens."
+}

@@ -1,0 +1,23 @@
+\begin{table*}[t]
+\centering
+\scriptsize
+\caption{Compact benchmark comparison using ACC.}
+\label{tab:benchmark\_compact\_primary}
+\begin{tabular}{lcccccccc}
+\toprule
+Method & Pollen & Quake\_Smart-seq2\_Lung & SRP171040 & SRP182008 & SRP235541 & Wang & hrvatin\_geo\_maintype\_counts & Avg. \\
+\midrule
+DEC & 0.734$\pm$0.067 & \underline{0.695$\pm$0.046} & 0.468 & 0.413 & 0.358 & 0.767$\pm$0.001 & \underline{0.917} & 0.622 \\
+Leiden & 0.628$\pm$0.000 & 0.612$\pm$0.014 & \textbf{0.690} & \underline{0.612} & \textbf{0.657} & 0.496$\pm$0.043 & 0.453 & 0.593 \\
+Louvain & 0.628$\pm$0.000 & 0.626$\pm$0.055 & 0.677 & 0.542 & 0.480 & 0.765$\pm$0.006 & 0.156 & 0.553 \\
+Neighbormix scmae & 0.888$\pm$0.007 & 0.682$\pm$0.071 & 0.630 & 0.581 & 0.566 & \underline{0.992$\pm$0.001} & \textbf{0.928} & 0.752 \\
+scMAE w/o NeighBorMix & \underline{0.889$\pm$0.018} & 0.635$\pm$0.032 & \underline{0.679} & 0.577 & 0.557 & \textbf{0.992$\pm$0.000} & 0.891 & 0.746 \\
+Sc3 & 0.007$\pm$0.006 & 0.119$\pm$0.035 & 0.245 & 0.158 & 0.146 & 0.990$\pm$0.000 & 0.043 & 0.244 \\
+Scdcc & \textbf{0.939$\pm$0.002} & 0.664$\pm$0.033 & 0.527 & \textbf{0.687} & \underline{0.567} & 0.921$\pm$0.002 & 0.865 & 0.739 \\
+Scdsc & 0.581$\pm$0.042 & \textbf{0.723$\pm$0.066} & -- & -- & -- & -- & -- & 0.652 \\
+scMAE & \underline{0.889$\pm$0.018} & 0.635$\pm$0.032 & \underline{0.679} & 0.577 & 0.557 & \textbf{0.992$\pm$0.000} & 0.891 & 0.746 \\
+\bottomrule
+\end{tabular}
+\vspace{2pt}
+\footnotesize Compact view for the primary metric. Best per dataset is bold; second-best is underlined.
+\end{table*}

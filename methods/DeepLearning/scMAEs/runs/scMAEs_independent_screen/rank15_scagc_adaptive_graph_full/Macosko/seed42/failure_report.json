@@ -1,0 +1,14 @@
+{
+  "dataset": "Macosko",
+  "method": "rank15_scagc_adaptive_graph_full",
+  "stage": "screen",
+  "seed": 42,
+  "status": "failed",
+  "failure": "process exited with code 139 before training logs",
+  "observed_stderr": [
+    "UserWarning: zero-centering a sparse array/matrix densifies it.",
+    "OpenBLAS warning: precompiled NUM_THREADS exceeded, adding auxiliary array for thread metadata."
+  ],
+  "note": "Melanoma_5K and Quake_10x_Spleen screen metrics were both below scMAE baseline, so this candidate cannot meet the two-dataset effective gate even if Macosko is retried. No Macosko metric was fabricated."
+}
+

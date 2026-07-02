@@ -1,0 +1,16 @@
+{
+  "edge_survival": 0.6779469871843183,
+  "neighbor_purity_proxy": 0.9866729480737019,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.7744800762635592,
+  "rare_risk_fraction": 0.0043969849246231155,
+  "embedding_variance": 0.6573996543884277,
+  "cluster_mass_min": 0.02533500837520938,
+  "cluster_mass_max": 0.5125628140703518,
+  "collapse_warning": false,
+  "edge_confidence_mean": NaN,
+  "edge_confidence_std": NaN,
+  "difficulty_score_mean": 0.21551752090454102,
+  "gene_difficulty_cv": 1.5793397426605225,
+  "diagnostic_note": "No NeighborMix is used. Self-guided MAE adaptation uses adaptive gene mask difficulty and rank-token targets."
+}

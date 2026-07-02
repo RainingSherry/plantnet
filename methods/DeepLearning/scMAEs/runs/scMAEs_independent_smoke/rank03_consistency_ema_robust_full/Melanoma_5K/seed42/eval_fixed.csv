@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,ema_decay,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + consistency EMA robust denoising,42,rank03_consistency_ema_robust_full,smoke,scaled encoder + log_expr target,0.99,0.524263239530246,0.5319390565787224,0.3801074995744143,0.4515242910994039,0.493429880653576,0.5319390565787224,0.5794871753701318,0.4916020904023347,9,,fixed,kmeans_known_k,True

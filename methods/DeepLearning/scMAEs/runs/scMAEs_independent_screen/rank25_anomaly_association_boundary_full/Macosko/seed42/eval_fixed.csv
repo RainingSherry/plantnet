@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + anomaly association boundary,42,rank25_anomaly_association_boundary_full,screen,scaled encoder + log-expression targets + covariance ordered gene modules,0.5158677021960364,0.4855989042588648,0.39784999827200007,0.2870914441954107,0.6205269631213376,0.48559890425886487,0.6149021729029432,0.40122767816284227,12,,fixed,kmeans_known_k,True

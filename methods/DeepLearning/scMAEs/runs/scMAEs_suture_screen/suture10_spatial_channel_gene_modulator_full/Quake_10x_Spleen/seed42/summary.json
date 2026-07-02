@@ -1,0 +1,51 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + spatial-channel gene modulator",
+  "method_dir": "suture10_spatial_channel_gene_modulator_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 81.01219511032104,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_suture_screen/suture10_spatial_channel_gene_modulator_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.7220477386934674,
+      "nmi": 0.6179233894466039,
+      "ari": 0.5059084873134799,
+      "f1_macro": 0.6126258558113519,
+      "fmi": 0.7361583714054907,
+      "v_measure": 0.617923389446604,
+      "homogeneity": 0.8117014096059731,
+      "completeness": 0.4988359496915465,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.8850364685058594,
+    "neighbor_purity_proxy": 0.9894123394751535,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.5125994682312012,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 1.1494455337524414,
+    "cluster_mass_min": 0.06072026800670017,
+    "cluster_mass_max": 0.48796063651591287,
+    "collapse_warning": false,
+    "cell_gate_mean": 0.11496353894472122,
+    "cell_gate_std": 0.01760980300605297,
+    "channel_gate_mean": 0.49984318017959595,
+    "channel_gate_std": 0.09528549760580063,
+    "diagnostic_note": "SCFM rewritten as latent channel/cell modulation; no image reshape, no graph, and no cell mixing."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Quick screen only; this file is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

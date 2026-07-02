@@ -1,0 +1,2 @@
+dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,suture07_wave_graph_propagation_full,42,smoke,0.6018169731885664,0.6754069515794187,0.5408533973828015,0.5000290108948772,0.6296415475303159,0.6754069515794187,0.7365454240907826,0.6236403940257089,9,,fixed,kmeans_known_k,True

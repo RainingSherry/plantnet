@@ -1,0 +1,16 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.8475662899771031,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.7683746218681335,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 1.0777722597122192,
+  "cluster_mass_min": 0.035453135386660756,
+  "cluster_mass_max": 0.23620651451362729,
+  "collapse_warning": false,
+  "prototype_entropy_mean": 0.7683746218681335,
+  "prototype_max_assignment_mean": 0.2052815556526184,
+  "prototype_gate_mean": 0.8077861070632935,
+  "prototype_gate_std": 0.15116068720817566,
+  "diagnostic_note": "Cluster-centric prototype adapter; no cell mixing; prototypes are initialized from warmup KMeans and propagated through prototype-prototype similarity."
+}

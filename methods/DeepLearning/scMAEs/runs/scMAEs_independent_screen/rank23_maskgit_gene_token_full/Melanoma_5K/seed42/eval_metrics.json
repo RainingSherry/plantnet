@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + MaskGIT gene-token curriculum",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.4356304010635941,
+      "nmi": 0.3131561522571556,
+      "ari": 0.2108575698834867,
+      "f1_macro": 0.3371371967228423,
+      "fmi": 0.3552838320688391,
+      "v_measure": 0.3131561522571556,
+      "homogeneity": 0.3349191854550362,
+      "completeness": 0.29404887025293314,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

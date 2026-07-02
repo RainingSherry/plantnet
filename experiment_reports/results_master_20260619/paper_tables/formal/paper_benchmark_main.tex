@@ -1,0 +1,78 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Benchmark results across datasets. Experiment group: canonical/formal\_benchmark\_20260607\_08.}
+\label{tab:benchmark\_main}
+\begin{tabular}{llrcccc}
+\toprule
+Dataset & Method & \#Seeds & ACC & NMI & ARI & Macro-F1 \\
+\midrule
+Pollen & DEC & 3 & 0.734$\pm$0.067 & 0.762$\pm$0.044 & 0.671$\pm$0.112 & 0.671$\pm$0.032 \\
+Pollen & Leiden & 3 & 0.628$\pm$0.000 & 0.690$\pm$0.001 & 0.457$\pm$0.001 & 0.385$\pm$0.000 \\
+Pollen & Louvain & 3 & 0.628$\pm$0.000 & 0.691$\pm$0.000 & 0.455$\pm$0.001 & 0.385$\pm$0.000 \\
+Pollen & Neighbormix scmae & 3 & 0.888$\pm$0.007 & 0.927$\pm$0.001 & 0.913$\pm$0.004 & \underline{0.764$\pm$0.016} \\
+Pollen & scMAE w/o NeighBorMix & 3 & \underline{0.889$\pm$0.018} & 0.928$\pm$0.014 & 0.911$\pm$0.012 & 0.753$\pm$0.019 \\
+Pollen & Sc3 & 3 & 0.007$\pm$0.006 & \underline{0.952$\pm$0.002} & \underline{0.954$\pm$0.002} & 0.016$\pm$0.014 \\
+Pollen & Scdcc & 3 & \textbf{0.939$\pm$0.002} & \textbf{0.955$\pm$0.005} & \textbf{0.959$\pm$0.003} & \textbf{0.891$\pm$0.006} \\
+Pollen & Scdsc & 3 & 0.581$\pm$0.042 & 0.615$\pm$0.018 & 0.443$\pm$0.050 & 0.336$\pm$0.071 \\
+Pollen & scMAE & 3 & \underline{0.889$\pm$0.018} & 0.928$\pm$0.014 & 0.911$\pm$0.012 & 0.753$\pm$0.019 \\
+\midrule
+Quake\_Smart-seq2\_Lung & DEC & 3 & \underline{0.695$\pm$0.046} & 0.639$\pm$0.029 & 0.566$\pm$0.066 & 0.570$\pm$0.072 \\
+Quake\_Smart-seq2\_Lung & Leiden & 3 & 0.612$\pm$0.014 & 0.648$\pm$0.001 & 0.505$\pm$0.012 & 0.454$\pm$0.005 \\
+Quake\_Smart-seq2\_Lung & Louvain & 3 & 0.626$\pm$0.055 & 0.646$\pm$0.025 & 0.513$\pm$0.046 & 0.442$\pm$0.046 \\
+Quake\_Smart-seq2\_Lung & Neighbormix scmae & 3 & 0.682$\pm$0.071 & \underline{0.772$\pm$0.040} & 0.634$\pm$0.089 & \textbf{0.604$\pm$0.098} \\
+Quake\_Smart-seq2\_Lung & scMAE w/o NeighBorMix & 3 & 0.635$\pm$0.032 & 0.767$\pm$0.005 & 0.593$\pm$0.016 & 0.541$\pm$0.056 \\
+Quake\_Smart-seq2\_Lung & Sc3 & 3 & 0.119$\pm$0.035 & \textbf{0.774$\pm$0.000} & 0.611$\pm$0.003 & 0.058$\pm$0.014 \\
+Quake\_Smart-seq2\_Lung & Scdcc & 3 & 0.664$\pm$0.033 & 0.769$\pm$0.034 & \textbf{0.646$\pm$0.091} & \underline{0.574$\pm$0.011} \\
+Quake\_Smart-seq2\_Lung & Scdsc & 3 & \textbf{0.723$\pm$0.066} & 0.660$\pm$0.064 & \underline{0.643$\pm$0.112} & 0.479$\pm$0.043 \\
+Quake\_Smart-seq2\_Lung & scMAE & 3 & 0.635$\pm$0.032 & 0.767$\pm$0.005 & 0.593$\pm$0.016 & 0.541$\pm$0.056 \\
+\midrule
+SRP171040 & DEC & 1 & 0.468 & 0.470 & 0.291 & 0.326 \\
+SRP171040 & Leiden & 1 & \textbf{0.690} & 0.676 & \textbf{0.583} & 0.468 \\
+SRP171040 & Louvain & 1 & 0.677 & 0.648 & 0.522 & 0.454 \\
+SRP171040 & Neighbormix scmae & 1 & 0.630 & \underline{0.688} & 0.521 & \textbf{0.547} \\
+SRP171040 & scMAE w/o NeighBorMix & 1 & \underline{0.679} & \textbf{0.693} & \underline{0.554} & \underline{0.543} \\
+SRP171040 & Sc3 & 1 & 0.245 & 0.668 & 0.469 & 0.053 \\
+SRP171040 & Scdcc & 1 & 0.527 & 0.624 & 0.424 & 0.481 \\
+SRP171040 & scMAE & 1 & \underline{0.679} & \textbf{0.693} & \underline{0.554} & \underline{0.543} \\
+\midrule
+SRP182008 & DEC & 1 & 0.413 & 0.428 & 0.282 & 0.248 \\
+SRP182008 & Leiden & 1 & \underline{0.612} & 0.609 & 0.417 & \textbf{0.658} \\
+SRP182008 & Louvain & 1 & 0.542 & 0.563 & 0.250 & 0.570 \\
+SRP182008 & Neighbormix scmae & 1 & 0.581 & 0.616 & 0.423 & 0.475 \\
+SRP182008 & scMAE w/o NeighBorMix & 1 & 0.577 & 0.595 & 0.369 & 0.478 \\
+SRP182008 & Sc3 & 1 & 0.158 & \underline{0.626} & \underline{0.426} & 0.063 \\
+SRP182008 & Scdcc & 1 & \textbf{0.687} & \textbf{0.677} & \textbf{0.566} & \underline{0.621} \\
+SRP182008 & scMAE & 1 & 0.577 & 0.595 & 0.369 & 0.478 \\
+\midrule
+SRP235541 & DEC & 1 & 0.358 & 0.414 & 0.230 & 0.233 \\
+SRP235541 & Leiden & 1 & \textbf{0.657} & \textbf{0.674} & \textbf{0.536} & \textbf{0.636} \\
+SRP235541 & Louvain & 1 & 0.480 & 0.498 & 0.171 & 0.497 \\
+SRP235541 & Neighbormix scmae & 1 & 0.566 & 0.652 & 0.388 & 0.537 \\
+SRP235541 & scMAE w/o NeighBorMix & 1 & 0.557 & \underline{0.656} & 0.387 & \underline{0.543} \\
+SRP235541 & Sc3 & 1 & 0.146 & 0.637 & 0.373 & 0.050 \\
+SRP235541 & Scdcc & 1 & \underline{0.567} & 0.615 & \underline{0.397} & 0.518 \\
+SRP235541 & scMAE & 1 & 0.557 & \underline{0.656} & 0.387 & \underline{0.543} \\
+\midrule
+Wang & DEC & 3 & 0.767$\pm$0.001 & 0.009$\pm$0.003 & -0.017$\pm$0.000 & 0.435$\pm$0.002 \\
+Wang & Leiden & 3 & 0.496$\pm$0.043 & 0.140$\pm$0.005 & -0.058$\pm$0.033 & 0.334$\pm$0.015 \\
+Wang & Louvain & 3 & 0.765$\pm$0.006 & 0.011$\pm$0.004 & -0.020$\pm$0.007 & 0.434$\pm$0.002 \\
+Wang & Neighbormix scmae & 3 & \underline{0.992$\pm$0.001} & \underline{0.912$\pm$0.006} & \underline{0.964$\pm$0.003} & \underline{0.988$\pm$0.001} \\
+Wang & scMAE w/o NeighBorMix & 3 & \textbf{0.992$\pm$0.000} & \textbf{0.915$\pm$0.003} & \textbf{0.965$\pm$0.001} & \textbf{0.988$\pm$0.000} \\
+Wang & Sc3 & 3 & 0.990$\pm$0.000 & 0.906$\pm$0.000 & 0.958$\pm$0.000 & 0.010$\pm$0.000 \\
+Wang & Scdcc & 3 & 0.921$\pm$0.002 & 0.621$\pm$0.007 & 0.694$\pm$0.008 & 0.897$\pm$0.003 \\
+Wang & scMAE & 3 & \textbf{0.992$\pm$0.000} & \textbf{0.915$\pm$0.003} & \textbf{0.965$\pm$0.001} & \textbf{0.988$\pm$0.000} \\
+\midrule
+hrvatin\_geo\_maintype\_counts & DEC & 1 & \underline{0.917} & 0.844 & 0.853 & \underline{0.758} \\
+hrvatin\_geo\_maintype\_counts & Leiden & 1 & 0.453 & 0.323 & 0.174 & 0.283 \\
+hrvatin\_geo\_maintype\_counts & Louvain & 1 & 0.156 & 0.012 & -0.003 & 0.044 \\
+hrvatin\_geo\_maintype\_counts & Neighbormix scmae & 1 & \textbf{0.928} & \textbf{0.941} & \textbf{0.910} & \textbf{0.853} \\
+hrvatin\_geo\_maintype\_counts & scMAE w/o NeighBorMix & 1 & 0.891 & \underline{0.908} & \underline{0.873} & 0.715 \\
+hrvatin\_geo\_maintype\_counts & Sc3 & 1 & 0.043 & 0.880 & 0.842 & 0.012 \\
+hrvatin\_geo\_maintype\_counts & Scdcc & 1 & 0.865 & 0.862 & 0.853 & 0.690 \\
+hrvatin\_geo\_maintype\_counts & scMAE & 1 & 0.891 & \underline{0.908} & \underline{0.873} & 0.715 \\
+\bottomrule
+\end{tabular}
+\vspace{2pt}
+\footnotesize Values are mean$\pm$std over random seeds. Best results per dataset and metric are bold; second-best results are underlined.
+\end{table*}

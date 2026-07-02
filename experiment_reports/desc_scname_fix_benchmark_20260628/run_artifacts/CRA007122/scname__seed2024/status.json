@@ -1,0 +1,20 @@
+{
+  "value_tag": "updated_after_desc_scname_fix_20260628",
+  "dataset": "CRA007122",
+  "data_path": "/data/luolie/biopipeline/scCluBench/data/CRA007122.h5ad",
+  "method": "scname",
+  "seed": 2024,
+  "epochs": 80,
+  "pretrain_epochs": 80,
+  "n_clusters": 7,
+  "status": "success",
+  "return_code": 0,
+  "error": "",
+  "gpu": 5,
+  "no_cuda": false,
+  "start_time": "2026-06-28T01:30:32.909601",
+  "end_time": "2026-06-28T02:17:27.995329",
+  "elapsed_seconds": 2815.1,
+  "command": "/data/luolie/conda/envs/scssl_bench_py310/bin/python /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scNAME/run.py --data_path /data/luolie/biopipeline/scCluBench/data/CRA007122.h5ad --save_dir /home/luolie/biopipeline/dimension-reduction/plantnet/experiment_reports/desc_scname_fix_benchmark_20260628/run_artifacts/CRA007122/scname__seed2024 --n_clusters 7 --seed 2024 --epochs 80 --pretrain_epochs 80 --gpu 5",
+  "save_dir": "/home/luolie/biopipeline/dimension-reduction/plantnet/experiment_reports/desc_scname_fix_benchmark_20260628/run_artifacts/CRA007122/scname__seed2024"
+}

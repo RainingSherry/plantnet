@@ -1,0 +1,13 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.8795036561045867,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9286636513325373,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 1.0856282711029053,
+  "cluster_mass_min": 0.03678262796366054,
+  "cluster_mass_max": 0.2027476179924662,
+  "collapse_warning": false,
+  "teacher_target_std": 0.5413290858268738,
+  "diagnostic_note": "No NeighborMix graph is used; EMA teacher latent targets are regressed from strong masked student views."
+}

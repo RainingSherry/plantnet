@@ -1,0 +1,16 @@
+{
+  "method_dir": "suture10_spatial_channel_gene_modulator_full",
+  "method_name": "scMAE + spatial-channel gene modulator",
+  "source_type": "suture_module_rewrite",
+  "reference_file": "/home/luolie/biopipeline/dimension-reduction/plantnet/缝合模块/即插即用/227 Spatial-Channel Feature Modulator (CVPR 2026).py",
+  "reference_title": "Spatial-Channel Feature Modulator",
+  "scmae_gap": "latent calibration and boundary-stable local modulation",
+  "core_mechanism": "latent channel gate plus cell/sample gate with small residual modulation",
+  "neighbor_mix_relation": "independent; NeighborMix is not used",
+  "implementation_notes": [
+    "scaled_expr is used only as encoder input",
+    "log_expr is used for masked expression reconstruction target",
+    "no image reshape, spatial convolution, KNN graph, prototype memory, or cell mixing is used",
+    "screen results are written only to quick-screen CSV files"
+  ]
+}

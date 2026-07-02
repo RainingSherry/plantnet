@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + scDiffusion pseudo-condition DDPM",
+  "seed": 42,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.5469559007320122,
+      "nmi": 0.6026297738393426,
+      "ari": 0.40157165246868626,
+      "f1_macro": 0.42138401695162925,
+      "fmi": 0.6196574328302938,
+      "v_measure": 0.6026297738393426,
+      "homogeneity": 0.8022213071774644,
+      "completeness": 0.4825676267681415,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

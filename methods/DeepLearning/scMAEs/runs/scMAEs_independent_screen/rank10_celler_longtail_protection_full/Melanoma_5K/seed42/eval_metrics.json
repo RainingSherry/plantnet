@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + Celler long-tail protection",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6370485264790605,
+      "nmi": 0.6382632059398246,
+      "ari": 0.5420755464996948,
+      "f1_macro": 0.4997049680821226,
+      "fmi": 0.6300724751851106,
+      "v_measure": 0.6382632059398244,
+      "homogeneity": 0.6882621365978365,
+      "completeness": 0.5950366575130385,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

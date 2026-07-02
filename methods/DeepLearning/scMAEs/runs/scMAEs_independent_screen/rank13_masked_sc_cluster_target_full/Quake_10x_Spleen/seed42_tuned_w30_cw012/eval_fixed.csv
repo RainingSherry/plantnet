@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + mask-sc cluster target,42,rank13_masked_sc_cluster_target_full,screen,scaled encoder + warmup cluster target,0.9580192629815746,0.8542704987931056,0.9253616405243048,0.726879743689826,0.9667424788402251,0.8542704987931056,0.8831508020460643,0.8272192382364689,5,,fixed,kmeans_known_k,True

@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + BGRL graph bootstrap",
+  "seed": 42,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.4009328691305124,
+      "nmi": 0.537222114289802,
+      "ari": 0.2175463623752834,
+      "f1_macro": 0.34494355159422335,
+      "fmi": 0.4528530273732996,
+      "v_measure": 0.5372221142898019,
+      "homogeneity": 0.7978176637840396,
+      "completeness": 0.404950813896466,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

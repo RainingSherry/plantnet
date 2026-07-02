@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "suture07_wave_graph_propagation_full",
+  "seed": 42,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.553391959798995,
+      "nmi": 0.484623806865623,
+      "ari": 0.307923363837854,
+      "f1_macro": 0.47079459506553245,
+      "fmi": 0.5904840092091997,
+      "v_measure": 0.48462380686562295,
+      "homogeneity": 0.6844288483167054,
+      "completeness": 0.3751162648685659,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

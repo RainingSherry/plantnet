@@ -1,0 +1,20 @@
+{
+  "rank": 60,
+  "method_dir": "rank60_qdiffusion_latent_denoising_full",
+  "paper_title": "q-Diffusion leverages the full dimensionality of gene coexpression in single-cell transcriptomics",
+  "recommendation": "可用",
+  "recommendation_score": 70,
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/060_可用_q-Diffusion_leverages_the_full_dimensionality_of_gene_coexpression_in_single-cell_transcriptomics.pdf",
+  "github_url": "https://github.com/marmarelis/QDiffusion.jl",
+  "github_status": "Anonymous ls-remote and clone of marmarelis/QDiffusion.jl succeeded. Core files inspected: README.md and src/kernels.jl. The report URL https://github.com/zsteve/qDiffusion was also checked but required credentials in this environment.",
+  "implemented_from": [
+    "QDiffusion.jl README: log-normalized data, DeformedKernel(q=1.5), AdaptiveKernel, inner_bandwidth",
+    "QDiffusion.jl src/kernels.jl: q_exp, q_sum_dynamic, q-deformed distance, adaptive neighbor bandwidth",
+    "q-Diffusion PDF abstract/introduction: high-dimensional coexpression kernel, robustness and multiscale structure",
+    "methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md section 61 notes for index rank60",
+    "methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv row sort_rank=60"
+  ],
+  "scmae_gap": "robust target / semantic denoising",
+  "core_mechanism": "Build a q-deformed adaptive neighbor kernel on log-expression and train a time-conditioned scMAE latent denoiser with weak q-context consistency.",
+  "neighbor_mix_relation": "independent and complementary; this candidate does not use NeighborMix and does not mix cells."
+}

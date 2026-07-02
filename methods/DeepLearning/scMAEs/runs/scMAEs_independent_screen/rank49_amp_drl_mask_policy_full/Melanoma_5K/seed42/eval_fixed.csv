@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + AMP-DRL adaptive mask policy,42,rank49_amp_drl_mask_policy_full,screen,scaled encoder + log-expression targets + AMP-DRL adaptive mask policy,0.6718369155772214,0.6395402898292366,0.5217684545802478,0.6112852243562236,0.6160910352040692,0.6395402898292366,0.6645452261369196,0.6163488454871988,9,,fixed,kmeans_known_k,True

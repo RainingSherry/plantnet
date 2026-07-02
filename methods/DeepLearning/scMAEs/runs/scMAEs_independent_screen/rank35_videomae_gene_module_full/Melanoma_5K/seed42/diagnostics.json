@@ -1,0 +1,13 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.7490139596720585,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9229156028473,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.3796890377998352,
+  "cluster_mass_min": 0.04232218036782628,
+  "cluster_mass_max": 0.21604254376246398,
+  "collapse_warning": false,
+  "masked_patch_fraction_mean": 0.7599999904632568,
+  "diagnostic_note": "No NeighborMix is used. VideoMAE-style tube masking is applied over data-ordered gene modules."
+}

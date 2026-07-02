@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + scMamba module sequence,42,rank11_scmamba_module_sequence_full,smoke,coexpression ordered module sequence,0.3494349656547751,0.2454642701139416,0.16572819756077387,0.2691640930284438,0.3101126015485282,0.2454642701139416,0.269316967343426,0.22549295103420744,9,,fixed,kmeans_known_k,True

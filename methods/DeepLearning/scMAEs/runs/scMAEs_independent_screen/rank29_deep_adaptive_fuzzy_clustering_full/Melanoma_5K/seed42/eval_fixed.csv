@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + deep adaptive fuzzy clustering,42,rank29_deep_adaptive_fuzzy_clustering_full,screen,scaled encoder + log-expression targets + adaptive fuzzy clustering,0.6419233325947263,0.576039617867697,0.526222533464087,0.36489092223650066,0.6259439564551563,0.576039617867697,0.5639594643737558,0.5886486192657372,9,,fixed,kmeans_known_k,True

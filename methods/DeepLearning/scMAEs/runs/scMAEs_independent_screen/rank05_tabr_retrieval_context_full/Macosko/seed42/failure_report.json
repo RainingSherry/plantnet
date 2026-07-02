@@ -1,0 +1,10 @@
+{
+  "dataset": "Macosko",
+  "method": "rank05_tabr_retrieval_context_full",
+  "seed": 42,
+  "stage": "screen",
+  "status": "failed_before_training",
+  "reason": "The process exited with code 139 during preprocessing/context setup after an OpenBLAS thread metadata warning. A retry with OPENBLAS_NUM_THREADS=64 also exited with code 139. A retry with --scale_input false exited with code 134 and 'corrupted size vs. prev_size'. No eval_fixed.csv or metrics.json was produced.",
+  "metrics_available": false,
+  "do_not_count_as_effective": true
+}

@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,ema_decay,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + consistency EMA robust denoising,42,rank03_consistency_ema_robust_full,screen,scaled encoder + log_expr target,0.99,0.581971969291198,0.5862149203027163,0.48759904858486697,0.36041243232768716,0.685194495317097,0.5862149203027164,0.7442661520138385,0.4835326580827486,12,,fixed,kmeans_known_k,True

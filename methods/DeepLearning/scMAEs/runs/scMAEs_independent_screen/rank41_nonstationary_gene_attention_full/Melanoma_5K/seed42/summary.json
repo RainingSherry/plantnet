@@ -1,0 +1,52 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + non-stationary gene-module attention",
+  "method_dir": "rank41_nonstationary_gene_attention_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 80.07689213752747,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank41_nonstationary_gene_attention_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6722800797695546,
+      "nmi": 0.6784942552079763,
+      "ari": 0.5787441326033734,
+      "f1_macro": 0.5034224919173356,
+      "fmi": 0.6608165319133025,
+      "v_measure": 0.6784942552079765,
+      "homogeneity": 0.7203572114205151,
+      "completeness": 0.641229726529296,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.8560602703301573,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.8869437089688517,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.3040458559989929,
+    "cluster_mass_min": 0.03567471748282739,
+    "cluster_mass_max": 0.25659206736095724,
+    "collapse_warning": false,
+    "module_count": 40,
+    "module_loss": 0.0029612589928814594,
+    "consistency_loss": 0.0005606494669336826,
+    "tau_mean": 1.0,
+    "delta_abs_mean": 0.0,
+    "diagnostic_note": "No NeighborMix is used. Non-stationary attention is applied on an SVD-derived gene-module axis, not raw HVG index order."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

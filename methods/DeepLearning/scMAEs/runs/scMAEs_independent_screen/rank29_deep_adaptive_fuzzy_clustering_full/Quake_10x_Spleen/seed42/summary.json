@@ -1,0 +1,49 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + deep adaptive fuzzy clustering",
+  "method_dir": "rank29_deep_adaptive_fuzzy_clustering_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 57.21112036705017,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank29_deep_adaptive_fuzzy_clustering_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.44765494137353434,
+      "nmi": 0.41238938512130535,
+      "ari": 0.1795085579148475,
+      "f1_macro": 0.2629567455814605,
+      "fmi": 0.48941257220516654,
+      "v_measure": 0.4123893851213054,
+      "homogeneity": 0.5976263861745199,
+      "completeness": 0.3148119862898691,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9798052763819095,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9666877101617072,
+    "rare_risk_fraction": 0.10008375209380234,
+    "embedding_variance": 0.8619410395622253,
+    "cluster_mass_min": 0.13274706867671693,
+    "cluster_mass_max": 0.3036013400335008,
+    "collapse_warning": false,
+    "membership_confidence_mean": 0.970745861530304,
+    "membership_confidence_p10": 0.9539154767990112,
+    "diagnostic_note": "No NeighborMix is used. Adaptive fuzzy membership strengthens only high-confidence core cells and leaves boundary cells entropy-tolerant."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

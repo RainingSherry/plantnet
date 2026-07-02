@@ -1,0 +1,14 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.8327276756038112,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.7564035467968676,
+  "rare_risk_fraction": 0.10015510746731664,
+  "embedding_variance": 0.7115147709846497,
+  "cluster_mass_min": 0.0042100598271659646,
+  "cluster_mass_max": 0.32151562153777974,
+  "collapse_warning": false,
+  "membership_confidence_mean": 0.9105021357536316,
+  "membership_confidence_p10": 0.8686482906341553,
+  "diagnostic_note": "No NeighborMix is used. Adaptive fuzzy membership strengthens only high-confidence core cells and leaves boundary cells entropy-tolerant."
+}

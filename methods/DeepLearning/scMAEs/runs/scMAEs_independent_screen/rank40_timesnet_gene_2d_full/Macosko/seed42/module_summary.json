@@ -1,0 +1,20 @@
+{
+  "gene_order": {
+    "method": "sampled log-expression SVD order; genes sorted by first-two loading angle and loading radius",
+    "sampled_cells": 5000,
+    "n_genes": 1000,
+    "singular_values_head": [
+      374.0556335449219,
+      271.7284240722656,
+      246.29600524902344,
+      242.12057495117188,
+      205.1597900390625,
+      181.47926330566406,
+      172.9392547607422,
+      155.6944580078125
+    ]
+  },
+  "module_size": 25,
+  "n_modules": 40,
+  "note": "Gene modules are contiguous blocks after sampled log-expression SVD ordering; TimesNet FFT period discovery runs on these modules."
+}

@@ -1,0 +1,16 @@
+{
+  "edge_survival": 0.6001425079397253,
+  "neighbor_purity_proxy": 0.9670540201005026,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.6970767416273828,
+  "rare_risk_fraction": 0.0043969849246231155,
+  "embedding_variance": 1.2883892850368284e-06,
+  "cluster_mass_min": 0.05402010050251256,
+  "cluster_mass_max": 0.6393425460636516,
+  "collapse_warning": false,
+  "mask_score_mean": 0.3918156325817108,
+  "posterior_variance_mean": 1.0251810550689697,
+  "posterior_variance_p95": 1.026674747467041,
+  "raw_counts_available": true,
+  "diagnostic_note": "No NeighborMix is used. NB loss uses aligned raw counts only when available; scaled expression is never used as count data."
+}

@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "suture07_wave_graph_propagation_full",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6018169731885664,
+      "nmi": 0.6754069515794187,
+      "ari": 0.5408533973828015,
+      "f1_macro": 0.5000290108948772,
+      "fmi": 0.6296415475303159,
+      "v_measure": 0.6754069515794187,
+      "homogeneity": 0.7365454240907826,
+      "completeness": 0.6236403940257089,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

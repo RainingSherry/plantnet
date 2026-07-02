@@ -1,0 +1,18 @@
+{
+  "rank": 59,
+  "method_dir": "rank59_soft_graph_clustering_full",
+  "paper_title": "Soft Graph Clustering for single-cell RNA Sequencing Data",
+  "recommendation": "可用",
+  "recommendation_score": 70,
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/059_可用_Soft_Graph_Clustering_for_single-cell_RNA_Sequencing_Data.pdf",
+  "github_url": "https://github.com/seandavi/awesome-single-cell",
+  "github_status": "Anonymous clone of https://github.com/seandavi/awesome-single-cell.git succeeded, but the repository is a curated resource list and contains no runnable Soft Graph Clustering/scSGC implementation. The candidate is reconstructed from the PDF and the scMAE improvement report.",
+  "implemented_from": [
+    "Soft Graph Clustering PDF: continuous soft graph weights, feature/cosine similarity views, graph-aware clustering motivation",
+    "methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md section 60 notes for index rank59",
+    "methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv row sort_rank=59"
+  ],
+  "scmae_gap": "graph / neighbor reliability",
+  "core_mechanism": "Build a shallow dual-channel soft KNN graph on log-expression and train a scMAE embedding with soft edge reconstruction, DropEdge robustness, and residual neighbor consistency.",
+  "neighbor_mix_relation": "independent and complementary; this candidate does not use NeighborMix and does not mix cells."
+}

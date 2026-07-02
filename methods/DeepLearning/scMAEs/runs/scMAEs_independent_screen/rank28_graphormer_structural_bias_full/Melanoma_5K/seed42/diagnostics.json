@@ -1,0 +1,14 @@
+{
+  "edge_survival": 0.850137917434468,
+  "neighbor_purity_proxy": 0.8621537779747397,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9282743847517693,
+  "rare_risk_fraction": 0.10015510746731664,
+  "embedding_variance": 0.3148418068885803,
+  "cluster_mass_min": 0.031243075559494793,
+  "cluster_mass_max": 0.20474185685796586,
+  "collapse_warning": false,
+  "edge_confidence_mean": 0.9920806288719177,
+  "edge_confidence_std": 0.03313680738210678,
+  "diagnostic_note": "No NeighborMix is used. Local Graphormer uses centrality encoding, KNN-rank spatial attention bias, edge confidence, and DropEdge robustness around the scMAE objective."
+}

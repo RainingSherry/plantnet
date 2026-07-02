@@ -1,0 +1,16 @@
+{
+  "method_dir": "suture05_token_statistics_aux_full",
+  "candidate_order": 5,
+  "reference_module": "/home/luolie/biopipeline/dimension-reduction/plantnet/缝合模块/即插即用/129 Token Statistics Self-Attention(ICLR 2025).py",
+  "reference_title": "Token Statistics Transformer: Linear-Time Attention via Variational Rate Reduction",
+  "reference_url": "https://arxiv.org/abs/2412.17810",
+  "implementation_source": "Rewritten as a gene-token statistics auxiliary branch for scRNA expression.",
+  "scmae_gap": "semantic target / gene-token statistics",
+  "core_mechanism": "linear gene-token statistics latent auxiliary branch",
+  "neighbor_mix_relation": "independent; no cell mixing is used",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true",
+    "reconstruction_target": "log_expr",
+    "scaled_expression_not_used_as": ["counts", "tokens from counts", "NB target", "ZINB target", "diffusion target"]
+  }
+}

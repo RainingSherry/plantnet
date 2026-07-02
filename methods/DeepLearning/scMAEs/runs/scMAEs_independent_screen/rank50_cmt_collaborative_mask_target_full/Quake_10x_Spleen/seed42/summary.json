@@ -1,0 +1,51 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + CMT collaborative mask target",
+  "method_dir": "rank50_cmt_collaborative_mask_target_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 43.14675688743591,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank50_cmt_collaborative_mask_target_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.9091289782244556,
+      "nmi": 0.6641591099982079,
+      "ari": 0.7664607619277045,
+      "f1_macro": 0.6903411665790555,
+      "fmi": 0.8981860552264366,
+      "v_measure": 0.6641591099982079,
+      "homogeneity": 0.6733377888175681,
+      "completeness": 0.6552273062327513,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.7546260433422552,
+    "neighbor_purity_proxy": 0.9755443886097153,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.5232975399866521,
+    "rare_risk_fraction": 0.0043969849246231155,
+    "embedding_variance": 0.05392248183488846,
+    "cluster_mass_min": 0.02229899497487437,
+    "cluster_mass_max": 0.7239321608040201,
+    "collapse_warning": false,
+    "edge_confidence_mean": NaN,
+    "edge_confidence_std": NaN,
+    "mask_score_mean": 0.24582001566886902,
+    "teacher_alpha_final": 0.35,
+    "diagnostic_note": "No NeighborMix is used. CMT adaptation linearly combines fixed teacher saliency/targets and EMA student saliency/targets."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

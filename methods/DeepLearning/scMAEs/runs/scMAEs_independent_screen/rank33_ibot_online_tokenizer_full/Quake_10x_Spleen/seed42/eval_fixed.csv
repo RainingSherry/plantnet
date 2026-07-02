@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + iBOT online tokenizer,42,rank33_ibot_online_tokenizer_full,screen,scaled encoder + log-expression targets + iBOT online tokenizer,0.5534966499162479,0.5567459687368181,0.3543085932944894,0.4449016014673027,0.6247331779303881,0.5567459687368183,0.7876564305642939,0.43053092118139774,5,,fixed,kmeans_known_k,True

@@ -1,0 +1,51 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + TS2Vec gene-module contextual consistency",
+  "method_dir": "rank39_ts2vec_gene_module_full",
+  "stage": "smoke",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 113.2787024974823,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_smoke/rank39_ts2vec_gene_module_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6911145579437181,
+      "nmi": 0.6416219723133495,
+      "ari": 0.5496853717915292,
+      "f1_macro": 0.5088410906572426,
+      "fmi": 0.6371278440598036,
+      "v_measure": 0.6416219723133495,
+      "homogeneity": 0.6786097124980432,
+      "completeness": 0.6084578704572762,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.8054952359849324,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.8805445935404985,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.2845994234085083,
+    "cluster_mass_min": 0.038112120540660314,
+    "cluster_mass_max": 0.26501218701528917,
+    "collapse_warning": false,
+    "module_count": 40,
+    "contrast_loss": 3.404193064745735,
+    "module_loss": 0.0039295322426101745,
+    "view_steps": 21.176470588235293,
+    "diagnostic_note": "No NeighborMix is used. TS2Vec is applied on an SVD-derived gene-module axis, not raw HVG index order."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

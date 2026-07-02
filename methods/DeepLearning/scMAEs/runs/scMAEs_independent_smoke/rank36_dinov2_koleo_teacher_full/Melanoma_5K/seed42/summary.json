@@ -1,0 +1,50 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + DINOv2 KoLeo teacher",
+  "method_dir": "rank36_dinov2_koleo_teacher_full",
+  "stage": "smoke",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 3.335693597793579,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_smoke/rank36_dinov2_koleo_teacher_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.3503212940394416,
+      "nmi": 0.3051283021730059,
+      "ari": 0.18365869812299163,
+      "f1_macro": 0.2899545078254303,
+      "fmi": 0.3190572154266029,
+      "v_measure": 0.30512830217300585,
+      "homogeneity": 0.34275837620902455,
+      "completeness": 0.27494336728905167,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.6505207179259915,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9842527261308923,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.03826583921909332,
+    "cluster_mass_min": 0.06270773321515621,
+    "cluster_mass_max": 0.16042543762463993,
+    "collapse_warning": false,
+    "teacher_embedding_variance": 0.023063872009515762,
+    "teacher_cls_confidence_mean": 0.44013282510579804,
+    "teacher_patch_confidence_mean": 0.8047888781510147,
+    "diagnostic_note": "No NeighborMix is used. DINOv2-style EMA teacher distillation plus KoLeo spreading is applied."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

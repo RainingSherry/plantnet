@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,policy_probs,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + JOAO mask policy,42,rank04_joao_mask_policy_full,smoke,scaled encoder + JOAO mask policy,swap:0.1815;absorbing:0.4149;module:0.1924;dropout:0.2112,0.576335032129404,0.6627410799126012,0.5102431669039326,0.47704451106772616,0.6039450876442419,0.6627410799126012,0.726803178141966,0.6090573673632316,9,,fixed,kmeans_known_k,True

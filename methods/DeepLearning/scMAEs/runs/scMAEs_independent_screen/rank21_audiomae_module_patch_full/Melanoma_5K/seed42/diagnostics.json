@@ -1,0 +1,13 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.77994682029692,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9054937058558947,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.052695244550704956,
+  "cluster_mass_min": 0.036339463771327275,
+  "cluster_mass_max": 0.25083093286062486,
+  "collapse_warning": false,
+  "module_target_variance": 0.059964194893836975,
+  "diagnostic_note": "No NeighborMix graph is used; AudioMAE-style high-ratio module patch masking is applied after coexpression ordering."
+}

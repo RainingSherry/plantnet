@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + trajectory-guided token selection,42,rank51_trajectory_guided_token_selection_full,screen,scaled encoder + log-expression targets + trajectory-guided mask token selection,0.6445823177487259,0.6679903465712893,0.553111034707189,0.5122660893459305,0.6396685746678329,0.6679903465712893,0.7255116303057484,0.6189200436912321,9,,fixed,kmeans_known_k,True

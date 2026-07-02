@@ -1,0 +1,34 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+Building PCA-KNN graph for NeighborMix ...
+Device=cuda:0 dataset=Macosko cells=44808 genes=1000 clusters=12
+Method=GatedNeighborMix_scMAE stage=screen epochs=80 warmup=20
+Epoch 001/80 loss=0.1959 scmae=0.0984 pseudo=0.3250 cluster=0.0000 r_mean=1.000 core=0.000 scale=0.00
+Epoch 010/80 loss=0.1471 scmae=0.0643 pseudo=0.2759 cluster=0.0000 r_mean=1.000 core=0.000 scale=0.00
+Epoch 020/80 loss=0.1442 scmae=0.0626 pseudo=0.2720 cluster=0.0000 r_mean=1.000 core=0.000 scale=0.00
+OpenBLAS warning: precompiled NUM_THREADS exceeded, adding auxiliary array for thread metadata.
+Epoch 030/80 loss=0.2403 scmae=0.0683 pseudo=0.2547 cluster=0.5462 r_mean=0.450 core=0.903 scale=0.50
+Epoch 040/80 loss=0.3694 scmae=0.0683 pseudo=0.2713 cluster=0.6278 r_mean=0.655 core=0.914 scale=1.00
+Epoch 050/80 loss=0.3654 scmae=0.0678 pseudo=0.2726 cluster=0.6167 r_mean=0.698 core=0.920 scale=1.00
+Epoch 060/80 loss=0.3663 scmae=0.0678 pseudo=0.2730 cluster=0.6187 r_mean=0.683 core=0.940 scale=1.00
+Epoch 070/80 loss=0.3789 scmae=0.0678 pseudo=0.2738 cluster=0.6541 r_mean=0.691 core=0.941 scale=1.00
+Epoch 080/80 loss=0.3835 scmae=0.0677 pseudo=0.2741 cluster=0.6674 r_mean=0.686 core=0.940 scale=1.00
+OpenBLAS : Program is Terminated. Because you tried to allocate too many memory regions.
+OpenBLAS : Program is Terminated. Because you tried to allocate too many memory regions.
+OpenBLAS : Program is Terminated. Because you tried to allocate too many memory regions.
+OpenBLAS : Program is Terminated. Because you tried to allocate too many memory regions.
+OpenBLAS : Program is Terminated. Because you tried to allocate too many memory regions.
+OpenBLAS : Program is Terminated. Because you tried to allocate too many memory regions.
+OpenBLAS : Program is Terminated. Because you tried to allocate too many memory regions.
+This library was built to support a maximum of 128 threads - either rebuild OpenBLAS
+with a larger NUM_THREADS value or set the environment variable OPENBLAS_NUM_THREADS to
+a sufficiently small number. This error typically occurs when the software that relies on
+OpenBLAS calls BLAS functions from many threads in parallel, or when your computer has more
+cpu cores than what OpenBLAS was configured to handle.
+OpenBLAS : Program is Terminated. Because you tried to allocate too many memory regions.
+OpenBLAS : Program is Terminated. Because you tried to allocate too many memory regions.
+OpenBLAS : Program is Terminated. Because you tried to allocate too many memory regions.

@@ -1,0 +1,50 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + MAE asymmetric decoder",
+  "method_dir": "rank48_mae_asymmetric_decoder_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 37.30364537239075,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank48_mae_asymmetric_decoder_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6834170854271356,
+      "nmi": 0.6122454347084038,
+      "ari": 0.4681820391943341,
+      "f1_macro": 0.6109592392730577,
+      "fmi": 0.7102353638667502,
+      "v_measure": 0.6122454347084038,
+      "homogeneity": 0.8155845364018113,
+      "completeness": 0.4900641131108155,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.9664165949499285,
+    "neighbor_purity_proxy": 0.9862018425460637,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.847468910328751,
+    "rare_risk_fraction": 0.0043969849246231155,
+    "embedding_variance": 1.032525897026062,
+    "cluster_mass_min": 0.059463986599664995,
+    "cluster_mass_max": 0.44304857621440535,
+    "collapse_warning": false,
+    "edge_confidence_mean": NaN,
+    "edge_confidence_std": NaN,
+    "mask_score_mean": 0.03138554468750954,
+    "diagnostic_note": "No NeighborMix is used. MAE asymmetric decoder uses scMAE swap corruption and mask prediction; no graph edges are trained."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

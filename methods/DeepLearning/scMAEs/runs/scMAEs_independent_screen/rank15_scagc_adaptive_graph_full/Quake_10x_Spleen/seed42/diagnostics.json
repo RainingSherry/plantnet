@@ -1,0 +1,13 @@
+{
+  "edge_survival": 0.6357830820770519,
+  "neighbor_purity_proxy": 0.9549204355108878,
+  "mixed_cell_fraction": 0.47650839315878385,
+  "boundary_entropy": 0.5811607078722167,
+  "rare_risk_fraction": 0.0775753768844221,
+  "embedding_variance": 0.6225864291191101,
+  "cluster_mass_min": 0.02858040201005025,
+  "cluster_mass_max": 0.6969221105527639,
+  "collapse_warning": false,
+  "edge_confidence_mean": 0.6405983567237854,
+  "diagnostic_note": "Adaptive graph reliability with optional confidence-gated local mix; boundary/rare veto can set mix to zero."
+}

@@ -1,0 +1,18 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+Building PCA-KNN graph ...
+Device=cuda:0 dataset=Macosko cells=44808 clusters=12 force_gate=1.0 kappa=0.15
+Epoch 001/80 loss=0.4546 scmae=0.4485 sharp=0.0000 soft=0.0000 gate=1.000 kl_ref=0.0000 scale=0.00
+Epoch 010/80 loss=0.4473 scmae=0.4468 sharp=0.0000 soft=0.0000 gate=1.000 kl_ref=0.0000 scale=0.00
+Epoch 020/80 loss=0.5108 scmae=0.4468 sharp=0.1803 soft=-0.0362 gate=1.000 kl_ref=0.0859 scale=1.00
+Epoch 030/80 loss=0.5108 scmae=0.4468 sharp=0.1796 soft=-0.0147 gate=1.000 kl_ref=0.0721 scale=1.00
+Epoch 040/80 loss=0.5110 scmae=0.4469 sharp=0.1796 soft=-0.0015 gate=1.000 kl_ref=0.0679 scale=1.00
+Epoch 050/80 loss=0.5118 scmae=0.4468 sharp=0.1816 soft=0.0086 gate=1.000 kl_ref=0.0653 scale=1.00
+Epoch 060/80 loss=0.5151 scmae=0.4468 sharp=0.1909 soft=0.0214 gate=1.000 kl_ref=0.0651 scale=1.00
+Epoch 070/80 loss=0.5200 scmae=0.4469 sharp=0.2046 soft=0.0413 gate=1.000 kl_ref=0.0665 scale=1.00
+Epoch 080/80 loss=0.5249 scmae=0.4469 sharp=0.2180 soft=0.0618 gate=1.000 kl_ref=0.0674 scale=1.00
+[RESULT] Macosko NMI=0.5646092491001323 ARI=0.44260376809480084 meets=False collapse=False gate=1.000 kl_ref=0.0674

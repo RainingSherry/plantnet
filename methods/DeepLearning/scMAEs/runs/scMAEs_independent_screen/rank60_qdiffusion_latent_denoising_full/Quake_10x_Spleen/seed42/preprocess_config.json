@@ -1,0 +1,22 @@
+{
+  "file_path": "methods/DeepLearning/scMAEs/benchmark_data/Quake_10x_Spleen.h5ad",
+  "counts_source": "adata.X",
+  "input_mode": "raw",
+  "normalization": "normalize_total(target_sum=10000.0) + log1p when raw",
+  "hvg": {
+    "n_top_genes": 1000,
+    "flavor": "seurat"
+  },
+  "scale_input": false,
+  "selected_n_genes": 1000,
+  "seed": 42,
+  "label_key": "resolved_label",
+  "encoder_scale_input": true,
+  "target_scale_input": false,
+  "rank60_core": "q-deformed adaptive kernel latent denoising",
+  "q_distance_mean": 312154.6875,
+  "q_distance_std": 23731580.0,
+  "q_weight_mean": 0.08333331346511841,
+  "q_weight_std": 0.015273855067789555,
+  "svd_dim_used": 32
+}

@@ -1,0 +1,2 @@
+dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,suture04_fcm_mask_unmask_fusion_full,42,screen,0.7406825795644891,0.5782282546040206,0.5348756215535235,0.5561767151688105,0.7560469750480721,0.5782282546040206,0.7449181656377758,0.4724977122978702,5,,fixed,kmeans_known_k,True

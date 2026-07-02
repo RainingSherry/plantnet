@@ -1,0 +1,25 @@
+{
+  "dataset": "SRP182008",
+  "method": "dual-axis (gene-module + prototype cell-axis) gated scMAE + DEC",
+  "seed": 42,
+  "n_clusters": 15,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.19439100192393075,
+      "nmi": 0.13479945979843116,
+      "ari": 0.0721815392377169,
+      "f1_macro": 0.11826055285270258,
+      "fmi": 0.1935303919991995,
+      "v_measure": 0.13479945979843116,
+      "homogeneity": 0.125191498616739,
+      "completeness": 0.1460047577655765,
+      "n_pred_clusters": 15,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

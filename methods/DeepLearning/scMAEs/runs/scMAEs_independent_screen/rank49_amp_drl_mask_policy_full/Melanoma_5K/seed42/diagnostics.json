@@ -1,0 +1,26 @@
+{
+  "edge_survival": 0.808224255547804,
+  "neighbor_purity_proxy": 0.8320629293153113,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.8512551504494762,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.08201240748167038,
+  "cluster_mass_min": 0.01706182140483049,
+  "cluster_mass_max": 0.2873919787281188,
+  "collapse_warning": false,
+  "edge_confidence_mean": NaN,
+  "edge_confidence_std": NaN,
+  "mask_score_mean": 0.20549389719963074,
+  "policy_action_histogram": {
+    "0:zero:0.25": 33,
+    "1:zero:0.4": 33,
+    "2:zero:0.55": 47,
+    "3:swap:0.25": 41,
+    "4:swap:0.4": 38,
+    "5:swap:0.55": 23,
+    "6:variance:0.25": 648,
+    "7:variance:0.4": 325,
+    "8:variance:0.55": 172
+  },
+  "diagnostic_note": "No NeighborMix is used. AMP-DRL adaptation uses a tiny dueling-Q controller to choose mask strategy and ratio; main loss remains scMAE."
+}

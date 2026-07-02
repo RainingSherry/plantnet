@@ -1,0 +1,16 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.8236871260802128,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9359524764733924,
+  "rare_risk_fraction": 0.10015510746731664,
+  "embedding_variance": 0.2746712267398834,
+  "cluster_mass_min": 0.04298692665632617,
+  "cluster_mass_max": 0.21692887214713052,
+  "collapse_warning": false,
+  "association_risk_mean": 15.476898193359375,
+  "association_risk_std": 0.5613898038864136,
+  "association_risk_p90": 16.31027603149414,
+  "association_boundary_entropy": 0.9371991983656435,
+  "diagnostic_note": "No NeighborMix is used. Association discrepancy is adapted from time-series anomaly attention to ordered gene-module boundary diagnostics."
+}

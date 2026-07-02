@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + DinoBloom self-distillation,42,rank07_dinobloom_self_distill_full,screen,scaled encoder + DINO-style self-distillation,0.6937735430977177,0.7109216332669678,0.6424244695681165,0.5081114498279633,0.7128634607848414,0.7109216332669678,0.7522335153373633,0.6739111348496648,9,,fixed,kmeans_known_k,True

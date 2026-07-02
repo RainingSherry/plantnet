@@ -1,0 +1,17 @@
+{
+  "method_dir": "suture02_structural_mask_policy_full",
+  "candidate_order": 2,
+  "reference_module": "/home/luolie/biopipeline/dimension-reduction/plantnet/缝合模块/即插即用/216 Structural-Aware Multi-Scale Masking Module(AAAI 2026).py",
+  "reference_title": "Decoding with Structured Awareness: Integrating Directional, Frequency-Spatial, and Structural Attention for Medical Image Segmentation",
+  "reference_url": "https://arxiv.org/abs/2512.05494",
+  "implementation_source": "Rewritten from the structural saliency masking concept for scRNA gene-level masking. The original 2D convolutional image module was not copied into the model.",
+  "scmae_gap": "mask",
+  "core_mechanism": "gene-level structural mask policy protecting high-risk marker-like genes",
+  "neighbor_mix_relation": "independent; no cell mixing is used",
+  "forbidden_source_edits": "No files under /home/luolie/biopipeline/dimension-reduction/plantnet/缝合模块 are modified.",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true",
+    "reconstruction_target": "log_expr",
+    "scaled_expression_not_used_as": ["counts", "tokens", "NB target", "ZINB target", "diffusion target"]
+  }
+}

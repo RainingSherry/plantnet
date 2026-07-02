@@ -1,0 +1,50 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + scLDM MCAB flow",
+  "method_dir": "rank62_scldm_mcab_flow_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 31.28685736656189,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank62_scldm_mcab_flow_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6598714823842233,
+      "nmi": 0.6531328013238159,
+      "ari": 0.5429400582300411,
+      "f1_macro": 0.5391242720658709,
+      "fmi": 0.6316677331310813,
+      "v_measure": 0.653132801323816,
+      "homogeneity": 0.6919940351113641,
+      "completeness": 0.6184042475777367,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.83990693551961,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.8834697500472716,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.00030785432318225503,
+    "cluster_mass_min": 0.029913582982495013,
+    "cluster_mass_max": 0.27387547086195435,
+    "collapse_warning": false,
+    "mask_score_mean": 0.39903607964515686,
+    "flow_timestep_mean": 0.5023597496397355,
+    "input_mask_rate": 0.399508057271733,
+    "diagnostic_note": "No NeighborMix is used. scLDM is adapted as MCAB-style gene-token latent pooling plus flow matching only."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

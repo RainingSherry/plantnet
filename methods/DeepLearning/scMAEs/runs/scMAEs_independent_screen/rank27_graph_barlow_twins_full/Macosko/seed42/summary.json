@@ -1,0 +1,49 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + Graph Barlow Twins",
+  "method_dir": "rank27_graph_barlow_twins_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 44808,
+  "n_genes": 1000,
+  "n_clusters": 12,
+  "runtime_seconds": 577.4876074790955,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank27_graph_barlow_twins_full/Macosko/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.3436886270308873,
+      "nmi": 0.4372897585161553,
+      "ari": 0.19582459113838055,
+      "f1_macro": 0.2565157689656164,
+      "fmi": 0.429828553364624,
+      "v_measure": 0.4372897585161553,
+      "homogeneity": 0.6557428184961606,
+      "completeness": 0.3280152947514807,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.799546172789165,
+    "neighbor_purity_proxy": 0.9506695232994108,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9455665700047938,
+    "rare_risk_fraction": 0.10000446348866274,
+    "embedding_variance": 1446.648681640625,
+    "cluster_mass_min": 0.028878771647920014,
+    "cluster_mass_max": 0.17499107302267453,
+    "collapse_warning": false,
+    "edge_confidence_mean": 0.9427953958511353,
+    "edge_confidence_std": 0.1277063637971878,
+    "diagnostic_note": "No NeighborMix is used. Graph Barlow Twins supplies symmetric graph view invariance and redundancy reduction around the scMAE objective."
+  },
+  "baseline": {
+    "nmi": 0.657465,
+    "ari": 0.494268
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

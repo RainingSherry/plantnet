@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + fuzzy rough quantification,42,rank30_fuzzy_rough_quantification_full,screen,scaled encoder + log-expression targets + fuzzy rough quantification,0.34547402249598286,0.33631389024779895,0.14799079485840227,0.22036325760090636,0.39803335705072374,0.3363138902477989,0.45617290744208333,0.2663346918217146,12,,fixed,kmeans_known_k,True

@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + adaptive-granularity cluster target,42,AdaptiveGranularity_scMAE,screen,0.39600071415818605,0.5502587798506519,0.25920039265071854,0.4213884635199056,0.49507189182733224,0.5502587798506519,0.7929229541338263,0.42131927414374265,12,,fixed,kmeans_known_k,True

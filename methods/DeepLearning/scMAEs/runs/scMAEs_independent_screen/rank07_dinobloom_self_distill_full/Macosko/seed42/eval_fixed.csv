@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + DinoBloom self-distillation,42,rank07_dinobloom_self_distill_full,screen,scaled encoder + DINO-style self-distillation,0.43947509373326193,0.5683399851208086,0.30027784396777896,0.3643374049168597,0.5336707946059284,0.5683399851208086,0.8088278208043236,0.4380847543815841,12,,fixed,kmeans_known_k,True

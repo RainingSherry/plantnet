@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + deep adaptive fuzzy clustering,42,rank29_deep_adaptive_fuzzy_clustering_full,screen,scaled encoder + log-expression targets + adaptive fuzzy clustering,0.44765494137353434,0.41238938512130535,0.1795085579148475,0.2629567455814605,0.48941257220516654,0.4123893851213054,0.5976263861745199,0.3148119862898691,5,,fixed,kmeans_known_k,True

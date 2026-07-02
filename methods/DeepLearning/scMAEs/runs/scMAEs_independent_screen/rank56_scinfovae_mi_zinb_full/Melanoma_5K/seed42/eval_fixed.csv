@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + ScInfoVAE MI-ZINB,42,rank56_scinfovae_mi_zinb_full,screen,scaled encoder + log-expression targets + optional aligned raw-count ZINB + InfoVAE MMD,0.7106137824063815,0.7065962710831684,0.6018595781857183,0.6463818919892583,0.6804744901252242,0.7065962710831684,0.7343488520272501,0.6808649584788006,9,,fixed,kmeans_known_k,True

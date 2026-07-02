@@ -1,0 +1,17 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.9669657204070702,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.7863007141237484,
+  "rare_risk_fraction": 0.02689251919300125,
+  "embedding_variance": 0.0025740766432136297,
+  "cluster_mass_min": 0.008056597036243528,
+  "cluster_mass_max": 0.3631271201571148,
+  "collapse_warning": false,
+  "mask_score_mean": 0.3997807204723358,
+  "pseudo_condition_min_fraction": 0.0074093911801464026,
+  "pseudo_condition_max_fraction": 0.140532940546331,
+  "diffusion_timestep_mean": 0.5005861571856908,
+  "input_mask_rate": 0.39990818892206464,
+  "diagnostic_note": "No NeighborMix is used. scDiffusion is adapted as pseudo-condition DDPM latent noise prediction only."
+}

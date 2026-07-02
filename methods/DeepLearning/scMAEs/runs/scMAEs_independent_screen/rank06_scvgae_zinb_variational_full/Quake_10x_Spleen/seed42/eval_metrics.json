@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + scVGAE ZINB variational decoder",
+  "seed": 42,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7415201005025126,
+      "nmi": 0.7021671962812153,
+      "ari": 0.5253488315373424,
+      "f1_macro": 0.7333982474128644,
+      "fmi": 0.7488537137409802,
+      "v_measure": 0.7021671962812152,
+      "homogeneity": 0.8940164549223558,
+      "completeness": 0.5781092631813667,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

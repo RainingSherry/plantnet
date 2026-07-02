@@ -1,0 +1,2 @@
+dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,suture12_attention_matching_teacher_consistency_full,42,screen,0.5227177554438861,0.5202104242990396,0.30878010897648517,0.42142186208177834,0.5865483470457974,0.5202104242990395,0.7557430219626995,0.3966055356677109,5,,fixed,kmeans_known_k,True

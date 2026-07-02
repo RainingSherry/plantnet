@@ -1,0 +1,48 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + AudioMAE module patch",
+  "method_dir": "rank21_audiomae_module_patch_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 131.05097317695618,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank21_audiomae_module_patch_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.7696817420435511,
+      "nmi": 0.6409930046056862,
+      "ari": 0.5809151323433339,
+      "f1_macro": 0.6139189543839402,
+      "fmi": 0.7843686589908144,
+      "v_measure": 0.6409930046056862,
+      "homogeneity": 0.8156664612988698,
+      "completeness": 0.5279364047489052,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9752931323283082,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.78675350705938,
+    "rare_risk_fraction": 0.0043969849246231155,
+    "embedding_variance": 0.08749258518218994,
+    "cluster_mass_min": 0.05422948073701842,
+    "cluster_mass_max": 0.5461683417085427,
+    "collapse_warning": false,
+    "module_target_variance": 0.12864431738853455,
+    "diagnostic_note": "No NeighborMix graph is used; AudioMAE-style high-ratio module patch masking is applied after coexpression ordering."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

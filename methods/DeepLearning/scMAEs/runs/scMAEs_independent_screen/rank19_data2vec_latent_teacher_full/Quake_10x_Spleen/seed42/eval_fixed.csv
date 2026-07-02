@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + data2vec latent teacher,42,rank19_data2vec_latent_teacher_full,screen,scaled encoder + data2vec EMA latent target,0.5391541038525963,0.5577991450729478,0.3193816572186442,0.4472692647136787,0.5950873751605167,0.5577991450729479,0.8071307345128275,0.4261551249540914,5,,fixed,kmeans_known_k,True

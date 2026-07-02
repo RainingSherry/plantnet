@@ -1,0 +1,17 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.8560602703301573,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.8869437089688517,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.3040458559989929,
+  "cluster_mass_min": 0.03567471748282739,
+  "cluster_mass_max": 0.25659206736095724,
+  "collapse_warning": false,
+  "module_count": 40,
+  "module_loss": 0.0029612589928814594,
+  "consistency_loss": 0.0005606494669336826,
+  "tau_mean": 1.0,
+  "delta_abs_mean": 0.0,
+  "diagnostic_note": "No NeighborMix is used. Non-stationary attention is applied on an SVD-derived gene-module axis, not raw HVG index order."
+}

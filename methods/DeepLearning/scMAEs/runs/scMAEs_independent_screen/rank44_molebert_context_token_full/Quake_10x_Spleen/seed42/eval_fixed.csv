@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + Mole-BERT context token modeling,42,rank44_molebert_context_token_full,screen,scaled encoder + log-expression targets + Mole-BERT context tokens,0.41384003350083753,0.39410680310009744,0.1871518180314625,0.3281104077484566,0.4870813334041891,0.39410680310009744,0.5819187170855543,0.29794595147603053,5,,fixed,kmeans_known_k,True

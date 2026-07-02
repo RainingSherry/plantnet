@@ -1,0 +1,18 @@
+{
+  "value_tag": "updated_after_desc_scname_fix_20260628",
+  "dataset": "processed__Pollen",
+  "data_path": "/data/luolie/biopipeline/scCluBench/data/processed/Pollen.h5ad",
+  "method": "scname",
+  "seed": 42,
+  "epochs": 80,
+  "pretrain_epochs": 80,
+  "n_clusters": "",
+  "status": "skipped",
+  "return_code": null,
+  "error": "n_clusters inference failed: No read method registered for IOSpec(encoding_type='null', encoding_version='0.1.0') from <class 'h5py._hl.dataset.Dataset'>. You may need to update your installation of anndata.",
+  "gpu": "",
+  "no_cuda": false,
+  "elapsed_seconds": 0.0,
+  "save_dir": "/home/luolie/biopipeline/dimension-reduction/plantnet/experiment_reports/desc_scname_fix_benchmark_20260628/run_artifacts/processed__Pollen/scname__seed42",
+  "command": ""
+}

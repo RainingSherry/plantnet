@@ -1,0 +1,16 @@
+{
+  "method_dir": "suture04_fcm_mask_unmask_fusion_full",
+  "candidate_order": 4,
+  "reference_module": "/home/luolie/biopipeline/dimension-reduction/plantnet/缝合模块/即插即用/154 Feature Correction Module(2025 一区TOP).py",
+  "reference_title": "CFFormer: A Cross-Fusion Transformer Framework for the Semantic Segmentation of Multisource Remote Sensing Images",
+  "reference_url": "https://ieeexplore.ieee.org/abstract/document/10786275",
+  "implementation_source": "Rewritten from feature correction/fusion concept for masked vs unmasked scRNA latent views.",
+  "scmae_gap": "masked/unmasked view mismatch",
+  "core_mechanism": "latent correction gate from masked view to detached unmasked teacher view, with weak non-zero gate budget to avoid self-shutdown",
+  "neighbor_mix_relation": "independent; no cell mixing is used",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true",
+    "reconstruction_target": "log_expr",
+    "scaled_expression_not_used_as": ["counts", "tokens", "NB target", "ZINB target", "diffusion target"]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + structural gene mask policy",
+  "method_dir": "suture02_structural_mask_policy_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 33.82570815086365,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_suture_screen/suture02_structural_mask_policy_full/Melanoma_5K/seed42_budgetfix/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6171061378240638,
+      "nmi": 0.6181392403342072,
+      "ari": 0.521976261758535,
+      "f1_macro": 0.400093808069502,
+      "fmi": 0.6133058025629743,
+      "v_measure": 0.6181392403342073,
+      "homogeneity": 0.6679414514905401,
+      "completeness": 0.5752482994966212,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.6793032884597778,
+    "neighbor_purity_proxy": 0.8658246547012335,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9249712814390536,
+    "rare_risk_fraction": 0.25,
+    "embedding_variance": 1.0161335468292236,
+    "cluster_mass_min": 0.02614668734766231,
+    "cluster_mass_max": 0.2428539773986262,
+    "collapse_warning": false,
+    "mask_prob_mean": 0.3946806788444519,
+    "mask_prob_high_risk": 0.32069671154022217,
+    "mask_prob_low_risk": 0.5417646765708923,
+    "marker_risk_mean": 0.5152490139007568,
+    "diagnostic_note": "SMMM-inspired structural saliency is used only as a gene mask policy; no cell mixing and no image-style 2D convolution."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Quick screen only; this file is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

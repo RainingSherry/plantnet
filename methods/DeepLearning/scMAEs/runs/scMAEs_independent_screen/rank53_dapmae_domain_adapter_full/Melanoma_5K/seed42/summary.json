@@ -1,0 +1,50 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + DAP-MAE domain adapter",
+  "method_dir": "rank53_dapmae_domain_adapter_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 39.74739336967468,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank53_dapmae_domain_adapter_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.588300465322402,
+      "nmi": 0.6004242317140854,
+      "ari": 0.47412132138967394,
+      "f1_macro": 0.43859024502475846,
+      "fmi": 0.5739202887822927,
+      "v_measure": 0.6004242317140854,
+      "homogeneity": 0.6416475332436935,
+      "completeness": 0.5641780371349158,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.6001238297013676,
+    "neighbor_purity_proxy": 0.8613782406381565,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.8979293150358555,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.5034067630767822,
+    "cluster_mass_min": 0.019720806558830045,
+    "cluster_mass_max": 0.26390427653445603,
+    "collapse_warning": false,
+    "mask_score_mean": 0.39963212609291077,
+    "pseudo_domain_entropy": 0.7056115840258181,
+    "n_pseudo_domains": 3,
+    "diagnostic_note": "No NeighborMix is used. Pseudo-domain labels are unsupervised SVD/KMeans domains used only for DAP-MAE adapter and DFG targets."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

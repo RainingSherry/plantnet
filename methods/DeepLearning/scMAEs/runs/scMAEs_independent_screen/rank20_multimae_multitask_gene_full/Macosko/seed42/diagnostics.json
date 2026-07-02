@@ -1,0 +1,12 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.9609578646670237,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.8791221591272708,
+  "rare_risk_fraction": 0.02689251919300125,
+  "embedding_variance": 0.35720252990722656,
+  "cluster_mass_min": 0.01153811819317979,
+  "cluster_mass_max": 0.23647562935190145,
+  "collapse_warning": false,
+  "diagnostic_note": "No NeighborMix graph is used; MultiMAE-style expression/token/module decoders are used."
+}

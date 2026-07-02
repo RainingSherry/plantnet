@@ -1,0 +1,14 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.983500837520938,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.5999150808771918,
+  "rare_risk_fraction": 0.0043969849246231155,
+  "embedding_variance": 0.2043532431125641,
+  "cluster_mass_min": 0.045644891122278056,
+  "cluster_mass_max": 0.4234715242881072,
+  "collapse_warning": false,
+  "cluster_confidence_mean": 0.6942241490402039,
+  "cluster_confident_fraction": 0.8802345058626466,
+  "diagnostic_note": "No NeighborMix graph is used; CICL pseudo-label positives and false-negative filtering are used."
+}

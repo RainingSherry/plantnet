@@ -1,0 +1,12 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.7245291380456459,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9306618359596506,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.23504570126533508,
+  "cluster_mass_min": 0.03523155329049413,
+  "cluster_mass_max": 0.18280522933746954,
+  "collapse_warning": false,
+  "diagnostic_note": "No NeighborMix graph is used; EMA teacher is used for latent consistency."
+}

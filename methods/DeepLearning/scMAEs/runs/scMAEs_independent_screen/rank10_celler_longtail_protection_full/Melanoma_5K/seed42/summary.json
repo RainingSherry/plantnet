@@ -1,0 +1,49 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + Celler long-tail protection",
+  "method_dir": "rank10_celler_longtail_protection_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 28.298678874969482,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank10_celler_longtail_protection_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6370485264790605,
+      "nmi": 0.6382632059398246,
+      "ari": 0.5420755464996948,
+      "f1_macro": 0.4997049680821226,
+      "fmi": 0.6300724751851106,
+      "v_measure": 0.6382632059398244,
+      "homogeneity": 0.6882621365978365,
+      "completeness": 0.5950366575130385,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.8513184134721914,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.3508077561855316,
+    "rare_risk_fraction": 0.08287170396631952,
+    "embedding_variance": 2.656128168106079,
+    "cluster_mass_min": 0.03833370263682694,
+    "cluster_mass_max": 0.23066696210946155,
+    "collapse_warning": false,
+    "prototype_mass_min": 0.0045765449118478725,
+    "prototype_mass_max": 0.711677664006784,
+    "diagnostic_note": "No NeighborMix graph is used; density/entropy rare-risk controls Celler-style long-tail losses."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

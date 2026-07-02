@@ -1,0 +1,48 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + mask-sc cluster target",
+  "method_dir": "rank13_masked_sc_cluster_target_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 23.624232530593872,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank13_masked_sc_cluster_target_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.7270108575227122,
+      "nmi": 0.7272207222544056,
+      "ari": 0.6524852605139382,
+      "f1_macro": 0.6395188409970414,
+      "fmi": 0.7211875973215222,
+      "v_measure": 0.7272207222544058,
+      "homogeneity": 0.7601943520505112,
+      "completeness": 0.696988656129086,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.8382007533791269,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.14179816877541743,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.5074560642242432,
+    "cluster_mass_min": 0.01883447817416353,
+    "cluster_mass_max": 0.25437624639929096,
+    "collapse_warning": false,
+    "cluster_confidence_mean": 0.947294170196638,
+    "diagnostic_note": "No NeighborMix graph is used; DEC-style high-confidence cluster target is used after scMAE warmup."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

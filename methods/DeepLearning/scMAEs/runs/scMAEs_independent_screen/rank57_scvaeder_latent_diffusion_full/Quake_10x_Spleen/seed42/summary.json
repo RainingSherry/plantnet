@@ -1,0 +1,52 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + scVAEDer latent diffusion",
+  "method_dir": "rank57_scvaeder_latent_diffusion_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 70.7337327003479,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank57_scvaeder_latent_diffusion_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.7867462311557789,
+      "nmi": 0.7033830123897673,
+      "ari": 0.5664237399622112,
+      "f1_macro": 0.7367291667621195,
+      "fmi": 0.7755117209943005,
+      "v_measure": 0.7033830123897674,
+      "homogeneity": 0.8792922666721513,
+      "completeness": 0.586124290972788,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.6001425079397253,
+    "neighbor_purity_proxy": 0.9896147403685092,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.7639258849620459,
+    "rare_risk_fraction": 0.0043969849246231155,
+    "embedding_variance": 0.022474093362689018,
+    "cluster_mass_min": 0.02512562814070352,
+    "cluster_mass_max": 0.5190536013400335,
+    "collapse_warning": false,
+    "mask_score_mean": 0.4006679952144623,
+    "posterior_variance_mean": 0.04613904654979706,
+    "posterior_variance_p95": 0.057281870394945145,
+    "raw_counts_available": true,
+    "diagnostic_note": "No NeighborMix is used. ZINB uses aligned raw counts only; scaled expression is never used as count data."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "raw_count_branch": "aligned raw counts from adata.X",
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

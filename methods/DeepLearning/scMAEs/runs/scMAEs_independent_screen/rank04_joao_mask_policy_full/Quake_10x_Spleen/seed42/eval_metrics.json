@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + JOAO mask policy",
+  "seed": 42,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7081239530988275,
+      "nmi": 0.6932591764798492,
+      "ari": 0.5044211313777545,
+      "f1_macro": 0.7125028532425203,
+      "fmi": 0.7345549024150485,
+      "v_measure": 0.6932591764798494,
+      "homogeneity": 0.8963510497674617,
+      "completeness": 0.5651985906388987,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

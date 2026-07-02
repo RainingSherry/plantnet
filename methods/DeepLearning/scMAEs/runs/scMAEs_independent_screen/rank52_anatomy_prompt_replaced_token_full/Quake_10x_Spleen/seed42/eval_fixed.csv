@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + anatomy prompt replaced token,42,rank52_anatomy_prompt_replaced_token_full,screen,scaled encoder + log-expression targets + module prompts/replaced-token objectives,0.7662269681742043,0.6650569263895487,0.5548108455638674,0.6686230402147412,0.7679826856489987,0.6650569263895487,0.848128652827167,0.5469876140215325,5,,fixed,kmeans_known_k,True
