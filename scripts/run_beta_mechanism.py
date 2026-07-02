@@ -217,7 +217,7 @@ def command_for(job: Job, args: argparse.Namespace, run_dir: Path) -> list[str]:
     method = str(variant.get("ablation_method", "beta_control"))
     cmd = [
         sys.executable,
-        "methods/DeepLearning/NeighborMix_scMAE/run_beta_mechanism.py",
+        "experimental_retired_models/NeighborMix_scMAE/run_beta_mechanism.py",
         "--data_path",
         str(dataset_path(job.dataset)),
         "--save_dir",

@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from methods.DeepLearning.NeighborMix_scMAE.model import AutoEncoder as _BaseAutoEncoder
+from experimental_retired_models.NeighborMix_scMAE.model import AutoEncoder as _BaseAutoEncoder
 
 
 class CutAwareAutoEncoder(_BaseAutoEncoder):

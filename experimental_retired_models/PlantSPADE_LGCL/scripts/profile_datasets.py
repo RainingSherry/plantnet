@@ -10,7 +10,7 @@ import pandas as pd
 import yaml
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-ROOT = SCRIPT_DIR.parents[3]
+ROOT = next(parent for parent in [SCRIPT_DIR, *SCRIPT_DIR.parents] if (parent / "methods" / "DeepLearning" / "scMAE_family.py").exists())
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
@@ -67,7 +67,7 @@ def main():
             print(f"[read] {dataset_name}: {file_path}", flush=True)
             import scanpy as sc
 
-            from methods.DeepLearning.PlantSPADE_LGCL.data import profile_anndata
+            from experimental_retired_models.PlantSPADE_LGCL.data import profile_anndata
 
             adata = sc.read_h5ad(file_path)
             profile = profile_anndata(

@@ -10,8 +10,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[3]
-RUNNER = ROOT / "methods" / "DeepLearning" / "CutAware_NeighborMix_scMAE" / "run.py"
+CURRENT_DIR = Path(__file__).resolve().parent
+ROOT = next(parent for parent in [CURRENT_DIR, *CURRENT_DIR.parents] if (parent / "methods" / "DeepLearning" / "scMAE_family.py").exists())
+RUNNER = ROOT / "experimental_retired_models" / "CutAware_NeighborMix_scMAE" / "run.py"
 FORBIDDEN_GPUS = {0, 7}
 
 

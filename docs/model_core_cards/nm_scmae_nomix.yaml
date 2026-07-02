@@ -5,8 +5,8 @@ model_key: nm_scmae_nomix
 name: nm_scmae_nomix
 full_name: NeighborMix-scMAE noMix (ablation)
 description: NeighborMix-scMAE with --use_pseudo=false --neighbor_k=0 (NeighborMix disabled)
-source_path: methods/DeepLearning/NeighborMix_scMAE
-target_path: methods/DeepLearning/NeighborMix_scMAE
+source_path: experimental_retired_models/NeighborMix_scMAE
+target_path: experimental_retired_models/NeighborMix_scMAE
 category: DeepLearning
 status: VERIFIED
 authenticity_status: VERIFIED

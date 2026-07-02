@@ -5,8 +5,8 @@ model_key: neighbormix_scmae
 name: NeighborMix_scMAE
 full_name: NeighborMix-scMAE
 description: scMAE with NeighborMix pseudo-cell augmentation
-source_path: methods/DeepLearning/NeighborMix_scMAE
-target_path: methods/DeepLearning/NeighborMix_scMAE
+source_path: experimental_retired_models/NeighborMix_scMAE
+target_path: experimental_retired_models/NeighborMix_scMAE
 category: DeepLearning
 status: VERIFIED
 authenticity_status: VERIFIED

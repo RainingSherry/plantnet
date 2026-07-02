@@ -80,7 +80,7 @@ def failed(run_dir: Path) -> bool:
 def command_for(job: Job, args: argparse.Namespace, run_dir: Path) -> list[str]:
     cmd = [
         sys.executable,
-        "methods/DeepLearning/NeighborMix_scMAE/run_stochastic_ablation.py",
+        "experimental_retired_models/NeighborMix_scMAE/run_stochastic_ablation.py",
         "--data_path",
         str(dataset_path(job.dataset)),
         "--save_dir",

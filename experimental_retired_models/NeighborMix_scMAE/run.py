@@ -45,7 +45,7 @@ from sklearn.preprocessing import LabelEncoder, normalize
 from torch.utils.data import DataLoader, Dataset
 
 CURRENT_DIR = Path(__file__).resolve().parent
-ROOT = CURRENT_DIR.parents[2]
+ROOT = next(parent for parent in [CURRENT_DIR, *CURRENT_DIR.parents] if (parent / "methods" / "DeepLearning" / "scMAE_family.py").exists())
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 

@@ -5,39 +5,46 @@ This repository contains a multi-baseline benchmark for single-cell clustering o
 ## Project Structure
 
 ```
-methods/
-├── shared_utils.py          # Shared utilities
-├── preprocess.py            # Standard data preprocessing (h5ad → normalized/scaled)
-├── evaluation.py           # 8 clustering metrics (ACC, NMI, ARI, F1-macro, FMI, V-measure, Homogeneity, Completeness)
-├── utils.py               # save() interface and helpers
-├── DeepLearning/
-│   ├── NeighborMix_scMAE/  # [PROPOSED] NeighborMix-scMAE
-│   ├── NeighborMix_MAE/    # NeighborMix-MAE (MAE variant)
-│   ├── scMAE/             # scMAE baseline
-│   ├── dec/               # DEC (Deep Embedded Clustering)
-│   ├── scDCC/             # scDCC (Deep Constrained Clustering)
-│   ├── scDeepCluster/     # scDeepCluster [TensorFlow, env-blocked if TF not installed]
-│   ├── scNAME/             # scNAME [env-blocked: requires TensorFlow]
-│   ├── scziDesk/           # scziDesk [env-blocked: requires TensorFlow]
-│   ├── desc/               # DESC [env-blocked: requires TensorFlow]
-│   ├── scVI/              # scVI baseline
-│   ├── PhytoCluster/       # PhytoCluster
-│   └── PlantSPADE_LGCL/    # [LEGACY] Retained for reference
-├── GNN/
-│   ├── scDSC/             # scDSC (Structural Deep Clustering Network)
-│   ├── scGNN/             # scGNN [env-blocked]
-│   ├── scCDCG/            # scCDCG [env-blocked]
-│   └── AttentionAE_sc/    # AttentionAE [env-blocked]
-├── Foundation/
-│   ├── scGPT/             # scGPT [placeholder: requires checkpoint download]
-│   ├── GeneFormer/        # GeneFormer [placeholder]
-│   ├── GeneCompass/       # GeneCompass [placeholder]
-│   └── scPlantLLM/        # scPlantLLM [placeholder]
-└── Traditional/
-    ├── ScanpyStandard/    # Scanpy standard pipeline
-    ├── Leiden/            # Leiden clustering
-    ├── Louvain/           # Louvain clustering
-    └── sc3/              # SC3 clustering
+plantnet/
+├── methods/
+│   ├── shared_utils.py          # Shared utilities
+│   ├── preprocess.py            # Standard data preprocessing (h5ad → normalized/scaled)
+│   ├── evaluation.py           # 8 clustering metrics (ACC, NMI, ARI, F1-macro, FMI, V-measure, Homogeneity, Completeness)
+│   ├── utils.py               # save() interface and helpers
+│   ├── DeepLearning/
+│   │   ├── NeighborMix_MAE/    # NeighborMix-MAE (MAE variant)
+│   │   ├── scMAE/             # scMAE baseline
+│   │   ├── dec/               # DEC (Deep Embedded Clustering)
+│   │   ├── scDCC/             # scDCC (Deep Constrained Clustering)
+│   │   ├── scDeepCluster/     # scDeepCluster [TensorFlow, env-blocked if TF not installed]
+│   │   ├── scNAME/             # scNAME [env-blocked: requires TensorFlow]
+│   │   ├── scziDesk/           # scziDesk [env-blocked: requires TensorFlow]
+│   │   ├── desc/               # DESC [env-blocked: requires TensorFlow]
+│   │   ├── scVI/              # scVI baseline
+│   │   └── PhytoCluster/       # PhytoCluster
+│   ├── GNN/
+│   │   ├── scDSC/             # scDSC (Structural Deep Clustering Network)
+│   │   ├── scGNN/             # scGNN [env-blocked]
+│   │   ├── scCDCG/            # scCDCG [env-blocked]
+│   │   └── AttentionAE_sc/    # AttentionAE [env-blocked]
+│   ├── Foundation/
+│   │   ├── scGPT/             # scGPT [placeholder: requires checkpoint download]
+│   │   ├── GeneFormer/        # GeneFormer [placeholder]
+│   │   ├── GeneCompass/       # GeneCompass [placeholder]
+│   │   └── scPlantLLM/        # scPlantLLM [placeholder]
+│   └── Traditional/
+│       ├── ScanpyStandard/    # Scanpy standard pipeline
+│       ├── Leiden/            # Leiden clustering
+│       ├── Louvain/           # Louvain clustering
+│       └── sc3/              # SC3 clustering
+├── experimental_retired_models/
+│   ├── APA_scMAE/
+│   ├── AdaptiveSwitch_scMAE/
+│   ├── CutAware_NeighborMix_scMAE/
+│   ├── DualAxisGated_scMAE/
+│   ├── NeighborMix_scMAE/
+│   ├── PlantSPADE_LGCL/
+│   └── RG_NeighborMix_scMAE/
 
 OtherMode/
 └── scCluBench-main/      # [REFERENCE ONLY] Original scCluBench repository.

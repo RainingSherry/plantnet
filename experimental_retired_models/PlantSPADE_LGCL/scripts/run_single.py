@@ -17,12 +17,12 @@ from sklearn.preprocessing import StandardScaler, normalize
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PKG_DIR = SCRIPT_DIR.parent
-ROOT = SCRIPT_DIR.parents[3]
+ROOT = next(parent for parent in [SCRIPT_DIR, *SCRIPT_DIR.parents] if (parent / "methods" / "DeepLearning" / "scMAE_family.py").exists())
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from methods.DeepLearning.PlantSPADE_LGCL.data import load_lgcl_dataset, write_dataset_artifacts
-from methods.DeepLearning.PlantSPADE_LGCL.utils import ensure_dir, save_json
+from experimental_retired_models.PlantSPADE_LGCL.data import load_lgcl_dataset, write_dataset_artifacts
+from experimental_retired_models.PlantSPADE_LGCL.utils import ensure_dir, save_json
 
 
 PLANTSPADE_METHODS = {

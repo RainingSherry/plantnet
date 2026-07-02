@@ -16,31 +16,31 @@ import torch
 import torch.nn.functional as F
 
 CURRENT_DIR = Path(__file__).resolve().parent
-ROOT = CURRENT_DIR.parents[2]
+ROOT = next(parent for parent in [CURRENT_DIR, *CURRENT_DIR.parents] if (parent / "methods" / "DeepLearning" / "scMAE_family.py").exists())
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from methods.DeepLearning.PlantSPADE_LGCL.data import load_lgcl_dataset, write_dataset_artifacts
-from methods.DeepLearning.PlantSPADE_LGCL.eval import write_evaluation_outputs
-from methods.DeepLearning.PlantSPADE_LGCL.eval.marker_analysis import write_marker_outputs
-from methods.DeepLearning.PlantSPADE_LGCL.gated_fusion import GatedFusionConfig, train_gated_fusion
-from methods.DeepLearning.PlantSPADE_LGCL.experiments.learned_topk_attention import (
+from experimental_retired_models.PlantSPADE_LGCL.data import load_lgcl_dataset, write_dataset_artifacts
+from experimental_retired_models.PlantSPADE_LGCL.eval import write_evaluation_outputs
+from experimental_retired_models.PlantSPADE_LGCL.eval.marker_analysis import write_marker_outputs
+from experimental_retired_models.PlantSPADE_LGCL.gated_fusion import GatedFusionConfig, train_gated_fusion
+from experimental_retired_models.PlantSPADE_LGCL.experiments.learned_topk_attention import (
     LearnedTopKConfig,
     LearnedTopKSupportAttention,
 )
-from methods.DeepLearning.PlantSPADE_LGCL.support_gene_attention import (
+from experimental_retired_models.PlantSPADE_LGCL.support_gene_attention import (
     SparseAttentionWeights,
     SupportGeneAttention,
     TrainableSupportGeneAttentionRefiner,
 )
-from methods.DeepLearning.PlantSPADE_LGCL.train import (
+from experimental_retired_models.PlantSPADE_LGCL.train import (
     LGCLTrainConfig,
     PlantSPADELGCL,
     normalized_bipartite_support,
     scipy_to_torch_sparse,
     train_lgcl,
 )
-from methods.DeepLearning.PlantSPADE_LGCL.utils import ensure_dir, save_json, set_seed
+from experimental_retired_models.PlantSPADE_LGCL.utils import ensure_dir, save_json, set_seed
 
 
 def str2bool(value):

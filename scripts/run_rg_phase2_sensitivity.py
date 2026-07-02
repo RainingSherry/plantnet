@@ -83,7 +83,7 @@ def command_for(args, ds: DatasetSpec, seed: int, value: float | int, save_dir: 
         pseudo_weight = float(value)
     return [
         sys.executable,
-        str(ROOT / "methods/DeepLearning/RG_NeighborMix_scMAE/run.py"),
+        str(ROOT / "experimental_retired_models/RG_NeighborMix_scMAE/run.py"),
         "--data_path", str(ROOT / ds.path),
         "--save_dir", str(save_dir),
         "--dataset_name", ds.name,

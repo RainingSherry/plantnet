@@ -18,12 +18,12 @@ from sklearn.preprocessing import normalize
 from torch.utils.data import DataLoader
 
 CURRENT_DIR = Path(__file__).resolve().parent
-ROOT = CURRENT_DIR.parents[2]
+ROOT = next(parent for parent in [CURRENT_DIR, *CURRENT_DIR.parents] if (parent / "methods" / "DeepLearning" / "scMAE_family.py").exists())
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from methods.DeepLearning import scMAE_family as family
-from methods.DeepLearning.RG_NeighborMix_scMAE.model import AutoEncoder
+from experimental_retired_models.RG_NeighborMix_scMAE.model import AutoEncoder
 from methods.shared_utils import ensure_dir, save_json, sanitize_anndata_for_write
 
 

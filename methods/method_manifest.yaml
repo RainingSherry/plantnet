@@ -141,7 +141,7 @@ methods:
   - key: neighbormix_scmae
     name: NeighborMix_scMAE
     full_name: NeighborMix-scMAE
-    path: methods/DeepLearning/NeighborMix_scMAE/run.py
+    path: experimental_retired_models/NeighborMix_scMAE/run.py
     category: DeepLearning
     authenticity: VERIFIED
     smoke: PASS
@@ -154,7 +154,7 @@ methods:
   - key: nm_scmae_nomix
     name: nm_scmae_nomix
     full_name: NeighborMix-scMAE-noMix (ablation)
-    path: methods/DeepLearning/NeighborMix_scMAE/run.py
+    path: experimental_retired_models/NeighborMix_scMAE/run.py
     category: DeepLearning
     authenticity: VERIFIED
     smoke: PASS

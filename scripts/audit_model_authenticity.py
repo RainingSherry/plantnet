@@ -310,7 +310,7 @@ LEGACY_MODEL_CHECKS: Dict[str, dict] = {
     },
     "neighbormix_scmae": {
         "name": "NeighborMix_scMAE",
-        "dir": METHODS_DIR / "DeepLearning" / "NeighborMix_scMAE",
+        "dir": PROJECT_ROOT / "experimental_retired_models" / "NeighborMix_scMAE",
         "entry": "run.py",
         "required": [
             ("AutoEncoder", "AutoEncoder class"),
@@ -335,7 +335,7 @@ LEGACY_MODEL_CHECKS: Dict[str, dict] = {
     },
     "nm_scmae_nomix": {
         "name": "nm_scmae_nomix (ablation)",
-        "dir": METHODS_DIR / "DeepLearning" / "NeighborMix_scMAE",
+        "dir": PROJECT_ROOT / "experimental_retired_models" / "NeighborMix_scMAE",
         "entry": "run.py",
         "required": [
             ("--use_pseudo", "use_pseudo flag"),

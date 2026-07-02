@@ -11,25 +11,25 @@ import torch
 from torch.utils.data import DataLoader
 
 CURRENT_DIR = Path(__file__).resolve().parent
-ROOT = CURRENT_DIR.parents[2]
+ROOT = next(parent for parent in [CURRENT_DIR, *CURRENT_DIR.parents] if (parent / "methods" / "DeepLearning" / "scMAE_family.py").exists())
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from methods.DeepLearning import scMAE_family as family
-from methods.DeepLearning.CutAware_NeighborMix_scMAE.cut_losses import (
+from experimental_retired_models.CutAware_NeighborMix_scMAE.cut_losses import (
     attention_fusion_probe,
     graph_cut_loss,
     ot_self_training_loss,
 )
-from methods.DeepLearning.CutAware_NeighborMix_scMAE.diagnostics import (
+from experimental_retired_models.CutAware_NeighborMix_scMAE.diagnostics import (
     embedding_geometry,
     mapped_predictions,
     pairwise_similarity_digest,
     per_cell_type_metrics,
 )
-from methods.DeepLearning.CutAware_NeighborMix_scMAE.mixing import make_gated_neighbor_mixed_batch, make_neighbor_mixed_batch
-from methods.DeepLearning.CutAware_NeighborMix_scMAE.model import CutAwareAutoEncoder
-from methods.DeepLearning.CutAware_NeighborMix_scMAE.neighbor_graph import (
+from experimental_retired_models.CutAware_NeighborMix_scMAE.mixing import make_gated_neighbor_mixed_batch, make_neighbor_mixed_batch
+from experimental_retired_models.CutAware_NeighborMix_scMAE.model import CutAwareAutoEncoder
+from experimental_retired_models.CutAware_NeighborMix_scMAE.neighbor_graph import (
     apply_cluster_cut_reweight,
     build_embedding_knn_graph,
     build_pca_knn_graph,

@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import torch
 
-from methods.DeepLearning.CutAware_NeighborMix_scMAE.neighbor_graph import NeighborGraph
+from experimental_retired_models.CutAware_NeighborMix_scMAE.neighbor_graph import NeighborGraph
 
 
 def make_neighbor_mixed_batch(

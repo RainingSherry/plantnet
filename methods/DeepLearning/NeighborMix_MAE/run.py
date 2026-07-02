@@ -25,9 +25,9 @@ ROOT = CURRENT_DIR.parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from methods.DeepLearning.PlantSPADE_LGCL.data import load_lgcl_dataset, write_dataset_artifacts
-from methods.DeepLearning.PlantSPADE_LGCL.eval import write_evaluation_outputs
-from methods.DeepLearning.PlantSPADE_LGCL.utils import ensure_dir, save_json
+from experimental_retired_models.PlantSPADE_LGCL.data import load_lgcl_dataset, write_dataset_artifacts
+from experimental_retired_models.PlantSPADE_LGCL.eval import write_evaluation_outputs
+from experimental_retired_models.PlantSPADE_LGCL.utils import ensure_dir, save_json
 
 
 class IndexedExpressionDataset(Dataset):

@@ -8,7 +8,8 @@ from pathlib import Path
 import pandas as pd
 
 
-ROOT = Path(__file__).resolve().parents[3]
+CURRENT_DIR = Path(__file__).resolve().parent
+ROOT = next(parent for parent in [CURRENT_DIR, *CURRENT_DIR.parents] if (parent / "methods" / "DeepLearning" / "scMAE_family.py").exists())
 METRIC_COLUMNS = ["acc", "nmi", "ari", "f1_macro", "fmi"]
 
 

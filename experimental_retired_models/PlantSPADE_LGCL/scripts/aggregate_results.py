@@ -11,7 +11,7 @@ import yaml
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PKG_DIR = SCRIPT_DIR.parent
-ROOT = SCRIPT_DIR.parents[3]
+ROOT = next(parent for parent in [SCRIPT_DIR, *SCRIPT_DIR.parents] if (parent / "methods" / "DeepLearning" / "scMAE_family.py").exists())
 
 METRICS = [
     "acc",

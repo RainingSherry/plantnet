@@ -21,13 +21,13 @@ import torch.nn.functional as F
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PKG_DIR = SCRIPT_DIR.parent
-ROOT = SCRIPT_DIR.parents[3]
+ROOT = next(parent for parent in [SCRIPT_DIR, *SCRIPT_DIR.parents] if (parent / "methods" / "DeepLearning" / "scMAE_family.py").exists())
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from methods.DeepLearning.PlantSPADE_LGCL.eval import write_evaluation_outputs
-from methods.DeepLearning.PlantSPADE_LGCL.support_gene_attention import SupportGeneAttention
-from methods.DeepLearning.PlantSPADE_LGCL.utils import save_json
+from experimental_retired_models.PlantSPADE_LGCL.eval import write_evaluation_outputs
+from experimental_retired_models.PlantSPADE_LGCL.support_gene_attention import SupportGeneAttention
+from experimental_retired_models.PlantSPADE_LGCL.utils import save_json
 
 
 def str2bool(value):
