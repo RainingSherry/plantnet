@@ -1,0 +1,49 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + graph wave propagation",
+  "method_dir": "suture07_wave_graph_propagation_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 100.66271495819092,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_suture_screen/suture07_wave_graph_propagation_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.553391959798995,
+      "nmi": 0.484623806865623,
+      "ari": 0.307923363837854,
+      "f1_macro": 0.47079459506553245,
+      "fmi": 0.5904840092091997,
+      "v_measure": 0.48462380686562295,
+      "homogeneity": 0.6844288483167054,
+      "completeness": 0.3751162648685659,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.9030308723449707,
+    "neighbor_purity_proxy": 0.9858458961474037,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.4519285559654236,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 143.05136108398438,
+    "cluster_mass_min": 0.0504606365159129,
+    "cluster_mass_max": 0.32464405360134,
+    "collapse_warning": false,
+    "wave_gate_mean": 0.0969691202044487,
+    "wave_gate_std": 0.031080659478902817,
+    "diagnostic_note": "Graph wave propagation on log-expression KNN; no image DCT/FFT and no cell mixing."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Quick screen only; this file is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

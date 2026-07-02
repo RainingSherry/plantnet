@@ -1,0 +1,51 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + anomaly association boundary",
+  "method_dir": "rank25_anomaly_association_boundary_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 106.55614304542542,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank25_anomaly_association_boundary_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.7037269681742043,
+      "nmi": 0.5513867757388824,
+      "ari": 0.5038248506225292,
+      "f1_macro": 0.44334692936978454,
+      "fmi": 0.7361558521695412,
+      "v_measure": 0.5513867757388823,
+      "homogeneity": 0.720060902928453,
+      "completeness": 0.4467383934991539,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9697236180904523,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.8207741034013304,
+    "rare_risk_fraction": 0.10008375209380234,
+    "embedding_variance": 0.4144420027732849,
+    "cluster_mass_min": 0.043655778894472363,
+    "cluster_mass_max": 0.5127721943048577,
+    "collapse_warning": false,
+    "association_risk_mean": 12.933600425720215,
+    "association_risk_std": 4.017628192901611,
+    "association_risk_p90": 15.136344909667969,
+    "association_boundary_entropy": 0.45094634203999046,
+    "diagnostic_note": "No NeighborMix is used. Association discrepancy is adapted from time-series anomaly attention to ordered gene-module boundary diagnostics."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

@@ -1,0 +1,16 @@
+{
+  "edge_survival": 0.75,
+  "neighbor_purity_proxy": 0.8620208287170397,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9950973720252378,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 2.530898094177246,
+  "cluster_mass_min": 0.08486594283181918,
+  "cluster_mass_max": 0.1393751384888101,
+  "collapse_warning": false,
+  "edge_confidence_mean": 0.7972368001937866,
+  "edge_confidence_std": 0.2611548900604248,
+  "context_gate_mean": 0.7465581297874451,
+  "token_count_used": 128,
+  "diagnostic_note": "No NeighborMix is used. Mole-BERT adaptation uses context-aware discrete cell tokens and masked expression reconstruction."
+}

@@ -1,0 +1,55 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + semantic uncertainty boundary gate",
+  "method_dir": "suture03_semantic_uncertainty_boundary_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 25.19291877746582,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_suture_screen/suture03_semantic_uncertainty_boundary_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6060270330157324,
+      "nmi": 0.6380915054017965,
+      "ari": 0.5164341778559925,
+      "f1_macro": 0.410842393716071,
+      "fmi": 0.6088256457056627,
+      "v_measure": 0.6380915054017966,
+      "homogeneity": 0.6988251467273191,
+      "completeness": 0.5870702793538669,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.7695364952087402,
+    "neighbor_purity_proxy": 0.8739345594209321,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.6969606876373291,
+    "rare_risk_fraction": 0.8003545313538666,
+    "embedding_variance": 0.9052061438560486,
+    "cluster_mass_min": 0.04121426988699313,
+    "cluster_mass_max": 0.2444050520717926,
+    "collapse_warning": false,
+    "gate_core_mean": 0.16245292127132416,
+    "gate_boundary_mean": 0.23046350479125977,
+    "gate_rare_mean": 0.6070836186408997,
+    "target_stats": {
+      "boundary_score_mean": 0.28422772884368896,
+      "rare_score_mean": 0.7630972266197205,
+      "core_score_mean": 0.18269848823547363
+    },
+    "diagnostic_note": "SID-inspired semantic decoupling is used as a cell-level uncertainty gate; no cell mixing is used."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Quick screen only; this file is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + MultiMAE gene multitask,42,rank20_multimae_multitask_gene_full,screen,scaled encoder + MultiMAE expression/token/module targets,0.41994733083377966,0.5553241641613493,0.2851860793475209,0.36979925694494625,0.519777271879802,0.5553241641613493,0.7937374630897996,0.4270515601732407,12,,fixed,kmeans_known_k,True

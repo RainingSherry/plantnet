@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + deep adaptive fuzzy clustering",
+  "seed": 42,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6812845920371362,
+      "nmi": 0.6350406198714321,
+      "ari": 0.5690132366744954,
+      "f1_macro": 0.5556613605037646,
+      "fmi": 0.743101980542223,
+      "v_measure": 0.6350406198714321,
+      "homogeneity": 0.7681530723080248,
+      "completeness": 0.5412482668000181,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

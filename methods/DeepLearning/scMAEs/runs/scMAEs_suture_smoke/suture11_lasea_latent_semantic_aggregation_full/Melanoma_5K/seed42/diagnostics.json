@@ -1,0 +1,16 @@
+{
+  "edge_survival": 0.8863036036491394,
+  "neighbor_purity_proxy": 0.8508457050003693,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.503616213798523,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.46645450592041016,
+  "cluster_mass_min": 0.034566807001994236,
+  "cluster_mass_max": 0.22978063372479504,
+  "collapse_warning": false,
+  "semantic_gate_mean": 0.11369640380144119,
+  "semantic_gate_std": 0.03329583257436752,
+  "semantic_attention_mean": 0.3834115266799927,
+  "semantic_attention_std": 0.1073889285326004,
+  "diagnostic_note": "LaSEA is rewritten as latent 1D multi-dilation semantic aggregation with detached clean-view semantic consistency."
+}

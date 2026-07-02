@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + Masked Siamese prototypes,42,rank34_masked_siamese_proto_full,screen,scaled encoder + log-expression targets + MSN prototype target,0.4095474022495983,0.5547953737306996,0.2657128121117327,0.3524685512097338,0.5013424289277841,0.5547953737306995,0.8090446734878365,0.42213560246438464,12,,fixed,kmeans_known_k,True

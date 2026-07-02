@@ -1,0 +1,49 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + adaptive sharp/soft switch",
+  "stage": "screen",
+  "seed": 2024,
+  "n_clusters": 5,
+  "runtime_seconds": 52.015772581100464,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.9515284757118928,
+      "nmi": 0.8341016657991418,
+      "ari": 0.9199518145672828,
+      "f1_macro": 0.7024836871169393,
+      "fmi": 0.9642806556307627,
+      "v_measure": 0.8341016657991418,
+      "homogeneity": 0.8673466428194999,
+      "completeness": 0.803311138659809,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "neighbor_purity_proxy": 0.9668655778894473,
+    "mixed_cell_fraction": 0.0,
+    "embedding_variance": 1.1705597639083862,
+    "cluster_mass_min": 0.021252093802345058,
+    "cluster_mass_max": 0.7006909547738693,
+    "collapse_warning": false,
+    "final_gate": 1.0,
+    "final_kl_ref": 0.010169610381126404,
+    "clusterability_mean": 0.9090046882629395,
+    "clusterability_min": 0.0,
+    "clusterability_max": 1.0,
+    "core_fraction": 0.9476549413735343,
+    "agree_mean": 0.9815605806811837,
+    "density_mean": 0.9090180880681389,
+    "confidence_mean": 0.9884136950119806
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "final_gate": 1.0,
+  "final_kl_ref": 0.010169610381126404
+}

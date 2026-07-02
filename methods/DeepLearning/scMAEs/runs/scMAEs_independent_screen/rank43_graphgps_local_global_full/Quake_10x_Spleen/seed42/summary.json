@@ -1,0 +1,50 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + GraphGPS local-global adapter",
+  "method_dir": "rank43_graphgps_local_global_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 139.7772433757782,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank43_graphgps_local_global_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6788107202680067,
+      "nmi": 0.6301579542644397,
+      "ari": 0.47234925377086495,
+      "f1_macro": 0.6198792996002103,
+      "fmi": 0.712944496190832,
+      "v_measure": 0.6301579542644397,
+      "homogeneity": 0.8373173692093249,
+      "completeness": 0.5051736988853243,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.6497571806649904,
+    "neighbor_purity_proxy": 0.990002093802345,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.8440284026625341,
+    "rare_risk_fraction": 0.0043969849246231155,
+    "embedding_variance": 0.3892887830734253,
+    "cluster_mass_min": 0.05820770519262981,
+    "cluster_mass_max": 0.43791876046901174,
+    "collapse_warning": false,
+    "edge_confidence_mean": 0.9748461842536926,
+    "edge_confidence_std": 0.1188037097454071,
+    "local_gate_mean": 0.4951149523258209,
+    "diagnostic_note": "No NeighborMix is used. GraphGPS local-global adapter combines structural encodings, local KNN messages, and batch global attention."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

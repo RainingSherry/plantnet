@@ -1,0 +1,13 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.8871925548415688,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.8727079554276386,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.18116849660873413,
+  "cluster_mass_min": 0.028584090405495238,
+  "cluster_mass_max": 0.2585863062264569,
+  "collapse_warning": false,
+  "replaced_expression_fraction": 0.13999275127973626,
+  "diagnostic_note": "No NeighborMix graph is used; BEiT-style gene-specific discrete token prediction is used."
+}

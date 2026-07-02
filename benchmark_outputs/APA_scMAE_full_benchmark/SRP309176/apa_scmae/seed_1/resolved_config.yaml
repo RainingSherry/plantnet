@@ -1,0 +1,76 @@
+method_name: apa_scmae
+seed: 1
+skip_eval: false
+runtime:
+  no_cuda: false
+  gpu: 6
+  gpu_explicit: true
+  allowed_gpus:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  forbidden_gpus:
+  - 0
+  - 7
+  deterministic: true
+  num_workers: 0
+  fail_fast: true
+  max_attention_elements: 300000000
+  force_large_attention: false
+preprocessing:
+  input_mode: log1p
+  target_sum: 10000.0
+  n_top_genes: 0
+  scale_input: false
+  input_mode_requested: log1p
+  input_mode_resolved: log1p
+  raw_count_source: null
+  label_key: Celltype
+  labels_available: true
+  actual_n_genes: 2000
+  feature_space_source: full_gene
+  gene_stats_source: pre_scale_log1p
+prototype:
+  n_prototypes: 16
+  pca_dim: 32
+model:
+  token_dim: 64
+  cell_dim: 64
+  attention_heads: 4
+  attention_dropout: 0.1
+  dropout: 0.0
+corruption:
+  type: scmae_shuffle
+  changed_tolerance_abs: 1.0e-06
+  changed_tolerance_rel: 1.0e-05
+mask:
+  ratio: 0.4
+  temperature: 1.0
+  masked_data_weight: 0.75
+  generator_topk_only_effective: true
+training:
+  epochs: 80
+  batch_size: 16
+  lr_student: 0.001
+  lr_generator: 0.0001
+  weight_decay: 1.0e-05
+  student_grad_clip: 5.0
+  generator_grad_clip: 1.0
+  generator_update_interval: 1
+  gamma: 0.7
+generator_loss:
+  lambda_entropy: 0.01
+  lambda_balance: 0.01
+  lambda_distortion: 0.01
+  lambda_coverage: 0.01
+evaluation:
+  label_key: Celltype
+  n_neighbors: 15
+  leiden_fixed_resolution: 1.0
+data_path: benchmark_outputs/APA_scMAE_full_benchmark/SRP309176/apa_scmae/seed_1/canonical_hvg.h5ad
+save_dir: benchmark_outputs/APA_scMAE_full_benchmark/SRP309176/apa_scmae/seed_1
+n_clusters: 13
+dataset_name: SRP309176

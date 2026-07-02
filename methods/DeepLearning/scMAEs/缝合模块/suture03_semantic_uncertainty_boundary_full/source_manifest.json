@@ -1,0 +1,16 @@
+{
+  "method_dir": "suture03_semantic_uncertainty_boundary_full",
+  "candidate_order": 3,
+  "reference_module": "/home/luolie/biopipeline/dimension-reduction/plantnet/缝合模块/即插即用/095 Semantic Information Decoupling Mask(AAAI 2025).py",
+  "reference_title": "ConDSeg: A General Medical Image Segmentation Framework via Contrast-Driven Feature Enhancement",
+  "reference_url": "https://arxiv.org/pdf/2412.08345",
+  "implementation_source": "Rewritten from the semantic decoupling concept for scRNA cell-level latent uncertainty gates.",
+  "scmae_gap": "boundary / rare-cell",
+  "core_mechanism": "core-boundary-rare semantic uncertainty gate",
+  "neighbor_mix_relation": "independent; no cell mixing is used",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true",
+    "reconstruction_target": "log_expr",
+    "scaled_expression_not_used_as": ["counts", "tokens", "NB target", "ZINB target", "diffusion target"]
+  }
+}

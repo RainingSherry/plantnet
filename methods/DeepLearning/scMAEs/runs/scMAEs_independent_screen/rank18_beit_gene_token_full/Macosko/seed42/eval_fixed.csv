@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + BEiT gene-token target,42,rank18_beit_gene_token_full,screen,scaled encoder + BEiT gene token target,0.440055347259418,0.5621111661653556,0.2967852610498912,0.37481131498378245,0.5304791025021371,0.5621111661653556,0.7989705795997469,0.4335752847965876,12,,fixed,kmeans_known_k,True

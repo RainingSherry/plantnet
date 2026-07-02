@@ -1,0 +1,19 @@
+{
+  "rank": 64,
+  "method_dir": "rank64_groundgan_causal_mask_full",
+  "paper_title": "GRouNdGAN: GRN-guided simulation of single-cell RNA-seq data using causal generative adversarial networks",
+  "recommendation": "可用",
+  "recommendation_score": 70,
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/064_可用_GRouNdGAN_GRN-guided_simulation_of_single-cell_RNA-seq_data_using_causal_generative_adversarial_networks.pdf",
+  "github_url": "https://github.com/Emad-COMBINE-lab/GRouNdGAN",
+  "github_status": "Anonymous ls-remote and shallow clone succeeded. Inspected README.md, src/networks/masked_causal_generator.py, src/layers/masked_linear.py, and src/preprocessing/grn_creation.py.",
+  "implemented_from": [
+    "GRouNdGAN PDF: GRN-guided causal implicit generator, TF-target causal dependencies, preservation of gene identities",
+    "GRouNdGAN source: causal_graph format, masked causal generator, MaskedLinear masked weights/gradients, top-k GRN preparation",
+    "methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md section 65 notes for index rank64",
+    "methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv row sort_rank=64"
+  ],
+  "scmae_gap": "graph / target dependency",
+  "core_mechanism": "Build a sparse pseudo TF-to-target causal mask on log-expression and train a target-expression dependency adapter alongside scMAE reconstruction.",
+  "neighbor_mix_relation": "independent and complementary; this candidate does not use NeighborMix and does not mix cells."
+}

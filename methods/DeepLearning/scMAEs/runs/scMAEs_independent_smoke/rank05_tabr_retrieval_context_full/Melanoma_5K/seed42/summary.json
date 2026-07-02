@@ -1,0 +1,53 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + TabR retrieval context",
+  "method_dir": "rank05_tabr_retrieval_context_full",
+  "stage": "smoke",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 1.8145573139190674,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_smoke/rank05_tabr_retrieval_context_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6015953910923998,
+      "nmi": 0.6640053325490315,
+      "ari": 0.5243028016323192,
+      "f1_macro": 0.4968603247874825,
+      "fmi": 0.6156186424672451,
+      "v_measure": 0.6640053325490315,
+      "homogeneity": 0.724358165358473,
+      "completeness": 0.612936081686647,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.8535785508530911,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9330393697636234,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.09311997145414352,
+    "cluster_mass_min": 0.03678262796366054,
+    "cluster_mass_max": 0.20141812541546644,
+    "collapse_warning": false,
+    "retrieval": {
+      "retrieval_k": 8,
+      "retrieval_svd_dim": 32,
+      "mean_neighbor_distance": 3.2882759462585542,
+      "max_neighbor_distance": 11.414438247680664
+    },
+    "diagnostic_note": "Retrieval context is used during both training and inference; no NeighborMix cell mixing."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

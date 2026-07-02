@@ -1,0 +1,49 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + FCM masked/unmasked latent correction",
+  "method_dir": "suture04_fcm_mask_unmask_fusion_full",
+  "stage": "smoke",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 2.238598346710205,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_suture_smoke/suture04_fcm_mask_unmask_fusion_full/Melanoma_5K/seed42_gatefloor/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6330600487480612,
+      "nmi": 0.685247339264983,
+      "ari": 0.5651921685560294,
+      "f1_macro": 0.5137247881361028,
+      "fmi": 0.6499359528683641,
+      "v_measure": 0.6852473392649829,
+      "homogeneity": 0.7451608616548316,
+      "completeness": 0.6342513286884519,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.8502271175384521,
+    "neighbor_purity_proxy": 0.8516434005465692,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.5568524599075317,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.7770594358444214,
+    "cluster_mass_min": 0.03567471748282739,
+    "cluster_mass_max": 0.2211389319742965,
+    "collapse_warning": false,
+    "correction_gate_mean": 0.14977288246154785,
+    "correction_gate_std": 0.10334160178899765,
+    "diagnostic_note": "FCM is adapted to masked/unmasked latent correction; clean view is a detached teacher context and no cell mixing is used."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Quick screen only; this file is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

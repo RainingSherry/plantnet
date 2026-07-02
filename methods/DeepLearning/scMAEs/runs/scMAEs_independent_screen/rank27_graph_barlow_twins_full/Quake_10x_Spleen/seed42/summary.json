@@ -1,0 +1,49 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + Graph Barlow Twins",
+  "method_dir": "rank27_graph_barlow_twins_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 122.94982767105103,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank27_graph_barlow_twins_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6538944723618091,
+      "nmi": 0.4541782838403179,
+      "ari": 0.3411336176904915,
+      "f1_macro": 0.4259057229211981,
+      "fmi": 0.6440491475097239,
+      "v_measure": 0.4541782838403179,
+      "homogeneity": 0.5367100564168822,
+      "completeness": 0.39364597307563265,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.7995355137296625,
+    "neighbor_purity_proxy": 0.981679229480737,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.6942911229956481,
+    "rare_risk_fraction": 0.10008375209380234,
+    "embedding_variance": 0.7025535106658936,
+    "cluster_mass_min": 0.0023031825795644893,
+    "cluster_mass_max": 0.4445142378559464,
+    "collapse_warning": false,
+    "edge_confidence_mean": 0.9435630440711975,
+    "edge_confidence_std": 0.12940548360347748,
+    "diagnostic_note": "No NeighborMix is used. Graph Barlow Twins supplies symmetric graph view invariance and redundancy reduction around the scMAE objective."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

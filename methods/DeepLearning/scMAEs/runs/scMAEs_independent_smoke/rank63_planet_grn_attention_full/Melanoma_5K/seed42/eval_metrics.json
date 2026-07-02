@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + Planet GRN attention",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.5829824950144028,
+      "nmi": 0.5699622814458016,
+      "ari": 0.4379164181717787,
+      "f1_macro": 0.48285724963732,
+      "fmi": 0.5424831053946348,
+      "v_measure": 0.5699622814458017,
+      "homogeneity": 0.620910657979683,
+      "completeness": 0.5267409337620049,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

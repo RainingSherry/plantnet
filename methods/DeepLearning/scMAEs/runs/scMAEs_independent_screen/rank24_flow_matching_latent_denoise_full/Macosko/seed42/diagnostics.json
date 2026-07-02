@@ -1,0 +1,14 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.9518813604713444,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9124955370316108,
+  "rare_risk_fraction": 0.02689251919300125,
+  "embedding_variance": 0.29583635926246643,
+  "cluster_mass_min": 0.0072085341903231565,
+  "cluster_mass_max": 0.1647250490983753,
+  "collapse_warning": false,
+  "flow_target_norm": 14.51929959978376,
+  "flow_pred_norm": 11.963483042035785,
+  "diagnostic_note": "No NeighborMix graph is used; latent Flow Matching is used only as denoising regularization, not for generated sample evaluation."
+}

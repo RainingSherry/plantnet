@@ -1,0 +1,15 @@
+{
+  "neighbor_purity_proxy": 0.5189581175077698,
+  "mixed_cell_fraction": 0.0,
+  "embedding_variance": 0.8266546726226807,
+  "cluster_mass_min": 0.007473730945685955,
+  "cluster_mass_max": 0.36436288293621427,
+  "collapse_warning": false,
+  "reliability_mean": 0.795552134513855,
+  "reliability_min": 0.0,
+  "reliability_max": 1.0,
+  "core_fraction": 0.8237383454195649,
+  "agree_mean": 0.8720783385131469,
+  "density_mean": 0.8306177105218863,
+  "confidence_mean": 0.9223189102660821
+}

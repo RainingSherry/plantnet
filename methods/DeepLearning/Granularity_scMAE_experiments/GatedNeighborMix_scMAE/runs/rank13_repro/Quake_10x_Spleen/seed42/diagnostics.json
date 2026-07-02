@@ -1,0 +1,13 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.9682684254606365,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.05225782174709652,
+  "rare_risk_fraction": 0.0043969849246231155,
+  "embedding_variance": 0.6476055383682251,
+  "cluster_mass_min": 0.015912897822445562,
+  "cluster_mass_max": 0.6969221105527639,
+  "collapse_warning": false,
+  "cluster_confidence_mean": 0.9874332745495553,
+  "diagnostic_note": "No NeighborMix graph is used; DEC-style high-confidence cluster target is used after scMAE warmup."
+}

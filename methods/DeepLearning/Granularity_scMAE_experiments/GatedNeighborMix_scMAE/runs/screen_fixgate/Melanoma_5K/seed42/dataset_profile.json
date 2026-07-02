@@ -1,0 +1,24 @@
+{
+  "dataset_name": "Melanoma_5K",
+  "n_cells": 4513,
+  "n_genes_original": 23684,
+  "n_genes": 1000,
+  "label_key": "resolved_label",
+  "n_cell_types": 9,
+  "cell_type_counts": {
+    "B cell": 512,
+    "CAF": 56,
+    "CD4+ T cell": 967,
+    "CD8+ T cell": 1153,
+    "Endothelial cell": 62,
+    "Macrophage": 120,
+    "NK cell": 46,
+    "Tumor": 1251,
+    "Unknown": 346
+  },
+  "counts_source": "adata.X",
+  "input_mode": "raw",
+  "has_raw": false,
+  "has_layers_counts": false,
+  "scale_input": true
+}

@@ -1,0 +1,49 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + fuzzy rough quantification",
+  "method_dir": "rank30_fuzzy_rough_quantification_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 64.97662043571472,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank30_fuzzy_rough_quantification_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.4635678391959799,
+      "nmi": 0.46604178587954004,
+      "ari": 0.2482956399598184,
+      "f1_macro": 0.3984172361432326,
+      "fmi": 0.5420782753916841,
+      "v_measure": 0.46604178587954,
+      "homogeneity": 0.6724332614260178,
+      "completeness": 0.3565921450042124,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9830192629815745,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9602517511017515,
+    "rare_risk_fraction": 0.10008375209380234,
+    "embedding_variance": 0.9563639163970947,
+    "cluster_mass_min": 0.09662897822445561,
+    "cluster_mass_max": 0.2768006700167504,
+    "collapse_warning": false,
+    "membership_confidence_mean": 0.9631374478340149,
+    "membership_confidence_p10": 0.9551534056663513,
+    "diagnostic_note": "No NeighborMix is used. Fuzzy rough lower approximation strengthens core cells, while upper approximation leaves boundary cells entropy-tolerant."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

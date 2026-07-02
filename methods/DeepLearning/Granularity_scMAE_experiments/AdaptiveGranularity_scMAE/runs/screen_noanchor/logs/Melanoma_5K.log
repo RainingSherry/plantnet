@@ -1,0 +1,18 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+Building PCA-KNN graph + SVD anchor ...
+Device=cuda:0 dataset=Melanoma_5K cells=4513 genes=1000 clusters=9 anchor=0 adaptive=True
+Epoch 001/80 loss=0.4589 scmae=0.4521 cluster=0.0000 cons=0.1361 c_mean=1.000 activeKL=0.000 scale=0.00
+Epoch 010/80 loss=0.4434 scmae=0.4432 cluster=0.0000 cons=0.0031 c_mean=1.000 activeKL=0.000 scale=0.00
+Epoch 020/80 loss=0.4430 scmae=0.4428 cluster=0.0000 cons=0.0025 c_mean=1.000 activeKL=0.000 scale=0.00
+Epoch 030/80 loss=0.4568 scmae=0.4429 cluster=0.0784 cons=0.0039 c_mean=0.778 activeKL=1.000 scale=0.50
+Epoch 040/80 loss=0.4760 scmae=0.4430 cluster=0.0934 cons=0.0058 c_mean=0.832 activeKL=1.000 scale=1.00
+Epoch 050/80 loss=0.4708 scmae=0.4430 cluster=0.0785 cons=0.0052 c_mean=0.864 activeKL=0.996 scale=1.00
+Epoch 060/80 loss=0.4682 scmae=0.4432 cluster=0.0707 cons=0.0058 c_mean=0.873 activeKL=0.994 scale=1.00
+Epoch 070/80 loss=0.4662 scmae=0.4432 cluster=0.0650 cons=0.0059 c_mean=0.875 activeKL=0.989 scale=1.00
+Epoch 080/80 loss=0.4652 scmae=0.4431 cluster=0.0620 cons=0.0066 c_mean=0.879 activeKL=0.988 scale=1.00
+[RESULT] Melanoma_5K NMI=0.7247751617097677 ARI=0.6543731413854548 meets=False collapse=False c_mean=0.881 core=0.902

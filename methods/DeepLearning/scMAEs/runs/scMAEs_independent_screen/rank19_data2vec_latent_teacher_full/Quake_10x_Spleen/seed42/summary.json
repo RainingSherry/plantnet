@@ -1,0 +1,48 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + data2vec latent teacher",
+  "method_dir": "rank19_data2vec_latent_teacher_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 43.721477031707764,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank19_data2vec_latent_teacher_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5391541038525963,
+      "nmi": 0.5577991450729478,
+      "ari": 0.3193816572186442,
+      "f1_macro": 0.4472692647136787,
+      "fmi": 0.5950873751605167,
+      "v_measure": 0.5577991450729479,
+      "homogeneity": 0.8071307345128275,
+      "completeness": 0.4261551249540914,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9906721105527638,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9644592043095693,
+    "rare_risk_fraction": 0.0043969849246231155,
+    "embedding_variance": 1.1117277145385742,
+    "cluster_mass_min": 0.08961474036850921,
+    "cluster_mass_max": 0.28999162479061974,
+    "collapse_warning": false,
+    "teacher_target_std": 0.5498754156602396,
+    "diagnostic_note": "No NeighborMix graph is used; EMA teacher latent targets are regressed from strong masked student views."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

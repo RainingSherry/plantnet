@@ -1,0 +1,14 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.7660536228672723,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.3411388695240021,
+  "rare_risk_fraction": 0.08287170396631952,
+  "embedding_variance": 0.4410006105899811,
+  "cluster_mass_min": 0.017726567693330378,
+  "cluster_mass_max": 0.40217150454243294,
+  "collapse_warning": false,
+  "prototype_mass_min": 0.004830024555572453,
+  "prototype_mass_max": 0.6951266597476763,
+  "diagnostic_note": "No NeighborMix graph is used; density/entropy rare-risk controls Celler-style long-tail losses."
+}

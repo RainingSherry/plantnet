@@ -1,0 +1,49 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + MaskGAE masked edge reconstruction",
+  "method_dir": "rank42_maskgae_edge_reconstruct_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 86.42477607727051,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank42_maskgae_edge_reconstruct_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6901172529313233,
+      "nmi": 0.5812811626062739,
+      "ari": 0.46177257509400865,
+      "f1_macro": 0.5607381010155936,
+      "fmi": 0.7062566839791973,
+      "v_measure": 0.581281162606274,
+      "homogeneity": 0.7824046891534308,
+      "completeness": 0.4624138891793208,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.44843749983890635,
+    "neighbor_purity_proxy": 0.981857202680067,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.8616051123956238,
+    "rare_risk_fraction": 0.0043969849246231155,
+    "embedding_variance": 0.45531290769577026,
+    "cluster_mass_min": 0.07799413735343383,
+    "cluster_mass_max": 0.46733668341708545,
+    "collapse_warning": false,
+    "edge_confidence_mean": 0.9907087683677673,
+    "edge_confidence_std": 0.0429624579846859,
+    "diagnostic_note": "No NeighborMix is used. MaskGAE masked edge reconstruction trains a shallow graph adapter and edge/degree decoders."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

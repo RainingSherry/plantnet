@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + Graph Barlow Twins,42,rank27_graph_barlow_twins_full,screen,scaled encoder + log-expression targets + shallow KNN Graph Barlow Twins,0.6166629736317305,0.5370075639950522,0.4369569798130618,0.4134674576187313,0.5521632151012043,0.5370075639950521,0.5466458162493217,0.5277032990389156,9,,fixed,kmeans_known_k,True

@@ -1,0 +1,52 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + Planet GRN attention",
+  "method_dir": "rank63_planet_grn_attention_full",
+  "stage": "smoke",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 1.897386074066162,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_smoke/rank63_planet_grn_attention_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5829824950144028,
+      "nmi": 0.5699622814458016,
+      "ari": 0.4379164181717787,
+      "f1_macro": 0.48285724963732,
+      "fmi": 0.5424831053946348,
+      "v_measure": 0.5699622814458017,
+      "homogeneity": 0.620910657979683,
+      "completeness": 0.5267409337620049,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.7998684153837317,
+    "neighbor_purity_proxy": 0.7411921116773764,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9306659872896567,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.009557896293699741,
+    "cluster_mass_min": 0.03700421005982717,
+    "cluster_mass_max": 0.20651451362729892,
+    "collapse_warning": false,
+    "mask_score_mean": 0.40331006050109863,
+    "edge_confidence_mean": 0.48791221134802876,
+    "input_mask_rate": 0.4002240545609418,
+    "grn_positive_edges": 8000,
+    "grn_negative_edges": 8000,
+    "diagnostic_note": "No NeighborMix is used. Planet is adapted as time-guided regulatory edge denoising from log-expression coexpression priors."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

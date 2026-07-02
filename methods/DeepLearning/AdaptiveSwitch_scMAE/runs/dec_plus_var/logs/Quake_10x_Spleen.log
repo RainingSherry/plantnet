@@ -1,0 +1,30 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/anndata/_core/anndata.py:1906: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/anndata/_core/anndata.py:1906: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/anndata/_core/anndata.py:1906: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/anndata/_core/anndata.py:1906: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/anndata/_core/anndata.py:1906: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/anndata/_core/anndata.py:1906: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+Building PCA-KNN graph ...
+Device=cuda:0 dataset=Quake_10x_Spleen cells=9552 clusters=5 force_gate=1.0 kappa=0.15
+Epoch 001/80 loss=0.4622 scmae=0.4497 sharp=0.0000 soft=0.0000 gate=1.000 kl_ref=0.0000 scale=0.00
+Epoch 010/80 loss=0.4434 scmae=0.4433 sharp=0.0000 soft=0.0000 gate=1.000 kl_ref=0.0000 scale=0.00
+Epoch 020/80 loss=0.4434 scmae=0.4432 sharp=0.0000 soft=0.0000 gate=1.000 kl_ref=0.0000 scale=0.00
+Epoch 030/80 loss=0.4473 scmae=0.4433 sharp=0.0215 soft=-0.0133 gate=1.000 kl_ref=0.0207 scale=0.50
+Epoch 040/80 loss=0.4501 scmae=0.4434 sharp=0.0189 soft=-0.0057 gate=1.000 kl_ref=0.0146 scale=1.00
+Epoch 050/80 loss=0.4489 scmae=0.4434 sharp=0.0154 soft=-0.0038 gate=1.000 kl_ref=0.0120 scale=1.00
+Epoch 060/80 loss=0.4483 scmae=0.4434 sharp=0.0139 soft=-0.0042 gate=1.000 kl_ref=0.0111 scale=1.00
+Epoch 070/80 loss=0.4479 scmae=0.4434 sharp=0.0126 soft=-0.0019 gate=1.000 kl_ref=0.0103 scale=1.00
+Epoch 080/80 loss=0.4477 scmae=0.4433 sharp=0.0124 soft=-0.0026 gate=1.000 kl_ref=0.0098 scale=1.00
+[RESULT] Quake_10x_Spleen NMI=0.840861897780549 ARI=0.9211156191086136 meets=False collapse=False gate=1.000 kl_ref=0.0098

@@ -1,0 +1,14 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.6830046532240195,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9620501536212254,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.00042241771006956697,
+  "cluster_mass_min": 0.03766895634832706,
+  "cluster_mass_max": 0.1929980057611345,
+  "collapse_warning": false,
+  "replaced_expression_fraction": 0.17010670213722714,
+  "masked_token_confidence": 0.729432035894955,
+  "diagnostic_note": "No NeighborMix graph is used; MaskGIT-style cosine curriculum masked gene-token prediction is used."
+}

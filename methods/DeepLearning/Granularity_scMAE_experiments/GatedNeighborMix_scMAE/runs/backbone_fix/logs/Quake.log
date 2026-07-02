@@ -1,0 +1,24 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/anndata/_core/anndata.py:1906: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/anndata/_core/anndata.py:1906: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/anndata/_core/anndata.py:1906: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+Building PCA-KNN graph for NeighborMix ...
+Device=cuda:0 dataset=Quake_10x_Spleen cells=9552 genes=1000 clusters=5
+Method=GatedNeighborMix_scMAE stage=screen epochs=80 warmup=20
+Epoch 001/80 loss=0.1895 scmae=0.1895 pseudo=0.0000 cluster=0.0000 r_mean=1.000 core=0.000 scale=0.00
+Epoch 010/80 loss=0.0734 scmae=0.0734 pseudo=0.0000 cluster=0.0000 r_mean=1.000 core=0.000 scale=0.00
+Epoch 020/80 loss=0.0722 scmae=0.0722 pseudo=0.0000 cluster=0.0000 r_mean=1.000 core=0.000 scale=0.00
+Epoch 030/80 loss=0.0714 scmae=0.0714 pseudo=0.0000 cluster=0.4091 r_mean=0.463 core=0.940 scale=0.50
+Epoch 040/80 loss=0.0713 scmae=0.0713 pseudo=0.0000 cluster=0.2067 r_mean=0.434 core=0.904 scale=1.00
+Epoch 050/80 loss=0.0711 scmae=0.0711 pseudo=0.0000 cluster=0.0922 r_mean=0.433 core=0.606 scale=1.00
+Epoch 060/80 loss=0.0705 scmae=0.0705 pseudo=0.0000 cluster=0.0534 r_mean=0.419 core=0.205 scale=1.00
+Epoch 070/80 loss=0.0703 scmae=0.0703 pseudo=0.0000 cluster=0.0349 r_mean=0.407 core=0.022 scale=1.00
+Epoch 080/80 loss=0.0701 scmae=0.0701 pseudo=0.0000 cluster=0.0000 r_mean=0.416 core=0.000 scale=1.00
+[RESULT] Quake_10x_Spleen NMI=0.6425185779661451 ARI=0.4841993728834907 meets_baseline=False collapse=False r_mean=0.403 core_frac=0.283
+Completed GatedNeighborMix_scMAE. Results saved to: methods/DeepLearning/GatedNeighborMix_scMAE/runs/backbone_fix/Quake_10x_Spleen/seed42

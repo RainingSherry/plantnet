@@ -1,0 +1,12 @@
+{
+  "shape": [
+    2000,
+    4
+  ],
+  "columns": [
+    "mean",
+    "variance",
+    "zero_rate",
+    "hvg_rank"
+  ]
+}

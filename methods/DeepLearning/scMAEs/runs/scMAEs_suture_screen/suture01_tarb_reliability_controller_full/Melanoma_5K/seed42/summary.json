@@ -1,0 +1,63 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + suture TARB reliability controller",
+  "method_dir": "suture01_tarb_reliability_controller_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 71.96090126037598,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_suture_screen/suture01_tarb_reliability_controller_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.728340350099712,
+      "nmi": 0.7310934676743682,
+      "ari": 0.6595196812128709,
+      "f1_macro": 0.6403894691275203,
+      "fmi": 0.7269116268079842,
+      "v_measure": 0.7310934676743683,
+      "homogeneity": 0.764013619975278,
+      "completeness": 0.7008930807171201,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.8473742521604254,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.14060900706015203,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.4900742471218109,
+    "cluster_mass_min": 0.019056060270330157,
+    "cluster_mass_max": 0.26058054509195655,
+    "collapse_warning": false,
+    "module_gate_entropy": 0.5909369404868101,
+    "operation_weight_mean": [
+      0.14769617924823739,
+      0.1607122231505189,
+      0.19649140019436523,
+      0.2624862007766481,
+      0.23261399685365014
+    ],
+    "cluster_confidence_mean": 0.9477844377750572,
+    "diagnostic_note": "TARB-style latent controller; no NeighborMix cell mixing; reliability gates only risky auxiliary operations, not DEC.",
+    "reliability_mean": 0.8803462386131287,
+    "reliability_min": 0.0,
+    "reliability_max": 1.0,
+    "core_fraction": 0.8989585641480169,
+    "agree_mean": 0.9486224979688308,
+    "density_mean": 0.888396926817495,
+    "confidence_mean": 0.9477844377750572
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

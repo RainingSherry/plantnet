@@ -1,0 +1,52 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + scDiffusion pseudo-condition DDPM",
+  "method_dir": "rank61_scdiffusion_pseudocond_ddpm_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 44808,
+  "n_genes": 1000,
+  "n_clusters": 12,
+  "runtime_seconds": 216.7217025756836,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank61_scdiffusion_pseudocond_ddpm_full/Macosko/seed42_svd16/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5469559007320122,
+      "nmi": 0.6026297738393426,
+      "ari": 0.40157165246868626,
+      "f1_macro": 0.42138401695162925,
+      "fmi": 0.6196574328302938,
+      "v_measure": 0.6026297738393426,
+      "homogeneity": 0.8022213071774644,
+      "completeness": 0.4825676267681415,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9669657204070702,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.7863007141237484,
+    "rare_risk_fraction": 0.02689251919300125,
+    "embedding_variance": 0.0025740766432136297,
+    "cluster_mass_min": 0.008056597036243528,
+    "cluster_mass_max": 0.3631271201571148,
+    "collapse_warning": false,
+    "mask_score_mean": 0.3997807204723358,
+    "pseudo_condition_min_fraction": 0.0074093911801464026,
+    "pseudo_condition_max_fraction": 0.140532940546331,
+    "diffusion_timestep_mean": 0.5005861571856908,
+    "input_mask_rate": 0.39990818892206464,
+    "diagnostic_note": "No NeighborMix is used. scDiffusion is adapted as pseudo-condition DDPM latent noise prediction only."
+  },
+  "baseline": {
+    "nmi": 0.657465,
+    "ari": 0.494268
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

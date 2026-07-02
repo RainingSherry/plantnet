@@ -1,0 +1,46 @@
+{
+  "dataset": "SRP171040",
+  "method": "dual-axis (gene-module + prototype cell-axis) gated scMAE + DEC",
+  "method_dir": "DualAxisGated_scMAE",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 33956,
+  "n_genes": 1000,
+  "n_clusters": 12,
+  "runtime_seconds": 602.9119691848755,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.415419955236188,
+      "nmi": 0.501378392938618,
+      "ari": 0.2978541656485236,
+      "f1_macro": 0.27485828092722814,
+      "fmi": 0.4758626749435496,
+      "v_measure": 0.501378392938618,
+      "homogeneity": 0.416921324081897,
+      "completeness": 0.628745316721173,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "neighbor_purity_proxy": 0.6910825774531747,
+    "mixed_cell_fraction": 0.9496112616327012,
+    "embedding_variance": 0.41720613837242126,
+    "cluster_mass_min": 0.006744021675108965,
+    "cluster_mass_max": 0.5151077865472965,
+    "collapse_warning": false,
+    "reliability_mean": 0.833590567111969,
+    "reliability_min": 0.0,
+    "reliability_max": 1.0,
+    "core_fraction": 0.885145482388974,
+    "agree_mean": 0.9583303883457023,
+    "density_mean": 0.8380488311603597,
+    "confidence_mean": 0.8887919292467399
+  },
+  "baseline": {},
+  "meets_screen_baseline_any": false,
+  "note": "Independent candidate; NOT appended to \u5168benchmark\u7ed3\u679c.csv."
+}

@@ -1,0 +1,17 @@
+{
+  "file_path": "/data/luolie/biopipeline/scCluBench/data/SRP145013.h5ad",
+  "counts_source": "adata.raw.X",
+  "input_mode": "raw",
+  "support_definition": "M_cg = 1[count_cg > 0]",
+  "amplitude_definition": "normalize_total(target_sum=10000.0) + log1p on selected genes",
+  "n_top_genes": 2000,
+  "selected_n_genes": 2000,
+  "target_sum": 10000.0,
+  "svd_dim": 32,
+  "svd_iter": 7,
+  "seed": 2,
+  "label_key": "Celltype",
+  "subsample": {
+    "enabled": false
+  }
+}

@@ -1,0 +1,2 @@
+dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,suture08_parameter_free_edge_structure_full,42,screen,0.49357257632565615,0.5793668347971065,0.3469493362868916,0.39800086450026223,0.5746789803827936,0.5793668347971065,0.7918678435326465,0.45678633407342656,12,,fixed,kmeans_known_k,True

@@ -1,0 +1,49 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + adaptive sharp/soft switch",
+  "stage": "screen",
+  "seed": 42,
+  "n_clusters": 12,
+  "runtime_seconds": 259.6747798919678,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.46895643635065165,
+      "nmi": 0.5787382593362701,
+      "ari": 0.32814618020170344,
+      "f1_macro": 0.3957400818177381,
+      "fmi": 0.5584772531400305,
+      "v_measure": 0.57873825933627,
+      "homogeneity": 0.7970965224679111,
+      "completeness": 0.45428931004909573,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "neighbor_purity_proxy": 0.9365916800571327,
+    "mixed_cell_fraction": 0.0,
+    "embedding_variance": 1.2104134559631348,
+    "cluster_mass_min": 0.0056686306016782715,
+    "cluster_mass_max": 0.2602660239242992,
+    "collapse_warning": false,
+    "final_gate": 1.0,
+    "final_kl_ref": 0.0804559662938118,
+    "clusterability_mean": 0.7849984765052795,
+    "clusterability_min": 0.0,
+    "clusterability_max": 1.0,
+    "core_fraction": 0.8410998036064988,
+    "agree_mean": 0.8855501993691604,
+    "density_mean": 0.8404978740054412,
+    "confidence_mean": 0.8499061465130344
+  },
+  "baseline": {
+    "nmi": 0.657465,
+    "ari": 0.494268
+  },
+  "meets_screen_baseline_any": false,
+  "final_gate": 1.0,
+  "final_kl_ref": 0.0804559662938118
+}

@@ -1,0 +1,48 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + data2vec latent teacher",
+  "method_dir": "rank19_data2vec_latent_teacher_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 44808,
+  "n_genes": 1000,
+  "n_clusters": 12,
+  "runtime_seconds": 222.51067996025085,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank19_data2vec_latent_teacher_full/Macosko/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.3533967148723442,
+      "nmi": 0.5246963208058155,
+      "ari": 0.18771941163464867,
+      "f1_macro": 0.3167771358999604,
+      "fmi": 0.4201136711319467,
+      "v_measure": 0.5246963208058155,
+      "homogeneity": 0.8025816855517246,
+      "completeness": 0.3897496526517095,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9685033922513837,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9739937485533761,
+    "rare_risk_fraction": 0.02689251919300125,
+    "embedding_variance": 1.0281462669372559,
+    "cluster_mass_min": 0.04380914122478129,
+    "cluster_mass_max": 0.13122656668452062,
+    "collapse_warning": false,
+    "teacher_target_std": 0.5226571910721916,
+    "diagnostic_note": "No NeighborMix graph is used; EMA teacher latent targets are regressed from strong masked student views."
+  },
+  "baseline": {
+    "nmi": 0.657465,
+    "ari": 0.494268
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

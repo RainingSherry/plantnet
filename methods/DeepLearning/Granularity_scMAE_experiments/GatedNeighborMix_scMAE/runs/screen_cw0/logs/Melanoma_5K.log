@@ -1,0 +1,20 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+Building PCA-KNN graph for NeighborMix ...
+Device=cuda:0 dataset=Melanoma_5K cells=4513 genes=1000 clusters=9
+Method=GatedNeighborMix_scMAE stage=screen epochs=80 warmup=20
+Epoch 001/80 loss=0.4217 scmae=0.3075 pseudo=0.3804 cluster=0.0000 r_mean=1.000 core=0.000 scale=0.00
+Epoch 010/80 loss=0.1921 scmae=0.0978 pseudo=0.3144 cluster=0.0000 r_mean=1.000 core=0.000 scale=0.00
+Epoch 020/80 loss=0.1829 scmae=0.0930 pseudo=0.2999 cluster=0.0000 r_mean=1.000 core=0.000 scale=0.00
+Epoch 030/80 loss=0.1763 scmae=0.0926 pseudo=0.2791 cluster=0.7996 r_mean=0.490 core=0.917 scale=0.50
+Epoch 040/80 loss=0.1759 scmae=0.0916 pseudo=0.2810 cluster=0.5854 r_mean=0.500 core=0.887 scale=1.00
+Epoch 050/80 loss=0.1750 scmae=0.0913 pseudo=0.2790 cluster=0.3828 r_mean=0.518 core=0.786 scale=1.00
+Epoch 060/80 loss=0.1743 scmae=0.0906 pseudo=0.2788 cluster=0.2455 r_mean=0.505 core=0.611 scale=1.00
+Epoch 070/80 loss=0.1727 scmae=0.0898 pseudo=0.2763 cluster=0.1680 r_mean=0.502 core=0.236 scale=1.00
+Epoch 080/80 loss=0.1732 scmae=0.0895 pseudo=0.2790 cluster=0.1512 r_mean=0.522 core=0.020 scale=1.00
+[RESULT] Melanoma_5K NMI=0.6954046794220022 ARI=0.6304026652164385 meets_baseline=False collapse=False r_mean=0.528 core_frac=0.594
+Completed GatedNeighborMix_scMAE. Results saved to: methods/DeepLearning/GatedNeighborMix_scMAE/runs/screen_cw0/Melanoma_5K/seed42

@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + soft graph clustering",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6820296920008864,
+      "nmi": 0.6855645431804024,
+      "ari": 0.595819619218907,
+      "f1_macro": 0.5064436595974222,
+      "fmi": 0.6750017595732909,
+      "v_measure": 0.6855645431804024,
+      "homogeneity": 0.7234507347772559,
+      "completeness": 0.6514489910047826,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + GRouNdGAN causal mask,42,rank64_groundgan_causal_mask_full,screen,scaled encoder + log-expression targets + causal mask consistency,0.3995938225316908,0.5543824464531047,0.2688038253482013,0.38153273592725384,0.5044744939136577,0.5543824464531046,0.7869681685249214,0.4279139558696721,12,,fixed,kmeans_known_k,True

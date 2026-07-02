@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + CICL cluster-aware contrast,42,rank14_cicl_cluster_aware_contrast_full,screen,scaled encoder + CICL cluster-aware contrast,0.667608877721943,0.6285092946900258,0.47156621310287955,0.6444764957204875,0.7128121771467704,0.6285092946900258,0.827082133235289,0.5068261964430426,5,,fixed,kmeans_known_k,True

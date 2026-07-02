@@ -1,0 +1,48 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + scAGC adaptive graph",
+  "method_dir": "rank15_scagc_adaptive_graph_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 35.38006091117859,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank15_scagc_adaptive_graph_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5360070906270773,
+      "nmi": 0.5117617159759753,
+      "ari": 0.3705859963783395,
+      "f1_macro": 0.4887320959126618,
+      "fmi": 0.4847942291103178,
+      "v_measure": 0.5117617159759753,
+      "homogeneity": 0.5613717914704638,
+      "completeness": 0.4702080484491885,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.5931752714380678,
+    "neighbor_purity_proxy": 0.7580101927764237,
+    "mixed_cell_fraction": 0.44353170955882354,
+    "boundary_entropy": 0.9425889065067927,
+    "rare_risk_fraction": 0.08287170396631952,
+    "embedding_variance": 0.00027223466895520687,
+    "cluster_mass_min": 0.03434522490582761,
+    "cluster_mass_max": 0.20319078218479947,
+    "collapse_warning": false,
+    "edge_confidence_mean": 0.6214115619659424,
+    "diagnostic_note": "Adaptive graph reliability with optional confidence-gated local mix; boundary/rare veto can set mix to zero."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

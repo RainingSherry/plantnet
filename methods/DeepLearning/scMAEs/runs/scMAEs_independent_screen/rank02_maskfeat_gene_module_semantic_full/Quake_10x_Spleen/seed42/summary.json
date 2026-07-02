@@ -1,0 +1,47 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + MaskFeat gene-module semantic target",
+  "method_dir": "rank02_maskfeat_gene_module_semantic_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 36.887046813964844,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank02_maskfeat_gene_module_semantic_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5428182579564489,
+      "nmi": 0.5467175807773571,
+      "ari": 0.3108792442435611,
+      "f1_macro": 0.4799091109116736,
+      "fmi": 0.5912313860422683,
+      "v_measure": 0.5467175807773572,
+      "homogeneity": 0.7767289620850848,
+      "completeness": 0.421808246642574,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9891645728643216,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9376961343493606,
+    "rare_risk_fraction": 0.0043969849246231155,
+    "embedding_variance": 0.23200204968452454,
+    "cluster_mass_min": 0.053706030150753765,
+    "cluster_mass_max": 0.29554020100502515,
+    "collapse_warning": false,
+    "diagnostic_note": "No NeighborMix graph is used; MaskFeat semantic target is module-level."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

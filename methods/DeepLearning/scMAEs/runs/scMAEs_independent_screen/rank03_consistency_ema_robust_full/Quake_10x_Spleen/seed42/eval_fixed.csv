@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,ema_decay,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + consistency EMA robust denoising,42,rank03_consistency_ema_robust_full,screen,scaled encoder + log_expr target,0.99,0.7471733668341709,0.6271224469361932,0.535261811743545,0.6085156442860956,0.7555544731253956,0.6271224469361932,0.8159287621386168,0.5092757816240797,5,,fixed,kmeans_known_k,True

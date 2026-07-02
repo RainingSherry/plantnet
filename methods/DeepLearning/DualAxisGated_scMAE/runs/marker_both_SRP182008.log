@@ -1,0 +1,21 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+Building PCA-KNN graph for NeighborMix ...
+Building 64 gene modules for the gene axis ...
+Device=cuda:2 dataset=SRP182008 cells=13514 genes=1000 clusters=15
+Method=DualAxisGated_scMAE stage=screen epochs=80 warmup=20
+Epoch 001/80 loss=0.3811 scmae=0.3794 pseudo=0.0000 cluster=0.0000 cons=0.0336 r_mean=1.000 conf=0.000 scale=0.00
+Epoch 010/80 loss=0.3613 scmae=0.3612 pseudo=0.0000 cluster=0.0000 cons=0.0012 r_mean=1.000 conf=0.000 scale=0.00
+Epoch 020/80 loss=0.3612 scmae=0.3612 pseudo=0.0000 cluster=0.0000 cons=0.0015 r_mean=1.000 conf=0.000 scale=0.00
+Epoch 030/80 loss=0.3783 scmae=0.3613 pseudo=0.0000 cluster=0.0957 cons=0.0056 r_mean=0.725 conf=0.968 scale=0.50
+Epoch 040/80 loss=0.4113 scmae=0.3615 pseudo=0.0000 cluster=0.1407 cons=0.0108 r_mean=0.765 conf=0.996 scale=1.00
+Epoch 050/80 loss=0.4148 scmae=0.3615 pseudo=0.0000 cluster=0.1506 cons=0.0130 r_mean=0.775 conf=0.998 scale=1.00
+Epoch 060/80 loss=0.4115 scmae=0.3616 pseudo=0.0000 cluster=0.1406 cons=0.0136 r_mean=0.787 conf=0.998 scale=1.00
+Epoch 070/80 loss=0.4098 scmae=0.3617 pseudo=0.0000 cluster=0.1353 cons=0.0143 r_mean=0.791 conf=0.998 scale=1.00
+Epoch 080/80 loss=0.4044 scmae=0.3616 pseudo=0.0000 cluster=0.1204 cons=0.0123 r_mean=0.795 conf=0.999 scale=1.00
+[RESULT] SRP182008 NMI=0.5135009054363587 ARI=0.31687606122792483 meets_baseline=False collapse=False r_mean=0.796 core_frac=0.824
+Completed DualAxisGated_scMAE. Results saved to: methods/DeepLearning/DualAxisGated_scMAE/runs/marker/SRP182008_both/seed42

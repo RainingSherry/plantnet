@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + adaptive sharp/soft switch",
+  "seed": 2024,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.4664792001428316,
+      "nmi": 0.5856335825385776,
+      "ari": 0.3293483307976896,
+      "f1_macro": 0.38661827086630846,
+      "fmi": 0.5595257094233094,
+      "v_measure": 0.5856335825385776,
+      "homogeneity": 0.8062989778932094,
+      "completeness": 0.4597976047868574,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

@@ -1,0 +1,16 @@
+{
+  "edge_survival": 0.9703317284584045,
+  "neighbor_purity_proxy": 0.9858458961474037,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.991584300994873,
+  "rare_risk_fraction": 0.011411222780569514,
+  "embedding_variance": 12.130672454833984,
+  "cluster_mass_min": 0.013086264656616416,
+  "cluster_mass_max": 0.7068676716917923,
+  "collapse_warning": false,
+  "reliability_mean": 0.49447154998779297,
+  "reliability_std": 0.0535070076584816,
+  "edge_score_mean": 0.5055280327796936,
+  "graph_mode": "exact_cell_knn",
+  "diagnostic_note": "Parameter-free reliability from log-expression graph low-frequency structure and high-frequency residual; no image FFT and no cell mixing."
+}

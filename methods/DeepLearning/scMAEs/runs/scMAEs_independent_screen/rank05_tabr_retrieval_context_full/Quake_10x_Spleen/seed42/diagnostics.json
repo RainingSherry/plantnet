@@ -1,0 +1,18 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.9898241206030151,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.8330245972704233,
+  "rare_risk_fraction": 0.0043969849246231155,
+  "embedding_variance": 1.1520094871520996,
+  "cluster_mass_min": 0.05443886097152429,
+  "cluster_mass_max": 0.4474455611390285,
+  "collapse_warning": false,
+  "retrieval": {
+    "retrieval_k": 8,
+    "retrieval_svd_dim": 32,
+    "mean_neighbor_distance": 3.940677483399185,
+    "max_neighbor_distance": 12.17744255065918
+  },
+  "diagnostic_note": "Retrieval context is used during both training and inference; no NeighborMix cell mixing."
+}

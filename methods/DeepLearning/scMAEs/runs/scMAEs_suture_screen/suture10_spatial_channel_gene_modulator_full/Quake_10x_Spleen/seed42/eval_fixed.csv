@@ -1,0 +1,2 @@
+dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,suture10_spatial_channel_gene_modulator_full,42,screen,0.7220477386934674,0.6179233894466039,0.5059084873134799,0.6126258558113519,0.7361583714054907,0.617923389446604,0.8117014096059731,0.4988359496915465,5,,fixed,kmeans_known_k,True

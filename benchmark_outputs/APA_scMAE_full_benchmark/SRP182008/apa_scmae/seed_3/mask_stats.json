@@ -1,0 +1,11 @@
+{
+  "target_mask_ratio": 0.4,
+  "mask_ratio": 0.0616999976336956,
+  "selected_mask_ratio": 0.0616999976336956,
+  "effective_mask_ratio": 0.0616999976336956,
+  "budget_deficit_rate": 0.33830001950263977,
+  "zero_to_zero_rate": 0.0,
+  "mask_entropy": 7.537808895111084,
+  "mask_gini": 0.8117722272872925,
+  "top_gene_concentration": 1.0
+}

@@ -1,0 +1,49 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + Celler long-tail protection",
+  "method_dir": "rank10_celler_longtail_protection_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 64.18553900718689,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank10_celler_longtail_protection_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5461683417085427,
+      "nmi": 0.5228732976771929,
+      "ari": 0.3221704037974657,
+      "f1_macro": 0.43146470228598305,
+      "fmi": 0.5982345190051271,
+      "v_measure": 0.5228732976771929,
+      "homogeneity": 0.7538938939628009,
+      "completeness": 0.40022863947875253,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9819095477386934,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.2959627766866942,
+    "rare_risk_fraction": 0.0775753768844221,
+    "embedding_variance": 2.1780686378479004,
+    "cluster_mass_min": 0.1053182579564489,
+    "cluster_mass_max": 0.3128140703517588,
+    "collapse_warning": false,
+    "prototype_mass_min": 0.004203709269823863,
+    "prototype_mass_max": 0.7351663139966118,
+    "diagnostic_note": "No NeighborMix graph is used; density/entropy rare-risk controls Celler-style long-tail losses."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

@@ -1,0 +1,74 @@
+{
+  "loss_student": [
+    5.706203433317104
+  ],
+  "loss_generator": [
+    null
+  ],
+  "loss_rec": [
+    17.432040436000218
+  ],
+  "loss_mask": [
+    0.525199453853192
+  ],
+  "loss_repr": [
+    0.10226954174991745
+  ],
+  "loss_repr_invariance": [
+    0.00857070773911335
+  ],
+  "loss_repr_variance": [
+    0.9294612687065138
+  ],
+  "loss_repr_covariance": [
+    0.07527056783752224
+  ],
+  "loss_teacher": [
+    0.006681912865132956
+  ],
+  "loss_proto": [
+    0.0
+  ],
+  "loss_proto_balance": [
+    0.0
+  ],
+  "mask_ratio": [
+    0.4000000059604645
+  ],
+  "effective_mask_ratio": [
+    0.4000000059604645
+  ],
+  "zero_to_zero_rate": [
+    0.0
+  ],
+  "mask_entropy": [
+    7.560259612278746
+  ],
+  "mask_gini": [
+    0.23036010539112892
+  ],
+  "top_gene_concentration": [
+    0.9061696658097687
+  ],
+  "student_grad_norm": [
+    1.8500468917630843
+  ],
+  "generator_grad_norm": [
+    null
+  ],
+  "generator_update_count": [
+    0.0
+  ],
+  "generator_update_forced": [
+    0.0
+  ],
+  "warmup_epoch": [
+    1.0
+  ],
+  "generator_enabled": [
+    0.0
+  ],
+  "batch_seconds": [
+    0.03918601884690194
+  ]
+}

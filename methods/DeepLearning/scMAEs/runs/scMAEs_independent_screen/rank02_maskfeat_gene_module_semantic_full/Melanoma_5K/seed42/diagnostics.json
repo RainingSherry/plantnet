@@ -1,0 +1,12 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.8627963660536229,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.8908400867655294,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.21262481808662415,
+  "cluster_mass_min": 0.03345889652116109,
+  "cluster_mass_max": 0.24241081320629293,
+  "collapse_warning": false,
+  "diagnostic_note": "No NeighborMix graph is used; MaskFeat semantic target is module-level."
+}

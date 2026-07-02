@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + Planet GRN attention,42,rank63_planet_grn_attention_full,screen,scaled encoder + log-expression targets + GRN edge attention,0.5699875022317443,0.6080371234803641,0.4023557468085673,0.48076454545981745,0.620328006450997,0.6080371234803641,0.8052600579015577,0.488415277874817,12,,fixed,kmeans_known_k,True

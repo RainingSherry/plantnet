@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + qDiffusion latent denoising,42,rank60_qdiffusion_latent_denoising_full,screen,scaled encoder + log-expression targets + q-diffusion latent denoising,0.6888987369820518,0.6785269012286622,0.5490443475973077,0.6408044903258303,0.6388792412593848,0.6785269012286622,0.7006472439681519,0.6577605471624648,9,,fixed,kmeans_known_k,True

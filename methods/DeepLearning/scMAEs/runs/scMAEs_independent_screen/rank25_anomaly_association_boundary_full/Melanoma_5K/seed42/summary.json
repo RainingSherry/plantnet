@@ -1,0 +1,51 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + anomaly association boundary",
+  "method_dir": "rank25_anomaly_association_boundary_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 46.281739473342896,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank25_anomaly_association_boundary_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6385996011522269,
+      "nmi": 0.5929236357016798,
+      "ari": 0.5186077392445272,
+      "f1_macro": 0.4850098311395862,
+      "fmi": 0.6106547072574459,
+      "v_measure": 0.5929236357016798,
+      "homogeneity": 0.6479095685716473,
+      "completeness": 0.5465405543434366,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.8236871260802128,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9359524764733924,
+    "rare_risk_fraction": 0.10015510746731664,
+    "embedding_variance": 0.2746712267398834,
+    "cluster_mass_min": 0.04298692665632617,
+    "cluster_mass_max": 0.21692887214713052,
+    "collapse_warning": false,
+    "association_risk_mean": 15.476898193359375,
+    "association_risk_std": 0.5613898038864136,
+    "association_risk_p90": 16.31027603149414,
+    "association_boundary_entropy": 0.9371991983656435,
+    "diagnostic_note": "No NeighborMix is used. Association discrepancy is adapted from time-series anomaly attention to ordered gene-module boundary diagnostics."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

@@ -1,0 +1,16 @@
+{
+  "edge_survival": 0.7998621323529411,
+  "neighbor_purity_proxy": 0.8488366939951252,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.8767794115358981,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.027904361486434937,
+  "cluster_mass_min": 0.03212940394416131,
+  "cluster_mass_max": 0.25304675382229114,
+  "collapse_warning": false,
+  "mask_score_mean": 0.40485504269599915,
+  "edge_confidence_mean": 0.5549550652503967,
+  "edge_confidence_std": 0.09941515326499939,
+  "input_mask_rate": 0.40011904520146985,
+  "diagnostic_note": "No NeighborMix is used. Soft graph is used as shallow edge-confidence and residual consistency regularization only."
+}

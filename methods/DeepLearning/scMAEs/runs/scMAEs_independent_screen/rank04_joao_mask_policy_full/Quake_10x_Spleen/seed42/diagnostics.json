@@ -1,0 +1,18 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.9882014237855946,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.8075785105893843,
+  "rare_risk_fraction": 0.0043969849246231155,
+  "embedding_variance": 0.10334978252649307,
+  "cluster_mass_min": 0.028685092127303184,
+  "cluster_mass_max": 0.4408500837520938,
+  "collapse_warning": false,
+  "policy_probabilities": {
+    "swap": 0.13981395299261265,
+    "absorbing": 0.4769411042788363,
+    "module": 0.12802319119326808,
+    "dropout": 0.2552217515352829
+  },
+  "diagnostic_note": "JOAO-style mask policy only; no NeighborMix cell mixing."
+}

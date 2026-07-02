@@ -1,0 +1,52 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + scDiffusion pseudo-condition DDPM",
+  "method_dir": "rank61_scdiffusion_pseudocond_ddpm_full",
+  "stage": "smoke",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 2.7416043281555176,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_smoke/rank61_scdiffusion_pseudocond_ddpm_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5823177487259029,
+      "nmi": 0.5549535709487129,
+      "ari": 0.4308999809910636,
+      "f1_macro": 0.48173029523766986,
+      "fmi": 0.5366621907936124,
+      "v_measure": 0.5549535709487129,
+      "homogeneity": 0.6035851539947085,
+      "completeness": 0.5135742730258818,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.7454908043430091,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9278912641557585,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.009442203678190708,
+    "cluster_mass_min": 0.037225792155993795,
+    "cluster_mass_max": 0.23088854420562818,
+    "collapse_warning": false,
+    "mask_score_mean": 0.4015767574310303,
+    "pseudo_condition_min_fraction": 0.016840239308663858,
+    "pseudo_condition_max_fraction": 0.25326833591845777,
+    "diffusion_timestep_mean": 0.5035925156929913,
+    "input_mask_rate": 0.4001583369339214,
+    "diagnostic_note": "No NeighborMix is used. scDiffusion is adapted as pseudo-condition DDPM latent noise prediction only."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

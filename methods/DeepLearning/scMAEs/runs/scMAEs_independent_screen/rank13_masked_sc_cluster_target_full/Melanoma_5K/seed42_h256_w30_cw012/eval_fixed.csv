@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + mask-sc cluster target,42,rank13_masked_sc_cluster_target_full,screen,scaled encoder + warmup cluster target,0.7256813649457123,0.7201052701790879,0.6366656563551032,0.6411399564464807,0.7084426923610577,0.7201052701790878,0.7506979155774687,0.6919084298735064,9,,fixed,kmeans_known_k,True

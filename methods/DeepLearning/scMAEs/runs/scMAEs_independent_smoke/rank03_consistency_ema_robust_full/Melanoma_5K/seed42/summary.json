@@ -1,0 +1,47 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + consistency EMA robust denoising",
+  "method_dir": "rank03_consistency_ema_robust_full",
+  "stage": "smoke",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 2.2000534534454346,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_smoke/rank03_consistency_ema_robust_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.524263239530246,
+      "nmi": 0.5319390565787224,
+      "ari": 0.3801074995744143,
+      "f1_macro": 0.4515242910994039,
+      "fmi": 0.493429880653576,
+      "v_measure": 0.5319390565787224,
+      "homogeneity": 0.5794871753701318,
+      "completeness": 0.4916020904023347,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.7245291380456459,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9306618359596506,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.23504570126533508,
+    "cluster_mass_min": 0.03523155329049413,
+    "cluster_mass_max": 0.18280522933746954,
+    "collapse_warning": false,
+    "diagnostic_note": "No NeighborMix graph is used; EMA teacher is used for latent consistency."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

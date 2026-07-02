@@ -1,0 +1,2 @@
+dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,suture07_wave_graph_propagation_full,42,screen,0.553391959798995,0.484623806865623,0.307923363837854,0.47079459506553245,0.5904840092091997,0.48462380686562295,0.6844288483167054,0.3751162648685659,5,,fixed,kmeans_known_k,True

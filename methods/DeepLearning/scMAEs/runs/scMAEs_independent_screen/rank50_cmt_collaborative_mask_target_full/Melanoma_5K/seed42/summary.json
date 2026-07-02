@@ -1,0 +1,51 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + CMT collaborative mask target",
+  "method_dir": "rank50_cmt_collaborative_mask_target_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 19.451502561569214,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank50_cmt_collaborative_mask_target_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.650565034345225,
+      "nmi": 0.6310636074254085,
+      "ari": 0.525048483666398,
+      "f1_macro": 0.4949948606021549,
+      "fmi": 0.6180781330937424,
+      "v_measure": 0.6310636074254085,
+      "homogeneity": 0.6619960004961034,
+      "completeness": 0.6028928646203489,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.7086672660182505,
+    "neighbor_purity_proxy": 0.8173941945490805,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.8669160002440868,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.10051707923412323,
+    "cluster_mass_min": 0.027697762020828718,
+    "cluster_mass_max": 0.27298914247728784,
+    "collapse_warning": false,
+    "edge_confidence_mean": NaN,
+    "edge_confidence_std": NaN,
+    "mask_score_mean": 0.29118144512176514,
+    "teacher_alpha_final": 0.35,
+    "diagnostic_note": "No NeighborMix is used. CMT adaptation linearly combines fixed teacher saliency/targets and EMA student saliency/targets."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

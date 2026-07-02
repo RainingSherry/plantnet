@@ -1,0 +1,49 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + latent diffusion denoise",
+  "method_dir": "rank38_latent_diffusion_denoise_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 22.024749994277954,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank38_latent_diffusion_denoise_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6811433636162199,
+      "nmi": 0.6899485335203902,
+      "ari": 0.6059695544923411,
+      "f1_macro": 0.5039752579436325,
+      "fmi": 0.6831548301433988,
+      "v_measure": 0.6899485335203902,
+      "homogeneity": 0.7291670112549277,
+      "completeness": 0.6547334864020067,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.8666297363173056,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.8792740490968366,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.2755585312843323,
+    "cluster_mass_min": 0.033680478617327717,
+    "cluster_mass_max": 0.2521604254376246,
+    "collapse_warning": false,
+    "eps_target_norm": 11.304925413692699,
+    "eps_pred_norm": 9.634831989512724,
+    "diagnostic_note": "No NeighborMix graph is used; latent DDPM denoising is used only as regularization, not for generated sample evaluation."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

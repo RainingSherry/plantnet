@@ -1,0 +1,53 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + TabR retrieval context",
+  "method_dir": "rank05_tabr_retrieval_context_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 32.26013469696045,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank05_tabr_retrieval_context_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.692001675041876,
+      "nmi": 0.6320913695987822,
+      "ari": 0.4796667903289537,
+      "f1_macro": 0.6406782465474589,
+      "fmi": 0.7183510599855448,
+      "v_measure": 0.6320913695987821,
+      "homogeneity": 0.8330569397801133,
+      "completeness": 0.5092423974783838,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9898241206030151,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.8330245972704233,
+    "rare_risk_fraction": 0.0043969849246231155,
+    "embedding_variance": 1.1520094871520996,
+    "cluster_mass_min": 0.05443886097152429,
+    "cluster_mass_max": 0.4474455611390285,
+    "collapse_warning": false,
+    "retrieval": {
+      "retrieval_k": 8,
+      "retrieval_svd_dim": 32,
+      "mean_neighbor_distance": 3.940677483399185,
+      "max_neighbor_distance": 12.17744255065918
+    },
+    "diagnostic_note": "Retrieval context is used during both training and inference; no NeighborMix cell mixing."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

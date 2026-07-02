@@ -1,0 +1,17 @@
+{
+  "edge_survival": 0.8000214059012277,
+  "neighbor_purity_proxy": 0.9674098375290127,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.7798293538785169,
+  "rare_risk_fraction": 0.02689251919300125,
+  "embedding_variance": 0.0026545971632003784,
+  "cluster_mass_min": 0.008034279592929834,
+  "cluster_mass_max": 0.36917514729512585,
+  "collapse_warning": false,
+  "mask_score_mean": 0.3998553454875946,
+  "edge_confidence_mean": 0.5027678561210632,
+  "input_mask_rate": 0.3999851311956133,
+  "grn_positive_edges": 8000,
+  "grn_negative_edges": 8000,
+  "diagnostic_note": "No NeighborMix is used. Planet is adapted as time-guided regulatory edge denoising from log-expression coexpression priors."
+}

@@ -1,0 +1,49 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + reliability-gated NeighborMix + gated DEC",
+  "method_dir": "GatedNeighborMix_scMAE",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 75.44014263153076,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.9418969849246231,
+      "nmi": 0.8089409033911228,
+      "ari": 0.8899218866541195,
+      "f1_macro": 0.697255118023046,
+      "fmi": 0.9502941565816031,
+      "v_measure": 0.8089409033911229,
+      "homogeneity": 0.8566248750796414,
+      "completeness": 0.7662856587002832,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "neighbor_purity_proxy": 0.9663525963149079,
+    "mixed_cell_fraction": 0.9499581239530989,
+    "embedding_variance": 0.6432191133499146,
+    "cluster_mass_min": 0.02051926298157454,
+    "cluster_mass_max": 0.6886515912897823,
+    "collapse_warning": false,
+    "reliability_mean": 0.9133347868919373,
+    "reliability_min": 0.0,
+    "reliability_max": 1.0,
+    "core_fraction": 0.948178391959799,
+    "agree_mean": 0.9812116136236739,
+    "density_mean": 0.9133406630786725,
+    "confidence_mean": 0.9869609052187434
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Independent candidate; NOT appended to \u5168benchmark\u7ed3\u679c.csv."
+}

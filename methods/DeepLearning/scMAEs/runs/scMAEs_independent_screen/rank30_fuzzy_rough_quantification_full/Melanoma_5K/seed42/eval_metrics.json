@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + fuzzy rough quantification",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6445823177487259,
+      "nmi": 0.5304468483844512,
+      "ari": 0.4274706141492506,
+      "f1_macro": 0.4279098900492724,
+      "fmi": 0.5547274347069687,
+      "v_measure": 0.5304468483844511,
+      "homogeneity": 0.5135440646747641,
+      "completeness": 0.548500177198167,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

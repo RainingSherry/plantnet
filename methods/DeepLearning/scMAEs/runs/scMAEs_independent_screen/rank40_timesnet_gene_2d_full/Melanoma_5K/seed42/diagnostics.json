@@ -1,0 +1,15 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.8681143363616219,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.8770020572206438,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.29490527510643005,
+  "cluster_mass_min": 0.028805672501661866,
+  "cluster_mass_max": 0.2554841568801241,
+  "collapse_warning": false,
+  "module_count": 40,
+  "module_loss": 0.0021409227184074767,
+  "consistency_loss": 0.002004911397200297,
+  "diagnostic_note": "No NeighborMix is used. TimesNet 2D variation modeling is applied on an SVD-derived gene-module axis, not raw HVG index order."
+}

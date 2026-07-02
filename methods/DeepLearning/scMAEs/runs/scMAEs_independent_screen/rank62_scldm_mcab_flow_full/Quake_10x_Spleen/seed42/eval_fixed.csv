@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + scLDM MCAB flow,42,rank62_scldm_mcab_flow_full,screen,scaled encoder + log-expression targets + MCAB flow,0.943676716917923,0.8191780728037402,0.9254814743881732,0.6580409736536528,0.9669906297055141,0.8191780728037401,0.8472962711594296,0.7928661801610642,5,,fixed,kmeans_known_k,True

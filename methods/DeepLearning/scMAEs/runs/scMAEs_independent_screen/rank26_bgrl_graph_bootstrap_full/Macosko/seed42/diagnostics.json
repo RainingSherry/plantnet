@@ -1,0 +1,14 @@
+{
+  "edge_survival": 0.8001131364277431,
+  "neighbor_purity_proxy": 0.9628481521156936,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.931867214325808,
+  "rare_risk_fraction": 0.10000446348866274,
+  "embedding_variance": 0.33221015334129333,
+  "cluster_mass_min": 0.020643635065166935,
+  "cluster_mass_max": 0.16776022138903768,
+  "collapse_warning": false,
+  "edge_confidence_mean": 0.9972501397132874,
+  "edge_confidence_std": 0.020899251103401184,
+  "diagnostic_note": "No NeighborMix is used. BGRL supplies shallow graph bootstrap, edge confidence, and DropEdge robustness around the scMAE objective."
+}

@@ -1,0 +1,17 @@
+{
+  "method_dir": "suture09_lowfreq_gene_program_preservation_full",
+  "method_name": "scMAE + low-frequency gene-program preservation",
+  "source_type": "suture_module_rewrite",
+  "reference_file": "/home/luolie/biopipeline/dimension-reduction/plantnet/缝合模块/即插即用/224 Low-frequency Preservation(TPAMI 2026).py",
+  "reference_title": "AIRPNet Low-frequency Preservation",
+  "scmae_gap": "semantic target and low-frequency expression preservation",
+  "core_mechanism": "coarse log-expression gene-program auxiliary target with weak gated latent adapter",
+  "neighbor_mix_relation": "independent; NeighborMix is not used",
+  "implementation_notes": [
+    "scaled_expr is used only as encoder input",
+    "log_expr is used for reconstruction and low-frequency gene-program target",
+    "no image FFT, no wavelet transform, and no 2D gene-vector reshape are used",
+    "no cell mixing or graph propagation is performed",
+    "screen results are written only to quick-screen CSV files"
+  ]
+}
