@@ -1,0 +1,22 @@
+{
+  "method_dir": "rank50_cmt_collaborative_mask_target_full",
+  "rank": 50,
+  "paper_title": "The Dynamic Duo of Collaborative Masking and Target for Advanced Masked Autoencoder Learning",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/050_可用_The_Dynamic_Duo_of_Collaborative_Masking_and_Target_for_Advanced_Masked_Autoencoder_Learning.pdf",
+  "local_report": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "local_index": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_url": "",
+  "github_status": "No GitHub URL listed in the index. Implementation reconstructed from PDF and local report.",
+  "implementation_source": "Independent reconstruction and scMAE-specific adaptation from local report and PDF method description.",
+  "scmae_gap": "mask / semantic target / teacher",
+  "core_mechanism": "Collaborative teacher/student mask saliency and feature targets: fixed SVD teacher plus EMA student encoder.",
+  "neighbor_mix_relation": "independent; not used in this candidate",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true, otherwise log_expr",
+    "reconstruction_target": "log_expr",
+    "teacher_feature_target": "fixed SVD features computed from log_expr",
+    "student_feature_target": "EMA encoder feature",
+    "count_target": "none"
+  },
+  "formal_claims": "No formal improvement is claimed from smoke or screen results."
+}

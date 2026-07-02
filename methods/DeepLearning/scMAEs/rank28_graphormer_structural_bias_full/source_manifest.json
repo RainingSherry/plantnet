@@ -1,0 +1,22 @@
+{
+  "method_dir": "rank28_graphormer_structural_bias_full",
+  "rank": 28,
+  "paper_title": "Do Transformers Really Perform Bad for Graph Representation? / Graphormer",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/028_高_Graphormer.pdf",
+  "local_report": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "local_index": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_url": "https://github.com/microsoft/Graphormer",
+  "github_status": "HTTP 200; README, graphormer_graph_encoder.py, graphormer_graph_encoder_layer.py, multihead_attention.py, and data/wrapper.py inspected.",
+  "implementation_source": "Independent scMAE-specific reconstruction from local report, PDF, and inspected official GitHub code ideas.",
+  "scmae_gap": "graph / neighbor reliability",
+  "core_mechanism": "Local KNN Graphormer adapter with centrality encoding, KNN-rank spatial attention bias, edge/drop-edge attention bias, and edge-confidence diagnostics.",
+  "neighbor_mix_relation": "independent; not used in this candidate",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true, otherwise log_expr",
+    "reconstruction_target": "log_expr",
+    "svd_anchor": "scaled encoder input SVD used only as stabilizing encoder context",
+    "count_target": "none",
+    "token_target": "none"
+  },
+  "formal_claims": "No formal improvement is claimed from smoke or screen results."
+}

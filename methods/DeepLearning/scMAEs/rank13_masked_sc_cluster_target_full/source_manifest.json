@@ -1,0 +1,15 @@
+{
+  "rank": 13,
+  "method_dir": "rank13_masked_sc_cluster_target_full",
+  "title": "Masked Modeling for Single-cell Clustering of scRNA-seq Data",
+  "pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/013_高_Masked_Modeling_for_Single-cell_Clustering_of_scRNA-seq_Data.pdf",
+  "report_source": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "index_source": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_urls_checked": [],
+  "github_status": "No github_url is listed in the index for rank13.",
+  "implementation_source": "Independent reconstruction from the PDF and summary report.",
+  "core_mechanism": "Masked single-cell modeling with warmup then high-confidence cluster-aware target distribution.",
+  "scmae_gap": "cluster separability / semantic clustering target while preserving mask prediction and masked expression reconstruction",
+  "neighbor_mix_relation": "independent; no NeighborMix operator is used and mixed_cell_fraction remains 0.0"
+}
+

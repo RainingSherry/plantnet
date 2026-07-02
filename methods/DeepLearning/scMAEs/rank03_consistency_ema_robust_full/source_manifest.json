@@ -1,0 +1,20 @@
+{
+  "method_dir": "rank03_consistency_ema_robust_full",
+  "evidence_level": "independent-full candidate",
+  "sort_rank": 3,
+  "title": "Improved Techniques for Training Consistency Models",
+  "recommendation_level": "很高",
+  "recommendation_score": 92,
+  "pdf": "methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/003_很高_Improved_Techniques_for_Training_Consistency_Models.pdf",
+  "github_url": "https://github.com/openai/consistency_models",
+  "github_status_checked": "HTTP 200 on 2026-06-30; implementation adapts robust consistency ideas rather than copying image generation code.",
+  "implementation_source": "Reconstructed for scRNA-seq from the local PDF, GitHub project availability, and 00_scMAE改良方法整理总报告.md.",
+  "scmae_gap_addressed": "teacher/robust denoising",
+  "neighbor_mix_relation": "independent and complementary; NeighborMix is not used in this candidate",
+  "forbidden_claims": [
+    "Do not claim full consistency model generation.",
+    "Do not claim formal improvement from screen results.",
+    "Do not append smoke or screen outputs to 全benchmark结果.csv."
+  ]
+}
+

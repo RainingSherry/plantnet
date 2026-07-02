@@ -1,0 +1,16 @@
+{
+  "rank": 54,
+  "method_dir": "rank54_conditional_multi_mask_full",
+  "paper_title": "An Empirical Study of Multiple Masking in Masked Autoencoder / Conditional MAE",
+  "recommendation": "可用",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/054_可用_An_Empirical_Study_of_Multiple_Masking_in_Masked_Autoencoder_Conditional_MAE.pdf",
+  "github_url": null,
+  "github_status": "02_整理索引.csv does not provide a GitHub URL for rank54; implementation is reconstructed from the PDF and the scMAE improvement report.",
+  "implemented_from": [
+    "Conditional MAE PDF: multiple masking stages, subsequent masking conditioned on previous unmasked representations",
+    "scMAE improvement report rank54 notes"
+  ],
+  "scmae_gap": "mask/robustness",
+  "core_mechanism": "Two-shot masking: expression-space mask followed by conditional latent-space mask inside the encoder, while preserving mask prediction and masked expression reconstruction.",
+  "neighbor_mix_relation": "independent and complementary; this candidate does not use NeighborMix and does not mix cells."
+}

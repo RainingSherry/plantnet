@@ -1,0 +1,22 @@
+{
+  "method_dir": "rank06_scvgae_zinb_variational_full",
+  "evidence_level": "independent-full candidate",
+  "sort_rank": 6,
+  "title": "scVGAE: ZINB-Based Variational Graph Autoencoder for Single-Cell RNA-Seq Imputation",
+  "recommendation_level": "高",
+  "recommendation_score": 85,
+  "pdf": "methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/006_高_scVGAE_ZINB-Based_Variational_Graph_Autoencoder_for_Single-Cell_RNA-Seq_Imputation.pdf",
+  "indexed_github_url": "https://github.com/STOmics/scVGAE",
+  "indexed_github_status_checked": "HTTP 404 on 2026-06-30",
+  "paper_github_url": "https://github.com/inoue0426/scVGAE-paper",
+  "paper_github_status_checked": "HTTP 200 on 2026-06-30",
+  "implementation_source": "Reconstructed for scMAE from the local PDF, the accessible paper repository, and 00_scMAE改良方法整理总报告.md.",
+  "scmae_gap_addressed": "distribution / VAE uncertainty",
+  "neighbor_mix_relation": "independent and complementary; NeighborMix is not used in this candidate",
+  "forbidden_claims": [
+    "Do not claim full graph convolutional scVGAE reproduction.",
+    "Do not use scaled expression as the ZINB count target.",
+    "Do not append smoke or screen outputs to 全benchmark结果.csv."
+  ]
+}
+

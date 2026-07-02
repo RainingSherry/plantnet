@@ -1,0 +1,21 @@
+{
+  "method_dir": "rank48_mae_asymmetric_decoder_full",
+  "rank": 48,
+  "paper_title": "Masked Autoencoders Are Scalable Vision Learners",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/048_可用_Masked_Autoencoders_Are_Scalable_Vision_Learners.pdf",
+  "local_report": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "local_index": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_url": "https://github.com/facebookresearch/mae",
+  "github_status": "HTTP 200; official repository cloned to /tmp/mae_repo; models_mae.py inspected for random_masking, decoder_embed, mask_token, decoder_pred, and masked reconstruction loss.",
+  "implementation_source": "Independent reconstruction and scMAE-specific adaptation from local report, PDF method description, and inspected official GitHub code ideas.",
+  "scmae_gap": "mask / decoder target",
+  "core_mechanism": "MAE-inspired asymmetric latent-to-decoder bottleneck with learned mask-token conditioning, preserving scMAE swap corruption and mask prediction.",
+  "neighbor_mix_relation": "independent; not used in this candidate",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true, otherwise log_expr",
+    "reconstruction_target": "log_expr",
+    "count_target": "none",
+    "token_target": "none"
+  },
+  "formal_claims": "No formal improvement is claimed from smoke or screen results."
+}

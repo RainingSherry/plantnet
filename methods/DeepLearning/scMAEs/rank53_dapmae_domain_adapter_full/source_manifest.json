@@ -1,0 +1,23 @@
+{
+  "rank": 53,
+  "method_dir": "rank53_dapmae_domain_adapter_full",
+  "paper_title": "DAP-MAE: Domain-Adaptive Point Cloud Masked Autoencoder for Effective Cross-Domain Learning",
+  "recommendation": "可用",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/053_可用_DAP-MAE_Domain-Adaptive_Point_Cloud_Masked_Autoencoder_for_Effective_Cross-Domain_Learning.pdf",
+  "github_url": "https://github.com/CVI-SZU/DAP-MAE",
+  "github_status": "Accessible via git ls-remote and cloned to /tmp/DAP-MAE_repo for read-only inspection.",
+  "github_files_inspected": [
+    "README.md",
+    "models/HDAdapter.py",
+    "models/DAP_MAE.py",
+    "ContrastiveLoss.py"
+  ],
+  "implemented_from": [
+    "Heterogeneous domain adapter: domain-specific linear branches during pretraining",
+    "Domain tokens and domain feature generator / contrastive guidance",
+    "scMAE improvement report rank53 notes"
+  ],
+  "scmae_gap": "target/domain-adapter",
+  "core_mechanism": "Unsupervised SVD/KMeans pseudo-domains drive DAP-MAE style heterogeneous adapters and domain feature generator targets while preserving scMAE mask prediction and masked expression reconstruction.",
+  "neighbor_mix_relation": "independent and complementary; this candidate does not use NeighborMix and does not mix cells."
+}

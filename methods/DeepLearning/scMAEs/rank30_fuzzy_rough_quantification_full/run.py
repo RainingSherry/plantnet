@@ -1,0 +1,309 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import csv
+import fcntl
+import os
+import sys
+import time
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import torch
+from sklearn.cluster import KMeans
+from sklearn.decomposition import TruncatedSVD
+from sklearn.neighbors import NearestNeighbors
+from torch.utils.data import DataLoader, Dataset
+
+CURRENT_DIR = Path(__file__).resolve().parent
+ROOT = next(parent for parent in [CURRENT_DIR, *CURRENT_DIR.parents] if (parent / "methods" / "DeepLearning" / "scMAE_family.py").exists())
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+if str(CURRENT_DIR) not in sys.path:
+    sys.path.insert(0, str(CURRENT_DIR))
+os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
+os.environ.setdefault("NUMBA_CACHE_DIR", "/tmp/numba-cache")
+
+from loss import FuzzyRoughQuantificationLoss
+from model import FuzzyRoughQuantScMAE
+from methods.DeepLearning import scMAE_family as family
+from methods.shared_utils import ensure_dir, sanitize_anndata_for_write, save_json
+
+
+METHOD_NAME = "rank30_fuzzy_rough_quantification_full"
+DISPLAY_NAME = "scMAE + fuzzy rough quantification"
+RESULT_ROOT = ROOT / "methods" / "DeepLearning" / "scMAEs"
+SINGLE_RESULT_CSV = RESULT_ROOT / "新模型独立快筛单次结果.csv"
+SUMMARY_RESULT_CSV = RESULT_ROOT / "新模型独立快筛汇总结果.csv"
+BASELINES = {
+    "Melanoma_5K": {"nmi": 0.735414, "ari": 0.668029},
+    "Quake_10x_Spleen": {"nmi": 0.851730, "ari": 0.922275},
+    "Macosko": {"nmi": 0.657465, "ari": 0.494268},
+}
+
+
+class ExprDataset(Dataset):
+    def __init__(self, encoder_data: np.ndarray, log_expr: np.ndarray, anchor: np.ndarray, labels: np.ndarray):
+        self.encoder_data = torch.as_tensor(encoder_data, dtype=torch.float32)
+        self.log_expr = torch.as_tensor(log_expr, dtype=torch.float32)
+        self.anchor = torch.as_tensor(anchor, dtype=torch.float32)
+        self.labels = torch.as_tensor(labels, dtype=torch.long)
+
+    def __len__(self) -> int:
+        return int(self.encoder_data.shape[0])
+
+    def __getitem__(self, idx: int):
+        return int(idx), self.encoder_data[idx], self.log_expr[idx], self.anchor[idx], self.labels[idx]
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Independent fuzzy rough quantification scMAE candidate.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--data_path", required=True)
+    parser.add_argument("--save_dir", required=True)
+    parser.add_argument("--dataset_name", default=None)
+    parser.add_argument("--label_key", default="auto")
+    parser.add_argument("--input_mode", default="auto", choices=["auto", "raw", "log1p"])
+    parser.add_argument("--n_top_genes", type=int, default=1000)
+    parser.add_argument("--target_sum", type=float, default=10000.0)
+    parser.add_argument("--scale_input", type=family.str2bool, default=True)
+    parser.add_argument("--n_clusters", type=int, required=True)
+    parser.add_argument("--epochs", type=int, default=80)
+    parser.add_argument("--batch_size", type=int, default=256)
+    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--weight_decay", type=float, default=1e-5)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--gpu", type=int, default=1)
+    parser.add_argument("--no_cuda", action="store_true")
+    parser.add_argument("--skip_eval", action="store_true")
+    parser.add_argument("--no_save_h5ad", action="store_true")
+    parser.add_argument("--smoke", action="store_true")
+    parser.add_argument("--hidden_size", type=int, default=128)
+    parser.add_argument("--anchor_dim", type=int, default=64)
+    parser.add_argument("--dropout", type=float, default=0.05)
+    parser.add_argument("--mask_prob", type=float, default=0.4)
+    parser.add_argument("--warmup_epochs", type=int, default=10)
+    parser.add_argument("--confidence_threshold", type=float, default=-1.0)
+    parser.add_argument("--masked_data_weight", type=float, default=0.75)
+    parser.add_argument("--mask_weight", type=float, default=0.60)
+    parser.add_argument("--lower_weight", type=float, default=0.07)
+    parser.add_argument("--width_weight", type=float, default=0.03)
+    parser.add_argument("--upper_entropy_weight", type=float, default=0.02)
+    parser.add_argument("--balance_weight", type=float, default=0.02)
+    parser.add_argument("--separation_weight", type=float, default=0.01)
+    parser.add_argument("--anchor_weight", type=float, default=0.04)
+    parser.add_argument("--variance_weight", type=float, default=0.01)
+    return parser.parse_args()
+
+
+def build_anchor(data: np.ndarray, dim: int, seed: int) -> np.ndarray:
+    x = np.asarray(data, dtype=np.float32)
+    n_comp = int(min(max(2, dim), x.shape[1] - 1, x.shape[0] - 1))
+    z = TruncatedSVD(n_components=n_comp, random_state=seed).fit_transform(x).astype(np.float32)
+    z = (z - z.mean(axis=0, keepdims=True)) / np.maximum(z.std(axis=0, keepdims=True), 1e-6)
+    if n_comp < dim:
+        z = np.pad(z, ((0, 0), (0, dim - n_comp)))
+    return np.nan_to_num(z.astype(np.float32))
+
+
+@torch.no_grad()
+def initialize_centers(model: FuzzyRoughQuantScMAE, anchor: np.ndarray, n_clusters: int, seed: int, device: torch.device) -> None:
+    pred = KMeans(n_clusters=n_clusters, n_init=20, random_state=seed).fit_predict(anchor)
+    centers = []
+    for k in range(n_clusters):
+        cells = anchor[pred == k]
+        if len(cells) == 0:
+            cells = anchor
+        centers.append(cells.mean(axis=0))
+    centers = torch.as_tensor(np.stack(centers).astype(np.float32), device=device)
+    hidden = model.anchor_encoder(centers)
+    model.initialize_centers(hidden)
+
+
+@torch.no_grad()
+def extract_embedding(model: FuzzyRoughQuantScMAE, loader: DataLoader, device: torch.device) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    model.eval()
+    emb, labels, conf = [], [], []
+    for _, x, _, anchor, y in loader:
+        out = model(x.to(device), anchor.to(device))
+        emb.append(out["latent"].detach().cpu().numpy())
+        conf.append(out["membership_confidence"].detach().cpu().numpy())
+        labels.append(y.numpy())
+    return np.nan_to_num(np.concatenate(emb).astype(np.float32)), np.concatenate(labels).astype(np.int64), np.nan_to_num(np.concatenate(conf).astype(np.float32))
+
+
+def neighbor_purity(labels: np.ndarray, embedding: np.ndarray, k: int = 10) -> float:
+    if embedding.shape[0] <= 2:
+        return float("nan")
+    nn = NearestNeighbors(n_neighbors=min(k + 1, embedding.shape[0]))
+    nn.fit(embedding)
+    idx = nn.kneighbors(embedding, return_distance=False)[:, 1:]
+    return float(np.mean(labels[idx] == labels[:, None]))
+
+
+def diagnostics(embedding: np.ndarray, labels: np.ndarray, confidence: np.ndarray, n_clusters: int, seed: int, preds: np.ndarray | None) -> dict:
+    if preds is None:
+        preds = KMeans(n_clusters=n_clusters, n_init=20, random_state=seed).fit_predict(embedding)
+    counts = np.bincount(preds.astype(np.int64), minlength=n_clusters).astype(np.float64)
+    frac = counts / max(1.0, counts.sum())
+    probs = frac[frac > 0]
+    var = float(np.var(embedding, axis=0).mean()) if embedding.size else 0.0
+    mass_min = float(frac.min()) if frac.size else 0.0
+    mass_max = float(frac.max()) if frac.size else 0.0
+    boundary_fraction = float(np.mean(confidence <= np.quantile(confidence, 0.10))) if confidence.size else 0.0
+    return {
+        "edge_survival": 1.0,
+        "neighbor_purity_proxy": neighbor_purity(labels, embedding),
+        "mixed_cell_fraction": 0.0,
+        "boundary_entropy": float(-(probs * np.log(probs)).sum() / max(np.log(max(2, n_clusters)), 1e-8)),
+        "rare_risk_fraction": boundary_fraction,
+        "embedding_variance": var,
+        "cluster_mass_min": mass_min,
+        "cluster_mass_max": mass_max,
+        "collapse_warning": bool((not np.isfinite(var)) or var < 1e-8 or mass_min < 0.001 or mass_max > 0.95),
+        "membership_confidence_mean": float(np.mean(confidence)) if confidence.size else float("nan"),
+        "membership_confidence_p10": float(np.quantile(confidence, 0.10)) if confidence.size else float("nan"),
+        "diagnostic_note": "No NeighborMix is used. Fuzzy rough lower approximation strengthens core cells, while upper approximation leaves boundary cells entropy-tolerant.",
+    }
+
+
+def metric(eval_result: dict | None, name: str) -> float | None:
+    if not eval_result:
+        return None
+    value = eval_result.get("fixed", {}).get("kmeans_known_k", {}).get(name)
+    return None if value is None else float(value)
+
+
+def append_row(row: dict) -> None:
+    fields = ["stage", "method", "dataset", "seed", "acc", "nmi", "ari", "f1_macro", "baseline_nmi", "baseline_ari", "meets_baseline_any", "collapse_warning", "embedding_variance", "neighbor_purity_proxy", "mixed_cell_fraction", "run_dir"]
+    with SINGLE_RESULT_CSV.open("a+", newline="", encoding="utf-8") as handle:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        handle.seek(0)
+        exists = bool(handle.read(1))
+        handle.seek(0, 2)
+        writer = csv.DictWriter(handle, fieldnames=fields)
+        if not exists:
+            writer.writeheader()
+        writer.writerow({k: row.get(k, "") for k in fields})
+        fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+    df = pd.read_csv(SINGLE_RESULT_CSV)
+    out = []
+    for (stage, method_name), group in df.groupby(["stage", "method"], dropna=False):
+        screen = group[group["stage"] == "screen"]
+        meets = int(screen.get("meets_baseline_any", pd.Series(dtype=bool)).fillna(False).astype(bool).sum())
+        noncollapse = int((~screen.get("collapse_warning", pd.Series(dtype=bool)).fillna(True).astype(bool)).sum())
+        out.append({"stage": stage, "method": method_name, "n_rows": int(len(group)), "n_datasets": int(group["dataset"].nunique()), "mean_ari": float(group["ari"].dropna().mean()), "mean_nmi": float(group["nmi"].dropna().mean()), "screen_meets_baseline_count": meets, "screen_noncollapse_count": noncollapse, "effective_screen_candidate": bool(meets >= 2 and noncollapse >= 2), "datasets": ";".join(sorted(str(x) for x in group["dataset"].dropna().unique()))})
+    pd.DataFrame(out).to_csv(SUMMARY_RESULT_CSV, index=False)
+
+
+def main() -> int:
+    args = parse_args()
+    if args.gpu in {0, 7} and not args.no_cuda:
+        raise ValueError("GPU 0 and GPU 7 are forbidden. Choose GPU 1-6 or --no_cuda.")
+    if args.smoke:
+        args.epochs = min(args.epochs, 3)
+    family.set_seed(args.seed)
+    save_dir = Path(ensure_dir(args.save_dir))
+    save_json(vars(args), str(save_dir / "args.json"))
+    device = family.get_device(args.gpu, args.no_cuda)
+    dataset_name = args.dataset_name or Path(args.data_path).stem
+    stage = "smoke" if args.smoke else "screen"
+
+    target_bundle = family.load_scmae_dataset(args.data_path, args.input_mode, args.n_top_genes, args.target_sum, False, args.label_key, args.seed)
+    if args.scale_input:
+        encoder_bundle = family.load_scmae_dataset(args.data_path, args.input_mode, args.n_top_genes, args.target_sum, True, args.label_key, args.seed)
+        if not np.array_equal(encoder_bundle.gene_names.astype(str), target_bundle.gene_names.astype(str)):
+            raise ValueError("Scaled encoder genes and log-expression target genes differ.")
+        encoder_data = np.asarray(encoder_bundle.data, dtype=np.float32)
+    else:
+        encoder_bundle = target_bundle
+        encoder_data = np.asarray(target_bundle.data, dtype=np.float32)
+    log_expr = np.asarray(target_bundle.data, dtype=np.float32)
+    labels = np.asarray(target_bundle.labels, dtype=np.int64)
+    anchor = build_anchor(encoder_data, args.anchor_dim, args.seed)
+    n_clusters = int(args.n_clusters if args.n_clusters > 0 else len(np.unique(labels)))
+    effective_confidence_threshold = float(args.confidence_threshold if args.confidence_threshold >= 0 else min(0.55, 1.0 / max(1, n_clusters) + 0.02))
+    save_json(target_bundle.profile, str(save_dir / "dataset_profile.json"))
+    save_json({**target_bundle.preprocess_config, "encoder_scale_input": bool(args.scale_input), "target_scale_input": False, "fuzzy_rough_target": "lower-approximation core KL after warmup, rough-width control, upper-approximation boundary entropy tolerance", "effective_confidence_threshold": effective_confidence_threshold, "svd_anchor": f"TruncatedSVD({args.anchor_dim}) on scaled encoder input"}, str(save_dir / "preprocess_config.json"))
+    np.save(save_dir / "gene_names.npy", target_bundle.gene_names.astype(str))
+    np.save(save_dir / "svd_anchor.npy", anchor.astype(np.float32))
+
+    dataset = ExprDataset(encoder_data, log_expr, anchor, labels)
+    generator = torch.Generator().manual_seed(args.seed)
+    train_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, drop_last=True, generator=generator)
+    full_loader = DataLoader(dataset, batch_size=max(args.batch_size * 4, 512), shuffle=False, drop_last=False)
+    model = FuzzyRoughQuantScMAE(encoder_data.shape[1], n_clusters, args.hidden_size, args.anchor_dim, args.dropout).to(device)
+    initialize_centers(model, anchor, n_clusters, args.seed, device)
+    criterion = FuzzyRoughQuantificationLoss(args.masked_data_weight, args.mask_weight, args.lower_weight, args.width_weight, args.upper_entropy_weight, args.balance_weight, args.separation_weight, args.anchor_weight, args.variance_weight)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    history = {k: [] for k in ["loss", "scmae_loss", "reconstruction_loss", "mask_loss", "lower_kl_loss", "rough_width_loss", "upper_entropy_loss", "balance_loss", "center_separation_loss", "anchor_loss", "variance_loss", "core_fraction", "rough_width", "rough_certainty", "membership_confidence", "membership_entropy", "effective_mask_rate"]}
+    history["stage"] = stage
+    start = time.time()
+    print(f"Using device: {device}")
+    print(f"Dataset={dataset_name} cells={encoder_data.shape[0]} genes={encoder_data.shape[1]} clusters={n_clusters}")
+    print(f"Method={METHOD_NAME} stage={stage} epochs={args.epochs}")
+
+    for epoch in range(1, max(1, args.epochs) + 1):
+        model.train()
+        sums = {k: 0.0 for k in history if isinstance(history[k], list)}
+        n_batches = 0
+        for _, x_cpu, log_cpu, anchor_cpu, _ in train_loader:
+            x = x_cpu.to(device)
+            target = log_cpu.to(device)
+            anchor_batch = anchor_cpu.to(device)
+            corrupted, mask = model.mask_view(x, args.mask_prob)
+            out = model(corrupted, anchor_batch)
+            out["target_distribution"] = model.target_distribution(out["membership"])
+            rough_active = epoch > args.warmup_epochs
+            loss, parts = criterion(out, target, mask, anchor_batch, model.cluster_centers, rough_active, effective_confidence_threshold)
+            if not torch.isfinite(loss):
+                raise FloatingPointError(f"Non-finite loss at epoch {epoch}: {parts}")
+            optimizer.zero_grad()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
+            optimizer.step()
+            for key, value in parts.items():
+                sums[key] += value
+            sums["effective_mask_rate"] += float(mask.mean().detach().cpu())
+            n_batches += 1
+        for key in sums:
+            history[key].append(sums[key] / max(1, n_batches))
+        if epoch == 1 or epoch == args.epochs or epoch % 10 == 0:
+            print(f"Epoch {epoch:03d}/{args.epochs} loss={history['loss'][-1]:.4f} scmae={history['scmae_loss'][-1]:.4f} lower={history['lower_kl_loss'][-1]:.4f} width={history['rough_width'][-1]:.4f} core={history['core_fraction'][-1]:.4f}")
+
+    embedding, labels_out, confidence = extract_embedding(model, full_loader, device)
+    np.save(save_dir / "embedding_final.npy", embedding.astype(np.float32))
+    np.save(save_dir / "embeddings_base.npy", embedding.astype(np.float32))
+    np.save(save_dir / "labels.npy", labels_out.astype(np.int64))
+    np.save(save_dir / "membership_confidence.npy", confidence.astype(np.float32))
+    family.save_embedding_h5(save_dir / "embedding.h5", embedding, labels_out)
+    save_json(history, str(save_dir / "training_history.json"))
+    torch.save({"model": model.state_dict(), "optimizer": optimizer.state_dict(), "args": vars(args), "gene_names": target_bundle.gene_names.astype(str)}, save_dir / "model_checkpoint.pth")
+
+    eval_result, preds = None, None
+    if not args.skip_eval:
+        eval_result = family.write_kmeans_known_k_outputs(save_dir, dataset_name, DISPLAY_NAME, args.seed, embedding, labels_out, n_clusters, {"variant": METHOD_NAME, "stage": stage, "preprocessing": "scaled encoder + log-expression targets + fuzzy rough quantification"})
+        preds = eval_result["preds"]["kmeans_known_k"]
+        save_json(eval_result["fixed"], str(save_dir / "metrics.json"))
+    diag = diagnostics(embedding, labels_out, confidence, n_clusters, args.seed, preds)
+    save_json(diag, str(save_dir / "diagnostics.json"))
+    if not args.no_save_h5ad:
+        encoder_bundle.adata.obsm["X_fuzzy_rough_quant_scmae"] = embedding
+        encoder_bundle.adata.uns[METHOD_NAME] = {"method": DISPLAY_NAME, "variant": METHOD_NAME, "stage": stage}
+        sanitize_anndata_for_write(encoder_bundle.adata)
+        encoder_bundle.adata.write_h5ad(save_dir / "adata_fuzzy_rough_quant_scmae.h5ad", compression="gzip")
+
+    baseline = BASELINES.get(dataset_name, {})
+    nmi, ari, acc, f1 = metric(eval_result, "nmi"), metric(eval_result, "ari"), metric(eval_result, "acc"), metric(eval_result, "f1_macro")
+    meets = bool((nmi is not None and nmi >= baseline.get("nmi", np.inf)) or (ari is not None and ari >= baseline.get("ari", np.inf)))
+    summary = {"dataset": dataset_name, "method": DISPLAY_NAME, "method_dir": METHOD_NAME, "stage": stage, "seed": int(args.seed), "n_cells": int(encoder_data.shape[0]), "n_genes": int(encoder_data.shape[1]), "n_clusters": int(n_clusters), "runtime_seconds": float(time.time() - start), "embedding_path": str((save_dir / "embedding_final.npy").resolve()), "fixed_metrics": eval_result["fixed"] if eval_result is not None else {}, "diagnostics": diag, "baseline": baseline, "meets_screen_baseline_any": meets, "note": "Screen result is candidate evidence only and is not appended to 全benchmark结果.csv."}
+    save_json(summary, str(save_dir / "summary.json"))
+    if not args.skip_eval:
+        append_row({"stage": stage, "method": METHOD_NAME, "dataset": dataset_name, "seed": int(args.seed), "acc": acc, "nmi": nmi, "ari": ari, "f1_macro": f1, "baseline_nmi": baseline.get("nmi"), "baseline_ari": baseline.get("ari"), "meets_baseline_any": meets, "collapse_warning": diag["collapse_warning"], "embedding_variance": diag["embedding_variance"], "neighbor_purity_proxy": diag["neighbor_purity_proxy"], "mixed_cell_fraction": diag["mixed_cell_fraction"], "run_dir": str(save_dir.resolve())})
+    print(f"Completed {METHOD_NAME}. Results saved to: {save_dir}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

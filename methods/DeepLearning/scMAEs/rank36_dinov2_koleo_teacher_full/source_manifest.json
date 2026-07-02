@@ -1,0 +1,22 @@
+{
+  "method_dir": "rank36_dinov2_koleo_teacher_full",
+  "rank": 36,
+  "paper_title": "DINOv2: Learning Robust Visual Features without Supervision",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/036_中高_可用_DINOv2_Learning_Robust_Visual_Features_without_Supervision.pdf",
+  "local_report": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "local_index": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_url": "https://github.com/facebookresearch/dinov2",
+  "github_status": "HTTP 200; dinov2/loss/dino_clstoken_loss.py, ibot_patch_loss.py, koleo_loss.py, train/ssl_meta_arch.py, and configs/ssl_default_config.yaml inspected.",
+  "implementation_source": "Independent scMAE-specific reconstruction from local report, PDF, and official GitHub code ideas.",
+  "scmae_gap": "teacher / semantic target / collapse robustness",
+  "core_mechanism": "Student strong-mask view with scMAE reconstruction and mask prediction, EMA teacher centered/sharpened class and masked module distillation, and KoLeo nearest-neighbor spreading regularizer.",
+  "neighbor_mix_relation": "independent; not used in this candidate",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true, otherwise log_expr",
+    "reconstruction_target": "log_expr",
+    "teacher_target": "EMA teacher soft probability distributions",
+    "count_target": "none",
+    "offline_token_target": "none"
+  },
+  "formal_claims": "No formal improvement is claimed from smoke or screen results."
+}

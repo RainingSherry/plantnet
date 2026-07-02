@@ -1,0 +1,21 @@
+{
+  "method_dir": "rank25_anomaly_association_boundary_full",
+  "rank": 25,
+  "paper_title": "Anomaly Transformer: Time Series Anomaly Detection with Association Discrepancy",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/025_高_Anomaly_Transformer.pdf",
+  "local_report": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "local_index": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_url": "https://github.com/thuml/Anomaly-Transformer",
+  "github_status": "HTTP 200; README and model/attn.py inspected for AnomalyAttention prior/series association logic.",
+  "implementation_source": "Independent reconstruction and cautious adaptation from local report, PDF, and inspected GitHub code ideas.",
+  "scmae_gap": "boundary / rare-cell / robust loss",
+  "core_mechanism": "Anomaly-Transformer-style prior/series association discrepancy over covariance-ordered gene-module patches, trained as masked-view association stability plus scMAE reconstruction and mask prediction.",
+  "neighbor_mix_relation": "independent; not used in this candidate",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true, otherwise log_expr",
+    "reconstruction_target": "log_expr",
+    "count_target": "none",
+    "token_target": "none"
+  },
+  "formal_claims": "No formal improvement is claimed from smoke or screen results."
+}

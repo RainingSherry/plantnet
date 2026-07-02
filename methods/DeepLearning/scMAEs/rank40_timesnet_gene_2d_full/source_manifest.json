@@ -1,0 +1,28 @@
+{
+  "method_dir": "rank40_timesnet_gene_2d_full",
+  "rank": 40,
+  "recommendation_level": "中高/可用",
+  "recommendation_score": 72,
+  "paper": "TimesNet: Temporal 2D-Variation Modeling for General Time Series Analysis",
+  "venue_year": "ICLR 2023",
+  "pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/040_中高_可用_TimesNet_Temporal_2D-Variation_Modeling_for_General_Time_Series_Analysis.pdf",
+  "github_url": "https://github.com/thuml/TimesNet",
+  "github_status": "readable, but repository contains README/images and points complete code to https://github.com/thuml/Time-Series-Library",
+  "code_reference": {
+    "redirect_repo": "https://github.com/thuml/Time-Series-Library",
+    "inspected_files": [
+      "/tmp/TimesNet_repo/README.md",
+      "/tmp/Time-Series-Library_repo/models/TimesNet.py",
+      "/tmp/Time-Series-Library_repo/layers/Conv_Blocks.py"
+    ]
+  },
+  "implementation_basis": [
+    "Local report section 40: use long-range/multiscale signal modeling only after constructing gene module/order.",
+    "PDF: FFT period discovery, 1D-to-2D period reshape, intra-period/inter-period variation, inception-style 2D kernels.",
+    "Time-Series-Library code: FFT_for_Period, TimesBlock, Inception_Block_V1."
+  ],
+  "scmae_gap_addressed": "semantic target and long-range module-context signal",
+  "neighbor_mix_relation": "independent; not used",
+  "independent_full": true,
+  "no_formal_claim": true
+}

@@ -1,0 +1,21 @@
+{
+  "method_dir": "rank45_saint_rowcol_attention_full",
+  "rank": 45,
+  "paper_title": "SAINT: Improved Neural Networks for Tabular Data via Row Attention and Contrastive Pre-training",
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/045_中高_可用_SAINT_Improved_Neural_Networks_for_Tabular_Data_via_Row_Attention_and_Contrastive_Pre-training.pdf",
+  "local_report": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md",
+  "local_index": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv",
+  "github_url": "https://github.com/somepago/saint",
+  "github_status": "HTTP 200; README, models/model.py, models/pretrainmodel.py, augmentations.py, and pretraining.py inspected from a temporary clone.",
+  "implementation_source": "Independent reconstruction and scMAE-specific adaptation from local report, PDF method description, and inspected official GitHub code ideas.",
+  "scmae_gap": "feature tokenizer / row attention",
+  "core_mechanism": "SAINT-style gene-group feature tokenizer with column self-attention, batch row attention, and masked-view row consistency.",
+  "neighbor_mix_relation": "independent; not used in this candidate",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true, otherwise log_expr",
+    "reconstruction_target": "log_expr",
+    "count_target": "none",
+    "token_target": "none"
+  },
+  "formal_claims": "No formal improvement is claimed from smoke or screen results."
+}

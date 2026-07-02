@@ -1,0 +1,20 @@
+{
+  "method_dir": "rank39_ts2vec_gene_module_full",
+  "rank": 39,
+  "recommendation_level": "中高/可用",
+  "recommendation_score": 72,
+  "paper": "TS2Vec: Towards Universal Representation of Time Series",
+  "venue_year": "AAAI 2022",
+  "pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/039_中高_可用_TS2Vec_Towards_Universal_Representation_of_Time_Series.pdf",
+  "github_url": "https://github.com/yuezhihan/ts2vec",
+  "github_status": "readable via local clone /tmp/ts2vec_repo during implementation",
+  "implementation_basis": [
+    "Local report section 39: use long-range/multiscale signal modeling only after constructing gene module/order.",
+    "PDF: contextual consistency with overlapping subseries, timestamp latent masking, and hierarchical instance/temporal contrast.",
+    "GitHub: models/losses.py hierarchical_contrastive_loss and models/encoder.py latent timestamp masking."
+  ],
+  "scmae_gap_addressed": "semantic target and module-context signal",
+  "neighbor_mix_relation": "independent; not used",
+  "independent_full": true,
+  "no_formal_claim": true
+}
