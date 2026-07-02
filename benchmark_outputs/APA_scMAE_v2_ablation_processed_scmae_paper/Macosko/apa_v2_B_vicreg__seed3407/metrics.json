@@ -1,0 +1,33 @@
+{
+  "diagnostics": {
+    "embedding_shape": [
+      44808,
+      64
+    ]
+  },
+  "kmeans_known_k": {
+    "acc": 0.49091680057132653,
+    "nmi": 0.13999912360439268,
+    "ari": 0.13747804635724947,
+    "f1_macro": 0.15554777860921012,
+    "fmi": 0.48246386288527693,
+    "v_measure": 0.13999912360439268,
+    "homogeneity": 0.15598586263564854,
+    "completeness": 0.12698466995320576,
+    "uses_known_k": true,
+    "oracle-K": true,
+    "cluster_method": "kmeans_known_k"
+  },
+  "leiden_fixed": {
+    "acc": 0.10228084270665952,
+    "nmi": 0.19046685430163823,
+    "ari": 0.01637190899403295,
+    "f1_macro": 0.10946791410556801,
+    "n_pred_clusters": 61,
+    "uses_known_k": false,
+    "oracle-K": false,
+    "cluster_method": "leiden_fixed",
+    "resolution": 1.0,
+    "n_neighbors": 15
+  }
+}

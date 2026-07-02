@@ -1,0 +1,14 @@
+{
+  "edge_survival": 0.8395088911056519,
+  "neighbor_purity_proxy": 0.8602555580175788,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.3179211914539337,
+  "rare_risk_fraction": 0.0013294925769997785,
+  "embedding_variance": 48.885597229003906,
+  "cluster_mass_min": 0.0008863283846665189,
+  "cluster_mass_max": 0.30932860624861513,
+  "collapse_warning": false,
+  "correction_gate_mean": 0.16049109399318695,
+  "correction_gate_std": 0.27812501788139343,
+  "diagnostic_note": "FCM is adapted to masked/unmasked latent correction; clean view is a detached teacher context and no cell mixing is used."
+}

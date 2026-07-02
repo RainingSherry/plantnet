@@ -1,0 +1,16 @@
+{
+  "method_dir": "suture06_cluster_centric_prototype_graph_full",
+  "candidate_order": 6,
+  "reference_module": "/home/luolie/biopipeline/dimension-reduction/plantnet/缝合模块/即插即用/226 Cluster-Centric Scanning Module(CVPR 2026).py",
+  "reference_title": "Scan Clusters, Not Pixels: A Cluster-Centric Paradigm for Efficient Ultra-high-definition Image Restoration",
+  "reference_url": "https://arxiv.org/pdf/2602.21917",
+  "implementation_source": "Rewritten from cluster-centric scanning into cell-latent prototype graph propagation; no image scanning or Mamba dependency is used.",
+  "scmae_gap": "cluster geometry / prototype stability",
+  "core_mechanism": "warmup KMeans prototype memory with prototype-prototype propagation and gated cell context injection",
+  "neighbor_mix_relation": "independent; no cell mixing is used",
+  "data_semantics": {
+    "encoder_input": "scaled_expr when --scale_input true",
+    "reconstruction_target": "log_expr",
+    "scaled_expression_not_used_as": ["counts", "tokens", "NB target", "ZINB target", "diffusion target"]
+  }
+}

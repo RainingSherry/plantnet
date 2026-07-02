@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,token_bins,t_min,t_max,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + ScDiVa absorbing token target,42,rank01_scdiva_absorbing_diffusion_full,smoke,scaled encoder + log_expr targets,8,0.15,0.65,0.6018169731885664,0.5802317339039236,0.4465598931604431,0.4789182676496557,0.5501172149317209,0.5802317339039236,0.6285448293401351,0.5388156698983472,9,,fixed,kmeans_known_k,True

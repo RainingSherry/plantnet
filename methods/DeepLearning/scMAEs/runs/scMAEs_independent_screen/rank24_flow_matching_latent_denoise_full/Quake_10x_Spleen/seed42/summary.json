@@ -1,0 +1,49 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + latent flow matching denoise",
+  "method_dir": "rank24_flow_matching_latent_denoise_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 43.92599129676819,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank24_flow_matching_latent_denoise_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5375837520938024,
+      "nmi": 0.4967330021584165,
+      "ari": 0.28760234922440564,
+      "f1_macro": 0.43064703411333766,
+      "fmi": 0.5712931341798418,
+      "v_measure": 0.49673300215841637,
+      "homogeneity": 0.718315494009085,
+      "completeness": 0.37962738212451086,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9839510050251257,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9635303455129794,
+    "rare_risk_fraction": 0.0043969849246231155,
+    "embedding_variance": 0.5214003920555115,
+    "cluster_mass_min": 0.09579145728643217,
+    "cluster_mass_max": 0.295749581239531,
+    "collapse_warning": false,
+    "flow_target_norm": 15.582389264493376,
+    "flow_pred_norm": 11.086099598858807,
+    "diagnostic_note": "No NeighborMix graph is used; latent Flow Matching is used only as denoising regularization, not for generated sample evaluation."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

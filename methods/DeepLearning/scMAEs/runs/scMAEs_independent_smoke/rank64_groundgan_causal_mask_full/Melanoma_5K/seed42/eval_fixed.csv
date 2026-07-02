@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + GRouNdGAN causal mask,42,rank64_groundgan_causal_mask_full,smoke,scaled encoder + log-expression targets + causal mask consistency,0.5732328827830712,0.5558990813527909,0.42561863571373676,0.4755302720347867,0.5320869945497343,0.5558990813527909,0.6053395175221095,0.513924838107773,9,,fixed,kmeans_known_k,True

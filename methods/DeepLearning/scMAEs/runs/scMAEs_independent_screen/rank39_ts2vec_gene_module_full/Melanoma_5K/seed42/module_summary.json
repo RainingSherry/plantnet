@@ -1,0 +1,20 @@
+{
+  "gene_order": {
+    "method": "sampled log-expression SVD order; genes sorted by first-two loading angle and loading radius",
+    "sampled_cells": 4513,
+    "n_genes": 1000,
+    "singular_values_head": [
+      425.0216064453125,
+      360.83673095703125,
+      304.2417297363281,
+      293.6181335449219,
+      247.4398651123047,
+      225.17364501953125,
+      204.6321258544922,
+      193.47848510742188
+    ]
+  },
+  "module_size": 25,
+  "n_modules": 40,
+  "note": "Gene modules are contiguous blocks after sampled log-expression SVD ordering."
+}

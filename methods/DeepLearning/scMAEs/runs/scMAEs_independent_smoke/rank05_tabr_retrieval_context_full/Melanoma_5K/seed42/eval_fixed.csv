@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,retrieval_k,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + TabR retrieval context,42,rank05_tabr_retrieval_context_full,smoke,scaled encoder + retrieval context,8,0.6015953910923998,0.6640053325490315,0.5243028016323192,0.4968603247874825,0.6156186424672451,0.6640053325490315,0.724358165358473,0.612936081686647,9,,fixed,kmeans_known_k,True

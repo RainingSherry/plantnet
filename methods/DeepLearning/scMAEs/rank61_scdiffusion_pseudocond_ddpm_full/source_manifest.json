@@ -1,0 +1,19 @@
+{
+  "rank": 61,
+  "method_dir": "rank61_scdiffusion_pseudocond_ddpm_full",
+  "paper_title": "scDiffusion: conditional generation of high-quality single-cell data using diffusion model",
+  "recommendation": "可用",
+  "recommendation_score": 70,
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/061_可用_scDiffusion_conditional_generation_of_high-quality_single-cell_data_using_diffusion_model.pdf",
+  "github_url": "https://github.com/EperLuo/scDiffusion",
+  "github_status": "Anonymous ls-remote and shallow clone succeeded. Inspected README.md, guided_diffusion/gaussian_diffusion.py, guided_diffusion/script_util.py, guided_diffusion/train_util.py, classifier_sample.py, and cell_train.py.",
+  "implemented_from": [
+    "scDiffusion PDF: latent diffusion, controlled conditions, classifier/gradient guidance, rare cell conditional generation",
+    "scDiffusion GitHub: GaussianDiffusion beta schedule, q_sample, training_losses, uniform timestep sampling, conditional sampling scripts",
+    "methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md section 62 notes for index rank61",
+    "methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv row sort_rank=61"
+  ],
+  "scmae_gap": "robust denoising / conditional target",
+  "core_mechanism": "Use a DDPM linear beta schedule in scMAE latent space and train a time-conditioned pseudo-condition noise predictor as an auxiliary denoising target.",
+  "neighbor_mix_relation": "independent and complementary; this candidate does not use NeighborMix and does not mix cells."
+}

@@ -1,0 +1,8 @@
+# Heavy artifacts — keep lightweight JSON/CSV metrics tracked, ignore binaries
+runs/**/*.npy
+runs/**/*.pth
+runs/**/*.h5
+runs/**/*.h5ad
+runs/**/*.pt
+__pycache__/
+*.pyc

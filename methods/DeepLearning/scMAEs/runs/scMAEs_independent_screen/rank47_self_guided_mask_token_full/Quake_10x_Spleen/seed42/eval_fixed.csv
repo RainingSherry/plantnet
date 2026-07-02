@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + self-guided adaptive mask tokens,42,rank47_self_guided_mask_token_full,screen,scaled encoder + log-expression targets + self-guided adaptive mask rank tokens,0.7816164154103853,0.6780402885549605,0.5526148654011688,0.721915624919869,0.7668877722953592,0.6780402885549605,0.8546381341773707,0.5619267543595656,5,,fixed,kmeans_known_k,True

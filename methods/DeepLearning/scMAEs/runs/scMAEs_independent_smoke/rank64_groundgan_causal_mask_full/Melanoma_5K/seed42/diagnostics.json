@@ -1,0 +1,17 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.7434300908486594,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9299534617103487,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.009465977549552917,
+  "cluster_mass_min": 0.037225792155993795,
+  "cluster_mass_max": 0.21803678262796367,
+  "collapse_warning": false,
+  "mask_score_mean": 0.4016265273094177,
+  "causal_loss_last": 0.03869393139201052,
+  "tf_pool_size": 250,
+  "causal_edge_count": 8000,
+  "input_mask_rate": 0.4001583369339214,
+  "diagnostic_note": "No NeighborMix is used. GRouNdGAN is adapted as masked causal regulator-target consistency only."
+}

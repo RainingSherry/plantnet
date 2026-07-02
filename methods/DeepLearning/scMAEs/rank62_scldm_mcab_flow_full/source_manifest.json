@@ -1,0 +1,19 @@
+{
+  "rank": 62,
+  "method_dir": "rank62_scldm_mcab_flow_full",
+  "paper_title": "Scalable Single-Cell Gene Expression Generation with Latent Diffusion Models",
+  "recommendation": "可用",
+  "recommendation_score": 70,
+  "paper_pdf": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/参考文献/01_PDF论文_按推荐程度排序/062_可用_Scalable_Single-Cell_Gene_Expression_Generation_with_Latent_Diffusion_Models.pdf",
+  "github_url": "https://github.com/czi-ai/scldm",
+  "github_status": "Anonymous ls-remote and shallow clone succeeded. Inspected README.md, src/scldm/layers.py, src/scldm/nnets.py, src/scldm/vae.py, src/scldm/transport/path.py. The report URL https://github.com/OmicsML/scLDM required credentials.",
+  "implemented_from": [
+    "scLDM PDF: exchangeable gene-expression modeling, MCAB pooling/unpooling, latent diffusion with linear interpolants",
+    "czi-ai/scldm README and source: MCAB, DiT, classifier-free guidance, flow matching path utilities",
+    "methods/DeepLearning/scMAEs/参考文献/00_scMAE改良方法整理总报告.md section 63 notes for index rank62",
+    "methods/DeepLearning/scMAEs/参考文献/02_整理索引.csv row sort_rank=62"
+  ],
+  "scmae_gap": "semantic target / exchangeable gene representation",
+  "core_mechanism": "Fuse the vector scMAE encoder with a small MCAB-style gene-token cross-attention latent pooling adapter and add a linear-interpolant latent flow matching loss.",
+  "neighbor_mix_relation": "independent and complementary; this candidate does not use NeighborMix and does not mix cells."
+}

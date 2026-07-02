@@ -1,0 +1,50 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + iBOT online tokenizer",
+  "method_dir": "rank33_ibot_online_tokenizer_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 38.79230213165283,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank33_ibot_online_tokenizer_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5063150897407489,
+      "nmi": 0.5450821656551883,
+      "ari": 0.3841249923955891,
+      "f1_macro": 0.3914020236661744,
+      "fmi": 0.4959087878439397,
+      "v_measure": 0.5450821656551883,
+      "homogeneity": 0.604681096645669,
+      "completeness": 0.4961776178387675,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.7678927542654553,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9621682442855692,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.3564881384372711,
+    "cluster_mass_min": 0.051185464214491466,
+    "cluster_mass_max": 0.19410591624196766,
+    "collapse_warning": false,
+    "teacher_embedding_variance": 0.3229893445968628,
+    "teacher_cls_confidence_mean": 0.14903642219107818,
+    "teacher_patch_confidence_mean": 0.7183200966785935,
+    "diagnostic_note": "No NeighborMix is used. The EMA teacher acts as an online tokenizer for class and masked gene-module tokens."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

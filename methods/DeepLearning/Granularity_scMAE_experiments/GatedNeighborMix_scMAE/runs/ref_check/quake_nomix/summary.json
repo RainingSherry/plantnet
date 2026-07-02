@@ -1,0 +1,28 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "NeighborMix_scMAE",
+  "variant": "nm_scmae_mid",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/GatedNeighborMix_scMAE/runs/ref_check/quake_nomix/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.9613693467336684,
+      "nmi": 0.858313006067654,
+      "ari": 0.9177211441415859,
+      "f1_macro": 0.7434010731473997,
+      "fmi": 0.9637153503997489,
+      "v_measure": 0.8583130060676539,
+      "homogeneity": 0.8687258842361089,
+      "completeness": 0.8481467966536389,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "note": "Pseudo-cell branch is used only as an anchor-recovery training view; final embeddings are extracted from clean real cells."
+}

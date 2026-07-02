@@ -1,0 +1,49 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + reliability-gated NeighborMix + gated DEC",
+  "method_dir": "GatedNeighborMix_scMAE",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 44808,
+  "n_genes": 1000,
+  "n_clusters": 12,
+  "runtime_seconds": 253.93642377853394,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5385199071594358,
+      "nmi": 0.5889361107117863,
+      "ari": 0.3756986907232344,
+      "f1_macro": 0.42460886792443,
+      "fmi": 0.598681649975601,
+      "v_measure": 0.5889361107117863,
+      "homogeneity": 0.7937932780890425,
+      "completeness": 0.4681252865096694,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "neighbor_purity_proxy": 0.9464135868594894,
+    "mixed_cell_fraction": 0.0,
+    "embedding_variance": 0.10332061350345612,
+    "cluster_mass_min": 0.00723085163363685,
+    "cluster_mass_max": 0.3239153722549545,
+    "collapse_warning": false,
+    "reliability_mean": 0.7227016091346741,
+    "reliability_min": 0.0,
+    "reliability_max": 1.0,
+    "core_fraction": 0.8348732369219782,
+    "agree_mean": 1.0,
+    "density_mean": 0.7227016256506716,
+    "confidence_mean": 0.08625171942261581
+  },
+  "baseline": {
+    "nmi": 0.657465,
+    "ari": 0.494268
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Independent candidate; NOT appended to \u5168benchmark\u7ed3\u679c.csv."
+}

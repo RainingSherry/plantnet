@@ -1,0 +1,15 @@
+{
+  "edge_survival": 0.651156551697675,
+  "neighbor_purity_proxy": 0.8540881896742744,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.8563568432502346,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.5113388299942017,
+  "cluster_mass_min": 0.01883447817416353,
+  "cluster_mass_max": 0.2683359184577886,
+  "collapse_warning": false,
+  "edge_confidence_mean": 0.8041310906410217,
+  "edge_confidence_std": 0.29769280552864075,
+  "local_gate_mean": 0.5084136128425598,
+  "diagnostic_note": "No NeighborMix is used. GraphGPS local-global adapter combines structural encodings, local KNN messages, and batch global attention."
+}

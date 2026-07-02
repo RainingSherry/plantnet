@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + soft graph clustering,42,rank59_soft_graph_clustering_full,smoke,scaled encoder + log-expression targets + soft graph regularization,0.6820296920008864,0.6855645431804024,0.595819619218907,0.5064436595974222,0.6750017595732909,0.6855645431804024,0.7234507347772559,0.6514489910047826,9,,fixed,kmeans_known_k,True

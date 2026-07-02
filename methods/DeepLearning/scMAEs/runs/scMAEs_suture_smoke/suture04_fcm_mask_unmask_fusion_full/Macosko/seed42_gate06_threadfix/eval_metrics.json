@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "suture04_fcm_mask_unmask_fusion_full",
+  "seed": 42,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.5761024816996965,
+      "nmi": 0.6013246794354166,
+      "ari": 0.39790476726111307,
+      "f1_macro": 0.3888344614458661,
+      "fmi": 0.616648504367199,
+      "v_measure": 0.6013246794354166,
+      "homogeneity": 0.8136201134697131,
+      "completeness": 0.47689096349567733,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

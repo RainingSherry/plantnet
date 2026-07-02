@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+SRP182008,dual-axis (gene-module + prototype cell-axis) gated scMAE + DEC,42,DualAxisGated_scMAE,screen,0.5919046914311085,0.6144857516707739,0.4369294153723512,0.5469033132744222,0.4934623272477312,0.6144857516707739,0.6101246149006051,0.6189096836229396,15,,fixed,kmeans_known_k,True

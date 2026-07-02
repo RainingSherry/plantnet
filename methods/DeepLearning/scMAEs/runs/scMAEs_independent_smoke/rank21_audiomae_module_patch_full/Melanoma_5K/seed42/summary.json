@@ -1,0 +1,48 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + AudioMAE module patch",
+  "method_dir": "rank21_audiomae_module_patch_full",
+  "stage": "smoke",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 3.900399923324585,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_smoke/rank21_audiomae_module_patch_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.26944382893862173,
+      "nmi": 0.1495199944352266,
+      "ari": 0.08307165084960279,
+      "f1_macro": 0.2136235009961517,
+      "fmi": 0.23277778691797416,
+      "v_measure": 0.14951999443522657,
+      "homogeneity": 0.1668508383714416,
+      "completeness": 0.13545069255659495,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.5312430755594948,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9725433310744074,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.0038867744151502848,
+    "cluster_mass_min": 0.04143585198315976,
+    "cluster_mass_max": 0.18214048304896965,
+    "collapse_warning": false,
+    "module_target_variance": 0.059964194893836975,
+    "diagnostic_note": "No NeighborMix graph is used; AudioMAE-style high-ratio module patch masking is applied after coexpression ordering."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

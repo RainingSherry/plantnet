@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "suture05_token_statistics_aux_full",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6191003766895635,
+      "nmi": 0.6791202980358875,
+      "ari": 0.5566560417887669,
+      "f1_macro": 0.5083001035112079,
+      "fmi": 0.64266702831338,
+      "v_measure": 0.6791202980358875,
+      "homogeneity": 0.737892691091316,
+      "completeness": 0.629019539408021,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

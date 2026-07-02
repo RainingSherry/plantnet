@@ -1,0 +1,15 @@
+{
+  "edge_survival": 0.9591465975870105,
+  "neighbor_purity_proxy": 0.8821183248393529,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9315447913231247,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.8265924453735352,
+  "cluster_mass_min": 0.038998448925326834,
+  "cluster_mass_max": 0.20695767781963217,
+  "collapse_warning": false,
+  "edge_confidence_mean": NaN,
+  "edge_confidence_std": NaN,
+  "mask_score_mean": 0.037590984255075455,
+  "diagnostic_note": "No NeighborMix is used. MAE asymmetric decoder uses scMAE swap corruption and mask prediction; no graph edges are trained."
+}

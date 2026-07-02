@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + CICL cluster-aware contrast",
+  "seed": 42,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.667608877721943,
+      "nmi": 0.6285092946900258,
+      "ari": 0.47156621310287955,
+      "f1_macro": 0.6444764957204875,
+      "fmi": 0.7128121771467704,
+      "v_measure": 0.6285092946900258,
+      "homogeneity": 0.827082133235289,
+      "completeness": 0.5068261964430426,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

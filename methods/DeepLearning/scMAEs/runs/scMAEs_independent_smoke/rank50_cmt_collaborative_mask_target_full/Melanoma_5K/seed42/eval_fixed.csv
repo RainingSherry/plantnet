@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + CMT collaborative mask target,42,rank50_cmt_collaborative_mask_target_full,smoke,scaled encoder + log-expression targets + collaborative mask and feature targets,0.5599379570130734,0.5466378345538686,0.3909889195021092,0.46012726135745236,0.5042278127910821,0.5466378345538685,0.5905864510940758,0.5087770798019758,9,,fixed,kmeans_known_k,True

@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + MultiMAE gene multitask,42,rank20_multimae_multitask_gene_full,screen,scaled encoder + MultiMAE expression/token/module targets,0.6775980500775537,0.686721155096237,0.594785445320982,0.5057769317216944,0.6741708810996079,0.686721155096237,0.7236104844506542,0.6534105843306218,9,,fixed,kmeans_known_k,True

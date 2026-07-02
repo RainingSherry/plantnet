@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + scDiffusion pseudo-condition DDPM,42,rank61_scdiffusion_pseudocond_ddpm_full,screen,scaled encoder + log-expression targets + pseudo-condition DDPM latent denoising,0.9630443886097152,0.8728823379408455,0.9402220465506591,0.7304063897535148,0.9736444557728758,0.8728823379408455,0.8863094440565609,0.8598559873098509,5,,fixed,kmeans_known_k,True

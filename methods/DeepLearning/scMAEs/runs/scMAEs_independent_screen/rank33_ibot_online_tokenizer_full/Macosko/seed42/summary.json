@@ -1,0 +1,50 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + iBOT online tokenizer",
+  "method_dir": "rank33_ibot_online_tokenizer_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 44808,
+  "n_genes": 1000,
+  "n_clusters": 12,
+  "runtime_seconds": 414.9474940299988,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank33_ibot_online_tokenizer_full/Macosko/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.3506516693447599,
+      "nmi": 0.43826221269919846,
+      "ari": 0.18629573610872258,
+      "f1_macro": 0.25609987975146126,
+      "fmi": 0.4192792860182285,
+      "v_measure": 0.43826221269919846,
+      "homogeneity": 0.6609779389511462,
+      "completeness": 0.327807774884874,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9103530619532226,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9537188704702596,
+    "rare_risk_fraction": 0.02689251919300125,
+    "embedding_variance": 0.8124102354049683,
+    "cluster_mass_min": 0.045081235493661845,
+    "cluster_mass_max": 0.17325031244420638,
+    "collapse_warning": false,
+    "teacher_embedding_variance": 0.8022128343582153,
+    "teacher_cls_confidence_mean": 0.29735974412171967,
+    "teacher_patch_confidence_mean": 0.7523458336762019,
+    "diagnostic_note": "No NeighborMix is used. The EMA teacher acts as an online tokenizer for class and masked gene-module tokens."
+  },
+  "baseline": {
+    "nmi": 0.657465,
+    "ari": 0.494268
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

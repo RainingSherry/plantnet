@@ -1,0 +1,52 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + cluster-centric prototype graph",
+  "method_dir": "suture06_cluster_centric_prototype_graph_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "n_prototypes": 18,
+  "runtime_seconds": 47.71271371841431,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_suture_screen/suture06_cluster_centric_prototype_graph_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6877908265012187,
+      "nmi": 0.703634133739855,
+      "ari": 0.6382504874750914,
+      "f1_macro": 0.4808867747900186,
+      "fmi": 0.7095399580320217,
+      "v_measure": 0.703634133739855,
+      "homogeneity": 0.7508592908933668,
+      "completeness": 0.6619978975924643,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.8811138193367309,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.47378405928611755,
+    "rare_risk_fraction": 0.7626855750055396,
+    "embedding_variance": 1.9956820011138916,
+    "cluster_mass_min": 0.028140926213161978,
+    "cluster_mass_max": 0.23709284289829383,
+    "collapse_warning": false,
+    "prototype_entropy_mean": 0.47378405928611755,
+    "prototype_max_assignment_mean": 0.6890729665756226,
+    "prototype_gate_mean": 0.5307333469390869,
+    "prototype_gate_std": 0.3390914499759674,
+    "diagnostic_note": "Cluster-centric prototype adapter; no cell mixing; prototypes are initialized from warmup KMeans and propagated through prototype-prototype similarity."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Quick screen only; this file is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

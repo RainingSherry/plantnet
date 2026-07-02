@@ -1,0 +1,14 @@
+{
+  "edge_survival": 0.9164698719978333,
+  "neighbor_purity_proxy": 0.9621580122836404,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.4093279540538788,
+  "rare_risk_fraction": 0.00020938023450586265,
+  "embedding_variance": 553.980712890625,
+  "cluster_mass_min": 0.014761306532663316,
+  "cluster_mass_max": 0.6954564489112228,
+  "collapse_warning": false,
+  "program_gate_mean": 0.08353011310100555,
+  "program_gate_std": 0.025772616267204285,
+  "diagnostic_note": "Low-frequency gene program is a coarse log-expression target; no graph propagation and no cell mixing are used."
+}

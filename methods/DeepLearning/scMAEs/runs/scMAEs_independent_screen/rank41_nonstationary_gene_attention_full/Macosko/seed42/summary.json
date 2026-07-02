@@ -1,0 +1,52 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + non-stationary gene-module attention",
+  "method_dir": "rank41_nonstationary_gene_attention_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 44808,
+  "n_genes": 1000,
+  "n_clusters": 12,
+  "runtime_seconds": 827.0296425819397,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank41_nonstationary_gene_attention_full/Macosko/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.3887029101946081,
+      "nmi": 0.5262669232785995,
+      "ari": 0.24100887377953106,
+      "f1_macro": 0.40078223484967473,
+      "fmi": 0.4770700868227837,
+      "v_measure": 0.5262669232785995,
+      "homogeneity": 0.7680048216766129,
+      "completeness": 0.4002757598856563,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9508569898232458,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9075223241151428,
+    "rare_risk_fraction": 0.02689251919300125,
+    "embedding_variance": 0.42396169900894165,
+    "cluster_mass_min": 0.01238618103910016,
+    "cluster_mass_max": 0.18893947509373327,
+    "collapse_warning": false,
+    "module_count": 40,
+    "module_loss": 0.004119974201811211,
+    "consistency_loss": 0.0005622354598848947,
+    "tau_mean": 1.0,
+    "delta_abs_mean": 0.0,
+    "diagnostic_note": "No NeighborMix is used. Non-stationary attention is applied on an SVD-derived gene-module axis, not raw HVG index order."
+  },
+  "baseline": {
+    "nmi": 0.657465,
+    "ari": 0.494268
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

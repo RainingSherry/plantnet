@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "suture12_attention_matching_teacher_consistency_full",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7039663195213827,
+      "nmi": 0.6932124548570084,
+      "ari": 0.6140557043721826,
+      "f1_macro": 0.5418422114993082,
+      "fmi": 0.689696625131298,
+      "v_measure": 0.6932124548570084,
+      "homogeneity": 0.7328639726684776,
+      "completeness": 0.657631387111923,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

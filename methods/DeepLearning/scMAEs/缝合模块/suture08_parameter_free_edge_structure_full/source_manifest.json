@@ -1,0 +1,17 @@
+{
+  "method_dir": "suture08_parameter_free_edge_structure_full",
+  "method_name": "scMAE + parameter-free edge/structure reliability",
+  "source_type": "suture_module_rewrite",
+  "reference_file": "/home/luolie/biopipeline/dimension-reduction/plantnet/缝合模块/即插即用/223 Parameter-Free Edge-Structure Attention(MICCAI 2026).py",
+  "reference_title": "PFESA: FFT-based Parameter-Free Edge and Structure Attention for Medical Image Segmentation",
+  "scmae_gap": "cluster geometry and boundary reliability",
+  "core_mechanism": "parameter-free reliability score from log-expression graph low-frequency structure and high-frequency residual",
+  "neighbor_mix_relation": "independent; NeighborMix is not used and no cell mixing is performed",
+  "implementation_notes": [
+    "scaled_expr is used only as encoder input",
+    "log_expr is used for reconstruction target and graph reliability construction",
+    "the image FFT operation is replaced by KNN graph structure/residual decomposition",
+    "large datasets use an anchor-KNN fallback to avoid full pairwise KNN memory/thread failures",
+    "screen results are written only to quick-screen CSV files"
+  ]
+}

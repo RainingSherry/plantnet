@@ -1,0 +1,20 @@
+{
+  "edge_survival": 0.7695364952087402,
+  "neighbor_purity_proxy": 0.8739345594209321,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.6969606876373291,
+  "rare_risk_fraction": 0.8003545313538666,
+  "embedding_variance": 0.9052061438560486,
+  "cluster_mass_min": 0.04121426988699313,
+  "cluster_mass_max": 0.2444050520717926,
+  "collapse_warning": false,
+  "gate_core_mean": 0.16245292127132416,
+  "gate_boundary_mean": 0.23046350479125977,
+  "gate_rare_mean": 0.6070836186408997,
+  "target_stats": {
+    "boundary_score_mean": 0.28422772884368896,
+    "rare_score_mean": 0.7630972266197205,
+    "core_score_mean": 0.18269848823547363
+  },
+  "diagnostic_note": "SID-inspired semantic decoupling is used as a cell-level uncertainty gate; no cell mixing is used."
+}

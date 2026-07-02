@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + BGRL graph bootstrap",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6051407046310658,
+      "nmi": 0.6515939632917652,
+      "ari": 0.5188849163980661,
+      "f1_macro": 0.49698091213511053,
+      "fmi": 0.6115614972989164,
+      "v_measure": 0.6515939632917652,
+      "homogeneity": 0.7168553034734609,
+      "completeness": 0.597223690463928,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

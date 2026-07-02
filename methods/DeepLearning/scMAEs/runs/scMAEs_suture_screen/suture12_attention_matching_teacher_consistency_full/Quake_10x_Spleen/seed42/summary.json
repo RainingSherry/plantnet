@@ -1,0 +1,50 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + attention matching teacher consistency",
+  "method_dir": "suture12_attention_matching_teacher_consistency_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 94.40359735488892,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_suture_screen/suture12_attention_matching_teacher_consistency_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5227177554438861,
+      "nmi": 0.5202104242990396,
+      "ari": 0.30878010897648517,
+      "f1_macro": 0.42142186208177834,
+      "fmi": 0.5865483470457974,
+      "v_measure": 0.5202104242990395,
+      "homogeneity": 0.7557430219626995,
+      "completeness": 0.3966055356677109,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.9195688366889954,
+    "neighbor_purity_proxy": 0.9894123394751535,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.39374658465385437,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 1.2556874752044678,
+    "cluster_mass_min": 0.1053182579564489,
+    "cluster_mass_max": 0.2947026800670017,
+    "collapse_warning": false,
+    "match_gate_mean": 0.08043118566274643,
+    "match_attention_mean": 0.7307255864143372,
+    "match_similarity_mean": 0.9983075857162476,
+    "diagnostic_note": "Attention matching is applied between masked and detached clean latent views; no graph or cell mixing is used."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Quick screen only; this file is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

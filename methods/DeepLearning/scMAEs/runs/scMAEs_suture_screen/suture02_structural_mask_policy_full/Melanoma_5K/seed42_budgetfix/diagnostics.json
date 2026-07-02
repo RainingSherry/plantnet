@@ -1,0 +1,16 @@
+{
+  "edge_survival": 0.6793032884597778,
+  "neighbor_purity_proxy": 0.8658246547012335,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9249712814390536,
+  "rare_risk_fraction": 0.25,
+  "embedding_variance": 1.0161335468292236,
+  "cluster_mass_min": 0.02614668734766231,
+  "cluster_mass_max": 0.2428539773986262,
+  "collapse_warning": false,
+  "mask_prob_mean": 0.3946806788444519,
+  "mask_prob_high_risk": 0.32069671154022217,
+  "mask_prob_low_risk": 0.5417646765708923,
+  "marker_risk_mean": 0.5152490139007568,
+  "diagnostic_note": "SMMM-inspired structural saliency is used only as a gene mask policy; no cell mixing and no image-style 2D convolution."
+}

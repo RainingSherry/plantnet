@@ -1,0 +1,14 @@
+{
+  "method_dir": "suture01_tarb_reliability_controller_full",
+  "source_module": "/home/luolie/biopipeline/dimension-reduction/plantnet/缝合模块/即插即用/225 Task Adaptive Restoration Block(TPAMI 2026).py",
+  "source_title": "AIRPNet: Adaptive Image Restoration with Privacy Protection in Steganographic Domain",
+  "implementation_source": "Independent scRNA-specific reconstruction from the read-only suture module idea; source directory is not modified.",
+  "core_mechanism": "TARB-style adaptive operation selection rewritten as a latent scRNA controller.",
+  "scmae_gap": "cross-dataset adaptive control / unsafe smoothing retreat while preserving mask prediction and masked expression reconstruction",
+  "borrowed_lessons": [
+    "rank13-style DEC cluster geometry is preserved",
+    "GatedNeighborMix reliability controls only risky auxiliary smoothing-like operations, not DEC",
+    "scaled expression is only encoder input; log expression is reconstruction target"
+  ],
+  "neighbor_mix_relation": "independent; no NeighborMix cell mixing is used and mixed_cell_fraction remains 0.0"
+}

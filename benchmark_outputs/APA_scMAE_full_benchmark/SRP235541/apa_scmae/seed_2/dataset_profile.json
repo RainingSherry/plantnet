@@ -1,0 +1,69 @@
+{
+  "dataset_name": "SRP235541",
+  "n_cells": 27798,
+  "n_genes": 53678,
+  "label_key": "Celltype",
+  "n_cell_types": 18,
+  "cell_type_counts": {
+    "Columella root cap": 2981,
+    "Companion cell": 966,
+    "G2/M phase": 755,
+    "Lateral root cap": 3130,
+    "Meristematic cell": 2813,
+    "Metaxylem": 335,
+    "Non-hair": 1310,
+    "Phloem parenchyma": 1074,
+    "Phloem pole pericycle": 1073,
+    "Protoxylem": 666,
+    "Root cortex": 2372,
+    "Root endodermis": 2578,
+    "Root hair": 856,
+    "Root procambium": 1714,
+    "Root stele": 2181,
+    "S phase": 711,
+    "Sieve element": 427,
+    "Xylem pole pericycle": 1856
+  },
+  "x_looks_like_raw_counts": false,
+  "counts_source": "adata.raw.X",
+  "counts_source_looks_like_raw_counts": true,
+  "input_mode": "raw",
+  "has_raw": true,
+  "has_layers_counts": false,
+  "has_layers_log1p_norm": false,
+  "layers": [],
+  "sparsity": 0.9373517916581081,
+  "per_cell_nonzero_genes": {
+    "min": 222.0,
+    "q05": 472.85000000000014,
+    "q25": 984.0,
+    "median": 2882.5,
+    "q75": 5181.0,
+    "q95": 8137.149999999998,
+    "max": 11979.0,
+    "mean": 3362.83052737607
+  },
+  "library_size": {
+    "min": 500.0,
+    "q05": 612.0,
+    "q25": 1627.0,
+    "median": 8184.5,
+    "q75": 21412.75,
+    "q95": 60765.399999999965,
+    "max": 273473.0,
+    "mean": 16290.139002805958
+  },
+  "obs_fields_present": {
+    "batch": [],
+    "tissue": [
+      "Organ",
+      "Tissue"
+    ],
+    "genotype": [
+      "Genotype"
+    ],
+    "condition": [
+      "Condition"
+    ]
+  }
+}

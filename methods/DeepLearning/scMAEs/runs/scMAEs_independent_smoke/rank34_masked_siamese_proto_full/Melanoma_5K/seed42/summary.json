@@ -1,0 +1,50 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + Masked Siamese prototypes",
+  "method_dir": "rank34_masked_siamese_proto_full",
+  "stage": "smoke",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 1.9065139293670654,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_smoke/rank34_masked_siamese_proto_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5809882561489031,
+      "nmi": 0.5002406180989108,
+      "ari": 0.398240144180611,
+      "f1_macro": 0.39336973731566777,
+      "fmi": 0.5112223980495582,
+      "v_measure": 0.5002406180989108,
+      "homogeneity": 0.5363754652663049,
+      "completeness": 0.46866718109812283,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.7304010635940617,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9035790613962446,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.48541900515556335,
+    "cluster_mass_min": 0.0245956126744959,
+    "cluster_mass_max": 0.25725681364945713,
+    "collapse_warning": false,
+    "teacher_embedding_variance": 0.7715157270431519,
+    "target_confidence_mean": 0.550912605196822,
+    "target_used_prototypes_mean": 80.74509803921569,
+    "diagnostic_note": "No NeighborMix is used. MSN matches masked-anchor representations to EMA-teacher prototype distributions."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

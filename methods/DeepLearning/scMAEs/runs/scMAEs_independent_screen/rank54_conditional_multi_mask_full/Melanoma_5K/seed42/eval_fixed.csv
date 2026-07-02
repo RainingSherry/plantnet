@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + Conditional-MAE multi-mask,42,rank54_conditional_multi_mask_full,screen,scaled encoder + log-expression targets + conditional multi-mask,0.6851318413472192,0.6856905714473832,0.6032033673538697,0.5165864273761455,0.6806657930515444,0.6856905714473831,0.7293583890437528,0.6469562949839018,9,,fixed,kmeans_known_k,True

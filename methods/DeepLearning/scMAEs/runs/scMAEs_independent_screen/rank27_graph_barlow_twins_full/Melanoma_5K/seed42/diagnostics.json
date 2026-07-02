@@ -1,0 +1,14 @@
+{
+  "edge_survival": 0.7987515803645638,
+  "neighbor_purity_proxy": 0.8540217150454243,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.8178582072468259,
+  "rare_risk_fraction": 0.10015510746731664,
+  "embedding_variance": 0.46326330304145813,
+  "cluster_mass_min": 0.010414358519831598,
+  "cluster_mass_max": 0.33237314424994463,
+  "collapse_warning": false,
+  "edge_confidence_mean": 0.722562313079834,
+  "edge_confidence_std": 0.33635610342025757,
+  "diagnostic_note": "No NeighborMix is used. Graph Barlow Twins supplies symmetric graph view invariance and redundancy reduction around the scMAE objective."
+}

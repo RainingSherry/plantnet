@@ -1,0 +1,10 @@
+{
+  "physical_gpu": 6,
+  "cuda_visible_devices": "6",
+  "logical_device": "cuda:0",
+  "gpu_explicit": true,
+  "attention_elements": 256256064,
+  "max_attention_elements": 300000000,
+  "force_large_attention": false,
+  "warning": null
+}

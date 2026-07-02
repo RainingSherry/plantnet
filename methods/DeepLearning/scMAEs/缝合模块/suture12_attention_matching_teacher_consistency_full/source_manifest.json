@@ -1,0 +1,17 @@
+{
+  "method_dir": "suture12_attention_matching_teacher_consistency_full",
+  "method_name": "scMAE + attention matching teacher consistency",
+  "source_type": "suture_module_rewrite",
+  "reference_file": "/home/luolie/biopipeline/dimension-reduction/plantnet/缝合模块/即插即用/131 AttentionMacthcing(AAAI 2025).py",
+  "reference_title": "Attention Matching / FAMNet",
+  "scmae_gap": "teacher consistency and robust masked-view alignment",
+  "core_mechanism": "cosine attention matching between masked latent and detached clean latent",
+  "neighbor_mix_relation": "independent; NeighborMix is not used",
+  "implementation_notes": [
+    "scaled_expr is used only as encoder input",
+    "log_expr is used for masked expression reconstruction target",
+    "clean latent is detached and used only as teacher context",
+    "no graph propagation, prototype memory, or cell mixing is used",
+    "screen results are written only to quick-screen CSV files"
+  ]
+}

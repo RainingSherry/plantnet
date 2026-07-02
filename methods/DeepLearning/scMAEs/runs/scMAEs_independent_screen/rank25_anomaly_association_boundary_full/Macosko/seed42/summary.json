@@ -1,0 +1,51 @@
+{
+  "dataset": "Macosko",
+  "method": "scMAE + anomaly association boundary",
+  "method_dir": "rank25_anomaly_association_boundary_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 44808,
+  "n_genes": 1000,
+  "n_clusters": 12,
+  "runtime_seconds": 519.548023223877,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank25_anomaly_association_boundary_full/Macosko/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5158677021960364,
+      "nmi": 0.4855989042588648,
+      "ari": 0.39784999827200007,
+      "f1_macro": 0.2870914441954107,
+      "fmi": 0.6205269631213376,
+      "v_measure": 0.48559890425886487,
+      "homogeneity": 0.6149021729029432,
+      "completeness": 0.40122767816284227,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9120134797357615,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.7248828154353678,
+    "rare_risk_fraction": 0.10000446348866274,
+    "embedding_variance": 1.0904539823532104,
+    "cluster_mass_min": 0.008971612212104981,
+    "cluster_mass_max": 0.3688403856454205,
+    "collapse_warning": false,
+    "association_risk_mean": 12.649772644042969,
+    "association_risk_std": 1.4250404834747314,
+    "association_risk_p90": 16.08487892150879,
+    "association_boundary_entropy": 0.39342368535673267,
+    "diagnostic_note": "No NeighborMix is used. Association discrepancy is adapted from time-series anomaly attention to ordered gene-module boundary diagnostics."
+  },
+  "baseline": {
+    "nmi": 0.657465,
+    "ari": 0.494268
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

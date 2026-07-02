@@ -1,0 +1,49 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + gene token statistics auxiliary branch",
+  "method_dir": "suture05_token_statistics_aux_full",
+  "stage": "smoke",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 3.8460400104522705,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_suture_smoke/suture05_token_statistics_aux_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6191003766895635,
+      "nmi": 0.6791202980358875,
+      "ari": 0.5566560417887669,
+      "f1_macro": 0.5083001035112079,
+      "fmi": 0.64266702831338,
+      "v_measure": 0.6791202980358875,
+      "homogeneity": 0.737892691091316,
+      "completeness": 0.629019539408021,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.8500923258734028,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9766936302185059,
+    "rare_risk_fraction": 0.036339463771327275,
+    "embedding_variance": 0.360432505607605,
+    "cluster_mass_min": 0.03434522490582761,
+    "cluster_mass_max": 0.22690006647462885,
+    "collapse_warning": false,
+    "token_entropy_mean": 0.9766936302185059,
+    "token_importance_max_mean": 0.027727387845516205,
+    "diagnostic_note": "TSSA-inspired branch summarizes gene-token statistics linearly; no pairwise attention, no image reshape, and no cell mixing."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Quick screen only; this file is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

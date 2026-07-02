@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + Masked Siamese prototypes",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.5758918679370707,
+      "nmi": 0.4709436854890045,
+      "ari": 0.40162964267597934,
+      "f1_macro": 0.4347594722646057,
+      "fmi": 0.511766297599801,
+      "v_measure": 0.4709436854890045,
+      "homogeneity": 0.5154193365496914,
+      "completeness": 0.4335339435042834,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

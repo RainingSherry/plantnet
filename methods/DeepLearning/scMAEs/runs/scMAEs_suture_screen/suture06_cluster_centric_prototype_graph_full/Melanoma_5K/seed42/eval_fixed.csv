@@ -1,0 +1,2 @@
+dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,suture06_cluster_centric_prototype_graph_full,42,screen,0.6877908265012187,0.703634133739855,0.6382504874750914,0.4808867747900186,0.7095399580320217,0.703634133739855,0.7508592908933668,0.6619978975924643,9,,fixed,kmeans_known_k,True

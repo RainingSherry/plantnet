@@ -1,0 +1,15 @@
+{
+  "edge_survival": 0.6002892746644861,
+  "neighbor_purity_proxy": 0.8282295590516286,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9166358449606924,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.020178010687232018,
+  "cluster_mass_min": 0.0350099711943275,
+  "cluster_mass_max": 0.2257921559937957,
+  "collapse_warning": false,
+  "mask_score_mean": 0.40440988540649414,
+  "fuzzy_membership_entropy": 0.9848976030210193,
+  "fuzzy_core_fraction": 0.0,
+  "diagnostic_note": "No NeighborMix is used. Fuzzy-rough adaptation reinforces high-confidence core cells and leaves boundary cells weakly constrained."
+}

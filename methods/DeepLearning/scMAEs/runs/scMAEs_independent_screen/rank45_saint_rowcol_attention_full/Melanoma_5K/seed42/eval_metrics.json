@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + SAINT row-column attention",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.5743407932639043,
+      "nmi": 0.6513813600205597,
+      "ari": 0.5082009784033377,
+      "f1_macro": 0.412088233114859,
+      "fmi": 0.6042550846997374,
+      "v_measure": 0.6513813600205596,
+      "homogeneity": 0.726452427170145,
+      "completeness": 0.5903726757279126,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

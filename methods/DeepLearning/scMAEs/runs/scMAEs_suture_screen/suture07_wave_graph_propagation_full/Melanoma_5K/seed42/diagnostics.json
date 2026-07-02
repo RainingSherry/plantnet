@@ -1,0 +1,14 @@
+{
+  "edge_survival": 0.8559876680374146,
+  "neighbor_purity_proxy": 0.8434596351281484,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.5909316539764404,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 30.007526397705078,
+  "cluster_mass_min": 0.031907821847994684,
+  "cluster_mass_max": 0.21360514070463107,
+  "collapse_warning": false,
+  "wave_gate_mean": 0.14401231706142426,
+  "wave_gate_std": 0.026448728516697884,
+  "diagnostic_note": "Graph wave propagation on log-expression KNN; no image DCT/FFT and no cell mixing."
+}

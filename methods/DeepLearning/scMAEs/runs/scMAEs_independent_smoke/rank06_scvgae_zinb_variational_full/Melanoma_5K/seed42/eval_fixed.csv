@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,count_source,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + scVGAE ZINB variational decoder,42,rank06_scvgae_zinb_variational_full,smoke,scaled encoder + log_expr rec + count ZINB,raw_count_source,0.6275204963438954,0.6103270984513088,0.4838828573800954,0.4978405306484403,0.5815176012619452,0.610327098451309,0.6605833310713204,0.5671770795148493,9,,fixed,kmeans_known_k,True

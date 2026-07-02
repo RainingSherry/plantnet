@@ -1,0 +1,15 @@
+{
+  "edge_survival": 0.6499974510154208,
+  "neighbor_purity_proxy": 0.988714405360134,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.833927786420105,
+  "rare_risk_fraction": 0.0043969849246231155,
+  "embedding_variance": 0.030122173950076103,
+  "cluster_mass_min": 0.04417922948073702,
+  "cluster_mass_max": 0.40923366834170855,
+  "collapse_warning": false,
+  "mask_score_mean": 0.3486681580543518,
+  "input_mask_rate": 0.35000254898457916,
+  "latent_mask_rate": 0.35013972101984797,
+  "diagnostic_note": "No NeighborMix is used. Conditional-MAE is adapted as input masking followed by representation-stage latent masking."
+}

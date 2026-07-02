@@ -1,0 +1,17 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.988892378559464,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.5248888532961615,
+  "rare_risk_fraction": 0.0043969849246231155,
+  "embedding_variance": 0.004731399938464165,
+  "cluster_mass_min": 0.015598827470686766,
+  "cluster_mass_max": 0.7112646566164154,
+  "collapse_warning": false,
+  "mask_score_mean": 0.40020251274108887,
+  "q_weight_mean": 0.08333331346511841,
+  "q_weight_std": 0.015273855067789555,
+  "latent_noise_scale_mean": 0.2818079308883564,
+  "input_mask_rate": 0.4000005472350765,
+  "diagnostic_note": "No NeighborMix is used. qDiffusion provides latent denoising and q-kernel context only."
+}

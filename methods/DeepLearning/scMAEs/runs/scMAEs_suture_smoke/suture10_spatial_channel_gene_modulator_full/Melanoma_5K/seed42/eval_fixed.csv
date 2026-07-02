@@ -1,0 +1,2 @@
+dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,suture10_spatial_channel_gene_modulator_full,42,smoke,0.6128960779968978,0.6804889635726141,0.5535020382943456,0.5064167327579938,0.6399380343948546,0.6804889635726141,0.739113600150362,0.6304808075786956,9,,fixed,kmeans_known_k,True

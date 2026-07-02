@@ -1,0 +1,14 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.8725312061452102,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9974293112754822,
+  "rare_risk_fraction": 0.002437403057832927,
+  "embedding_variance": 1.049020528793335,
+  "cluster_mass_min": 0.05052071792599158,
+  "cluster_mass_max": 0.23797917128296034,
+  "collapse_warning": false,
+  "token_entropy_mean": 0.9974293112754822,
+  "token_importance_max_mean": 0.00669617997482419,
+  "diagnostic_note": "TSSA-inspired branch summarizes gene-token statistics linearly; no pairwise attention, no image reshape, and no cell mixing."
+}

@@ -1,0 +1,20 @@
+{
+  "dataset_name": "Quake_10x_Spleen",
+  "n_cells": 9552,
+  "n_genes_original": 23341,
+  "n_genes": 1000,
+  "label_key": "resolved_label",
+  "n_cell_types": 5,
+  "cell_type_counts": {
+    "0": 6886,
+    "1": 1930,
+    "2": 42,
+    "3": 464,
+    "4": 230
+  },
+  "counts_source": "adata.X",
+  "input_mode": "raw",
+  "has_raw": false,
+  "has_layers_counts": false,
+  "scale_input": false
+}

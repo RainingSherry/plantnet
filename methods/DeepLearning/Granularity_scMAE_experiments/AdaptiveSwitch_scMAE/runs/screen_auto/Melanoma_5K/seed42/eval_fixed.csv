@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + adaptive sharp/soft switch,42,AdaptiveSwitch_scMAE,screen,0.7250166186572125,0.721747561792145,0.6479849283461504,0.6341111408940939,0.7174909228948351,0.7217475617921449,0.7559516555861151,0.6905047070530944,9,,fixed,kmeans_known_k,True

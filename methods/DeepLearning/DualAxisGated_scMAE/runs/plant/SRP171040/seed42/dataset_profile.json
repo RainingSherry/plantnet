@@ -1,0 +1,27 @@
+{
+  "dataset_name": "SRP171040",
+  "n_cells": 33956,
+  "n_genes_original": 53678,
+  "n_genes": 1000,
+  "label_key": "Celltype",
+  "n_cell_types": 12,
+  "cell_type_counts": {
+    "Columella root cap": 5640,
+    "Lateral root cap": 2537,
+    "Meristematic cell": 570,
+    "Non-hair": 4242,
+    "Pericycle": 3232,
+    "Phloem": 1753,
+    "Root cortex": 4747,
+    "Root endodermis": 3668,
+    "Root hair": 4743,
+    "Root stele": 1367,
+    "Stem cell niche": 427,
+    "Xylem": 1030
+  },
+  "counts_source": "adata.raw.X",
+  "input_mode": "raw",
+  "has_raw": true,
+  "has_layers_counts": false,
+  "scale_input": false
+}

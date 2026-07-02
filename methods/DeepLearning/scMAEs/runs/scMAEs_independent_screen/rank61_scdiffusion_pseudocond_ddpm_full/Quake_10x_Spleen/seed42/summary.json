@@ -1,0 +1,52 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + scDiffusion pseudo-condition DDPM",
+  "method_dir": "rank61_scdiffusion_pseudocond_ddpm_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 45.4921510219574,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank61_scdiffusion_pseudocond_ddpm_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.9630443886097152,
+      "nmi": 0.8728823379408455,
+      "ari": 0.9402220465506591,
+      "f1_macro": 0.7304063897535148,
+      "fmi": 0.9736444557728758,
+      "v_measure": 0.8728823379408455,
+      "homogeneity": 0.8863094440565609,
+      "completeness": 0.8598559873098509,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.988892378559464,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.5248888532961615,
+    "rare_risk_fraction": 0.0043969849246231155,
+    "embedding_variance": 0.004731399938464165,
+    "cluster_mass_min": 0.015598827470686766,
+    "cluster_mass_max": 0.7112646566164154,
+    "collapse_warning": false,
+    "mask_score_mean": 0.40020251274108887,
+    "pseudo_condition_min_fraction": 0.019995812395309884,
+    "pseudo_condition_max_fraction": 0.31072026800670016,
+    "diffusion_timestep_mean": 0.5008936186094541,
+    "input_mask_rate": 0.4000005472350765,
+    "diagnostic_note": "No NeighborMix is used. scDiffusion is adapted as pseudo-condition DDPM latent noise prediction only."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": true,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

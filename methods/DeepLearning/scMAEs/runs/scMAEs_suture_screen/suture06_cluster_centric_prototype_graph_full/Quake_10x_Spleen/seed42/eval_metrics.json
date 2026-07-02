@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "suture06_cluster_centric_prototype_graph_full",
+  "seed": 42,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6480318257956449,
+      "nmi": 0.5639985032847696,
+      "ari": 0.4964990544672108,
+      "f1_macro": 0.4080788188848909,
+      "fmi": 0.7307237665880872,
+      "v_measure": 0.5639985032847697,
+      "homogeneity": 0.7473185287401595,
+      "completeness": 0.4529003551231145,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

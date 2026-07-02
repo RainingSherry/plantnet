@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + deep adaptive fuzzy clustering,42,rank29_deep_adaptive_fuzzy_clustering_full,screen,scaled encoder + log-expression targets + adaptive fuzzy clustering,0.6812845920371362,0.6350406198714321,0.5690132366744954,0.5556613605037646,0.743101980542223,0.6350406198714321,0.7681530723080248,0.5412482668000181,12,,fixed,kmeans_known_k,True

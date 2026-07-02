@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + Masked Siamese prototypes,42,rank34_masked_siamese_proto_full,screen,scaled encoder + log-expression targets + MSN prototype target,0.4793760469011725,0.4319266277105912,0.24395680500531508,0.35855222320619273,0.5348504142184525,0.43192662771059115,0.6328615199103494,0.3278375130098053,5,,fixed,kmeans_known_k,True

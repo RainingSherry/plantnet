@@ -1,0 +1,49 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + adaptive sharp/soft switch",
+  "stage": "smoke",
+  "seed": 42,
+  "n_clusters": 9,
+  "runtime_seconds": 2.034025192260742,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6924440505207179,
+      "nmi": 0.6803406479463504,
+      "ari": 0.5946259478339088,
+      "f1_macro": 0.5109601595973543,
+      "fmi": 0.6736121680040378,
+      "v_measure": 0.6803406479463503,
+      "homogeneity": 0.7244917858684692,
+      "completeness": 0.641261625877988,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "neighbor_purity_proxy": 0.8389319742964768,
+    "mixed_cell_fraction": 0.0,
+    "embedding_variance": 0.14623689651489258,
+    "cluster_mass_min": 0.029248836693995126,
+    "cluster_mass_max": 0.25415466430312433,
+    "collapse_warning": false,
+    "final_gate": 0.7154058452690903,
+    "final_kl_ref": 0.17241518199443817,
+    "clusterability_mean": 0.7344411015510559,
+    "clusterability_min": 0.0,
+    "clusterability_max": 1.0,
+    "core_fraction": 0.8229559051628629,
+    "agree_mean": 0.8976142994312727,
+    "density_mean": 0.7702373061820376,
+    "confidence_mean": 0.6005800200418652
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "final_gate": 0.7154058452690903,
+  "final_kl_ref": 0.17241518199443817
+}

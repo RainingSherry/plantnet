@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "suture12_attention_matching_teacher_consistency_full",
+  "seed": 42,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.5227177554438861,
+      "nmi": 0.5202104242990396,
+      "ari": 0.30878010897648517,
+      "f1_macro": 0.42142186208177834,
+      "fmi": 0.5865483470457974,
+      "v_measure": 0.5202104242990395,
+      "homogeneity": 0.7557430219626995,
+      "completeness": 0.3966055356677109,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + MaskGIT gene-token curriculum,42,rank23_maskgit_gene_token_full,screen,scaled encoder + MaskGIT gene token curriculum target,0.7350293132328308,0.5911592547076059,0.529369396857612,0.5702204803777756,0.7519360806233977,0.5911592547076059,0.7655814336422602,0.48146681956810794,5,,fixed,kmeans_known_k,True

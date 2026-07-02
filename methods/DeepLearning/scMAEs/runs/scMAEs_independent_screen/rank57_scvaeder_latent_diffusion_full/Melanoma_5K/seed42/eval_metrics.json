@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + scVAEDer latent diffusion",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7106137824063815,
+      "nmi": 0.703923120783785,
+      "ari": 0.5969345772943462,
+      "f1_macro": 0.6485538818998535,
+      "fmi": 0.6766027292595393,
+      "v_measure": 0.703923120783785,
+      "homogeneity": 0.7307439681059921,
+      "completeness": 0.6790014056188035,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

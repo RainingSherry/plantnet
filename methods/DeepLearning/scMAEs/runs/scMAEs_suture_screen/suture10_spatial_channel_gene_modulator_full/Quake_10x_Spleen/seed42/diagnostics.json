@@ -1,0 +1,16 @@
+{
+  "edge_survival": 0.8850364685058594,
+  "neighbor_purity_proxy": 0.9894123394751535,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.5125994682312012,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 1.1494455337524414,
+  "cluster_mass_min": 0.06072026800670017,
+  "cluster_mass_max": 0.48796063651591287,
+  "collapse_warning": false,
+  "cell_gate_mean": 0.11496353894472122,
+  "cell_gate_std": 0.01760980300605297,
+  "channel_gate_mean": 0.49984318017959595,
+  "channel_gate_std": 0.09528549760580063,
+  "diagnostic_note": "SCFM rewritten as latent channel/cell modulation; no image reshape, no graph, and no cell mixing."
+}

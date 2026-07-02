@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + Conditional-MAE multi-mask,42,rank54_conditional_multi_mask_full,screen,scaled encoder + log-expression targets + conditional multi-mask,0.6568257956448911,0.6518512597823781,0.4748222449226573,0.6449142747083446,0.7144943840768467,0.6518512597823781,0.859677322799372,0.5249461063250537,5,,fixed,kmeans_known_k,True

@@ -1,0 +1,14 @@
+{
+  "edge_survival": 0.4500765958253075,
+  "neighbor_purity_proxy": 0.8594283181918901,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9744620558840449,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.34873151779174805,
+  "cluster_mass_min": 0.05827609129182362,
+  "cluster_mass_max": 0.17239087081763793,
+  "collapse_warning": false,
+  "edge_confidence_mean": 0.9733612537384033,
+  "edge_confidence_std": 0.06812907010316849,
+  "diagnostic_note": "No NeighborMix is used. MaskGAE masked edge reconstruction trains a shallow graph adapter and edge/degree decoders."
+}

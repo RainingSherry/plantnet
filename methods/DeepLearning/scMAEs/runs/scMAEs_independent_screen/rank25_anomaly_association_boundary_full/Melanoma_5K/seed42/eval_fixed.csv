@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + anomaly association boundary,42,rank25_anomaly_association_boundary_full,screen,scaled encoder + log-expression targets + covariance ordered gene modules,0.6385996011522269,0.5929236357016798,0.5186077392445272,0.4850098311395862,0.6106547072574459,0.5929236357016798,0.6479095685716473,0.5465405543434366,9,,fixed,kmeans_known_k,True

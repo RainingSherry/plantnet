@@ -1,0 +1,16 @@
+{
+  "method_dir": "suture11_lasea_latent_semantic_aggregation_full",
+  "method_name": "scMAE + LaSEA latent semantic aggregation",
+  "source_type": "suture_module_rewrite",
+  "reference_file": "/home/luolie/biopipeline/dimension-reduction/plantnet/缝合模块/即插即用/237 Latent-Aware Semantic Extraction and Aggregation(2026 一区TOP).py",
+  "reference_title": "Latent-Aware Semantic Extraction and Aggregation",
+  "scmae_gap": "semantic target and masked-view latent stability",
+  "core_mechanism": "multi-dilation 1D latent semantic aggregation with detached clean-view semantic consistency",
+  "neighbor_mix_relation": "independent; NeighborMix is not used",
+  "implementation_notes": [
+    "scaled_expr is used only as encoder input",
+    "log_expr is used for masked expression reconstruction target",
+    "no image reshape, 2D convolution over gene vectors, graph propagation, prototype memory, or cell mixing is used",
+    "screen results are written only to quick-screen CSV files"
+  ]
+}

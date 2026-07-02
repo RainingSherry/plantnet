@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,token_bins,t_min,t_max,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + ScDiVa absorbing token target,42,rank01_scdiva_absorbing_diffusion_full,screen,scaled encoder + log_expr targets,8,0.15,0.65,0.560824958123953,0.5475061957085327,0.3277652887713773,0.4472427436612431,0.6022551633881408,0.5475061957085327,0.7898008443949207,0.41897368855963363,5,,fixed,kmeans_known_k,True

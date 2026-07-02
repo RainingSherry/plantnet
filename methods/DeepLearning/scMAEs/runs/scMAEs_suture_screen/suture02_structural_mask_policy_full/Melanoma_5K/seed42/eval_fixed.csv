@@ -1,0 +1,2 @@
+dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,suture02_structural_mask_policy_full,42,screen,0.6284068247285619,0.6434322792472388,0.5362094709095006,0.4317218593222156,0.6252246781949012,0.6434322792472388,0.69978838056979,0.5954767157381207,9,,fixed,kmeans_known_k,True

@@ -1,0 +1,18 @@
+{
+  "file_path": "methods/DeepLearning/scMAEs/benchmark_data/Melanoma_5K.h5ad",
+  "counts_source": "adata.X",
+  "input_mode": "raw",
+  "normalization": "normalize_total(target_sum=10000.0) + log1p when raw",
+  "hvg": {
+    "n_top_genes": 1000,
+    "flavor": "seurat"
+  },
+  "scale_input": false,
+  "selected_n_genes": 1000,
+  "seed": 42,
+  "label_key": "resolved_label",
+  "encoder_scale_input": true,
+  "target_scale_input": false,
+  "token_bins": 8,
+  "token_source": "log_expr gene-specific quantile bins"
+}

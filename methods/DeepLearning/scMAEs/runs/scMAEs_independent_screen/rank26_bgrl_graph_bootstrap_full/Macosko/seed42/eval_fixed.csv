@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,scMAE + BGRL graph bootstrap,42,rank26_bgrl_graph_bootstrap_full,screen,scaled encoder + log-expression targets + shallow KNN graph bootstrap,0.4009328691305124,0.537222114289802,0.2175463623752834,0.34494355159422335,0.4528530273732996,0.5372221142898019,0.7978176637840396,0.404950813896466,12,,fixed,kmeans_known_k,True

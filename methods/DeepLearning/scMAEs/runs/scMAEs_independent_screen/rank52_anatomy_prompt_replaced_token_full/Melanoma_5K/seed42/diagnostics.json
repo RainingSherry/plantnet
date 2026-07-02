@@ -1,0 +1,15 @@
+{
+  "edge_survival": 0.7014995252384859,
+  "neighbor_purity_proxy": 0.8487923775758919,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.867497903515594,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.09470245242118835,
+  "cluster_mass_min": 0.030799911367161533,
+  "cluster_mass_max": 0.2736538887657877,
+  "collapse_warning": false,
+  "mask_score_mean": 0.2992311418056488,
+  "gene_difficulty_cv": 1.6265263557434082,
+  "n_gene_modules": 32,
+  "diagnostic_note": "No NeighborMix is used. Anatomy guidance is represented by unsupervised gene modules and module prompts."
+}

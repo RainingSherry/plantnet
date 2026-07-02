@@ -1,0 +1,56 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + scVGAE ZINB variational decoder",
+  "method_dir": "rank06_scvgae_zinb_variational_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "runtime_seconds": 25.888020277023315,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank06_scvgae_zinb_variational_full/Melanoma_5K/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6578772435187237,
+      "nmi": 0.6836294976655418,
+      "ari": 0.5856658586418148,
+      "f1_macro": 0.5079955977714875,
+      "fmi": 0.6667763392257945,
+      "v_measure": 0.6836294976655419,
+      "homogeneity": 0.7414378979959743,
+      "completeness": 0.634183503656568,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.8906713937513849,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.9230423701039187,
+    "rare_risk_fraction": 0.0,
+    "embedding_variance": 0.4477112293243408,
+    "cluster_mass_min": 0.029470418790161754,
+    "cluster_mass_max": 0.22091734987812986,
+    "collapse_warning": false,
+    "posterior_variance_mean": 0.27662937606082244,
+    "count_branch": {
+      "counts_source": "adata.X",
+      "inferred_mode": "raw",
+      "count_source_note": "raw_count_source",
+      "target_sum": 10000.0,
+      "selected_n_genes": 1000,
+      "mean_library_size": 4856.58154296875
+    },
+    "diagnostic_note": "No NeighborMix graph is used; ZINB uses non-scaled count/count-like branch."
+  },
+  "baseline": {
+    "nmi": 0.735414,
+    "ari": 0.668029
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

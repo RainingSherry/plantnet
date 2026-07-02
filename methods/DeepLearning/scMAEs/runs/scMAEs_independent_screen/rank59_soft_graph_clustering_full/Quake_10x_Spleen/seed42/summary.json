@@ -1,0 +1,51 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + soft graph clustering",
+  "method_dir": "rank59_soft_graph_clustering_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 50.63980221748352,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank59_soft_graph_clustering_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.9611599664991625,
+      "nmi": 0.8664377487531526,
+      "ari": 0.9344713662585298,
+      "f1_macro": 0.729354713361158,
+      "fmi": 0.9710702794505088,
+      "v_measure": 0.8664377487531526,
+      "homogeneity": 0.8806649749872391,
+      "completeness": 0.8526628987182098,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.798363609893902,
+    "neighbor_purity_proxy": 0.989855527638191,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.5259458720289163,
+    "rare_risk_fraction": 0.0043969849246231155,
+    "embedding_variance": 0.006137379910796881,
+    "cluster_mass_min": 0.015912897822445562,
+    "cluster_mass_max": 0.7097989949748744,
+    "collapse_warning": false,
+    "mask_score_mean": 0.4001256227493286,
+    "edge_confidence_mean": 0.47931650280952454,
+    "edge_confidence_std": 0.05838051438331604,
+    "input_mask_rate": 0.39979583749899994,
+    "diagnostic_note": "No NeighborMix is used. Soft graph is used as shallow edge-confidence and residual consistency regularization only."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": true,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

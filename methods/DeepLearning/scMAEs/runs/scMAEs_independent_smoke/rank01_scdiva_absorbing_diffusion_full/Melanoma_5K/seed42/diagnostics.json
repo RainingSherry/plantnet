@@ -1,0 +1,12 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.7705295812098383,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9209961982866331,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.004835291765630245,
+  "cluster_mass_min": 0.037890538444493686,
+  "cluster_mass_max": 0.2182583647241303,
+  "collapse_warning": false,
+  "diagnostic_note": "No NeighborMix graph is used; edge_survival is the non-pruned diagnostic baseline."
+}

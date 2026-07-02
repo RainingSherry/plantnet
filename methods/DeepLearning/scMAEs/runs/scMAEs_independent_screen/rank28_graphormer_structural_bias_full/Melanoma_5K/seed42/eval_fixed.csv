@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + local Graphormer structural bias,42,rank28_graphormer_structural_bias_full,screen,scaled encoder + log-expression targets + local KNN Graphormer structural bias,0.6368269443828939,0.6416896492967892,0.5526720089762713,0.43808188292427697,0.6393764082067768,0.6416896492967891,0.698077764312508,0.5937303303396994,9,,fixed,kmeans_known_k,True

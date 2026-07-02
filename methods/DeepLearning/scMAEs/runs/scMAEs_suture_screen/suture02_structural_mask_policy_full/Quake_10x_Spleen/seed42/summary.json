@@ -1,0 +1,51 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + structural gene mask policy",
+  "method_dir": "suture02_structural_mask_policy_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 100.49048328399658,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_suture_screen/suture02_structural_mask_policy_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.536641541038526,
+      "nmi": 0.5248006418616737,
+      "ari": 0.3188693224230259,
+      "f1_macro": 0.43276636514084527,
+      "fmi": 0.5953102220801535,
+      "v_measure": 0.5248006418616737,
+      "homogeneity": 0.7579144945225363,
+      "completeness": 0.4013548293872213,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 0.9474324025213718,
+    "neighbor_purity_proxy": 0.9874232272473479,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.3504818533537972,
+    "rare_risk_fraction": 0.25,
+    "embedding_variance": 0.6088117361068726,
+    "cluster_mass_min": 0.0992462311557789,
+    "cluster_mass_max": 0.30265912897822445,
+    "collapse_warning": false,
+    "mask_prob_mean": 0.08028750866651535,
+    "mask_prob_high_risk": 0.05256759747862816,
+    "mask_prob_low_risk": 0.1415848433971405,
+    "marker_risk_mean": 0.51910400390625,
+    "diagnostic_note": "SMMM-inspired structural saliency is used only as a gene mask policy; no cell mixing and no image-style 2D convolution."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Quick screen only; this file is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

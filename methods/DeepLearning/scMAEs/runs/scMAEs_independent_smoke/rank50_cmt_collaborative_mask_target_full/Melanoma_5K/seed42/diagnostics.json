@@ -1,0 +1,16 @@
+{
+  "edge_survival": 0.7183451109072742,
+  "neighbor_purity_proxy": 0.7535342344338577,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9164689127639388,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.01197613961994648,
+  "cluster_mass_min": 0.03855528473299357,
+  "cluster_mass_max": 0.2450697983602925,
+  "collapse_warning": false,
+  "edge_confidence_mean": NaN,
+  "edge_confidence_std": NaN,
+  "mask_score_mean": 0.27833279967308044,
+  "teacher_alpha_final": 0.35,
+  "diagnostic_note": "No NeighborMix is used. CMT adaptation linearly combines fixed teacher saliency/targets and EMA student saliency/targets."
+}

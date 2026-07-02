@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + Conditional-MAE multi-mask",
+  "seed": 42,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6568257956448911,
+      "nmi": 0.6518512597823781,
+      "ari": 0.4748222449226573,
+      "f1_macro": 0.6449142747083446,
+      "fmi": 0.7144943840768467,
+      "v_measure": 0.6518512597823781,
+      "homogeneity": 0.859677322799372,
+      "completeness": 0.5249461063250537,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

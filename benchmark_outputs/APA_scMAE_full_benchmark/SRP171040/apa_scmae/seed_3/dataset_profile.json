@@ -1,0 +1,63 @@
+{
+  "dataset_name": "SRP171040",
+  "n_cells": 33956,
+  "n_genes": 53678,
+  "label_key": "Celltype",
+  "n_cell_types": 12,
+  "cell_type_counts": {
+    "Columella root cap": 5640,
+    "Lateral root cap": 2537,
+    "Meristematic cell": 570,
+    "Non-hair": 4242,
+    "Pericycle": 3232,
+    "Phloem": 1753,
+    "Root cortex": 4747,
+    "Root endodermis": 3668,
+    "Root hair": 4743,
+    "Root stele": 1367,
+    "Stem cell niche": 427,
+    "Xylem": 1030
+  },
+  "x_looks_like_raw_counts": false,
+  "counts_source": "adata.raw.X",
+  "counts_source_looks_like_raw_counts": true,
+  "input_mode": "raw",
+  "has_raw": true,
+  "has_layers_counts": false,
+  "has_layers_log1p_norm": false,
+  "layers": [],
+  "sparsity": 0.9518359238771074,
+  "per_cell_nonzero_genes": {
+    "min": 243.0,
+    "q05": 516.0,
+    "q25": 934.0,
+    "median": 1765.0,
+    "q75": 3915.25,
+    "q95": 6817.0,
+    "max": 9647.0,
+    "mean": 2585.351278124632
+  },
+  "library_size": {
+    "min": 500.0,
+    "q05": 714.0,
+    "q25": 1614.0,
+    "median": 4748.0,
+    "q75": 15212.25,
+    "q95": 48357.25,
+    "max": 129350.0,
+    "mean": 11967.50918836141
+  },
+  "obs_fields_present": {
+    "batch": [],
+    "tissue": [
+      "Organ",
+      "Tissue"
+    ],
+    "genotype": [
+      "Genotype"
+    ],
+    "condition": [
+      "Condition"
+    ]
+  }
+}

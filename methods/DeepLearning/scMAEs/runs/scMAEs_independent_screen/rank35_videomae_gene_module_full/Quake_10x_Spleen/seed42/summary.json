@@ -1,0 +1,48 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "scMAE + VideoMAE gene-module tube mask",
+  "method_dir": "rank35_videomae_gene_module_full",
+  "stage": "screen",
+  "seed": 42,
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "runtime_seconds": 409.6263921260834,
+  "embedding_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/scMAEs/runs/scMAEs_independent_screen/rank35_videomae_gene_module_full/Quake_10x_Spleen/seed42/embedding_final.npy",
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.7552345058626466,
+      "nmi": 0.6440614873031917,
+      "ari": 0.5362292378311686,
+      "f1_macro": 0.6463990304710786,
+      "fmi": 0.7562048346013873,
+      "v_measure": 0.6440614873031917,
+      "homogeneity": 0.8305771832470649,
+      "completeness": 0.5259527294967677,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "diagnostics": {
+    "edge_survival": 1.0,
+    "neighbor_purity_proxy": 0.9784128978224456,
+    "mixed_cell_fraction": 0.0,
+    "boundary_entropy": 0.8041572392670675,
+    "rare_risk_fraction": 0.0043969849246231155,
+    "embedding_variance": 0.42489945888519287,
+    "cluster_mass_min": 0.052135678391959796,
+    "cluster_mass_max": 0.5095268006700168,
+    "collapse_warning": false,
+    "masked_patch_fraction_mean": 0.7599999904632568,
+    "diagnostic_note": "No NeighborMix is used. VideoMAE-style tube masking is applied over data-ordered gene modules."
+  },
+  "baseline": {
+    "nmi": 0.85173,
+    "ari": 0.922275
+  },
+  "meets_screen_baseline_any": false,
+  "note": "Screen result is candidate evidence only and is not appended to \u5168benchmark\u7ed3\u679c.csv."
+}

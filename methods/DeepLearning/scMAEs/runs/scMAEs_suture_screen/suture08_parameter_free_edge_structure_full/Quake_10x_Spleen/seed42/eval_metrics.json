@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "suture08_parameter_free_edge_structure_full",
+  "seed": 42,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.9536222780569514,
+      "nmi": 0.8248127659102745,
+      "ari": 0.9242529291997716,
+      "f1_macro": 0.693689389114747,
+      "fmi": 0.9663170632954133,
+      "v_measure": 0.8248127659102744,
+      "homogeneity": 0.8539011697814173,
+      "completeness": 0.7976408857785247,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "scMAE + deep adaptive fuzzy clustering",
+  "seed": 42,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6758253933082207,
+      "nmi": 0.6605045547134264,
+      "ari": 0.5720219362503561,
+      "f1_macro": 0.4746174616390852,
+      "fmi": 0.6553900959818422,
+      "v_measure": 0.6605045547134263,
+      "homogeneity": 0.700764382618821,
+      "completeness": 0.6246193578118564,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

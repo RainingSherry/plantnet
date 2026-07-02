@@ -1,0 +1,28 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.9694095477386935,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.0535477787646517,
+  "rare_risk_fraction": 0.0043969849246231155,
+  "embedding_variance": 0.657164454460144,
+  "cluster_mass_min": 0.022613065326633167,
+  "cluster_mass_max": 0.6888609715242882,
+  "collapse_warning": false,
+  "module_gate_entropy": 0.9768330154199139,
+  "operation_weight_mean": [
+    0.18870816521433928,
+    0.18419586365396654,
+    0.1859576538317467,
+    0.22045497318739118,
+    0.2206833443371969
+  ],
+  "cluster_confidence_mean": 0.9870279335558814,
+  "diagnostic_note": "TARB-style latent controller; no NeighborMix cell mixing; reliability gates only risky auxiliary operations, not DEC.",
+  "reliability_mean": 0.9152777791023254,
+  "reliability_min": 0.0,
+  "reliability_max": 1.0,
+  "core_fraction": 0.9463986599664992,
+  "agree_mean": 0.9820561139028476,
+  "density_mean": 0.9153071901701245,
+  "confidence_mean": 0.9870279335558814
+}

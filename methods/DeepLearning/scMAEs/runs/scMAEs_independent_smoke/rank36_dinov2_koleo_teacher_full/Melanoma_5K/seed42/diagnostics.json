@@ -1,0 +1,15 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.6505207179259915,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9842527261308923,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.03826583921909332,
+  "cluster_mass_min": 0.06270773321515621,
+  "cluster_mass_max": 0.16042543762463993,
+  "collapse_warning": false,
+  "teacher_embedding_variance": 0.023063872009515762,
+  "teacher_cls_confidence_mean": 0.44013282510579804,
+  "teacher_patch_confidence_mean": 0.8047888781510147,
+  "diagnostic_note": "No NeighborMix is used. DINOv2-style EMA teacher distillation plus KoLeo spreading is applied."
+}

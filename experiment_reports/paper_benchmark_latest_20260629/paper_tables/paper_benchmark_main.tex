@@ -1,0 +1,240 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Benchmark results across datasets.}
+\label{tab:benchmark\_main}
+\begin{tabular}{llrcccc}
+\toprule
+Dataset & Method & \#Seeds & ACC & NMI & ARI & Macro-F1 \\
+\midrule
+Bach & DEC & 3 & 0.710$\pm$0.040 & 0.685$\pm$0.043 & 0.614$\pm$0.077 & 0.428$\pm$0.023 \\
+Bach & Leiden & 3 & 0.834$\pm$0.015 & 0.730$\pm$0.003 & 0.719$\pm$0.000 & 0.514$\pm$0.057 \\
+Bach & Louvain & 3 & 0.834$\pm$0.016 & 0.726$\pm$0.002 & 0.716$\pm$0.003 & 0.516$\pm$0.054 \\
+Bach & scMAE + NeighborMix & 3 & 0.839$\pm$0.028 & 0.850$\pm$0.013 & 0.851$\pm$0.014 & \underline{0.724$\pm$0.070} \\
+Bach & scMAE w/o NeighBorMix & 3 & 0.860$\pm$0.046 & 0.856$\pm$0.020 & \textbf{0.875$\pm$0.042} & 0.716$\pm$0.021 \\
+Bach & SC3 & 3 & 0.064$\pm$0.087 & 0.835$\pm$0.008 & 0.812$\pm$0.065 & 0.188$\pm$0.036 \\
+Bach & scDCC & 3 & 0.710$\pm$0.018 & 0.786$\pm$0.013 & 0.667$\pm$0.034 & 0.617$\pm$0.012 \\
+Bach & scMAE & 3 & 0.860$\pm$0.046 & 0.856$\pm$0.020 & \textbf{0.875$\pm$0.042} & 0.716$\pm$0.021 \\
+Bach & DESC & 3 & 0.551$\pm$0.064 & 0.644$\pm$0.028 & 0.455$\pm$0.085 & 0.442$\pm$0.023 \\
+Bach & scNAME & 3 & \underline{0.876$\pm$0.039} & \textbf{0.869$\pm$0.019} & \underline{0.870$\pm$0.022} & \textbf{0.727$\pm$0.008} \\
+Bach & scziDesk & 3 & \textbf{0.891$\pm$0.061} & \underline{0.868$\pm$0.053} & 0.854$\pm$0.081 & 0.704$\pm$0.101 \\
+\midrule
+Baron & DEC & 3 & 0.798$\pm$0.032 & 0.717$\pm$0.034 & 0.708$\pm$0.066 & 0.570$\pm$0.046 \\
+Baron & Leiden & 3 & \textbf{0.870$\pm$0.000} & 0.753$\pm$0.000 & \textbf{0.775$\pm$0.001} & 0.498$\pm$0.005 \\
+Baron & Louvain & 3 & \underline{0.862$\pm$0.002} & 0.736$\pm$0.003 & 0.759$\pm$0.004 & 0.498$\pm$0.007 \\
+Baron & scMAE + NeighborMix & 3 & 0.754$\pm$0.093 & \underline{0.821$\pm$0.030} & \underline{0.771$\pm$0.126} & \textbf{0.626$\pm$0.006} \\
+Baron & scMAE w/o NeighBorMix & 3 & 0.734$\pm$0.007 & 0.811$\pm$0.010 & 0.768$\pm$0.009 & 0.609$\pm$0.013 \\
+Baron & SC3 & 3 & 0.075$\pm$0.128 & 0.804$\pm$0.001 & 0.636$\pm$0.000 & 0.070$\pm$0.064 \\
+Baron & scDCC & 3 & 0.659$\pm$0.025 & \textbf{0.825$\pm$0.001} & 0.634$\pm$0.009 & \underline{0.609$\pm$0.005} \\
+Baron & scMAE & 3 & 0.734$\pm$0.007 & 0.811$\pm$0.010 & 0.768$\pm$0.009 & 0.609$\pm$0.013 \\
+Baron & DESC & 3 & 0.448$\pm$0.030 & 0.663$\pm$0.010 & 0.353$\pm$0.020 & 0.333$\pm$0.042 \\
+Baron & scNAME & 3 & 0.667$\pm$0.063 & 0.801$\pm$0.024 & 0.627$\pm$0.037 & 0.560$\pm$0.130 \\
+Baron & scziDesk & 3 & 0.666$\pm$0.064 & 0.803$\pm$0.017 & 0.666$\pm$0.076 & 0.537$\pm$0.058 \\
+Baron & AttentionAE-SC & 3 & 0.717$\pm$0.075 & 0.628$\pm$0.084 & 0.572$\pm$0.104 & 0.290$\pm$0.081 \\
+\midrule
+CRA002977\_1 & DESC & 3 & 0.200$\pm$0.044 & \underline{0.235$\pm$0.062} & -0.076$\pm$0.104 & 0.159$\pm$0.080 \\
+CRA002977\_1 & scNAME & 3 & \textbf{0.687$\pm$0.001} & \textbf{0.509$\pm$0.008} & \textbf{0.445$\pm$0.004} & \textbf{0.577$\pm$0.019} \\
+CRA002977\_1 & APA-scMAE & 3 & \underline{0.278$\pm$0.061} & 0.101$\pm$0.074 & \underline{0.064$\pm$0.079} & \underline{0.190$\pm$0.042} \\
+\midrule
+CRA007122 & DESC & 3 & 0.246$\pm$0.029 & \underline{0.200$\pm$0.050} & 0.070$\pm$0.054 & \underline{0.238$\pm$0.014} \\
+CRA007122 & scNAME & 3 & \textbf{0.385$\pm$0.029} & \textbf{0.247$\pm$0.032} & \textbf{0.154$\pm$0.040} & \textbf{0.390$\pm$0.011} \\
+CRA007122 & APA-scMAE & 1 & \underline{0.281} & 0.111 & \underline{0.079} & 0.220 \\
+\midrule
+Guo & DEC & 3 & 0.694$\pm$0.005 & 0.739$\pm$0.036 & 0.661$\pm$0.063 & 0.543$\pm$0.021 \\
+Guo & Leiden & 3 & 0.826$\pm$0.041 & 0.827$\pm$0.018 & 0.776$\pm$0.033 & 0.744$\pm$0.015 \\
+Guo & Louvain & 3 & 0.752$\pm$0.063 & 0.791$\pm$0.034 & 0.721$\pm$0.045 & 0.667$\pm$0.122 \\
+Guo & scMAE + NeighborMix & 3 & \underline{0.871$\pm$0.003} & \textbf{0.857$\pm$0.001} & 0.834$\pm$0.006 & \underline{0.821$\pm$0.019} \\
+Guo & scMAE w/o NeighBorMix & 3 & 0.865$\pm$0.004 & 0.852$\pm$0.001 & 0.829$\pm$0.008 & 0.811$\pm$0.017 \\
+Guo & SC3 & 3 & 0.217$\pm$0.102 & 0.854$\pm$0.000 & \textbf{0.839$\pm$0.000} & 0.134$\pm$0.049 \\
+Guo & scDCC & 3 & \textbf{0.872$\pm$0.020} & \underline{0.857$\pm$0.007} & \underline{0.839$\pm$0.007} & \textbf{0.828$\pm$0.061} \\
+Guo & scMAE & 3 & 0.865$\pm$0.004 & 0.852$\pm$0.001 & 0.829$\pm$0.008 & 0.811$\pm$0.017 \\
+Guo & DESC & 2 & 0.388$\pm$0.011 & 0.517$\pm$0.052 & 0.138$\pm$0.084 & 0.442$\pm$0.027 \\
+Guo & scNAME & 3 & 0.819$\pm$0.018 & 0.841$\pm$0.014 & 0.800$\pm$0.025 & 0.740$\pm$0.027 \\
+Guo & scziDesk & 3 & 0.788$\pm$0.011 & 0.819$\pm$0.013 & 0.779$\pm$0.025 & 0.660$\pm$0.041 \\
+Guo & AttentionAE-SC & 3 & 0.754$\pm$0.021 & 0.763$\pm$0.016 & 0.728$\pm$0.015 & 0.573$\pm$0.047 \\
+\midrule
+hrvatin\_geo\_maintype\_counts & DEC & 1 & \underline{0.917} & 0.844 & 0.853 & \underline{0.758} \\
+hrvatin\_geo\_maintype\_counts & Leiden & 1 & 0.453 & 0.323 & 0.174 & 0.283 \\
+hrvatin\_geo\_maintype\_counts & Louvain & 1 & 0.156 & 0.012 & -0.003 & 0.044 \\
+hrvatin\_geo\_maintype\_counts & scMAE + NeighborMix & 1 & \textbf{0.928} & \textbf{0.941} & \textbf{0.910} & \textbf{0.853} \\
+hrvatin\_geo\_maintype\_counts & scMAE w/o NeighBorMix & 1 & 0.891 & \underline{0.908} & \underline{0.873} & 0.715 \\
+hrvatin\_geo\_maintype\_counts & SC3 & 1 & 0.043 & 0.880 & 0.842 & 0.012 \\
+hrvatin\_geo\_maintype\_counts & scDCC & 1 & 0.865 & 0.862 & 0.853 & 0.690 \\
+hrvatin\_geo\_maintype\_counts & scMAE & 1 & 0.891 & \underline{0.908} & \underline{0.873} & 0.715 \\
+\midrule
+Limb\_Muscle & DEC & 3 & 0.620$\pm$0.014 & 0.500$\pm$0.028 & 0.341$\pm$0.033 & 0.420$\pm$0.026 \\
+Limb\_Muscle & Leiden & 3 & 0.867$\pm$0.000 & 0.842$\pm$0.001 & 0.769$\pm$0.000 & 0.792$\pm$0.001 \\
+Limb\_Muscle & Louvain & 3 & 0.864$\pm$0.001 & 0.832$\pm$0.003 & 0.762$\pm$0.003 & 0.788$\pm$0.003 \\
+Limb\_Muscle & scMAE + NeighborMix & 3 & \textbf{0.990$\pm$0.008} & \textbf{0.972$\pm$0.017} & \textbf{0.981$\pm$0.019} & \underline{0.987$\pm$0.009} \\
+Limb\_Muscle & scMAE w/o NeighBorMix & 3 & \underline{0.990$\pm$0.006} & \underline{0.966$\pm$0.015} & \underline{0.977$\pm$0.021} & \textbf{0.988$\pm$0.002} \\
+Limb\_Muscle & SC3 & 3 & 0.193$\pm$0.164 & 0.853$\pm$0.033 & 0.806$\pm$0.093 & 0.171$\pm$0.151 \\
+Limb\_Muscle & scDCC & 3 & 0.984$\pm$0.009 & 0.956$\pm$0.020 & 0.964$\pm$0.022 & 0.982$\pm$0.010 \\
+Limb\_Muscle & scMAE & 3 & \underline{0.990$\pm$0.006} & \underline{0.966$\pm$0.015} & \underline{0.977$\pm$0.021} & \textbf{0.988$\pm$0.002} \\
+Limb\_Muscle & DESC & 3 & 0.616$\pm$0.020 & 0.625$\pm$0.016 & 0.352$\pm$0.031 & 0.618$\pm$0.015 \\
+Limb\_Muscle & scNAME & 3 & 0.814$\pm$0.060 & 0.845$\pm$0.047 & 0.760$\pm$0.072 & 0.709$\pm$0.120 \\
+Limb\_Muscle & scziDesk & 3 & 0.861$\pm$0.136 & 0.874$\pm$0.099 & 0.826$\pm$0.168 & 0.769$\pm$0.213 \\
+Limb\_Muscle & AttentionAE-SC & 3 & 0.530$\pm$0.370 & 0.504$\pm$0.435 & 0.438$\pm$0.394 & 0.424$\pm$0.349 \\
+\midrule
+Macosko & DEC & 3 & \textbf{0.692$\pm$0.022} & 0.385$\pm$0.035 & \underline{0.453$\pm$0.031} & 0.312$\pm$0.013 \\
+Macosko & Leiden & 3 & 0.629$\pm$0.002 & 0.502$\pm$0.001 & 0.407$\pm$0.004 & 0.428$\pm$0.003 \\
+Macosko & Louvain & 3 & 0.452$\pm$0.267 & 0.347$\pm$0.110 & 0.292$\pm$0.053 & 0.198$\pm$0.120 \\
+Macosko & scMAE + NeighborMix & 3 & 0.561$\pm$0.072 & \underline{0.632$\pm$0.032} & 0.421$\pm$0.088 & \underline{0.597$\pm$0.044} \\
+Macosko & scMAE w/o NeighBorMix & 3 & 0.625$\pm$0.084 & \textbf{0.657$\pm$0.039} & \textbf{0.494$\pm$0.087} & \textbf{0.630$\pm$0.051} \\
+Macosko & SC3 & 3 & 0.141$\pm$0.057 & 0.510$\pm$0.000 & 0.214$\pm$0.000 & 0.090$\pm$0.063 \\
+Macosko & scDCC & 3 & 0.520$\pm$0.012 & 0.628$\pm$0.015 & 0.403$\pm$0.062 & 0.480$\pm$0.016 \\
+Macosko & scMAE & 3 & 0.625$\pm$0.084 & \textbf{0.657$\pm$0.039} & \textbf{0.494$\pm$0.087} & \textbf{0.630$\pm$0.051} \\
+Macosko & DESC & 2 & 0.449$\pm$0.009 & 0.557$\pm$0.017 & 0.288$\pm$0.011 & 0.435$\pm$0.002 \\
+Macosko & scNAME & 1 & \underline{0.656} & 0.000 & 0.000 & 0.066 \\
+Macosko & scziDesk & 3 & \underline{0.656$\pm$0.000} & 0.000$\pm$0.000 & 0.000$\pm$0.000 & 0.066$\pm$0.000 \\
+Macosko & scGPT & 1 & 0.385 & 0.535 & 0.226 & 0.326 \\
+\midrule
+Melanoma\_5K & DEC & 3 & 0.490$\pm$0.062 & 0.354$\pm$0.020 & 0.251$\pm$0.025 & 0.383$\pm$0.031 \\
+Melanoma\_5K & Leiden & 3 & 0.514$\pm$0.001 & 0.557$\pm$0.002 & 0.395$\pm$0.001 & 0.468$\pm$0.000 \\
+Melanoma\_5K & Louvain & 3 & 0.496$\pm$0.013 & 0.508$\pm$0.025 & 0.357$\pm$0.022 & 0.440$\pm$0.017 \\
+Melanoma\_5K & scMAE + NeighborMix & 3 & \textbf{0.790$\pm$0.068} & \textbf{0.744$\pm$0.028} & \textbf{0.710$\pm$0.063} & \underline{0.645$\pm$0.063} \\
+Melanoma\_5K & scMAE w/o NeighBorMix & 3 & \underline{0.739$\pm$0.002} & \underline{0.735$\pm$0.002} & \underline{0.668$\pm$0.002} & \textbf{0.657$\pm$0.000} \\
+Melanoma\_5K & SC3 & 3 & 0.400$\pm$0.026 & 0.722$\pm$0.000 & 0.635$\pm$0.000 & 0.148$\pm$0.056 \\
+Melanoma\_5K & scDCC & 3 & 0.641$\pm$0.035 & 0.658$\pm$0.009 & 0.508$\pm$0.022 & 0.494$\pm$0.041 \\
+Melanoma\_5K & scMAE & 3 & \underline{0.739$\pm$0.002} & \underline{0.735$\pm$0.002} & \underline{0.668$\pm$0.002} & \textbf{0.657$\pm$0.000} \\
+Melanoma\_5K & DESC & 3 & 0.636$\pm$0.010 & 0.564$\pm$0.018 & 0.424$\pm$0.025 & 0.425$\pm$0.027 \\
+Melanoma\_5K & scNAME & 2 & 0.642$\pm$0.006 & 0.668$\pm$0.006 & 0.570$\pm$0.016 & 0.533$\pm$0.038 \\
+Melanoma\_5K & scziDesk & 3 & 0.635$\pm$0.041 & 0.665$\pm$0.021 & 0.551$\pm$0.048 & 0.493$\pm$0.009 \\
+Melanoma\_5K & AttentionAE-SC & 3 & 0.513$\pm$0.072 & 0.510$\pm$0.004 & 0.382$\pm$0.026 & 0.238$\pm$0.064 \\
+Melanoma\_5K & scGPT & 1 & 0.660 & 0.643 & 0.553 & 0.509 \\
+\midrule
+Pollen & DEC & 3 & 0.734$\pm$0.067 & 0.762$\pm$0.044 & 0.671$\pm$0.112 & 0.671$\pm$0.032 \\
+Pollen & Leiden & 3 & 0.628$\pm$0.000 & 0.690$\pm$0.001 & 0.457$\pm$0.001 & 0.385$\pm$0.000 \\
+Pollen & Louvain & 3 & 0.628$\pm$0.000 & 0.691$\pm$0.000 & 0.455$\pm$0.001 & 0.385$\pm$0.000 \\
+Pollen & scMAE + NeighborMix & 3 & 0.888$\pm$0.007 & 0.927$\pm$0.001 & 0.913$\pm$0.004 & \underline{0.764$\pm$0.016} \\
+Pollen & scMAE w/o NeighBorMix & 3 & \underline{0.889$\pm$0.018} & 0.928$\pm$0.014 & 0.911$\pm$0.012 & 0.753$\pm$0.019 \\
+Pollen & SC3 & 3 & 0.007$\pm$0.006 & \underline{0.952$\pm$0.002} & \underline{0.954$\pm$0.002} & 0.016$\pm$0.014 \\
+Pollen & scDCC & 3 & \textbf{0.939$\pm$0.002} & \textbf{0.955$\pm$0.005} & \textbf{0.959$\pm$0.003} & \textbf{0.891$\pm$0.006} \\
+Pollen & scDSC & 3 & 0.581$\pm$0.042 & 0.615$\pm$0.018 & 0.443$\pm$0.050 & 0.336$\pm$0.071 \\
+Pollen & scMAE & 3 & \underline{0.889$\pm$0.018} & 0.928$\pm$0.014 & 0.911$\pm$0.012 & 0.753$\pm$0.019 \\
+\midrule
+Quake\_10x\_Spleen & DEC & 3 & 0.716$\pm$0.008 & 0.112$\pm$0.084 & 0.095$\pm$0.067 & 0.244$\pm$0.020 \\
+Quake\_10x\_Spleen & Leiden & 3 & 0.715$\pm$0.005 & 0.509$\pm$0.003 & 0.416$\pm$0.007 & 0.496$\pm$0.001 \\
+Quake\_10x\_Spleen & Louvain & 3 & 0.912$\pm$0.013 & 0.680$\pm$0.027 & 0.780$\pm$0.040 & 0.485$\pm$0.193 \\
+Quake\_10x\_Spleen & scMAE + NeighborMix & 3 & \textbf{0.965$\pm$0.008} & \textbf{0.866$\pm$0.002} & \textbf{0.925$\pm$0.009} & \textbf{0.748$\pm$0.027} \\
+Quake\_10x\_Spleen & scMAE w/o NeighBorMix & 3 & \underline{0.957$\pm$0.005} & \underline{0.852$\pm$0.019} & \underline{0.922$\pm$0.010} & \underline{0.725$\pm$0.010} \\
+Quake\_10x\_Spleen & SC3 & 3 & 0.337$\pm$0.375 & 0.686$\pm$0.000 & 0.530$\pm$0.000 & 0.192$\pm$0.248 \\
+Quake\_10x\_Spleen & scDCC & 3 & 0.745$\pm$0.126 & 0.605$\pm$0.030 & 0.575$\pm$0.141 & 0.555$\pm$0.015 \\
+Quake\_10x\_Spleen & scMAE & 3 & \underline{0.957$\pm$0.005} & \underline{0.852$\pm$0.019} & \underline{0.922$\pm$0.010} & \underline{0.725$\pm$0.010} \\
+Quake\_10x\_Spleen & scNAME & 3 & 0.821$\pm$0.006 & 0.695$\pm$0.022 & 0.610$\pm$0.007 & 0.716$\pm$0.051 \\
+Quake\_10x\_Spleen & scziDesk & 3 & 0.930$\pm$0.008 & 0.779$\pm$0.025 & 0.865$\pm$0.036 & 0.599$\pm$0.043 \\
+Quake\_10x\_Spleen & AttentionAE-SC & 3 & 0.690$\pm$0.053 & 0.017$\pm$0.029 & -0.029$\pm$0.051 & 0.165$\pm$0.004 \\
+\midrule
+Quake\_Smart-seq2\_Lung & DEC & 3 & \underline{0.695$\pm$0.046} & 0.639$\pm$0.029 & 0.566$\pm$0.066 & 0.570$\pm$0.072 \\
+Quake\_Smart-seq2\_Lung & Leiden & 3 & 0.612$\pm$0.014 & 0.648$\pm$0.001 & 0.505$\pm$0.012 & 0.454$\pm$0.005 \\
+Quake\_Smart-seq2\_Lung & Louvain & 3 & 0.626$\pm$0.055 & 0.646$\pm$0.025 & 0.513$\pm$0.046 & 0.442$\pm$0.046 \\
+Quake\_Smart-seq2\_Lung & scMAE + NeighborMix & 3 & 0.682$\pm$0.071 & \underline{0.772$\pm$0.040} & 0.634$\pm$0.089 & \textbf{0.604$\pm$0.098} \\
+Quake\_Smart-seq2\_Lung & scMAE w/o NeighBorMix & 3 & 0.635$\pm$0.032 & 0.767$\pm$0.005 & 0.593$\pm$0.016 & 0.541$\pm$0.056 \\
+Quake\_Smart-seq2\_Lung & SC3 & 3 & 0.119$\pm$0.035 & \textbf{0.774$\pm$0.000} & 0.611$\pm$0.003 & 0.058$\pm$0.014 \\
+Quake\_Smart-seq2\_Lung & scDCC & 3 & 0.664$\pm$0.033 & 0.769$\pm$0.034 & \textbf{0.646$\pm$0.091} & \underline{0.574$\pm$0.011} \\
+Quake\_Smart-seq2\_Lung & scDSC & 3 & \textbf{0.723$\pm$0.066} & 0.660$\pm$0.064 & \underline{0.643$\pm$0.112} & 0.479$\pm$0.043 \\
+Quake\_Smart-seq2\_Lung & scMAE & 3 & 0.635$\pm$0.032 & 0.767$\pm$0.005 & 0.593$\pm$0.016 & 0.541$\pm$0.056 \\
+\midrule
+Shekhar & DEC & 3 & 0.622$\pm$0.046 & 0.754$\pm$0.041 & 0.547$\pm$0.076 & 0.502$\pm$0.059 \\
+Shekhar & Leiden & 3 & 0.503$\pm$0.002 & 0.318$\pm$0.005 & 0.275$\pm$0.002 & 0.250$\pm$0.023 \\
+Shekhar & Louvain & 3 & 0.387$\pm$0.162 & 0.295$\pm$0.016 & 0.265$\pm$0.011 & 0.188$\pm$0.030 \\
+Shekhar & scMAE + NeighborMix & 3 & 0.746$\pm$0.038 & 0.868$\pm$0.014 & 0.663$\pm$0.017 & 0.769$\pm$0.078 \\
+Shekhar & scMAE w/o NeighBorMix & 3 & 0.748$\pm$0.050 & 0.865$\pm$0.016 & 0.636$\pm$0.078 & 0.794$\pm$0.038 \\
+Shekhar & SC3 & 3 & 0.026$\pm$0.023 & 0.779$\pm$0.008 & 0.472$\pm$0.026 & 0.075$\pm$0.070 \\
+Shekhar & scDCC & 3 & 0.811$\pm$0.031 & \underline{0.883$\pm$0.005} & 0.706$\pm$0.014 & \underline{0.817$\pm$0.009} \\
+Shekhar & scMAE & 3 & 0.748$\pm$0.050 & 0.865$\pm$0.016 & 0.636$\pm$0.078 & 0.794$\pm$0.038 \\
+Shekhar & DESC & 3 & \textbf{0.968$\pm$0.001} & \textbf{0.949$\pm$0.001} & \textbf{0.975$\pm$0.002} & \textbf{0.845$\pm$0.001} \\
+Shekhar & scNAME & 3 & \underline{0.861$\pm$0.023} & 0.864$\pm$0.019 & \underline{0.914$\pm$0.033} & 0.526$\pm$0.064 \\
+Shekhar & scziDesk & 3 & 0.712$\pm$0.072 & 0.793$\pm$0.026 & 0.733$\pm$0.119 & 0.500$\pm$0.023 \\
+\midrule
+SRP145013 & DESC & 3 & \textbf{0.328$\pm$0.008} & \textbf{0.217$\pm$0.003} & \textbf{0.085$\pm$0.010} & \textbf{0.292$\pm$0.004} \\
+SRP145013 & APA-scMAE & 3 & \underline{0.248$\pm$0.024} & \underline{0.073$\pm$0.007} & \underline{0.083$\pm$0.019} & \underline{0.163$\pm$0.001} \\
+\midrule
+SRP171040 & DEC & 1 & 0.468 & 0.470 & 0.291 & 0.326 \\
+SRP171040 & Leiden & 1 & \textbf{0.690} & 0.676 & \textbf{0.583} & 0.468 \\
+SRP171040 & Louvain & 1 & 0.677 & 0.648 & 0.522 & 0.454 \\
+SRP171040 & scMAE + NeighborMix & 1 & 0.630 & \underline{0.688} & 0.521 & \textbf{0.547} \\
+SRP171040 & scMAE w/o NeighBorMix & 1 & \underline{0.679} & \textbf{0.693} & \underline{0.554} & \underline{0.543} \\
+SRP171040 & SC3 & 1 & 0.245 & 0.668 & 0.469 & 0.053 \\
+SRP171040 & scDCC & 1 & 0.527 & 0.624 & 0.424 & 0.481 \\
+SRP171040 & scMAE & 1 & \underline{0.679} & \textbf{0.693} & \underline{0.554} & \underline{0.543} \\
+SRP171040 & APA-scMAE & 3 & 0.217$\pm$0.032 & 0.114$\pm$0.030 & 0.054$\pm$0.015 & 0.195$\pm$0.032 \\
+\midrule
+SRP182008 & DEC & 1 & 0.413 & 0.428 & 0.282 & 0.248 \\
+SRP182008 & Leiden & 1 & 0.612 & 0.609 & 0.417 & \underline{0.658} \\
+SRP182008 & Louvain & 1 & 0.542 & 0.563 & 0.250 & 0.570 \\
+SRP182008 & scMAE + NeighborMix & 1 & 0.581 & 0.616 & 0.423 & 0.475 \\
+SRP182008 & scMAE w/o NeighBorMix & 1 & 0.577 & 0.595 & 0.369 & 0.478 \\
+SRP182008 & SC3 & 1 & 0.158 & 0.626 & 0.426 & 0.063 \\
+SRP182008 & scDCC & 1 & \textbf{0.687} & \textbf{0.677} & \textbf{0.566} & 0.621 \\
+SRP182008 & scMAE & 1 & 0.577 & 0.595 & 0.369 & 0.478 \\
+SRP182008 & scGPT & 1 & \underline{0.679} & \underline{0.660} & \underline{0.513} & \textbf{0.685} \\
+SRP182008 & APA-scMAE & 3 & 0.205$\pm$0.043 & 0.123$\pm$0.035 & 0.061$\pm$0.019 & 0.170$\pm$0.045 \\
+\midrule
+SRP224648 & APA-scMAE & 3 & \textbf{0.432$\pm$0.049} & \textbf{0.126$\pm$0.045} & \textbf{0.045$\pm$0.056} & \textbf{0.348$\pm$0.084} \\
+\midrule
+SRP235541 & DEC & 1 & 0.358 & 0.414 & 0.230 & 0.233 \\
+SRP235541 & Leiden & 1 & \textbf{0.657} & \textbf{0.674} & \textbf{0.536} & \textbf{0.636} \\
+SRP235541 & Louvain & 1 & 0.480 & 0.498 & 0.171 & 0.497 \\
+SRP235541 & scMAE + NeighborMix & 1 & 0.566 & 0.652 & 0.388 & 0.537 \\
+SRP235541 & scMAE w/o NeighBorMix & 1 & 0.557 & \underline{0.656} & 0.387 & \underline{0.543} \\
+SRP235541 & SC3 & 1 & 0.146 & 0.637 & 0.373 & 0.050 \\
+SRP235541 & scDCC & 1 & \underline{0.567} & 0.615 & \underline{0.397} & 0.518 \\
+SRP235541 & scMAE & 1 & 0.557 & \underline{0.656} & 0.387 & \underline{0.543} \\
+SRP235541 & APA-scMAE & 3 & 0.161$\pm$0.007 & 0.113$\pm$0.023 & 0.048$\pm$0.008 & 0.130$\pm$0.009 \\
+\midrule
+SRP309176 & APA-scMAE & 3 & \textbf{0.163$\pm$0.001} & \textbf{0.064$\pm$0.008} & \textbf{0.026$\pm$0.002} & \textbf{0.125$\pm$0.008} \\
+\midrule
+Tosches & DEC & 3 & 0.551$\pm$0.084 & 0.635$\pm$0.039 & 0.434$\pm$0.106 & 0.389$\pm$0.045 \\
+Tosches & Leiden & 3 & 0.577$\pm$0.035 & 0.472$\pm$0.011 & 0.337$\pm$0.069 & 0.518$\pm$0.025 \\
+Tosches & Louvain & 3 & 0.546$\pm$0.010 & 0.380$\pm$0.020 & 0.283$\pm$0.025 & 0.408$\pm$0.055 \\
+Tosches & scMAE + NeighborMix & 3 & 0.637$\pm$0.018 & 0.745$\pm$0.019 & 0.532$\pm$0.011 & \underline{0.667$\pm$0.017} \\
+Tosches & scMAE w/o NeighBorMix & 3 & 0.683$\pm$0.079 & 0.752$\pm$0.020 & 0.606$\pm$0.132 & \textbf{0.701$\pm$0.052} \\
+Tosches & SC3 & 3 & 0.113$\pm$0.004 & 0.694$\pm$0.000 & 0.429$\pm$0.000 & 0.073$\pm$0.056 \\
+Tosches & scDCC & 3 & 0.681$\pm$0.058 & 0.754$\pm$0.014 & 0.598$\pm$0.074 & 0.663$\pm$0.019 \\
+Tosches & scMAE & 3 & 0.683$\pm$0.079 & 0.752$\pm$0.020 & 0.606$\pm$0.132 & \textbf{0.701$\pm$0.052} \\
+Tosches & DESC & 3 & \textbf{0.727$\pm$0.058} & \underline{0.760$\pm$0.039} & \underline{0.627$\pm$0.065} & 0.627$\pm$0.066 \\
+Tosches & scNAME & 3 & \underline{0.719$\pm$0.038} & \textbf{0.760$\pm$0.023} & \textbf{0.674$\pm$0.060} & 0.496$\pm$0.032 \\
+Tosches & scziDesk & 3 & 0.670$\pm$0.109 & 0.740$\pm$0.030 & 0.614$\pm$0.171 & 0.535$\pm$0.027 \\
+Tosches & AttentionAE-SC & 3 & 0.357$\pm$0.014 & 0.076$\pm$0.132 & 0.008$\pm$0.014 & 0.048$\pm$0.023 \\
+Tosches & scGPT & 1 & 0.637 & 0.728 & 0.522 & 0.663 \\
+\midrule
+Wang & DEC & 3 & 0.767$\pm$0.001 & 0.009$\pm$0.003 & -0.017$\pm$0.000 & 0.435$\pm$0.002 \\
+Wang & Leiden & 3 & 0.496$\pm$0.043 & 0.140$\pm$0.005 & -0.058$\pm$0.033 & 0.334$\pm$0.015 \\
+Wang & Louvain & 3 & 0.765$\pm$0.006 & 0.011$\pm$0.004 & -0.020$\pm$0.007 & 0.434$\pm$0.002 \\
+Wang & scMAE + NeighborMix & 3 & \underline{0.992$\pm$0.001} & \underline{0.912$\pm$0.006} & \underline{0.964$\pm$0.003} & \underline{0.988$\pm$0.001} \\
+Wang & scMAE w/o NeighBorMix & 3 & \textbf{0.992$\pm$0.000} & \textbf{0.915$\pm$0.003} & \textbf{0.965$\pm$0.001} & \textbf{0.988$\pm$0.000} \\
+Wang & SC3 & 3 & 0.990$\pm$0.000 & 0.906$\pm$0.000 & 0.958$\pm$0.000 & 0.010$\pm$0.000 \\
+Wang & scDCC & 3 & 0.921$\pm$0.002 & 0.621$\pm$0.007 & 0.694$\pm$0.008 & 0.897$\pm$0.003 \\
+Wang & scMAE & 3 & \textbf{0.992$\pm$0.000} & \textbf{0.915$\pm$0.003} & \textbf{0.965$\pm$0.001} & \textbf{0.988$\pm$0.000} \\
+Wang & scGPT & 1 & 0.986 & 0.868 & 0.938 & 0.980 \\
+\midrule
+worm\_neuron\_cell & DEC & 3 & 0.413$\pm$0.055 & 0.338$\pm$0.085 & 0.168$\pm$0.071 & 0.274$\pm$0.077 \\
+worm\_neuron\_cell & Leiden & 3 & 0.329$\pm$0.003 & 0.150$\pm$0.003 & 0.053$\pm$0.001 & 0.273$\pm$0.005 \\
+worm\_neuron\_cell & Louvain & 3 & 0.304$\pm$0.024 & 0.114$\pm$0.020 & 0.042$\pm$0.008 & 0.228$\pm$0.056 \\
+worm\_neuron\_cell & scMAE + NeighborMix & 3 & 0.643$\pm$0.037 & 0.609$\pm$0.022 & 0.437$\pm$0.007 & 0.635$\pm$0.059 \\
+worm\_neuron\_cell & scMAE w/o NeighBorMix & 3 & \textbf{0.718$\pm$0.010} & \underline{0.643$\pm$0.031} & \underline{0.482$\pm$0.031} & \textbf{0.707$\pm$0.027} \\
+worm\_neuron\_cell & SC3 & 3 & 0.142$\pm$0.056 & 0.512$\pm$0.009 & 0.281$\pm$0.009 & 0.087$\pm$0.072 \\
+worm\_neuron\_cell & scDCC & 3 & 0.677$\pm$0.044 & \textbf{0.688$\pm$0.005} & \textbf{0.520$\pm$0.044} & 0.639$\pm$0.005 \\
+worm\_neuron\_cell & scMAE & 3 & \textbf{0.718$\pm$0.010} & \underline{0.643$\pm$0.031} & \underline{0.482$\pm$0.031} & \textbf{0.707$\pm$0.027} \\
+worm\_neuron\_cell & DESC & 3 & \underline{0.717$\pm$0.018} & 0.639$\pm$0.019 & 0.452$\pm$0.029 & \underline{0.700$\pm$0.012} \\
+worm\_neuron\_cell & scNAME & 3 & 0.572$\pm$0.072 & 0.500$\pm$0.048 & 0.321$\pm$0.090 & 0.555$\pm$0.078 \\
+worm\_neuron\_cell & scziDesk & 3 & 0.521$\pm$0.062 & 0.480$\pm$0.037 & 0.291$\pm$0.034 & 0.502$\pm$0.054 \\
+worm\_neuron\_cell & AttentionAE-SC & 3 & 0.229$\pm$0.024 & 0.001$\pm$0.001 & -0.000$\pm$0.000 & 0.038$\pm$0.003 \\
+\midrule
+Young & DEC & 3 & 0.457$\pm$0.045 & 0.495$\pm$0.030 & 0.312$\pm$0.067 & 0.233$\pm$0.032 \\
+Young & Leiden & 3 & 0.817$\pm$0.017 & 0.682$\pm$0.014 & 0.638$\pm$0.013 & \underline{0.786$\pm$0.060} \\
+Young & Louvain & 3 & 0.736$\pm$0.053 & 0.649$\pm$0.023 & 0.557$\pm$0.041 & 0.663$\pm$0.098 \\
+Young & scMAE + NeighborMix & 3 & \textbf{0.836$\pm$0.052} & \textbf{0.832$\pm$0.035} & \textbf{0.751$\pm$0.063} & \textbf{0.803$\pm$0.065} \\
+Young & scMAE w/o NeighBorMix & 3 & \underline{0.823$\pm$0.029} & \underline{0.823$\pm$0.012} & \underline{0.746$\pm$0.042} & 0.738$\pm$0.027 \\
+Young & SC3 & 3 & 0.095$\pm$0.089 & 0.744$\pm$0.011 & 0.620$\pm$0.016 & 0.054$\pm$0.085 \\
+Young & scDCC & 3 & 0.805$\pm$0.026 & 0.795$\pm$0.036 & 0.689$\pm$0.074 & 0.726$\pm$0.014 \\
+Young & scMAE & 3 & \underline{0.823$\pm$0.029} & \underline{0.823$\pm$0.012} & \underline{0.746$\pm$0.042} & 0.738$\pm$0.027 \\
+Young & DESC & 3 & 0.551$\pm$0.066 & 0.599$\pm$0.030 & 0.303$\pm$0.054 & 0.414$\pm$0.055 \\
+Young & scNAME & 3 & 0.700$\pm$0.056 & 0.717$\pm$0.016 & 0.575$\pm$0.068 & 0.573$\pm$0.020 \\
+Young & scziDesk & 3 & 0.498$\pm$0.203 & 0.423$\pm$0.366 & 0.301$\pm$0.261 & 0.352$\pm$0.273 \\
+Young & AttentionAE-SC & 3 & 0.576$\pm$0.051 & 0.543$\pm$0.054 & 0.361$\pm$0.017 & 0.282$\pm$0.140 \\
+\bottomrule
+\end{tabular}
+\vspace{2pt}
+\footnotesize Values are mean$\pm$std over random seeds. Best results per dataset and metric are bold; second-best results are underlined.
+\end{table*}

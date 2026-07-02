@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + adaptive-granularity cluster target,42,AdaptiveGranularity_scMAE,screen,0.7296698426767118,0.7247751617097677,0.6543731413854548,0.6403370238114623,0.7227535613567369,0.7247751617097677,0.7570741935481886,0.6951193091030426,9,,fixed,kmeans_known_k,True

@@ -1,0 +1,19 @@
+{
+  "edge_survival": 0.6066599067519693,
+  "neighbor_purity_proxy": 0.690538444493685,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9404122964398564,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.0057128118351101875,
+  "cluster_mass_min": 0.0350099711943275,
+  "cluster_mass_max": 0.2049634389541325,
+  "collapse_warning": false,
+  "edge_confidence_mean": NaN,
+  "edge_confidence_std": NaN,
+  "mask_score_mean": 0.38828375935554504,
+  "trajectory_level_cv": 1.7597758769989014,
+  "mask_probability_mean": 0.38489869236946106,
+  "mask_probability_std": 0.14273543655872345,
+  "sampler_entropy": 0.9856825856601491,
+  "diagnostic_note": "No NeighborMix is used. Rank51 adapts video trajectory-guided token selection to per-gene reconstruction-error trajectories."
+}

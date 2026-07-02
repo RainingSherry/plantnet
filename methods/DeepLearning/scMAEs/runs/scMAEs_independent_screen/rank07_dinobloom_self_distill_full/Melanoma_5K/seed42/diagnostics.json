@@ -1,0 +1,14 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.892510525149568,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.8812757989988733,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.7806434035301208,
+  "cluster_mass_min": 0.029470418790161754,
+  "cluster_mass_max": 0.2667848437846222,
+  "collapse_warning": false,
+  "center_norm": 0.20593395829200745,
+  "teacher_entropy": 4.446232711567598,
+  "diagnostic_note": "No NeighborMix graph is used; EMA teacher and centered prototype distillation are used."
+}

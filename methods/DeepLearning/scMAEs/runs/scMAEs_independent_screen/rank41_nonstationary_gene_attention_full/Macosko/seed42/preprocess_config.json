@@ -1,0 +1,34 @@
+{
+  "file_path": "methods/DeepLearning/scMAEs/benchmark_data/Macosko.h5ad",
+  "counts_source": "adata.X",
+  "input_mode": "raw",
+  "normalization": "normalize_total(target_sum=10000.0) + log1p when raw",
+  "hvg": {
+    "n_top_genes": 1000,
+    "flavor": "seurat"
+  },
+  "scale_input": false,
+  "selected_n_genes": 1000,
+  "seed": 42,
+  "label_key": "resolved_label",
+  "encoder_scale_input": true,
+  "target_scale_input": false,
+  "gene_module_order": {
+    "method": "sampled log-expression SVD order; genes sorted by first-two loading angle and loading radius",
+    "sampled_cells": 5000,
+    "n_genes": 1000,
+    "singular_values_head": [
+      374.0556335449219,
+      271.7284240722656,
+      246.29600524902344,
+      242.12057495117188,
+      205.1597900390625,
+      181.47926330566406,
+      172.9392547607422,
+      155.6944580078125
+    ]
+  },
+  "module_size": 25,
+  "n_modules": 40,
+  "attention": "series stationarization with learned de-stationary tau/delta"
+}

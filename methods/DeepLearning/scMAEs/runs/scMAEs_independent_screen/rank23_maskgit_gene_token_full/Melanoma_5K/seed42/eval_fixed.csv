@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,scMAE + MaskGIT gene-token curriculum,42,rank23_maskgit_gene_token_full,screen,scaled encoder + MaskGIT gene token curriculum target,0.4356304010635941,0.3131561522571556,0.2108575698834867,0.3371371967228423,0.3552838320688391,0.3131561522571556,0.3349191854550362,0.29404887025293314,9,,fixed,kmeans_known_k,True

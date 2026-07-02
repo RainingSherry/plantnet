@@ -1,0 +1,2 @@
+dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Melanoma_5K,suture12_attention_matching_teacher_consistency_full,42,screen,0.667848437846222,0.68275172813414,0.5890124348671252,0.5192269158723903,0.6696699726279212,0.68275172813414,0.7418575730827349,0.6323691302863276,9,,fixed,kmeans_known_k,True

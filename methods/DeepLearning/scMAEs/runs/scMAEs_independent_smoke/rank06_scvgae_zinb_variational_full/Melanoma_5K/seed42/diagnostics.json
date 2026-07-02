@@ -1,0 +1,21 @@
+{
+  "edge_survival": 1.0,
+  "neighbor_purity_proxy": 0.7801905606027033,
+  "mixed_cell_fraction": 0.0,
+  "boundary_entropy": 0.9195402322907428,
+  "rare_risk_fraction": 0.0,
+  "embedding_variance": 0.03218434378504753,
+  "cluster_mass_min": 0.04010635940615998,
+  "cluster_mass_max": 0.24174606691779305,
+  "collapse_warning": false,
+  "posterior_variance_mean": 0.20128023624420166,
+  "count_branch": {
+    "counts_source": "adata.X",
+    "inferred_mode": "raw",
+    "count_source_note": "raw_count_source",
+    "target_sum": 10000.0,
+    "selected_n_genes": 1000,
+    "mean_library_size": 4856.58154296875
+  },
+  "diagnostic_note": "No NeighborMix graph is used; ZINB uses non-scaled count/count-like branch."
+}

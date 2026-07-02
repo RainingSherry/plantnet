@@ -1,0 +1,2 @@
+dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,scMAE + Celler long-tail protection,42,rank10_celler_longtail_protection_full,screen,scaled encoder + Celler long-tail protection,0.5461683417085427,0.5228732976771929,0.3221704037974657,0.43146470228598305,0.5982345190051271,0.5228732976771929,0.7538938939628009,0.40022863947875253,5,,fixed,kmeans_known_k,True
