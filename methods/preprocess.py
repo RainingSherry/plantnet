@@ -44,6 +44,26 @@ from sklearn.preprocessing import scale
 import utils as utils
 
 
+def _register_null_h5ad_reader():
+    """Allow AnnData files with null-encoded uns entries to be read."""
+    try:
+        from anndata._io.specs.registry import _REGISTRY, IOSpec
+
+        def _read_null(*args, **kwargs):
+            return None
+
+        for typ in (h5py.Dataset, h5py.Group):
+            try:
+                _REGISTRY.register_read(typ, IOSpec("null", "0.1.0"))(_read_null)
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+
+_register_null_h5ad_reader()
+
+
 # TODO: Fix this
 class AnnSequence:
     """

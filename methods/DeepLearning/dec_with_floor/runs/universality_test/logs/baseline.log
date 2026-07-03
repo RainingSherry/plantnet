@@ -1,6 +1,6 @@
 /data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
   from pkg_resources import get_distribution, DistributionNotFound
-Using device: cuda:1
+Using device: cuda:0
 Loading data...
 是否归一化: False, 是否 log1p 变换: False, 是否标准化: False
 数据未归一化，进行 normalize_per_cell 处理
@@ -11,25 +11,16 @@ Loading data...
 Number of cells: 44808, Number of genes: 2000
 Number of clusters: 12
 Initializing DEC model...
-Traceback (most recent call last):
-  File "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/dec_with_floor/run_with_floor.py", line 321, in <module>
-    main()
-  File "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/dec_with_floor/run_with_floor.py", line 250, in main
-    model = DEC(dims=dims, n_clusters=n_clusters, alpha=args.alpha).to(device)
-  File "/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1174, in to
-    return self._apply(convert)
-  File "/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 780, in _apply
-    module._apply(fn)
-  File "/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 780, in _apply
-    module._apply(fn)
-  File "/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 780, in _apply
-    module._apply(fn)
-  File "/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 805, in _apply
-    param_applied = fn(param)
-  File "/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1160, in convert
-    return t.to(
-RuntimeError: CUDA error: invalid device ordinal
-CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
-For debugging consider passing CUDA_LAUNCH_BLOCKING=1
-Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
-
+Pretraining autoencoder...
+Pretrain Epoch 50/200, Loss: 0.809173
+Pretrain Epoch 100/200, Loss: 0.793242
+Pretrain Epoch 150/200, Loss: 0.788087
+Pretrain Epoch 200/200, Loss: 0.787951
+Initializing cluster centers...
+OpenBLAS warning: precompiled NUM_THREADS exceeded, adding auxiliary array for thread metadata.
+OpenBLAS : Program is Terminated. Because you tried to allocate too many memory regions.
+This library was built to support a maximum of 128 threads - either rebuild OpenBLAS
+with a larger NUM_THREADS value or set the environment variable OPENBLAS_NUM_THREADS to
+a sufficiently small number. This error typically occurs when the software that relies on
+OpenBLAS calls BLAS functions from many threads in parallel, or when your computer has more
+cpu cores than what OpenBLAS was configured to handle.

@@ -1,0 +1,2 @@
+"""CAAM-scMAE tests."""
+

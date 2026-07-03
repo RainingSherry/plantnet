@@ -12,7 +12,7 @@
     "tol": 0.001,
     "update_interval": 1,
     "seed": 42,
-    "gpu": 1,
+    "gpu": 0,
     "no_cuda": false,
     "floor_weight": 0.0,
     "cuda": true

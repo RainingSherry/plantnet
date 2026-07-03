@@ -1,0 +1,5 @@
+deep:
+  caam_scmae:
+    runner: methods/DeepLearning/CAAM_scMAE/run.py
+    variant: full
+

@@ -12,7 +12,6 @@ plantnet/
 │   ├── evaluation.py           # 8 clustering metrics (ACC, NMI, ARI, F1-macro, FMI, V-measure, Homogeneity, Completeness)
 │   ├── utils.py               # save() interface and helpers
 │   ├── DeepLearning/
-│   │   ├── NeighborMix_MAE/    # NeighborMix-MAE (MAE variant)
 │   │   ├── scMAE/             # scMAE baseline
 │   │   ├── dec/               # DEC (Deep Embedded Clustering)
 │   │   ├── scDCC/             # scDCC (Deep Constrained Clustering)
@@ -40,8 +39,11 @@ plantnet/
 ├── experimental_retired_models/
 │   ├── APA_scMAE/
 │   ├── AdaptiveSwitch_scMAE/
+│   ├── CAAM_scMAE/
 │   ├── CutAware_NeighborMix_scMAE/
 │   ├── DualAxisGated_scMAE/
+│   ├── Granularity_scMAE_experiments/
+│   ├── NeighborMix_MAE/
 │   ├── NeighborMix_scMAE/
 │   ├── PlantSPADE_LGCL/
 │   └── RG_NeighborMix_scMAE/
