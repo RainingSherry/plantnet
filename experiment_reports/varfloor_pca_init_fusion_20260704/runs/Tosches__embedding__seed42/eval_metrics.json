@@ -1,0 +1,25 @@
+{
+  "dataset": "Tosches",
+  "method": "VarFloor-scMAE",
+  "seed": 42,
+  "n_clusters": 15,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.5645092156022289,
+      "nmi": 0.7110286775342045,
+      "ari": 0.45779328577140155,
+      "f1_macro": 0.560587005526972,
+      "fmi": 0.5449336359858187,
+      "v_measure": 0.7110286775342044,
+      "homogeneity": 0.7499184905185792,
+      "completeness": 0.6759735542893857,
+      "n_pred_clusters": 15,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

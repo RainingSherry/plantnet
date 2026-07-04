@@ -187,6 +187,37 @@ methods:
     framework: PyTorch
     required_artifacts: *canonical_artifacts
 
+  - key: varfloor_scmae
+    name: VarFloor-scMAE
+    full_name: zero-mask scMAE + DEC + per-dimension std-floor
+    path: methods/DeepLearning/scMAE_DEC_StdFloor/run.py
+    category: DeepLearning
+    authenticity: VERIFIED
+    smoke: PASS
+    gpu_policy: PASS
+    default_in_formal: false
+    framework: PyTorch
+    required_artifacts: *canonical_artifacts
+    role: proposed
+    notes:
+      - Promoted from AdaptiveSwitch_scMAE fixed sharp path with force_gate=1.
+      - Uses labels only for final known-K benchmark evaluation.
+
+  - key: pca_kmeans_known_k
+    name: PCA+KMeans known-K
+    full_name: PCA embedding followed by KMeans with benchmark known K
+    path: methods/Traditional/PCA_KMeans/run.py
+    category: Traditional
+    authenticity: VERIFIED
+    smoke: PASS
+    gpu_policy: CPU
+    default_in_formal: false
+    framework: scikit-learn
+    required_artifacts: *canonical_artifacts
+    role: baseline
+    notes:
+      - Known-K baseline; labels are used only for final scoring.
+
   # ── ENV-GATED: blocked by environment ──
   - key: scdeepcluster
     name: scDeepCluster

@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "VarFloor-scMAE",
+  "seed": 2024,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.9515284757118928,
+      "nmi": 0.8341016657991418,
+      "ari": 0.9199518145672828,
+      "f1_macro": 0.7024836871169393,
+      "fmi": 0.9642806556307627,
+      "v_measure": 0.8341016657991418,
+      "homogeneity": 0.8673466428194999,
+      "completeness": 0.803311138659809,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

@@ -1,0 +1,36 @@
+{
+  "dataset": "Pollen",
+  "method": "PCA+KMeans known-K",
+  "method_raw": "pca_kmeans_known_k",
+  "seed": 42,
+  "n_clusters": 11,
+  "runtime_seconds": 3.740051507949829,
+  "pca_dim": 128,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.45514950166112955,
+      "nmi": 0.6656139307046354,
+      "ari": 0.35984496129550514,
+      "f1_macro": 0.2640769290385659,
+      "fmi": 0.5456861113260638,
+      "v_measure": 0.6656139307046354,
+      "homogeneity": 0.521741805685585,
+      "completeness": 0.9190433418281722,
+      "n_pred_clusters": 11,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 1.045945644378662,
+    "std_median": 1.7972335815429688,
+    "std_max": 8.162738800048828,
+    "effective_dim_pr": 50.56114650049006,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 128
+  },
+  "cluster_mass_min": 0.0033222591362126247,
+  "cluster_mass_max": 0.5083056478405316
+}

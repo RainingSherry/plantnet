@@ -52,6 +52,8 @@ venv/
 env/
 .venv/
 .env/
+.codex_tex/
+.mamba-root/
 
 # Runtime registry with local absolute paths (commit only the example)
 envs/runtime_registry.yaml
@@ -67,6 +69,19 @@ build/
 *.temp
 .cache/
 .codegraph/
+cache/
+
+# LaTeX build intermediates
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
 
 # Large PDFs
 0/普林斯顿数学指南.pdf
+paper/protocol_analysis_manuscript/main.pdf

@@ -1,0 +1,35 @@
+{
+  "dataset": "Tosches",
+  "method": "VarFloor-scMAE",
+  "method_raw": "varfloor_scmae",
+  "seed": 3407,
+  "n_clusters": 15,
+  "runtime_seconds": 96.52405381202698,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6402164594942135,
+      "nmi": 0.7040326110442741,
+      "ari": 0.5689322912850007,
+      "f1_macro": 0.46106933572051495,
+      "fmi": 0.6422800093132662,
+      "v_measure": 0.7040326110442738,
+      "homogeneity": 0.6953399446868908,
+      "completeness": 0.7129453684171916,
+      "n_pred_clusters": 15,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 1.1126644611358643,
+    "std_median": 1.312951922416687,
+    "std_max": 1.6355267763137817,
+    "effective_dim_pr": 126.08412302331706,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 128
+  },
+  "cluster_mass_min": 0.004929275610801543,
+  "cluster_mass_max": 0.24946420917273895
+}

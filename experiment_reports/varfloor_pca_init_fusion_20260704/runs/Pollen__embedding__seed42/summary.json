@@ -1,0 +1,35 @@
+{
+  "dataset": "Pollen",
+  "method": "VarFloor-scMAE",
+  "method_raw": "varfloor_scmae",
+  "seed": 42,
+  "n_clusters": 11,
+  "runtime_seconds": 1.8646323680877686,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.8604651162790697,
+      "nmi": 0.9186043789778304,
+      "ari": 0.903183030827466,
+      "f1_macro": 0.7678539783802942,
+      "fmi": 0.9142160141649462,
+      "v_measure": 0.9186043789778304,
+      "homogeneity": 0.9137074005977567,
+      "completeness": 0.9235541305142604,
+      "n_pred_clusters": 11,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 0.2907772958278656,
+    "std_median": 0.6083735227584839,
+    "std_max": 0.9929996728897095,
+    "effective_dim_pr": 99.26583729090301,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 0
+  },
+  "cluster_mass_min": 0.03322259136212625,
+  "cluster_mass_max": 0.17940199335548174
+}

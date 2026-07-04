@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "VarFloor-scMAE",
+  "seed": 2024,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.5986654168898411,
+      "nmi": 0.5830909789784214,
+      "ari": 0.40948382733021704,
+      "f1_macro": 0.4107123846324894,
+      "fmi": 0.6258314056246876,
+      "v_measure": 0.5830909789784213,
+      "homogeneity": 0.7881670872462607,
+      "completeness": 0.4626994884803809,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

@@ -1,0 +1,25 @@
+{
+  "dataset": "Pollen",
+  "method": "VarFloor-scMAE",
+  "seed": 2024,
+  "n_clusters": 11,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.8837209302325582,
+      "nmi": 0.9253070831764402,
+      "ari": 0.9105138742948047,
+      "f1_macro": 0.7983978719177158,
+      "fmi": 0.9204966927390337,
+      "v_measure": 0.9253070831764403,
+      "homogeneity": 0.923344354480383,
+      "completeness": 0.9272781738884668,
+      "n_pred_clusters": 11,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

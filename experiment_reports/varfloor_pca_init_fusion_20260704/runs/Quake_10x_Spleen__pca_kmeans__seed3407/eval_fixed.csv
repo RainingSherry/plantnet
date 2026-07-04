@@ -1,0 +1,2 @@
+dataset,method,seed,variant,std_floor_weight,cluster_method_train,mask_strategy,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Quake_10x_Spleen,VarFloor-scMAE,3407,varfloor_scmae,0.02,DEC_sharpened_target,zero,0.9699539363484088,0.8570335290196356,0.919858287790374,0.7611002603292836,0.9643286448384973,0.8570335290196356,0.8719954174853719,0.8425764181907915,5,,fixed,kmeans_known_k,True

@@ -1,0 +1,2 @@
+dataset,method,seed,variant,std_floor_weight,cluster_method_train,mask_strategy,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Macosko,VarFloor-scMAE,3407,varfloor_scmae,0.02,DEC_sharpened_target,zero,0.5869710765934655,0.5660064336032465,0.3253534647297558,0.42368840351698567,0.5561740501440682,0.5660064336032465,0.7771795520965917,0.44507253295424976,12,,fixed,kmeans_known_k,True

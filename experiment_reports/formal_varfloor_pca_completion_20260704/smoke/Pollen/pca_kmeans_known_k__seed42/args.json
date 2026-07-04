@@ -1,0 +1,16 @@
+{
+  "data_path": "/data/luolie/biopipeline/scCluBench/data/processed/Pollen.h5ad",
+  "save_dir": "experiment_reports/formal_varfloor_pca_completion_20260704/smoke/Pollen/pca_kmeans_known_k__seed42",
+  "dataset_name": "Pollen",
+  "method_name": "PCA+KMeans known-K",
+  "variant_name": "pca_kmeans_known_k",
+  "label_key": "resolved_label",
+  "input_mode": "auto",
+  "n_top_genes": 1000,
+  "target_sum": 10000.0,
+  "scale_input": true,
+  "n_clusters": 11,
+  "pca_dim": 128,
+  "seed": 42,
+  "skip_eval": false
+}

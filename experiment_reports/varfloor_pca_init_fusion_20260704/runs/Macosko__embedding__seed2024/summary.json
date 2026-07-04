@@ -1,0 +1,35 @@
+{
+  "dataset": "Macosko",
+  "method": "VarFloor-scMAE",
+  "method_raw": "varfloor_scmae",
+  "seed": 2024,
+  "n_clusters": 12,
+  "runtime_seconds": 242.15634107589722,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6749687555793609,
+      "nmi": 0.604629520313732,
+      "ari": 0.5422926695267468,
+      "f1_macro": 0.37902501120971605,
+      "fmi": 0.7239792349924906,
+      "v_measure": 0.6046295203137318,
+      "homogeneity": 0.7687236936381531,
+      "completeness": 0.49826772685185367,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 1.007956862449646,
+    "std_median": 1.0575376749038696,
+    "std_max": 2.6330089569091797,
+    "effective_dim_pr": 100.76235438333391,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 128
+  },
+  "cluster_mass_min": 0.007811105159792894,
+  "cluster_mass_max": 0.483663631494376
+}

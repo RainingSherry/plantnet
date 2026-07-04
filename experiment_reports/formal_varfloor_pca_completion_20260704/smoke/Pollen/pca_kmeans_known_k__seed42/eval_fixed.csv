@@ -1,0 +1,2 @@
+dataset,method,seed,variant,pca_dim,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+Pollen,PCA+KMeans known-K,42,pca_kmeans_known_k,128,scMAE_family,0.45514950166112955,0.6656139307046354,0.35984496129550514,0.2640769290385659,0.5456861113260638,0.6656139307046354,0.521741805685585,0.9190433418281722,11,,fixed,kmeans_known_k,True
