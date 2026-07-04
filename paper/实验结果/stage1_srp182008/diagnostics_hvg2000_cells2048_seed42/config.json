@@ -1,0 +1,9 @@
+{
+  "mode": "diagnostics_only",
+  "data_path": "数据文件\\SRP182008.h5ad",
+  "save_dir": "实验结果\\stage1_srp182008\\diagnostics_hvg2000_cells2048_seed42",
+  "n_top_genes": 2000,
+  "max_cells": 2048,
+  "mask_ratio": 0.3,
+  "seed": 42
+}

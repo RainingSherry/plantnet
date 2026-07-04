@@ -1,0 +1,62 @@
+{
+  "claim_boundary": "single-dataset development smoke; not validation; not a universal claim against full-gene or sparse/gene-token models",
+  "deltas": {
+    "full_minus_hvg_known_k_ari": -0.04184411576809066,
+    "full_minus_hvg_known_k_f1_macro": -0.017416125626087853,
+    "full_minus_hvg_known_k_nmi": -0.05186758700741645,
+    "full_minus_hvg_leiden_fixed_ari": -0.0742709120061088,
+    "full_minus_hvg_leiden_fixed_f1_macro": -0.1508248759432393,
+    "full_minus_hvg_leiden_fixed_nmi": -0.04988139540937675,
+    "full_over_hvg_gene_ratio": 11.6705,
+    "full_over_hvg_parameter_ratio": 121.32074849394671
+  },
+  "n_runs": 2,
+  "rows": [
+    {
+      "dataset": "Quake_Smart-seq2_Lung",
+      "epochs": 3,
+      "feature_space_source": "hvg",
+      "generator_trainable_params": 0,
+      "kmeans_known_k_acc": 0.5399761336515513,
+      "kmeans_known_k_ari": 0.48557138401218913,
+      "kmeans_known_k_f1_macro": 0.47159358051572403,
+      "kmeans_known_k_nmi": 0.7244668679435708,
+      "leiden_fixed_acc": 0.5793556085918854,
+      "leiden_fixed_ari": 0.4635158900199186,
+      "leiden_fixed_f1_macro": 0.6057730223493557,
+      "leiden_fixed_nmi": 0.7409217298677777,
+      "n_cells": 1676,
+      "n_genes": 2000,
+      "n_genes_original": 23341,
+      "n_top_genes": 2000,
+      "role": "hvg2000",
+      "run_dir": "/tmp/caam_feature_space_smoke/dev_20260626_gpu/Quake_Smart-seq2_Lung__hvg2000__control__seed42__epochs3",
+      "seed": 42,
+      "student_trainable_params": 9080688
+    },
+    {
+      "dataset": "Quake_Smart-seq2_Lung",
+      "epochs": 3,
+      "feature_space_source": "full_gene_stress",
+      "generator_trainable_params": 0,
+      "kmeans_known_k_acc": 0.4594272076372315,
+      "kmeans_known_k_ari": 0.44372726824409847,
+      "kmeans_known_k_f1_macro": 0.4541774548896362,
+      "kmeans_known_k_nmi": 0.6725992809361544,
+      "leiden_fixed_acc": 0.45763723150357993,
+      "leiden_fixed_ari": 0.3892449780138098,
+      "leiden_fixed_f1_macro": 0.4549481464061164,
+      "leiden_fixed_nmi": 0.691040334458401,
+      "n_cells": 1676,
+      "n_genes": 23341,
+      "n_genes_original": 23341,
+      "n_top_genes": 0,
+      "role": "full_gene_stress",
+      "run_dir": "/tmp/caam_feature_space_smoke/dev_20260626_gpu/Quake_Smart-seq2_Lung__full_gene_stress__control__seed42__epochs3",
+      "seed": 42,
+      "student_trainable_params": 1101675865
+    }
+  ],
+  "run_root": "/tmp/caam_feature_space_smoke/dev_20260626_gpu",
+  "status": "development_only"
+}

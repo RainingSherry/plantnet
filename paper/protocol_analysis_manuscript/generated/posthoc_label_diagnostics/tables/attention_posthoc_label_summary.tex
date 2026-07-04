@@ -1,0 +1,20 @@
+\begin{table}[ht]
+\centering
+\caption{Post-hoc label diagnostics for the attention/context smoke. Numeric labels are used only after training.}
+\label{tab:generated-attention-posthoc-labels}
+\begin{tabular}{llrrrr}
+\toprule
+Dataset & Condition & Label F1 & Rare-label F1 & Worst-label F1 & ARI \\
+\midrule
+Limb\_Muscle & control & 0.848033 & -- & 0.552585 & 0.866751 \\
+Limb\_Muscle & axial & 0.474983 & -- & 0.248996 & 0.204241 \\
+Limb\_Muscle & mlp\_parammatched & 0.847492 & -- & 0.557348 & 0.861273 \\
+Mouse\_Pancreas\_1 & control & 0.478824 & 0.408520 & 0.115385 & 0.365151 \\
+Mouse\_Pancreas\_1 & axial & 0.294820 & 0.191027 & 0.045455 & 0.303162 \\
+Mouse\_Pancreas\_1 & mlp\_parammatched & 0.478686 & 0.417502 & 0.033333 & 0.370947 \\
+Quake\_Smart-seq2\_Lung & control & 0.552968 & 0.286910 & 0.248447 & 0.454009 \\
+Quake\_Smart-seq2\_Lung & axial & 0.227270 & 0.139402 & 0.072202 & 0.066389 \\
+Quake\_Smart-seq2\_Lung & mlp\_parammatched & 0.510623 & 0.303834 & 0.269231 & 0.521373 \\
+\bottomrule
+\end{tabular}
+\end{table}

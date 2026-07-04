@@ -1,0 +1,20 @@
+\begin{table}[ht]
+\centering
+\caption{Post-hoc label diagnostics for Phase 13 corruption variants. Numeric labels are used only after training.}
+\label{tab:generated-phase13-posthoc-labels}
+\begin{tabular}{llrrrr}
+\toprule
+Dataset & Condition & Label F1 & Rare-label F1 & Worst-label F1 & ARI \\
+\midrule
+Limb\_Muscle & scmae\_shuffle & 0.831643 & -- & 0.549627 & 0.777303 \\
+Limb\_Muscle & matched\_donor & 0.933567 & -- & 0.823251 & 0.910976 \\
+Limb\_Muscle & nonzero\_aware\_donor & 0.968942 & -- & 0.924537 & 0.967668 \\
+Mouse\_Pancreas\_1 & scmae\_shuffle & 0.559598 & 0.488538 & 0.155051 & 0.655529 \\
+Mouse\_Pancreas\_1 & matched\_donor & 0.541135 & 0.425551 & 0.160980 & 0.481717 \\
+Mouse\_Pancreas\_1 & nonzero\_aware\_donor & 0.366920 & 0.222106 & 0.053330 & 0.428367 \\
+Quake\_Smart-seq2\_Lung & scmae\_shuffle & 0.631821 & 0.441453 & 0.260708 & 0.543149 \\
+Quake\_Smart-seq2\_Lung & matched\_donor & 0.578889 & 0.519954 & 0.238199 & 0.412963 \\
+Quake\_Smart-seq2\_Lung & nonzero\_aware\_donor & 0.504736 & 0.341159 & 0.226496 & 0.532312 \\
+\bottomrule
+\end{tabular}
+\end{table}

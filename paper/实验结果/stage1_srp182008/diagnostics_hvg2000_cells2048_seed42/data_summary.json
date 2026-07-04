@@ -1,0 +1,432 @@
+{
+  "data_path": "数据文件\\SRP182008.h5ad",
+  "shape": {
+    "n_cells": 13514,
+    "n_genes": 53678
+  },
+  "nnz": 17378932,
+  "density": 0.02395757427981298,
+  "sparsity": 0.9760424257201871,
+  "metadata": {
+    "root_keys": [
+      "X",
+      "obs",
+      "obsm",
+      "raw",
+      "var",
+      "varm"
+    ],
+    "x_encoding": {
+      "encoding-type": "csr_matrix",
+      "encoding-version": "0.1.0",
+      "shape": "[13514 53678]"
+    },
+    "obs_columns": [
+      "ACE",
+      "Celltype",
+      "Condition",
+      "Dataset",
+      "Genotype",
+      "Libraries",
+      "Organ",
+      "Orig.ident",
+      "Percent.mt",
+      "Seurat_clusters",
+      "Tissue",
+      "_index",
+      "nCount_RNA",
+      "nFeature_RNA"
+    ],
+    "var_columns": [
+      "_index",
+      "features"
+    ],
+    "obsm_keys": [
+      "X_tsne",
+      "X_umap"
+    ]
+  },
+  "hvg": {
+    "n_selected_genes": 2000,
+    "selected_gene_indices_sample": [
+      25194,
+      7885,
+      1259,
+      10773,
+      8576,
+      31745,
+      15156,
+      6426,
+      11857,
+      3063,
+      13583,
+      4854,
+      23152,
+      6888,
+      15706,
+      21628,
+      2716,
+      7984,
+      8171,
+      52
+    ],
+    "selected_gene_names_sample": [
+      "AT5G02380",
+      "AT1G75750",
+      "AT1G07590",
+      "AT2G22470",
+      "AT2G02130",
+      "AT5G64310",
+      "AT3G09260",
+      "AT1G62480",
+      "AT2G32190",
+      "AT1G20450",
+      "AT2G47730",
+      "AT1G45145",
+      "AT4G24380",
+      "AT1G66580",
+      "AT3G13520",
+      "AT4G11600",
+      "AT1G17180",
+      "AT1G76680",
+      "AT1G78380",
+      "AT1G01470"
+    ]
+  },
+  "selected_cells": {
+    "n_selected_cells": 2048,
+    "selected_cell_indices_sample": [
+      14,
+      18,
+      19,
+      26,
+      35,
+      38,
+      47,
+      54,
+      55,
+      56,
+      57,
+      62,
+      68,
+      69,
+      84,
+      90,
+      91,
+      98,
+      99,
+      100
+    ]
+  },
+  "obs": {
+    "Celltype": {
+      "n_unique": 15,
+      "top": [
+        {
+          "label": "Root stele",
+          "count": 2569,
+          "fraction": 0.1900991564303685
+        },
+        {
+          "label": "Root cortex",
+          "count": 1751,
+          "fraction": 0.12956933550392186
+        },
+        {
+          "label": "Phloem/Pericycle",
+          "count": 1524,
+          "fraction": 0.11277194021015244
+        },
+        {
+          "label": "Root hair",
+          "count": 1153,
+          "fraction": 0.08531892851857333
+        },
+        {
+          "label": "Columella root cap",
+          "count": 1082,
+          "fraction": 0.08006511765576439
+        },
+        {
+          "label": "Lateral root cap",
+          "count": 948,
+          "fraction": 0.07014947461891372
+        },
+        {
+          "label": "Root endodermis",
+          "count": 854,
+          "fraction": 0.06319372502589907
+        },
+        {
+          "label": "Unknow",
+          "count": 805,
+          "fraction": 0.05956785555719994
+        },
+        {
+          "label": "Companion cell",
+          "count": 690,
+          "fraction": 0.05105816190617138
+        },
+        {
+          "label": "S phase",
+          "count": 478,
+          "fraction": 0.03537072665384046
+        },
+        {
+          "label": "Protoxylem",
+          "count": 396,
+          "fraction": 0.02930294509397662
+        },
+        {
+          "label": "G2/M phase",
+          "count": 354,
+          "fraction": 0.026195056977948793
+        },
+        {
+          "label": "Sieve element",
+          "count": 344,
+          "fraction": 0.02545508361698979
+        },
+        {
+          "label": "Metaxylem",
+          "count": 300,
+          "fraction": 0.022199200828770166
+        },
+        {
+          "label": "Root epidermis",
+          "count": 266,
+          "fraction": 0.019683291401509546
+        }
+      ]
+    },
+    "Seurat_clusters": {
+      "n_unique": 24,
+      "top": [
+        {
+          "label": "0",
+          "count": 1524,
+          "fraction": 0.11277194021015244
+        },
+        {
+          "label": "1",
+          "count": 1480,
+          "fraction": 0.10951605742193281
+        },
+        {
+          "label": "2",
+          "count": 1477,
+          "fraction": 0.10929406541364511
+        },
+        {
+          "label": "3",
+          "count": 1092,
+          "fraction": 0.0808050910167234
+        },
+        {
+          "label": "4",
+          "count": 1082,
+          "fraction": 0.08006511765576439
+        },
+        {
+          "label": "5",
+          "count": 809,
+          "fraction": 0.05986384490158354
+        },
+        {
+          "label": "6",
+          "count": 690,
+          "fraction": 0.05105816190617138
+        },
+        {
+          "label": "7",
+          "count": 571,
+          "fraction": 0.042252478910759214
+        },
+        {
+          "label": "8",
+          "count": 511,
+          "fraction": 0.03781263874500518
+        },
+        {
+          "label": "9",
+          "count": 396,
+          "fraction": 0.02930294509397662
+        },
+        {
+          "label": "10",
+          "count": 382,
+          "fraction": 0.02826698238863401
+        },
+        {
+          "label": "11",
+          "count": 377,
+          "fraction": 0.027896995708154508
+        },
+        {
+          "label": "12",
+          "count": 354,
+          "fraction": 0.026195056977948793
+        },
+        {
+          "label": "14",
+          "count": 344,
+          "fraction": 0.02545508361698979
+        },
+        {
+          "label": "13",
+          "count": 344,
+          "fraction": 0.02545508361698979
+        },
+        {
+          "label": "15",
+          "count": 300,
+          "fraction": 0.022199200828770166
+        },
+        {
+          "label": "16",
+          "count": 282,
+          "fraction": 0.020867248779043956
+        },
+        {
+          "label": "17",
+          "count": 271,
+          "fraction": 0.020053278081989048
+        },
+        {
+          "label": "18",
+          "count": 266,
+          "fraction": 0.019683291401509546
+        },
+        {
+          "label": "19",
+          "count": 258,
+          "fraction": 0.01909131271274234
+        },
+        {
+          "label": "20",
+          "count": 223,
+          "fraction": 0.016501405949385824
+        },
+        {
+          "label": "21",
+          "count": 214,
+          "fraction": 0.015835429924522717
+        },
+        {
+          "label": "22",
+          "count": 196,
+          "fraction": 0.014503477874796507
+        },
+        {
+          "label": "23",
+          "count": 71,
+          "fraction": 0.005253810862808939
+        }
+      ]
+    },
+    "Dataset": {
+      "n_unique": 1,
+      "top": [
+        {
+          "label": "SRP182008",
+          "count": 13514,
+          "fraction": 1.0
+        }
+      ]
+    },
+    "Orig.ident": {
+      "n_unique": 1,
+      "top": [
+        {
+          "label": "SRX5290443",
+          "count": 13514,
+          "fraction": 1.0
+        }
+      ]
+    },
+    "ACE": {
+      "n_unique": 1,
+      "top": [
+        {
+          "label": "10 days old seedling",
+          "count": 13514,
+          "fraction": 1.0
+        }
+      ]
+    },
+    "Condition": {
+      "n_unique": 1,
+      "top": [
+        {
+          "label": "Normal",
+          "count": 13514,
+          "fraction": 1.0
+        }
+      ]
+    },
+    "Genotype": {
+      "n_unique": 1,
+      "top": [
+        {
+          "label": "Col-0",
+          "count": 13514,
+          "fraction": 1.0
+        }
+      ]
+    },
+    "Libraries": {
+      "n_unique": 1,
+      "top": [
+        {
+          "label": "10x Genomics",
+          "count": 13514,
+          "fraction": 1.0
+        }
+      ]
+    },
+    "Organ": {
+      "n_unique": 1,
+      "top": [
+        {
+          "label": "Root",
+          "count": 13514,
+          "fraction": 1.0
+        }
+      ]
+    },
+    "Tissue": {
+      "n_unique": 1,
+      "top": [
+        {
+          "label": "Root tip",
+          "count": 13514,
+          "fraction": 1.0
+        }
+      ]
+    },
+    "nCount_RNA": {
+      "min": 500.0,
+      "q25": 968.0,
+      "median": 1889.5,
+      "mean": 3255.9937842237678,
+      "q75": 4166.0,
+      "max": 39150.0
+    },
+    "nFeature_RNA": {
+      "min": 234.0,
+      "q25": 646.0,
+      "median": 1007.0,
+      "mean": 1285.994672191801,
+      "q75": 1714.0,
+      "max": 3812.0
+    },
+    "Percent.mt": {
+      "min": 0.0,
+      "q25": 0.0,
+      "median": 0.0,
+      "mean": 0.0001779359320257102,
+      "q75": 0.0,
+      "max": 0.15174506828528073
+    }
+  }
+}

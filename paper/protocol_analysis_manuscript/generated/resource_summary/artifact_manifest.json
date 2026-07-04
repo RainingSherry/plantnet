@@ -1,0 +1,14 @@
+{
+  "phase13_root": "/home/luolie/biopipeline/dimension-reduction/plantnet/results/CAAM_scMAE_correction/corruption_triad/formal",
+  "phase14_root": "/home/luolie/biopipeline/dimension-reduction/plantnet/results/CAAM_scMAE_correction/advmask_triage/formal",
+  "attention_root": "/tmp/caam_attention_context_smoke/dev_20260626",
+  "phase13_runs": 27,
+  "phase14_runs": 18,
+  "attention_runs": 9,
+  "claim_scope": "development evidence only; no validation or sealed test data",
+  "resource_scope": "trainable parameters and device metadata from existing manifests",
+  "wall_clock_seconds_status": "not recorded by current source runtime.json files",
+  "memory_status": "not recorded by current source manifests",
+  "known_k_metric": "kmeans_known_k.ari",
+  "non_oracle_metric": "leiden_fixed.ari"
+}

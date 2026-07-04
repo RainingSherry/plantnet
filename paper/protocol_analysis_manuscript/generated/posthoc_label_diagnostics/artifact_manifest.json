@@ -1,0 +1,29 @@
+{
+  "phase13_root": "/home/luolie/biopipeline/dimension-reduction/plantnet/results/CAAM_scMAE_correction/corruption_triad/formal",
+  "phase14_root": "/home/luolie/biopipeline/dimension-reduction/plantnet/results/CAAM_scMAE_correction/advmask_triage/formal",
+  "attention_root": "/tmp/caam_attention_context_smoke/dev_20260626",
+  "phase13_runs": 27,
+  "phase14_runs": 18,
+  "attention_runs": 9,
+  "evaluators": [
+    "kmeans_known_k",
+    "leiden_fixed"
+  ],
+  "rare_label_rule": {
+    "rare_fraction": 0.01,
+    "rare_min_count": 50,
+    "threshold": "label_count <= max(ceil(n_cells * rare_fraction), rare_min_count)"
+  },
+  "label_cluster_flow": {
+    "csv_rows": {
+      "phase13": 1876,
+      "phase14": 1214,
+      "attention": 893
+    },
+    "figure_evaluator": "kmeans_known_k",
+    "figure_seed": 42,
+    "interpretation": "row-normalized label-to-cluster heatmaps; cluster IDs are arbitrary within each run"
+  },
+  "claim_scope": "post-hoc development diagnostics only; labels are never used for training, model selection, corruption, masks, context, early stopping, or validation",
+  "label_semantics": "numeric label IDs from existing artifacts; no marker-gene or cell-type-name claim is made here"
+}

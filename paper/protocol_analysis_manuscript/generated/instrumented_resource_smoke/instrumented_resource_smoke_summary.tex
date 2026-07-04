@@ -1,0 +1,16 @@
+\begin{table}[ht]
+\centering
+\caption{Condition-level mean of the instrumented development resource smoke. Means are over development datasets only.}
+\label{tab:generated-instrumented-resource-smoke-summary}
+\scriptsize
+\begin{tabular}{lrrrrrr}
+\toprule
+Condition & Datasets & Params & Known-K ARI & Leiden ARI & Wall sec. & GPU delta MiB \\
+\midrule
+control & 3 & 9,080,688 & 0.563205 & 0.420215 & 20.45 & 1449.3 \\
+advmask & 3 & 9,345,393 & 0.564355 & 0.416609 & 19.12 & 2094.7 \\
+axial & 3 & 9,154,544 & 0.198101 & 0.101700 & 35.33 & 2868.7 \\
+mlp\_parammatched & 3 & 9,155,273 & 0.576788 & 0.404586 & 17.44 & 1450.7 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,10 @@
+study,mechanism,n_dataset_groups,known_k_ari_mean,fixed_leiden_ari_mean,effective_corruption_mean,decision,claim_boundary,known_k_delta_mean,fixed_leiden_delta_mean,known_k_positive_datasets,fixed_leiden_positive_datasets,generator_grad_positive,known_k_delta_vs_control_mean,fixed_leiden_delta_vs_control_mean,known_k_parammatched_delta_mean,n_runs,wall_clock_seconds_mean,gpu_delta_mib_mean
+phase13_corruption_triad,matched_donor,3,0.6018855545805265,0.3216205854571095,0.14086172221293503,diagnostic_only,development evidence only; not validation,,,,,,,,,,,
+phase13_corruption_triad,nonzero_aware_donor,3,0.6427821935515412,0.35201036262709967,0.5152486801674097,diagnostic_only,development evidence only; not validation,,,,,,,,,,,
+phase13_corruption_triad,scmae_shuffle,3,0.6586603179289091,0.3354847262126736,0.1475854746075255,carry_forward,development evidence only; not validation,,,,,,,,,,,
+phase14_advmask_triage,advmask,,,,,drop_or_downgrade,active generator is not evidence of useful clustering representation,0.0024029036882198076,-0.005289481679252954,2,1,True,,,,,,
+attention_context_smoke,current_axial_encoder,,,,,do_not_use_as_rescue_path,not evidence that all attention mechanisms fail,,,0,,,-0.3707060739024535,-0.28130990238858583,0.02256034683913481,,,
+instrumented_resource_smoke,advmask,,0.5643554808944343,0.41660895426157896,,cost_without_stable_gain,resource smoke only; not submission-scale runtime benchmark,,,,,,,,,3,19.121732249700774,2094.6666666666665
+instrumented_resource_smoke,axial,,0.19810090922572168,0.10169952014186152,,cost_without_stable_gain,resource smoke only; not submission-scale runtime benchmark,,,,,,,,,3,35.33060837401232,2868.6666666666665
+instrumented_resource_smoke,control,,0.5632052828851449,0.42021516851914265,,diagnostic_control,resource smoke only; not submission-scale runtime benchmark,,,,,,,,,3,20.450805188990973,1449.3333333333333
+instrumented_resource_smoke,mlp_parammatched,,0.5767881081851352,0.4045856314508489,,diagnostic_control,resource smoke only; not submission-scale runtime benchmark,,,,,,,,,3,17.44344748032745,1450.6666666666667

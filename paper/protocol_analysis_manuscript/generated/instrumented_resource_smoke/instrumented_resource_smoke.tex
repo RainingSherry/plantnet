@@ -1,0 +1,24 @@
+\begin{table}[ht]
+\centering
+\caption{Instrumented development resource smoke across development datasets, seed 42, three epochs. This table is development evidence only.}
+\label{tab:generated-instrumented-resource-smoke}
+\scriptsize
+\begin{tabular}{llrrrrrr}
+\toprule
+Dataset & Condition & Params & Gen. params & Known-K ARI & Leiden ARI & Wall sec. & GPU delta MiB \\
+\midrule
+Quake\_Smart-seq2\_Lung & control & 9,080,688 & 0 & 0.485571 & 0.463516 & 19.41 & 1436 \\
+Quake\_Smart-seq2\_Lung & advmask & 9,345,393 & 264,705 & 0.481255 & 0.454045 & 17.22 & 2082 \\
+Quake\_Smart-seq2\_Lung & axial & 9,154,544 & 0 & 0.065707 & 0.046261 & 22.26 & 2858 \\
+Quake\_Smart-seq2\_Lung & mlp\_parammatched & 9,155,273 & 0 & 0.497657 & 0.462312 & 16.31 & 1438 \\
+Mouse\_Pancreas\_1 & control & 9,080,688 & 0 & 0.337675 & 0.378928 & 19.38 & 1452 \\
+Mouse\_Pancreas\_1 & advmask & 9,345,393 & 264,705 & 0.337077 & 0.385671 & 18.56 & 2096 \\
+Mouse\_Pancreas\_1 & axial & 9,154,544 & 0 & 0.308817 & 0.153685 & 24.62 & 2870 \\
+Mouse\_Pancreas\_1 & mlp\_parammatched & 9,155,273 & 0 & 0.364258 & 0.341140 & 17.89 & 1452 \\
+Limb\_Muscle & control & 9,080,688 & 0 & 0.866369 & 0.418202 & 22.56 & 1460 \\
+Limb\_Muscle & advmask & 9,345,393 & 264,705 & 0.874734 & 0.410110 & 21.59 & 2106 \\
+Limb\_Muscle & axial & 9,154,544 & 0 & 0.219779 & 0.105153 & 59.12 & 2878 \\
+Limb\_Muscle & mlp\_parammatched & 9,155,273 & 0 & 0.868450 & 0.410305 & 18.13 & 1462 \\
+\bottomrule
+\end{tabular}
+\end{table}

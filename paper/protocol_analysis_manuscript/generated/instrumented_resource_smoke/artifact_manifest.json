@@ -1,0 +1,33 @@
+{
+  "claim_scope": "development-only resource smoke; no validation or sealed test data",
+  "conditions": [
+    "advmask",
+    "axial",
+    "control",
+    "mlp_parammatched"
+  ],
+  "datasets": [
+    {
+      "data_path": "/data/luolie/biopipeline/dimension-reduction/plantnet/data/processed/Quake_Smart-seq2_Lung.h5ad",
+      "name": "Quake_Smart-seq2_Lung"
+    },
+    {
+      "data_path": "/data/luolie/biopipeline/dimension-reduction/plantnet/data/\u5176\u4ed6/Mouse_Pancreas_1.h5ad",
+      "name": "Mouse_Pancreas_1"
+    },
+    {
+      "data_path": "/data/luolie/biopipeline/dimension-reduction/plantnet/data/processed_scmae/Limb_Muscle.h5ad",
+      "name": "Limb_Muscle"
+    }
+  ],
+  "epochs": 3,
+  "gpu_memory_sampling_mode": "total_gpu_memory_delta",
+  "parameter_matched_mlp_hidden_dims": {
+    "Limb_Muscle": 291,
+    "Mouse_Pancreas_1": 291,
+    "Quake_Smart-seq2_Lung": 291
+  },
+  "run_root": "/tmp/caam_resource_smoke/dev_20260626",
+  "seed": 42,
+  "source_runner": "/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/CAAM_scMAE/run.py"
+}

@@ -1,0 +1,17 @@
+\begin{table}[ht]
+\centering
+\caption{Mask-ratio development sensitivity on Quake\_Smart-seq2\_Lung across three seeds. This is a single-dataset diagnostic and must not be used to tune validation.}
+\label{tab:mask-ratio-smoke}
+\scriptsize
+\begin{tabular}{rrrrrr}
+\toprule
+Mask ratio & masked effective & global effective & known-\(K\) ARI & fixed-Leiden ARI & fixed-Leiden F1 \\
+\midrule
+0.2 & 0.191674 & 0.038335 & 0.462024 & 0.408229 & 0.586061 \\
+0.4 & 0.191684 & 0.076674 & 0.490818 & 0.430972 & 0.591222 \\
+0.6 & 0.191593 & 0.114956 & 0.470444 & 0.480897 & 0.606429 \\
+\bottomrule
+\end{tabular}
+
+\footnotesize{Means over seeds 42, 2024, and 3407. Known-\(K\) ARI mean range: 0.028794; fixed-Leiden ARI mean range: 0.072668.}
+\end{table}

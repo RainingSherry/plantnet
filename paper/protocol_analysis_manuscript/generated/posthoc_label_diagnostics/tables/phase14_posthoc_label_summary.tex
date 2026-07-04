@@ -1,0 +1,17 @@
+\begin{table}[ht]
+\centering
+\caption{Post-hoc label diagnostics for Phase 14 AdvMask triage. Numeric labels are used only after training.}
+\label{tab:generated-phase14-posthoc-labels}
+\begin{tabular}{llrrrr}
+\toprule
+Dataset & Condition & Label F1 & Rare-label F1 & Worst-label F1 & ARI \\
+\midrule
+Limb\_Muscle & control & 0.843676 & -- & 0.545916 & 0.872681 \\
+Limb\_Muscle & advmask & 0.842139 & -- & 0.545520 & 0.864421 \\
+Mouse\_Pancreas\_1 & control & 0.492579 & 0.424063 & 0.101624 & 0.330536 \\
+Mouse\_Pancreas\_1 & advmask & 0.498201 & 0.434095 & 0.097662 & 0.345744 \\
+Quake\_Smart-seq2\_Lung & control & 0.589589 & 0.494174 & 0.268730 & 0.490818 \\
+Quake\_Smart-seq2\_Lung & advmask & 0.590694 & 0.497146 & 0.273099 & 0.491079 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,20 @@
+\begin{table}[ht]
+\centering
+\caption{Trainable-parameter and recorded-runtime summary from existing development artifacts. Wall-clock and memory values were not recorded by the current source runtime manifests.}
+\label{tab:generated-resource-summary}
+\scriptsize
+\begin{tabular}{llrrrrrl}
+\toprule
+Study & Condition & Runs & Student params & Gen. params & Known-K ARI & Leiden ARI & Wall time \\
+\midrule
+Phase 13 & scMAE shuffle & 9 & 9,080,688 & 0 & 0.658660 & 0.335485 & not recorded \\
+Phase 13 & matched donor & 9 & 9,080,688 & 0 & 0.601886 & 0.321621 & not recorded \\
+Phase 13 & nonzero-aware donor & 9 & 9,080,688 & 0 & 0.642782 & 0.352010 & not recorded \\
+Phase 14 & control & 9 & 9,080,688 & 0 & 0.564678 & 0.413652 & not recorded \\
+Phase 14 & AdvMask & 9 & 9,080,688 & 264,705 & 0.567081 & 0.408362 & not recorded \\
+Attention smoke & control & 3 & 9,080,688 & 0 & 0.561970 & 0.392201 & not recorded \\
+Attention smoke & Axial & 3 & 9,154,544 & 0 & 0.191264 & 0.110891 & not recorded \\
+Attention smoke & parameter-matched MLP & 3 & 9,155,273 & 0 & 0.584531 & 0.401894 & not recorded \\
+\bottomrule
+\end{tabular}
+\end{table}

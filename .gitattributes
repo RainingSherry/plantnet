@@ -1,2 +1,5 @@
-# Git LFS is not used in this repo - data/model files are not tracked
-# Large files should be managed separately (e.g., downloads or external storage)
+# Large files are normally managed separately.
+# The paper archive contains manuscript support PDFs and h5ad data that exceed
+# GitHub's regular 100 MB file limit, so only those paper assets use Git LFS.
+paper/**/*.pdf filter=lfs diff=lfs merge=lfs -text
+paper/**/*.h5ad filter=lfs diff=lfs merge=lfs -text

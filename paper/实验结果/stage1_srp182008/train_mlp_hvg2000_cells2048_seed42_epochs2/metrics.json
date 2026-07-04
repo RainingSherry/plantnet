@@ -1,0 +1,20 @@
+{
+  "celltype_n_classes": 15,
+  "celltype_ari": 0.044649625280608174,
+  "celltype_nmi": 0.1586408557644881,
+  "celltype_macro_f1_unmapped": 0.05332866187979579,
+  "celltype_acc_mapped": 0.19970703125,
+  "celltype_macro_f1_mapped": 0.1753801129402733,
+  "celltype_cluster_mapping_method": "hungarian",
+  "seurat_clusters_n_classes": 24,
+  "seurat_clusters_ari": 0.08383149035539664,
+  "seurat_clusters_nmi": 0.24318867692425386,
+  "seurat_clusters_macro_f1_unmapped": 0.04093841006994571,
+  "seurat_clusters_acc_mapped": 0.2158203125,
+  "seurat_clusters_macro_f1_mapped": 0.15803992087724947,
+  "seurat_clusters_cluster_mapping_method": "hungarian",
+  "embedding_shape": [
+    2048,
+    64
+  ]
+}

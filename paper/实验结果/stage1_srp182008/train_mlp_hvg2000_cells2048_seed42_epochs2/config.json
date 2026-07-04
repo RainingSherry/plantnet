@@ -1,0 +1,14 @@
+{
+  "cache_dir": "实验结果\\stage1_srp182008\\cache_hvg2000_cells2048_seed42",
+  "save_dir": "实验结果\\stage1_srp182008\\train_mlp_hvg2000_cells2048_seed42_epochs2",
+  "epochs": 2,
+  "batch_size": 128,
+  "mask_ratio": 0.3,
+  "latent_dim": 64,
+  "hidden_dim": 512,
+  "lr": 0.001,
+  "lambda_masked": 4.0,
+  "gamma_mask": 1.0,
+  "seed": 42,
+  "device": "cpu"
+}

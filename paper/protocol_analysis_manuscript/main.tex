@@ -1,0 +1,524 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+
+\title{Protocol-aware Masked Autoencoding for Single-cell RNA-seq Clustering}
+\author{Draft manuscript scaffold}
+\date{Updated: 2026-06-26}
+
+\begin{document}
+\maketitle
+
+\section*{Manuscript Status}
+
+This is a LaTeX scaffold for the current evidence-driven paper route. It does not claim that CAAM-scMAE is a validated positive method. Phase 14 development triage showed that the constrained AdvMask selector trains with nonzero generator gradients, but does not improve clustering beyond seed-level variation. A follow-up development smoke also found that the existing Axial encoder underperforms both the standard MLP and a parameter-matched MLP under random masking and scMAE-style shuffle corruption. The current working route is therefore a protocol-analysis and diagnostic paper about masked autoencoding for sparse scRNA-seq clustering.
+
+\section*{Title Candidates}
+
+\begin{enumerate}
+  \item Protocol-aware Masked Autoencoding for Single-cell RNA-seq Clustering
+  \item When Does Masked Corruption Help Single-cell Clustering?
+  \item Masked Corruption Protocols Matter in Single-cell RNA-seq Representation Learning
+  \item Effective Corruption Diagnostics for Single-cell Masked Autoencoders
+\end{enumerate}
+
+\begin{abstract}
+Masked autoencoding has recently become a promising self-supervised objective for single-cell RNA-seq clustering, with scMAE demonstrating that gene-wise corruption and mask prediction can produce useful cell representations. However, masked autoencoder performance depends on several protocol choices that are often treated as implementation details: feature-space selection, corruption semantics, effective corruption under sparsity, and mask-selection policy. We study these choices under a staged, label-free development protocol. First, we correct the benchmark feature space from full-gene input to HVG-based log-normalized input and treat zero-to-zero corruption as a diagnostic rather than a hard failure. Second, we compare scMAE-style gene-wise shuffle, matched donor replacement, and nonzero-aware donor replacement. Third, we test whether a constrained adversarial mask selector improves over random masking. Across three development datasets, scMAE-style shuffle remains the most robust corruption choice, while nonzero-aware donor improves effective corruption diagnostics without stable clustering gains. The learned mask selector produces nonzero generator gradients and avoids obvious mask collapse, but its mean ARI gain over random masking is smaller than seed-level variation. These results suggest that active mask learning is not sufficient evidence of useful representation learning. The paper reframes CAAM-scMAE from a larger method proposal into a protocol-aware analysis of when masked corruption helps single-cell clustering.
+\end{abstract}
+
+\section{Introduction}
+
+Single-cell RNA sequencing (scRNA-seq) has become a central technology for profiling cellular heterogeneity, developmental trajectories, and tissue-specific transcriptional programs. Cell clustering is a foundational step in this analysis because it supports cell-type discovery, marker identification, atlas construction, and biological interpretation. A clustering representation should be numerically separable, biologically meaningful, and robust to sparsity, high dimensionality, and dataset-specific technical variation.
+
+Masked autoencoding provides a compelling self-supervised objective for scRNA-seq clustering. In scMAE, expression entries are corrupted by gene-wise shuffling, and the model learns to reconstruct original expression values and predict which entries were masked \citep{fang2024scmae}. This makes masked reconstruction a clustering-oriented pretext task rather than a generic denoising problem. Benchmarks such as scCluBench further motivate standardized multi-dataset evaluation for single-cell clustering methods \citep{xu2026scclubench}.
+
+The central question of this manuscript is not whether a larger architecture can be assembled from scMAE, adversarial masking, and TabPFN-inspired attention. Instead, we ask a narrower and more testable question: how do feature-space choices, corruption mechanisms, effective corruption diagnostics, and mask-selection policies affect clustering-oriented masked autoencoding for sparse scRNA-seq matrices?
+
+This reframing is necessary because development evidence does not support AdvMask as a main contribution. Under the corrected Phase 14 protocol, AdvMask produced real generator gradients and no obvious mask concentration, but its mean ARI improvement over random masking was only 0.002403, below half of the mean seed standard-deviation reference. We therefore treat learned adversarial masking as a negative diagnostic result rather than a validated module.
+
+\paragraph{Contributions.}
+\begin{enumerate}
+  \item We isolate masked autoencoding protocol choices that materially affect scRNA-seq clustering experiments: HVG versus full-gene feature space, strict effective-budget semantics, and zero-to-zero corruption handling.
+  \item We compare three corruption mechanisms under a controlled MLP + random-mask baseline: scMAE-style gene-wise shuffle, matched donor replacement, and nonzero-aware donor replacement.
+  \item We show that improving corruption diagnostics does not necessarily improve clustering, and that a learned mask selector can train without producing stable representation gains.
+  \item We provide a staged decision framework for preventing negative development evidence from being repackaged as a positive method claim.
+\end{enumerate}
+
+\section{Related Work}
+
+\subsection{Single-cell clustering protocols and benchmark pressure}
+Unsupervised clustering of scRNA-seq data remains difficult because expression matrices are sparse, noisy, high-dimensional, and biologically heterogeneous \citep{kiselev2019challenges}. Classical references such as SC3 \citep{kiselev2017sc3}, Louvain community detection \citep{blondel2008louvain}, Leiden clustering \citep{traag2019leiden}, and Seurat-style graph workflows \citep{stuart2019seurat} remain important because they make preprocessing, graph construction, and resolution choices explicit. scCluBench further shows that clustering conclusions should be evaluated across datasets, algorithm families, and failure modes rather than inferred from a single favorable setting \citep{xu2026scclubench}. This motivates the central stance of this manuscript: masked-autoencoder variants should first be evaluated as protocol choices under controlled development gates before they are promoted as new methods.
+
+\subsection{Deep single-cell clustering and leakage risks}
+Deep embedded clustering introduced the idea that nonlinear embeddings can be optimized for clustering objectives \citep{xie2016dec}. Single-cell adaptations and related models, including DESC \citep{li2020desc}, scDeepCluster \citep{tian2019scdeepcluster}, scDCC \citep{tian2021scdcc}, scGNN \citep{wang2021scgnn}, scDSC \citep{gan2022scdsc}, and scCDCG \citep{xu2024sccdcg}, demonstrate the value of autoencoder, graph, and constraint-aware representations. They also clarify why claim boundaries matter. Graph construction, pairwise constraints, pseudo-labels, batch correction, and clustering losses can improve downstream metrics, but they can also make it difficult to separate representation quality from evaluation assumptions. Our protocol therefore treats labels, known \(K\), donor selection, mask selection, context construction, early stopping, and resolution selection as separate leakage surfaces.
+
+\subsection{Masked objectives for sparse gene-expression matrices}
+Masked modeling is a broad self-supervised paradigm in language and vision \citep{devlin2019bert,he2022mae}. However, sparse scRNA-seq expression matrices differ from text tokens or image patches: a masked entry can remain zero after corruption, and a nominal mask budget may not correspond to an effective information change. scNAME uses neighborhood contrastive learning with an ancillary mask-estimation signal \citep{wan2022scname}, while scMAE directly makes masked reconstruction and mask prediction a clustering-oriented pretext task \citep{fang2024scmae}. These papers support the promise of mask-aware single-cell representation learning, but they do not resolve which corruption semantics are most informative under a corrected HVG-based protocol. That unresolved point is the main gap this manuscript studies.
+
+\subsection{Foundation models and context modeling as motivation, not evidence}
+Single-cell foundation models such as Geneformer, scGPT, and scFoundation show that large-scale pretraining can produce transferable cell or gene representations \citep{theodoris2023geneformer,cui2024scgpt,hao2024scfoundation}. TabPFN similarly motivates row/feature contextual modeling for tabular prediction \citep{hollmann2025tabpfn}. These directions inspired the original CAAM hypothesis that cell-gene context or axial attention might improve scRNA-seq masked autoencoding. The current evidence does not support that claim for the existing Axial implementation: the attention/context smoke is development-only, single-seed, and negative relative to both a standard MLP and a parameter-matched MLP. We therefore use foundation and tabular context models as motivation for future designs, not as evidence that the current CAAM architecture works.
+
+\subsection{Learned masking and adversarial difficulty}
+The AdvMask branch was motivated by a plausible idea: in sparse matrices, random masks may spend budget on uninformative positions, so a constrained selector might choose harder or more useful entries. The Phase 14 result shows why this must be tested downstream rather than assumed. A selector can have nonzero gradients, non-collapsed entropy, and nontrivial mask distributions while still failing the clustering effect-size gate. In the terminology of this manuscript, learned masking is a mechanism hypothesis, not a contribution until it improves representation quality under a fixed budget, no-label protocol, and random-mask control.
+
+\section{Methods and Protocol}
+
+\subsection{Problem setup}
+Let \(X \in \mathbb{R}^{N \times G}\) be a preprocessed scRNA-seq expression matrix with \(N\) cells and \(G\) genes. The model learns an encoder \(f_\theta\) that maps a corrupted cell vector \(\widetilde{x}_i\) to an embedding \(z_i\). Labels are not used during training, corruption, mask selection, feature selection, donor selection, context selection, early stopping, or resolution selection. Labels are used only for post hoc evaluation.
+
+\subsection{Corrected feature-space protocol}
+The corrected development protocol uses:
+\[
+\text{input\_mode}=\text{log1p}, \quad n_{\text{top genes}}=2000, \quad \text{scale\_input}=\text{false}.
+\]
+Full-gene input is treated as a stress test rather than the default clustering protocol. Zero-to-zero corruption and effective corruption rates are diagnostics rather than default hard failures.
+
+As a small development-only stress check, we compared HVG 2000 with dense full-gene input on Quake\_Smart-seq2\_Lung using the same MLP control, scMAE-style shuffle corruption, random masking, seed 42, and three epochs. The full-gene input expands the dense MLP student from 9,080,688 to 1,101,675,865 trainable parameters and does not improve clustering in this smoke: known-\(K\) ARI changes from 0.485571 to 0.443727, and fixed-Leiden ARI changes from 0.463516 to 0.389245. This is not validation evidence and does not reject sparse or gene-token full-gene architectures; it supports keeping HVG 2000 as the current dense-MLP protocol default.
+
+\input{generated/feature_space_smoke/feature_space_smoke.tex}
+
+\subsection{Corruption mechanisms}
+The scMAE-style shuffle corruption samples replacement values within each gene column:
+\[
+X'_{ij}=X_{\pi_j(i),j},
+\]
+where \(\pi_j\) is a random permutation over cells for gene \(j\). The corrupted input is:
+\[
+\widetilde{X}=(1-M)\odot X + M\odot X'.
+\]
+
+Matched donor replacement instead samples a donor cell conditioned on label-free metadata such as batch code, library size, and zero ratio. Nonzero-aware donor replacement prioritizes donors that change the original value, then falls back to matched donor or scMAE-style shuffle.
+
+\subsection{AdvMask triage}
+The AdvMask variant replaces random mask selection with a constrained mask selector. The selector is label-free, budget-controlled, and restricted to choosing mask positions; it does not generate replacement values. In Phase 14, the triage compares only:
+\[
+\text{control} = \text{MLP} + \text{random mask},
+\]
+\[
+\text{advmask} = \text{MLP} + \text{constrained AdvMask selector}.
+\]
+Axial and full models are not run in this triage.
+
+\section{Experimental Setup}
+
+\subsection{Development datasets}
+The current development protocol uses:
+\begin{itemize}
+  \item Quake\_Smart-seq2\_Lung
+  \item Mouse\_Pancreas\_1
+  \item Limb\_Muscle
+\end{itemize}
+No validation or sealed test datasets are used for mechanism selection in the current evidence.
+
+\subsection{Metrics}
+The primary metric is known-\(K\) K-means ARI for development triage. Secondary metrics include NMI, ACC, macro-F1, fixed-resolution Leiden metrics, effective corruption rate, zero-to-zero rate, mean absolute corruption delta, generator gradient norm, mask entropy, mask Gini, top-gene concentration, and embedding collapse diagnostics.
+
+\subsection{Gate criteria}
+AdvMask is retained only if:
+\begin{enumerate}
+  \item ARI improves on at least two of three development datasets;
+  \item the mean ARI gain exceeds half of the seed standard-deviation reference;
+  \item generator gradients are nonzero;
+  \item masks do not collapse to a small gene subset;
+  \item embeddings do not collapse.
+\end{enumerate}
+
+\subsection{Validation freeze}
+Validation has not been run in the current evidence. This is an intentional protocol boundary rather than an implicit claim of validation. The frozen validation plan reserves Young, Baron, and SRP182008 for a later one-pass validation of the protocol-analysis route only, after explicit approval. These datasets must not be used to choose corruption type, number of HVGs, mask ratio, model architecture, loss weights, clustering resolution, early stopping, or manuscript claims.
+
+If validation is later approved, the tested primary condition is fixed in advance: log1p input, HVG 2000, no scaling, scMAE-style shuffle corruption, random mask selection, and the MLP control encoder. Matched donor, nonzero-aware donor, AdvMask, and the current Axial encoder may be reported only as diagnostic or downgraded conditions unless a separate approved gate is opened. A validation pass would support this manuscript only if the qualitative development observations remain stable without validation-specific tuning: scMAE-style shuffle remains a strong reference, improved effective corruption does not automatically imply clustering gains, learned masking remains unsupported or weak relative to seed variation, and known-\(K\) and fixed-Leiden conclusions are not contradictory enough to invalidate the analysis.
+
+Sealed testing is not part of the current manuscript evidence. It can be considered only after validation is approved, run once under the frozen protocol, and accepted without protocol changes. The sealed-test protocol must then remain fixed after seeing sealed results.
+
+\section{Results}
+
+\subsection{Phase 13: corruption triad}
+Phase 13 compared scMAE-style shuffle, matched donor, and nonzero-aware donor under an MLP + random-mask control. Under the primary known-\(K\) development metric, scMAE-style shuffle had the highest global mean ARI across the three development datasets (0.658660), followed by nonzero-aware donor (0.642782) and matched donor (0.601886). scMAE-style shuffle was the best known-\(K\) condition on Mouse\_Pancreas\_1 and Quake\_Smart-seq2\_Lung, while nonzero-aware donor was best on Limb\_Muscle.
+
+The diagnostic metrics tell a more subtle story. Nonzero-aware donor substantially increased the effective corruption rate (global mean 0.515249 versus 0.147585 for scMAE-style shuffle) and mean absolute corruption delta (0.266026 versus 0.081130). However, these stronger perturbation diagnostics did not translate into stable known-\(K\) clustering gains. In fixed-Leiden non-oracle summaries, nonzero-aware donor had the highest global mean ARI (0.352010), but the best condition varied by dataset. We therefore treat effective corruption as necessary diagnostic information rather than as a sufficient proxy for representation quality. The development decision was to carry scMAE-style shuffle forward because it was the strongest and most stable primary-metric condition, not because alternative corruptions were uninformative.
+
+\subsection{Phase 14: AdvMask triage}
+Table~\ref{tab:phase14} summarizes the corrected Phase 14 triage. The first attempt was invalid because a 3-epoch run used the default 20-epoch student warmup, making AdvMask identical to random masking. The corrected run used \( \text{student\_warmup\_epochs}=1 \), ensuring generator updates during the triage.
+
+\begin{table}[h]
+\centering
+\caption{Phase 14 development triage under scMAE-style shuffle corruption.}
+\label{tab:phase14}
+\begin{tabular}{lrrr}
+\toprule
+Dataset & Control ARI & AdvMask ARI & AdvMask - Control \\
+\midrule
+Limb\_Muscle & 0.872681 & 0.864421 & -0.008260 \\
+Mouse\_Pancreas\_1 & 0.330536 & 0.345744 & 0.015208 \\
+Quake\_Smart-seq2\_Lung & 0.490818 & 0.491079 & 0.000261 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+AdvMask has positive known-\(K\) ARI deltas on two datasets, but the mean ARI delta is only 0.002403, while the mean seed standard-deviation reference is 0.013035. Therefore, the effect-size gate fails. The fixed-Leiden view does not rescue the mechanism: AdvMask improves fixed-Leiden ARI on Limb\_Muscle (+0.011188), but decreases it on Mouse\_Pancreas\_1 (-0.022554) and Quake\_Smart-seq2\_Lung (-0.004503). The post-hoc label diagnostics are similarly small, with macro label-F1 deltas of -0.001537, +0.005622, and +0.001105 on the same three datasets.
+
+This failure is scientifically useful because it is not an inactivity artifact. The first Phase 14 attempt was invalid because the selector did not warm up inside a 3-epoch run; the corrected run used \( \text{student\_warmup\_epochs}=1 \). After correction, generator gradient norms are positive on all AdvMask runs, and the mask entropy and Gini diagnostics do not indicate obvious mask collapse. The conclusion is therefore not that the implementation is silent; it is that active mask learning is insufficient evidence of useful clustering representation learning.
+
+\section{Ablation and Diagnostic Studies}
+
+The current evidence blocks an AdvMask-centered full ablation. Future ablations should follow this order:
+\begin{enumerate}
+  \item corrected MLP random-mask baseline versus scMAE-compatible baseline;
+  \item corruption diagnostics versus clustering outcomes;
+  \item if attention is revisited, context/attention-only models versus parameter-matched MLP;
+  \item no full model unless its components pass individual gates.
+\end{enumerate}
+
+\subsection{Development smoke: existing Axial encoder}
+
+After Phase 14 downgraded AdvMask, we ran a development-only attention/context smoke to test whether the existing Axial encoder could stand independently under the corrected protocol. The smoke used three development datasets, seed 42, three epochs, random masking, scMAE-style shuffle corruption, log1p input, HVG 2000, and no validation or sealed test data. It compared the standard MLP, the existing Axial encoder, and a parameter-matched MLP.
+
+\begin{table}[ht]
+\centering
+\caption{Development-only attention/context smoke under random masking and scMAE-style shuffle.}
+\label{tab:attention-smoke}
+\begin{tabular}{lrrr}
+\toprule
+Dataset & MLP ARI & Axial ARI & Param-matched MLP ARI \\
+\midrule
+Limb\_Muscle & 0.866751 & 0.204241 & 0.861273 \\
+Mouse\_Pancreas\_1 & 0.365151 & 0.303162 & 0.370947 \\
+Quake\_Smart-seq2\_Lung & 0.454009 & 0.066389 & 0.521373 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The existing Axial encoder underperforms both MLP controls on all three datasets in this smoke. Its mean known-\(K\) ARI is 0.191264, compared with 0.561970 for the standard MLP and 0.584531 for the parameter-matched MLP. The same direction appears under fixed-Leiden ARI: Axial averages 0.110891, compared with 0.392201 for the standard MLP and 0.401894 for the parameter-matched MLP. Post-hoc macro label F1 also drops from 0.626609 for the standard MLP to 0.332358 for Axial. This should not be interpreted as a claim that all attention mechanisms fail for single-cell data; it only means the current Axial implementation is not supported as a main contribution or as a rescue path for AdvMask.
+
+\subsection{Resource diagnostics from existing artifacts}
+
+We also generated a resource-summary table from existing run manifests, without running new experiments. The current manifests record trainable parameter counts and device metadata, but not wall-clock seconds or memory usage. This partial table is still useful for mechanism triage. AdvMask adds 264,705 trainable generator parameters to the 9,080,688-parameter MLP student, yet its known-\(K\) ARI mean changes only from 0.564678 to 0.567081 and its fixed-Leiden ARI mean decreases from 0.413652 to 0.408362. The current Axial encoder has 9,154,544 trainable student parameters, close to the 9,155,273-parameter matched MLP, but its development-smoke ARI is much lower under both known-\(K\) and fixed-Leiden evaluation.
+
+\input{generated/resource_summary/tables/resource_summary.tex}
+
+Because wall-clock and memory were not recorded in the earlier Phase 13, Phase 14, and attention-smoke manifests, the manifest-derived resource table should be treated as a parameter-efficiency and artifact-audit diagnostic rather than a complete runtime benchmark.
+
+To close the most immediate resource gap, we ran a small instrumented development smoke across the three development datasets: seed 42, three epochs, scMAE-style shuffle corruption, random-mask MLP control, AdvMask, the existing Axial encoder, and the parameter-matched MLP. This is not validation and should not be used for generalization claims. It records wall-clock time with GNU time and samples GPU memory as total GPU-memory delta from a pre-run baseline. Averaged across the three development datasets, AdvMask changes mean known-\(K\) ARI only from 0.563205 to 0.564355 and mean fixed-Leiden ARI from 0.420215 to 0.416609, while increasing mean GPU-memory delta from 1449.3 MiB to 2094.7 MiB. The existing Axial encoder is substantially worse in this smoke: mean known-\(K\) ARI falls to 0.198101, fixed-Leiden ARI falls to 0.101700, mean wall-clock time rises to 35.33 s, and mean GPU-memory delta rises to 2868.7 MiB. The parameter-matched MLP has the best mean known-\(K\) ARI (0.576788), but its mean fixed-Leiden ARI (0.404586) remains below the standard MLP control, so this result supports parameter matching as a diagnostic control rather than a new positive claim.
+
+\input{generated/instrumented_resource_smoke/instrumented_resource_smoke.tex}
+
+\input{generated/instrumented_resource_smoke/instrumented_resource_smoke_summary.tex}
+
+The resource smoke reinforces, but does not independently prove, the current mechanism decision: extra mechanism complexity should not be retained without stable representation gains under broader development and validation evidence. The parameter-matched MLP result is not a new positive claim; it is a diagnostic reminder that architecture comparisons require parameter controls and non-oracle metrics.
+
+\input{generated/mechanism_decisions/mechanism_decisions.tex}
+
+The generated mechanism-decision table is a development-route record, not validation evidence. Its purpose is to make the current research decision auditable: carry scMAE-style shuffle forward as the frozen candidate corruption, downgrade AdvMask under current evidence, avoid treating the existing Axial encoder as a rescue path, and keep parameter-matched MLP comparisons as diagnostics rather than new method claims.
+
+\section{Biological Interpretation Plan}
+
+The current development evidence does not yet support marker-gene or named cell-type claims. Future biological interpretation should evaluate marker overlap, rare-cell recovery, cluster-to-label Sankey diagrams, and whether corruption diagnostics predict biologically meaningful cluster separation. No marker or rare-cell claim should be written from the Phase 14 triage or the attention/context smoke alone.
+
+As a safe intermediate step, we added a post-hoc label diagnostic generator that reads only existing development artifacts after training. It computes dominant-cluster recall, dominant-cluster purity, label-level F1, rare-label summaries, and worst-label recovery from numeric label IDs. Labels are not used for training, corruption, donor selection, mask selection, context construction, model selection, early stopping, validation, or sealed testing.
+
+These diagnostics reinforce the main development conclusion. In Phase 14, AdvMask changes macro label F1 only marginally relative to the random-mask control: -0.001536 on Limb\_Muscle, +0.005622 on Mouse\_Pancreas\_1, and +0.001105 on Quake\_Smart-seq2\_Lung. In the attention/context smoke, the existing Axial encoder has lower post-hoc label F1 than the MLP control on all three development datasets. This is consistent with the ARI evidence and does not rescue either AdvMask or the current Axial implementation as a main contribution.
+
+The generator also exports label-to-cluster flow tables and row-normalized heatmaps for seed 42. These heatmaps are not cell-type interpretations: cluster IDs are arbitrary within each run and should not be matched across conditions. Their purpose is narrower: to diagnose whether numeric labels are concentrated into dominant clusters or fragmented across several clusters after training.
+
+\input{generated/posthoc_label_diagnostics/tables/phase14_posthoc_label_summary.tex}
+
+\input{generated/posthoc_label_diagnostics/tables/attention_posthoc_label_summary.tex}
+
+\section{Discussion}
+
+\subsection{Protocol sensitivity is the main finding}
+The Phase 13 and Phase 14 results are useful because they separate protocol activity from scientific utility. A corruption mechanism can increase effective perturbation without improving clustering, and a generator can have nonzero gradients and non-collapsed masks while still failing to improve representation quality. This matters for single-cell masked autoencoding because sparsity makes nominal corruption, actual information change, reconstruction difficulty, and clustering utility diverge.
+
+We also ran a single-dataset mask-ratio sensitivity smoke on Quake\_Smart-seq2\_Lung with the MLP control, scMAE-style shuffle corruption, seeds 42, 2024, and 3407, and three epochs. The masked-position effective corruption rate stays nearly constant around 0.192 as the nominal mask ratio changes from 0.2 to 0.6, while the estimated global effective change rate increases from 0.038335 to 0.114956. Downstream clustering is metric-dependent rather than monotonic: mean known-\(K\) ARI is highest at mask ratio 0.4 in this smoke, while mean fixed-Leiden ARI is highest at 0.6. This is development-only sensitivity evidence; it must not be used to tune the frozen validation mask ratio.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.86\linewidth]{generated/mask_ratio_smoke/mask_ratio_smoke_sensitivity.png}
+\caption{Generated mask-ratio development sensitivity smoke. Error bars show seed standard deviation for ARI metrics across seeds 42, 2024, and 3407. The red curve is an estimated global effective-change diagnostic, not a clustering metric.}
+\label{fig:generated-mask-ratio-smoke}
+\end{figure}
+
+\input{generated/mask_ratio_smoke/mask_ratio_smoke.tex}
+
+\subsection{Negative mechanism evidence should change the paper route}
+The current evidence does not support a positive CAAM-scMAE method paper. AdvMask should be downgraded to a negative diagnostic result under the corrected protocol, and the existing Axial encoder should not be used as a rescue path. This is not a failure of the whole research program; it is the point of staged development gates. The honest manuscript route is a protocol-analysis paper: which masked corruption choices help, which diagnostics are necessary but insufficient, and how learned masking can look active without producing stable clustering gains.
+
+\subsection{Evaluation boundaries}
+Known-\(K\) K-means ARI remains a useful development diagnostic, but it is not fully unsupervised evidence. The manuscript therefore reports fixed-Leiden summaries and post-hoc label diagnostics separately. Labels are never used for training, corruption, mask selection, context construction, model selection, early stopping, or resolution selection. The current biological diagnostics use numeric labels only after training and cannot support marker-gene or named cell-type claims.
+
+\subsection{Implications for future attention or foundation-model work}
+The negative Axial smoke should not be interpreted as evidence that all attention or TabPFN-like context modeling is ineffective for scRNA-seq. It only says that the current implementation is not supported as a main contribution. Any future context model should be reopened as a new mechanism with parameter-matched MLP controls, fixed corruption settings, no validation tuning, and explicit gates for representation quality, runtime, and biological interpretability.
+
+\section{Limitations}
+
+The current evidence is development-only and uses three datasets. Validation and sealed test datasets have not been run, so the manuscript cannot yet make publication-level generalization claims. The purpose of the current draft is to define and document the protocol-analysis route before validation is touched. If validation later contradicts the development findings, the protocol must not be tuned on validation; the contradiction must be reported and the manuscript route reconsidered.
+
+The current analysis uses known-\(K\) K-means ARI as a primary development metric. This is useful for controlled mechanism triage, but it is not fully unsupervised unknown-\(K\) evidence. Fixed-Leiden summaries and post-hoc label diagnostics are included to reduce reliance on known-\(K\), but they do not replace validation across held-out datasets.
+
+Biological interpretation is still preliminary. Numeric labels are used only after training to compute label recovery and fragmentation diagnostics. The current draft does not include marker-gene enrichment, named cell-type validation, rare-cell biological interpretation, or literature-backed marker overlap. These analyses must be predefined before validation if they are to support biological claims.
+
+Runtime and memory comparisons remain incomplete at submission scale. The generated resource summary records trainable parameter counts and device metadata from existing artifacts, and the instrumented resource smoke records wall-clock time and GPU-memory delta for three development datasets under seed 42 and three epochs. This matters because more complex corruption, learned masking, or attention/context mechanisms may be unattractive even if they produce small metric gains. A submission-ready version should include broader wall-clock and memory diagnostics under the frozen protocol and any diagnostic variants.
+
+Finally, the existing Axial encoder has only failed a short development smoke. This result downgrades the current implementation, but it should not be used as a universal negative claim about attention or TabPFN-like context modeling for single-cell data. A substantially new context design would require a fresh mechanism gate, parameter-matched controls, and no use of validation or sealed data for selection.
+
+\section{Conclusion}
+
+The corrected development pipeline suggests that masked autoencoding for scRNA-seq clustering is sensitive to protocol choices. scMAE-style gene-wise shuffle remains a strong baseline; more complex donor or learned masking mechanisms can improve diagnostics without producing stable clustering gains. AdvMask should be downgraded to a supplementary negative result under the current evidence. A credible paper route should emphasize protocol-aware masked autoencoding and diagnostics rather than an unsupported adversarial-mask method claim.
+
+\section*{Reproducibility and Artifact Manifest}
+
+The manuscript assets are regenerated from existing development artifacts by six generator scripts, one optional instrumented resource-smoke runner, and one claim-boundary audit:
+
+\begin{verbatim}
+paper/protocol_analysis_manuscript/scripts/build_protocol_figures.py
+paper/protocol_analysis_manuscript/scripts/build_posthoc_label_diagnostics.py
+paper/protocol_analysis_manuscript/scripts/build_resource_summary.py
+paper/protocol_analysis_manuscript/scripts/build_mechanism_decision_tables.py
+paper/protocol_analysis_manuscript/scripts/build_feature_space_smoke_summary.py
+paper/protocol_analysis_manuscript/scripts/build_mask_ratio_smoke_summary.py
+paper/protocol_analysis_manuscript/scripts/run_instrumented_resource_smoke.py
+paper/protocol_analysis_manuscript/scripts/audit_claim_boundaries.py
+\end{verbatim}
+
+The generated manifests record 27 Phase 13 corruption-triad runs, 18 Phase 14 AdvMask-triage runs, 9 attention/context smoke runs, 12 instrumented resource-smoke runs, 2 feature-space smoke runs, and 9 mask-ratio smoke runs. The generated artifact directory currently contains 65 files, including CSV summaries, LaTeX tables, figures, post-hoc label-flow diagnostics, resource summaries, instrumented resource-smoke tables, feature-space and mask-ratio smoke records, mechanism-decision records, and the claim-boundary audit. These artifacts are development evidence only and explicitly exclude validation and sealed test data.
+
+The source artifact roots are:
+
+\begin{verbatim}
+results/CAAM_scMAE_correction/corruption_triad/formal
+results/CAAM_scMAE_correction/advmask_triage/formal
+/tmp/caam_attention_context_smoke/dev_20260626
+/tmp/caam_resource_smoke/dev_20260626
+/tmp/caam_feature_space_smoke/dev_20260626_gpu
+/tmp/caam_mask_ratio_smoke/dev_20260626_gpu
+\end{verbatim}
+
+The `/tmp` attention, resource-smoke, feature-space-smoke, and mask-ratio-smoke paths are intentionally treated as development-only and ephemeral. Before submission, this evidence must either be regenerated into reviewed stable artifact paths or excluded from the reproducibility package. A reviewer-facing reproducibility checklist is maintained at:
+
+\begin{verbatim}
+paper/protocol_analysis_manuscript/REPRODUCIBILITY_CHECKLIST.md
+\end{verbatim}
+
+That checklist records run counts, generation commands, metric labels, label-leakage controls, validation/sealed-test boundaries, and remaining submission-readiness gaps.
+
+\section*{Generated Evidence Assets}
+
+The following figures and CSV/LaTeX tables are generated from existing development artifacts by:
+
+\begin{verbatim}
+python paper/protocol_analysis_manuscript/scripts/build_protocol_figures.py
+python paper/protocol_analysis_manuscript/scripts/build_posthoc_label_diagnostics.py
+python paper/protocol_analysis_manuscript/scripts/build_resource_summary.py
+python paper/protocol_analysis_manuscript/scripts/build_mechanism_decision_tables.py
+python paper/protocol_analysis_manuscript/scripts/build_feature_space_smoke_summary.py
+python paper/protocol_analysis_manuscript/scripts/build_mask_ratio_smoke_summary.py
+python paper/protocol_analysis_manuscript/scripts/run_instrumented_resource_smoke.py --summarize-only
+python paper/protocol_analysis_manuscript/scripts/audit_claim_boundaries.py
+\end{verbatim}
+
+The generated manifests record 27 Phase 13 runs, 18 Phase 14 runs, 9 attention/context smoke runs, 12 instrumented resource-smoke runs, 2 feature-space smoke runs, and 9 mask-ratio smoke runs. These assets remain development evidence only; they do not include validation or sealed test data.
+
+The current validation freeze plan is recorded outside this manuscript at:
+\begin{verbatim}
+BDD/CAAM_scMAE_BDD_plan/PROTOCOL_ANALYSIS_VALIDATION_PLAN.md
+\end{verbatim}
+Validation is not yet approved. If validation is later approved, it must test the frozen protocol-analysis route and must not be used to choose corruption type, mask policy, architecture, clustering resolution, or manuscript claims.
+
+A reviewer-risk matrix is maintained at:
+\begin{verbatim}
+paper/论文工作台/Reviewer_Risk_and_Rebuttal_Matrix_2026-06-26.md
+\end{verbatim}
+The highest current risks are development-only evidence, known-\(K\) dependence, missing biological interpretation, and whether the negative diagnostic findings are broad enough for publication.
+
+A source-to-claim literature matrix is maintained at:
+\begin{verbatim}
+paper/论文工作台/Protocol_Analysis_Literature_Matrix_2026-06-26.md
+\end{verbatim}
+It maps each cited method or benchmark to the manuscript claim it supports or weakens, the experiment design it suggests, and the safe gap sentence to use in Related Work and Discussion.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\linewidth]{generated/figures/phase13_corruption_ari.png}
+\caption{Generated Phase 13 corruption triad ARI summary.}
+\label{fig:generated-phase13-ari}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\linewidth]{generated/figures/phase13_corruption_leiden_ari.png}
+\caption{Generated Phase 13 corruption triad fixed-Leiden ARI summary.}
+\label{fig:generated-phase13-leiden-ari}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\linewidth]{generated/figures/phase13_effective_corruption_vs_ari.png}
+\caption{Generated diagnostic plot showing that effective corruption rate alone does not guarantee clustering improvement.}
+\label{fig:generated-phase13-diagnostics}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\linewidth]{generated/figures/phase14_advmask_delta.png}
+\caption{Generated Phase 14 AdvMask-minus-control ARI deltas.}
+\label{fig:generated-phase14-delta}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\linewidth]{generated/figures/phase14_advmask_leiden_delta.png}
+\caption{Generated Phase 14 AdvMask-minus-control fixed-Leiden ARI deltas.}
+\label{fig:generated-phase14-leiden-delta}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\linewidth]{generated/figures/attention_context_smoke_ari.png}
+\caption{Generated attention/context smoke ARI comparison against MLP controls.}
+\label{fig:generated-attention-smoke}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\linewidth]{generated/figures/attention_context_smoke_leiden_ari.png}
+\caption{Generated attention/context smoke fixed-Leiden ARI comparison against MLP controls.}
+\label{fig:generated-attention-smoke-leiden}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\linewidth]{generated/posthoc_label_diagnostics/figures/phase13_posthoc_label_f1.png}
+\caption{Generated post-hoc label recovery diagnostic for Phase 13 corruption variants. Numeric labels are used only after training.}
+\label{fig:generated-phase13-posthoc-labels}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\linewidth]{generated/posthoc_label_diagnostics/figures/phase14_posthoc_label_f1_delta.png}
+\caption{Generated post-hoc AdvMask-minus-control label F1 deltas. Numeric labels are used only after training.}
+\label{fig:generated-phase14-posthoc-label-delta}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\linewidth]{generated/posthoc_label_diagnostics/figures/attention_posthoc_label_f1.png}
+\caption{Generated post-hoc label recovery diagnostic for the attention/context smoke. Numeric labels are used only after training.}
+\label{fig:generated-attention-posthoc-labels}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\linewidth]{generated/posthoc_label_diagnostics/figures/phase13_label_cluster_heatmaps_seed42.png}
+\caption{Generated Phase 13 label-to-cluster flow heatmaps for seed 42. Rows are numeric labels and columns are run-local cluster IDs; values are row-normalized label fractions.}
+\label{fig:generated-phase13-label-flow}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\linewidth]{generated/posthoc_label_diagnostics/figures/phase14_label_cluster_heatmaps_seed42.png}
+\caption{Generated Phase 14 label-to-cluster flow heatmaps for seed 42. Cluster IDs are arbitrary within each run and should not be matched across control and AdvMask.}
+\label{fig:generated-phase14-label-flow}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\linewidth]{generated/posthoc_label_diagnostics/figures/attention_label_cluster_heatmaps_seed42.png}
+\caption{Generated attention/context smoke label-to-cluster flow heatmaps for seed 42. The figure is a post-hoc fragmentation diagnostic, not a biological cell-type claim.}
+\label{fig:generated-attention-label-flow}
+\end{figure}
+
+Exact generated tables are available in:
+
+\begin{verbatim}
+generated/tables/phase13_corruption_summary.tex
+generated/tables/phase13_corruption_nonoracle_summary.tex
+generated/tables/phase14_advmask_summary.tex
+generated/tables/phase14_advmask_nonoracle_summary.tex
+generated/tables/attention_context_smoke_summary.tex
+generated/tables/attention_context_smoke_nonoracle_summary.tex
+generated/posthoc_label_diagnostics/tables/phase13_posthoc_label_summary.tex
+generated/posthoc_label_diagnostics/tables/phase14_posthoc_label_summary.tex
+generated/posthoc_label_diagnostics/tables/attention_posthoc_label_summary.tex
+generated/posthoc_label_diagnostics/data/phase13_label_cluster_flow.csv
+generated/posthoc_label_diagnostics/data/phase14_label_cluster_flow.csv
+generated/posthoc_label_diagnostics/data/attention_label_cluster_flow.csv
+generated/resource_summary/data/resource_runs.csv
+generated/resource_summary/data/resource_summary.csv
+generated/resource_summary/data/resource_summary_by_dataset.csv
+generated/resource_summary/tables/resource_summary.tex
+generated/resource_summary/artifact_manifest.json
+generated/instrumented_resource_smoke/instrumented_resource_smoke.csv
+generated/instrumented_resource_smoke/instrumented_resource_smoke.tex
+generated/instrumented_resource_smoke/instrumented_resource_smoke_summary.tex
+generated/instrumented_resource_smoke/artifact_manifest.json
+generated/feature_space_smoke/feature_space_smoke.csv
+generated/feature_space_smoke/feature_space_smoke.json
+generated/feature_space_smoke/feature_space_smoke.md
+generated/feature_space_smoke/feature_space_smoke.tex
+generated/mask_ratio_smoke/mask_ratio_smoke.csv
+generated/mask_ratio_smoke/mask_ratio_smoke.json
+generated/mask_ratio_smoke/mask_ratio_smoke.md
+generated/mask_ratio_smoke/mask_ratio_smoke.tex
+generated/mask_ratio_smoke/mask_ratio_smoke_sensitivity.png
+generated/mechanism_decisions/mechanism_decisions.csv
+generated/mechanism_decisions/mechanism_decisions.json
+generated/mechanism_decisions/mechanism_decisions.md
+generated/mechanism_decisions/mechanism_decisions.tex
+generated/claim_audit/claim_boundary_audit.md
+generated/claim_audit/claim_boundary_audit.json
+\end{verbatim}
+
+\section*{Figures and Tables Plan}
+
+\begin{enumerate}
+  \item Figure 1: staged correction pipeline from protocol correction to corruption triad to AdvMask triage.
+  \item Figure 2: corruption diagnostics versus clustering metrics across corruption types.
+  \item Figure 3: Phase 14 AdvMask versus random-mask ARI deltas with seed variation.
+  \item Figure 4: post-hoc label recovery diagnostics for corruption, AdvMask, and attention smoke.
+  \item Figure 5: label-to-cluster flow heatmaps as fragmentation diagnostics.
+  \item Figure 6: mask-ratio sensitivity versus global effective perturbation.
+  \item Table 1: datasets and feature-space settings.
+  \item Table 2: corruption triad summary.
+  \item Table 3: AdvMask triage summary.
+  \item Table 4: post-hoc label recovery and rare-label diagnostics.
+  \item Table 5: trainable-parameter and resource-manifest summary.
+  \item Table 6: instrumented three-dataset resource smoke.
+  \item Table 7: mechanism-decision matrix with explicit claim boundaries.
+  \item Table 8: single-dataset feature-space stress smoke.
+  \item Table 9: single-dataset mask-ratio sensitivity smoke.
+  \item Supplementary Table S1: all development runs and artifact paths.
+\end{enumerate}
+
+\section*{Supplementary Experiments}
+
+\begin{enumerate}
+  \item full-gene stress test, reported separately from the main HVG protocol;
+  \item nonzero-aware donor diagnostic analysis by sparsity level;
+  \item learned-mask negative result with generator-gradient and mask-distribution diagnostics;
+  \item future context/attention-only experiment with parameter-matched MLP, if explicitly approved.
+\end{enumerate}
+
+\section*{Reproducibility Checklist}
+
+\begin{itemize}
+  \item No validation or sealed test data used for mechanism selection.
+  \item No label, cell type, or \(K\) used during training, corruption, donor selection, mask selection, feature selection, or early stopping.
+  \item Post-hoc label diagnostics use numeric labels only after training and cannot drive model or protocol choices.
+  \item Main feature-space protocol: log1p, HVG 2000, no scaling.
+  \item Corruption diagnostics saved for each run.
+  \item Phase 14 grid: 3 datasets, 2 variants, 3 seeds, 18 complete runs.
+  \item Existing resource manifests support trainable-parameter summaries but not wall-clock or memory claims.
+  \item Instrumented resource smoke records wall-clock and GPU-memory delta on three development datasets.
+  \item Development evidence is not presented as publication-level validation.
+\end{itemize}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

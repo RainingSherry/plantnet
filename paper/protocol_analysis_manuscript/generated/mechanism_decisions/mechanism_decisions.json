@@ -1,0 +1,333 @@
+{
+  "attention": {
+    "decision": [
+      {
+        "claim_boundary": "not evidence that all attention mechanisms fail",
+        "decision": "do_not_use_as_rescue_path",
+        "fixed_leiden_delta_vs_control_mean": -0.28130990238858583,
+        "known_k_delta_vs_control_mean": -0.3707060739024535,
+        "known_k_parammatched_delta_mean": 0.02256034683913481,
+        "known_k_positive_datasets": 0,
+        "mechanism": "current_axial_encoder",
+        "study": "attention_context_smoke"
+      }
+    ],
+    "deltas": {
+      "axial_fixed_leiden_deltas": [
+        {
+          "baseline": "control",
+          "baseline_value": 0.4198974567192369,
+          "candidate": "axial",
+          "candidate_value": 0.11445474693269476,
+          "delta": -0.30544270978654214,
+          "group": "Limb_Muscle",
+          "metric": "leiden_fixed.ari"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.31615285405833315,
+          "candidate": "axial",
+          "candidate_value": 0.16380560292818422,
+          "delta": -0.15234725113014894,
+          "group": "Mouse_Pancreas_1",
+          "metric": "leiden_fixed.ari"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.4405530176415283,
+          "candidate": "axial",
+          "candidate_value": 0.05441327139246193,
+          "delta": -0.3861397462490664,
+          "group": "Quake_Smart-seq2_Lung",
+          "metric": "leiden_fixed.ari"
+        }
+      ],
+      "axial_known_k_deltas": [
+        {
+          "baseline": "control",
+          "baseline_value": 0.8667507781388327,
+          "candidate": "axial",
+          "candidate_value": 0.20424149391940732,
+          "delta": -0.6625092842194253,
+          "group": "Limb_Muscle",
+          "metric": "kmeans_known_k.ari"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.36515146731927767,
+          "candidate": "axial",
+          "candidate_value": 0.30316246786612766,
+          "delta": -0.06198899945315001,
+          "group": "Mouse_Pancreas_1",
+          "metric": "kmeans_known_k.ari"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.4540089129239961,
+          "candidate": "axial",
+          "candidate_value": 0.06638897488921072,
+          "delta": -0.38761993803478534,
+          "group": "Quake_Smart-seq2_Lung",
+          "metric": "kmeans_known_k.ari"
+        }
+      ],
+      "parammatched_known_k_deltas": [
+        {
+          "baseline": "control",
+          "baseline_value": 0.8667507781388327,
+          "candidate": "mlp_parammatched",
+          "candidate_value": 0.8612726175959898,
+          "delta": -0.0054781605428428914,
+          "group": "Limb_Muscle",
+          "metric": "kmeans_known_k.ari"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.36515146731927767,
+          "candidate": "mlp_parammatched",
+          "candidate_value": 0.3709468673673414,
+          "delta": 0.005795400048063726,
+          "group": "Mouse_Pancreas_1",
+          "metric": "kmeans_known_k.ari"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.4540089129239961,
+          "candidate": "mlp_parammatched",
+          "candidate_value": 0.5213727139361797,
+          "delta": 0.06736380101218359,
+          "group": "Quake_Smart-seq2_Lung",
+          "metric": "kmeans_known_k.ari"
+        }
+      ]
+    }
+  },
+  "claim_scope": "development evidence only; no validation or sealed test data",
+  "phase13": {
+    "best_fixed_leiden_corruption": "nonzero_aware_donor",
+    "best_known_k_corruption": "scmae_shuffle",
+    "recommended_corruption": "scmae_shuffle",
+    "scmae_shuffle_fixed_leiden_mean": 0.3354847262126736,
+    "scmae_shuffle_known_k_mean": 0.6586603179289091
+  },
+  "phase14": {
+    "decision": [
+      {
+        "claim_boundary": "active generator is not evidence of useful clustering representation",
+        "decision": "drop_or_downgrade",
+        "fixed_leiden_delta_mean": -0.005289481679252954,
+        "fixed_leiden_positive_datasets": 1,
+        "generator_grad_positive": true,
+        "known_k_delta_mean": 0.0024029036882198076,
+        "known_k_positive_datasets": 2,
+        "mechanism": "advmask",
+        "study": "phase14_advmask_triage"
+      }
+    ],
+    "deltas": {
+      "fixed_leiden_deltas": [
+        {
+          "baseline": "control",
+          "baseline_value": 0.4184410604060046,
+          "candidate": "advmask",
+          "candidate_value": 0.4296291465033084,
+          "delta": 0.011188086097303818,
+          "group": "Limb_Muscle",
+          "metric": "leiden_fixed.ari.mean"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.39154196197555663,
+          "candidate": "advmask",
+          "candidate_value": 0.36898836123861983,
+          "delta": -0.022553600736936796,
+          "group": "Mouse_Pancreas_1",
+          "metric": "leiden_fixed.ari.mean"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.4309715160413772,
+          "candidate": "advmask",
+          "candidate_value": 0.4264685856432513,
+          "delta": -0.004502930398125882,
+          "group": "Quake_Smart-seq2_Lung",
+          "metric": "leiden_fixed.ari.mean"
+        }
+      ],
+      "known_k_deltas": [
+        {
+          "baseline": "control",
+          "baseline_value": 0.8726813335728005,
+          "candidate": "advmask",
+          "candidate_value": 0.8644208663393187,
+          "delta": -0.008260467233481839,
+          "group": "Limb_Muscle",
+          "metric": "kmeans_known_k.ari.mean"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.33053584423764343,
+          "candidate": "advmask",
+          "candidate_value": 0.345743774446204,
+          "delta": 0.015207930208560594,
+          "group": "Mouse_Pancreas_1",
+          "metric": "kmeans_known_k.ari.mean"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.49081810313377555,
+          "candidate": "advmask",
+          "candidate_value": 0.4910793512233562,
+          "delta": 0.0002612480895806679,
+          "group": "Quake_Smart-seq2_Lung",
+          "metric": "kmeans_known_k.ari.mean"
+        }
+      ]
+    }
+  },
+  "resource": {
+    "decision": [
+      {
+        "claim_boundary": "resource smoke only; not submission-scale runtime benchmark",
+        "decision": "cost_without_stable_gain",
+        "fixed_leiden_ari_mean": 0.41660895426157896,
+        "gpu_delta_mib_mean": 2094.6666666666665,
+        "known_k_ari_mean": 0.5643554808944343,
+        "mechanism": "advmask",
+        "n_runs": 3,
+        "study": "instrumented_resource_smoke",
+        "wall_clock_seconds_mean": 19.121732249700774
+      },
+      {
+        "claim_boundary": "resource smoke only; not submission-scale runtime benchmark",
+        "decision": "cost_without_stable_gain",
+        "fixed_leiden_ari_mean": 0.10169952014186152,
+        "gpu_delta_mib_mean": 2868.6666666666665,
+        "known_k_ari_mean": 0.19810090922572168,
+        "mechanism": "axial",
+        "n_runs": 3,
+        "study": "instrumented_resource_smoke",
+        "wall_clock_seconds_mean": 35.33060837401232
+      },
+      {
+        "claim_boundary": "resource smoke only; not submission-scale runtime benchmark",
+        "decision": "diagnostic_control",
+        "fixed_leiden_ari_mean": 0.42021516851914265,
+        "gpu_delta_mib_mean": 1449.3333333333333,
+        "known_k_ari_mean": 0.5632052828851449,
+        "mechanism": "control",
+        "n_runs": 3,
+        "study": "instrumented_resource_smoke",
+        "wall_clock_seconds_mean": 20.450805188990973
+      },
+      {
+        "claim_boundary": "resource smoke only; not submission-scale runtime benchmark",
+        "decision": "diagnostic_control",
+        "fixed_leiden_ari_mean": 0.4045856314508489,
+        "gpu_delta_mib_mean": 1450.6666666666667,
+        "known_k_ari_mean": 0.5767881081851352,
+        "mechanism": "mlp_parammatched",
+        "n_runs": 3,
+        "study": "instrumented_resource_smoke",
+        "wall_clock_seconds_mean": 17.44344748032745
+      }
+    ],
+    "deltas": {
+      "advmask_fixed_leiden_deltas": [
+        {
+          "baseline": "control",
+          "baseline_value": 0.4182019358205741,
+          "candidate": "advmask",
+          "candidate_value": 0.41011035799234813,
+          "delta": -0.008091577828225949,
+          "group": "Limb_Muscle",
+          "metric": "leiden_fixed.ari"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.37892767971693525,
+          "candidate": "advmask",
+          "candidate_value": 0.38567145399035535,
+          "delta": 0.0067437742734201,
+          "group": "Mouse_Pancreas_1",
+          "metric": "leiden_fixed.ari"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.4635158900199186,
+          "candidate": "advmask",
+          "candidate_value": 0.45404505080203333,
+          "delta": -0.009470839217885274,
+          "group": "Quake_Smart-seq2_Lung",
+          "metric": "leiden_fixed.ari"
+        }
+      ],
+      "advmask_known_k_deltas": [
+        {
+          "baseline": "control",
+          "baseline_value": 0.8663689948245417,
+          "candidate": "advmask",
+          "candidate_value": 0.874734430438695,
+          "delta": 0.008365435614153371,
+          "group": "Limb_Muscle",
+          "metric": "kmeans_known_k.ari"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.33767546981870394,
+          "candidate": "advmask",
+          "candidate_value": 0.3370774467572093,
+          "delta": -0.0005980230614946458,
+          "group": "Mouse_Pancreas_1",
+          "metric": "kmeans_known_k.ari"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.48557138401218913,
+          "candidate": "advmask",
+          "candidate_value": 0.48125456548739853,
+          "delta": -0.0043168185247906,
+          "group": "Quake_Smart-seq2_Lung",
+          "metric": "kmeans_known_k.ari"
+        }
+      ],
+      "axial_known_k_deltas": [
+        {
+          "baseline": "control",
+          "baseline_value": 0.8663689948245417,
+          "candidate": "axial",
+          "candidate_value": 0.21977870896431942,
+          "delta": -0.6465902858602223,
+          "group": "Limb_Muscle",
+          "metric": "kmeans_known_k.ari"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.33767546981870394,
+          "candidate": "axial",
+          "candidate_value": 0.30881725098698265,
+          "delta": -0.028858218831721294,
+          "group": "Mouse_Pancreas_1",
+          "metric": "kmeans_known_k.ari"
+        },
+        {
+          "baseline": "control",
+          "baseline_value": 0.48557138401218913,
+          "candidate": "axial",
+          "candidate_value": 0.06570676772586301,
+          "delta": -0.4198646162863261,
+          "group": "Quake_Smart-seq2_Lung",
+          "metric": "kmeans_known_k.ari"
+        }
+      ]
+    }
+  },
+  "safe_route": "protocol_analysis",
+  "unsafe_claims": [
+    "AdvMask improves clustering",
+    "current Axial improves clustering",
+    "Axial plus AdvMask synergy",
+    "development evidence validates a publication-ready method",
+    "known-K ARI proves unknown-K clustering quality"
+  ]
+}

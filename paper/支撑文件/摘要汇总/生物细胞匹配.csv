@@ -1,0 +1,1631 @@
+group_slug,group_title,query,rank,title,url,domain,score,content,is_probably_paper
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),scVelo RNA velocity statistical model trajectory inference theory 2024 2025,1,RNA velocity estimation leveraging cluster-level trajectory inference,https://www.nature.com/articles/s41467-025-61628-x.pdf,www.nature.com,0.99998486,"Benchmarking methods scVelo. scVelo implements preprocessing by the following functions: scvelo.pp.ﬁlter_and_normalize(adata, min_shared_counts =20, n_top_genes=2000) scvelo.pp.moments(adata, n_neighbors=30, n_pcs=30) For both stochastic mode and dynamical mode, we use the default setting of scVelo following the tutorial:  en/stable/.
+Notably, the inherent randomness in scVelo’s dynamical mode and veloVI may lead to differences between the reproduced results and the results shown in the original paper. The details are discussed in Supplementary Note 9. [...] cell type, which is identical to the annotation in (a).d Velocity ﬁtting for genes Map1b, Cplx2 and Ak5 from TIVelo. Top row: u-s scatter plots colored by cell type, with ﬁtted ODE curve from scVelo (dynamical mode). Bottom row: ﬁtted velocity vectors of sampled cells from TIVelo. The Granule mature cells are colored by red, and other cell types are colored by light blue. e Directed trajectory inference (DTI) analysis by TIVelo. [...] Article  Nature Communications| (2025) 16:6258 8 Quantitative comparison with benchmarking methods on ten real datasets To thoroughly assess TIVelo’s performance, we did a comparison on ten datasets commonly used by existing RNA velocity inference methods, as shown in Fig. 7. The comparison includes TIVelo and six other benchmarking methods, namely scVelo (stochastic mode), scVelo (dynamical mode), UniTVelo, cellDancer, veloVI and Deep-Velo. The metrics to measure their performance include cross-boundary direction correctness (CBDir) (Gene space), transition cosine similarities (TransCosine), and velocity coherence (VeloCoh)14. CBDir (Gene space) and TransCosine assess if the esti-mated velocity vectors follow the expected developmental trajec-tory, while VeloCoh tests if the inferred",False
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),trajectory inference single-cell optimal transport Waddington ICML NeurIPS 2024 2025,1,MIOFlow 2.0: A unified framework for inferring cellular stochastic ...,https://arxiv.org/html/2603.22564v2,arxiv.org,0.9999745,"Existing approaches to trajectory inference fall short in addressing these combined challenges. A substantial body of work focuses on generative modeling tasks, such as flowing from noise distributions to data, and is not designed for temporal interpolation (Song and Ermon, 2019; Ho et al., 2020; Grathwohl et al., 2019). Methods that do tackle trajectory inference, including TrajectoryNet (Tong et al., 2020) and Waddington-OT (Schiebinger et al., 2019), often make restrictive assumptions such as Gaussian distributed populations. More recently, Flow Matching (Lipman et al., 2023; Tong et al., 2023) has been applied to single-cell trajectory problems but relies on prescribed velocity fields that enforce straight-line interpolations in ambient space, ignoring curved manifold geometry. While [...] ### 2.4. Related Work: The Methodological Landscape
+
+The intersection of Optimal Transport and Differential Equations has sparked a surge of interest in trajectory inference.
+Early discrete methods, such as Waddington-OT (WOT) (Schiebinger et al., 2019), used static OT to connect snapshots but lacked a continuous time model.
+TrajectoryNet (Tong et al., 2020) was the first to bridge this gap by regularizing a Continuous Normalizing Flow (CNF) with an OT-based kinetic energy penalty.
+However, TrajectoryNet assumed strict mass conservation and was primarily tested on deterministic, non-spatial systems. [...] By performing trajectory inference in this biologically informative latent space 𝒵\mathcal{Z}, MIOFlow 2.0 ensures that the inferred transport costs correspond to true developmental distances rather than artifacts of high-dimensional noise.",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),scVelo RNA velocity statistical model trajectory inference theory 2024 2025,2,spVelo: RNA velocity inference for multi-batch spatial ... - PMC - NIH,https://pmc.ncbi.nlm.nih.gov/articles/PMC12337411/,pmc.ncbi.nlm.nih.gov,0.99996877,Abstract. RNA velocity has emerged as a powerful tool to interpret transcriptional dynamics and infer trajectory from snapshot datasets.,True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),trajectory inference single-cell optimal transport Waddington ICML NeurIPS 2024 2025,2,Deciphering cell-fate trajectories using spatiotemporal single-cell ...,https://www.nature.com/articles/s41540-025-00624-9,www.nature.com,0.9999685,"Trajectory inference methods also differ in the dynamical models they adopt, which could be formulated in either discrete or continuous time and space. The choice of dynamical model specifies the underlying structure of the governing equations, while the inference procedure estimates the unknown components (typically time-dependent scalar or vector fields). When the continuous temporal evolution of the distribution is not of primary interest, one may instead employ discrete-time dynamics, focusing on the mapping of cell states observed at an initial time point to those at a subsequent one (Eq. (1)). Methods such as Waddington OT35.""), MOSCOT36."") and Multistage OT112."") adopt this setting. In particular, optimal transport between Gaussian mixtures admits an analytical solution, which [...] 113. Yachimura, T. et al. scEGOT: single-cell trajectory inference framework based on entropic gaussian mixture optimal transport. BMC Bioinform. 25, 388 (2024). [...] Wasserstein Flow Matching with Applications to Single-Cell Genomics. Adv. Neural Inf. Process. Syst. (Curran Associates, Inc., 2024).""), and SCOT+101."") apply GWOT theory to address multi-modal and cross-system integration challenges in trajectory inference tasks.",False
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell multi-omics alignment optimal transport manifold 2024 2025 bioinformatics,1,Single‐Cell and Spatial Omics: Methods and Applications - PMC,https://pmc.ncbi.nlm.nih.gov/articles/PMC13053676/,pmc.ncbi.nlm.nih.gov,0.9999671,"optimal transport theory and convex neural architectures to develop a framework for predicting the response of cells to given perturbation . [...] In addition to improving the performance of common spatial omics tasks, spatial multi‐omics integration can also be used for downstream biomedical discovery. For example, stClinic designed a dynamic graph model that integrates spatial multi‐slice multiomics and clinical phenotype data to uncover clinically relevant niches . Some other algorithms are developed to integrate spatial omics across different platforms  or different samples. PASTE provided cross‐slice alignment by Gromov–Wasserstein optimal transport algorithm . CAST is a deep graph neural network‐based method for cross sample alignment of spatial omics at the single‐cell level . These approaches lay the groundwork for comparative spatial analyses across tissues, conditions, and technologies. Moreover, additional representation [...] and spatial evolutionary trajectories in brain tumors. An emerging frontier involves quantifying causal effects and treatment perturbations directly at single‐cell resolution. Perturbation‐aware models such as CINEMA‐OT employed causal optimal transport to reveal mechanisms of environmental exposure, for example, diminished antiviral responses following cigarette‐smoke stimulation . scCausalVI employed causality‐aware generative modeling to identify treatment‐responsive cell populations and their underlying molecular programs in infectious disease .",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),single-cell flow estimation optimal transport developmental biology 2024 2025,1,Generating and navigating single cell dynamics via a geodesic ...,https://www.biorxiv.org/content/10.64898/2026.03.31.715478v1.full-text,www.biorxiv.org,0.9999453,MultistageOT: Multistage optimal transport infers trajectories from a snapshot of single-cell data . Preprint at doi:10.48550/ARXIV.2502.05241 (2025).,False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),scVelo RNA velocity statistical model trajectory inference theory 2024 2025,3,"Paradigms, innovations, and biological applications of RNA velocity",https://pmc.ncbi.nlm.nih.gov/articles/PMC12265890/,pmc.ncbi.nlm.nih.gov,0.99992573,"Trajectory methods, such as the dynamical model of scVelo, therefore struggle to determine whether a trajectory is in the upregulation or downregulation phase.",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell multi-omics alignment optimal transport manifold 2024 2025 bioinformatics,2,[PDF] scCotag: Diagonal integration of single-cell multi-omics data via ...,https://www.biorxiv.org/content/10.64898/2025.12.11.693589v1.full.pdf,www.biorxiv.org,0.99992573,"Nature Biotechnology 40(10), 1458–1466 (2022) 10. Chizat, L., Peyré, G., Schmitzer, B., Vialard, F.X.: Unbalanced optimal transport: Dynamic and kantorovich formulations. Journal of Functional Analysis 274(11), 3090–3123 (2018) 11. Cohen Kalafut, N., Huang, X., Wang, D.: Joint variational autoencoders for multimodal imputation and embed-ding. Nature machine intelligence 5(6), 631–642 (2023) 12. Cui, Z., Chang, H., Shan, S., Chen, X.: Generalized unsupervised manifold alignment. Advances in Neural Infor-mation Processing Systems 27 (2014) 13. Cuturi, M.: Sinkhorn distances: Lightspeed computation of optimal transport. Advances in neural information processing systems 26 (2013) 14. Demetci, P., Santorella, R., Sandstede, B., Noble, W.S., Singh, R.: Scot: single-cell multi-omics alignment [...] have enabled characterization of cellular states across distinct omics layers, yielding complementary insights into the organization of biological systems. To jointly leverage these disparate modalities, computational methods have been developed to align non-overlapping cell populations profiled in different omics layers, a task known as diagonal integration, thereby facilitating more fine-grained biological interpretations. However, existing integration approaches unrealistically assume that all cells are alignable and treat prior-knowledge-derived feature correspondences as fully reliable, retaining them unrefined throughout the alignment process. In this work, we introduce scCotag, a co-optimal transport (COOT)-based deep learning frame-work for diagonal integration of single-cell [...] W.S., Singh, R.: Scot: single-cell multi-omics alignment with optimal transport. Journal of computational biology 29(1), 3–18 (2022) 15. Duren, Z., Chen, X., Zamanighomi, M., Zeng, W., Satpathy, A.T., Chang, H.Y., Wang, Y., Wong, W.H.: In-tegrative analysis of single-cell genomics data by coupled nonnegative matrix factorizations. Proceedings of the National Academy of Sciences 115(30), 7723–7728 (2018) 16. Flamary, R., Courty, N., Gramfort, A., Alaya, M.Z., Boisbunon, A., Chambon, S., Chapel, L., Corenflos, A., Fatras, K., Fournier, N., et al.: Pot: Python optimal transport. Journal of Machine Learning Research 22(78), 1–8 (2021) 17. Fu, S., Wang, S., Si, D., Li, G., Gao, Y., Liu, Q.: Benchmarking single-cell multi-modal data integrations. Nature Methods pp. 1–12 (2025) 18. Gabitto,",False
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),trajectory inference single-cell optimal transport Waddington ICML NeurIPS 2024 2025,3,Simulation-based inference of cell migration dynamics in complex ...,https://www.nature.com/articles/s41540-026-00648-9,www.nature.com,0.9998776,"A dynamic model for Waddington's landscape accounting for cell-to-cell communication. ... Optimal Transport: Old and New Vol. 338 (Springer, 2009). Prangle, D",False
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell multi-omics alignment optimal transport manifold 2024 2025 bioinformatics,3,SCOT+: A Comprehensive Software Suite for Single-Cell alignment ...,https://pmc.ncbi.nlm.nih.gov/articles/PMC12154691/,pmc.ncbi.nlm.nih.gov,0.99983656,"By using optimal transport (OT) to align cells and features across disparate datasets produced by separate assays, Single Cell alignment using Optimal",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),trajectory inference single-cell optimal transport Waddington ICML NeurIPS 2024 2025,4,[PDF] Generative Reconstruction of Unobserved Cellular Dynamics using ...,https://www.biorxiv.org/content/10.64898/2025.12.29.696948v1.full.pdf,www.biorxiv.org,0.99979335,"GRAIL represents a new paradigm for single-cell trajectory inference, uniting deep generative modeling with pseudotem- poral analysis to overcome the",False
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),trajectory inference single-cell optimal transport Waddington ICML NeurIPS 2024 2025,5,[PDF] Joint Velocity-Growth Flow Matching for Single-Cell Dynamics ...,https://openreview.net/pdf/9f11dcc1529f78a8688417612e15793796038b39.pdf,openreview.net,0.99974877,"3 Method Given the snapshot population of single cells, this paper aims to build the dynamic trajectory of single cells. Considering the unbalancedness between snapshot populations due to the undergo cell proliferation or death, we aim to build a model that can transform between unbalanced distributions by jointly learning a velocity field for controlling state transition and a growth function for controlling mass variation. Towards this goal, we propose joint Velocity-Growth Flow Matching (VGFM) based on semi-relaxed optimal transport to learn the dynamics of single cells. As illustrated in Fig. 2, we first present a decoupled understanding of state transition and mass growth for unbalanced dynamics based on semi-relaxed optimal transport (Figs. 2 (a), (b)), upon which we build a dynamic [...] Zhenyi Zhang, Tiejun Li, and Peijie Zhou. Learning stochastic dynamics from snapshots through regularized unbalanced optimal transport. In ICLR, 2025.
+ Xi Zhang, Yuan Pu, Yuki Kawamura, Andrew Loza, Yoshua Bengio, Dennis Shung, and Alexander Tong. Trajectory flow matching with applications to clinical time series modelling.
+In NeurIPS, 2024.
+ Anming Gu, Edward Chien, and Kristjan Greenewald. Partially observed trajectory inference using optimal transport and a dynamics prior. In ICLR, 2025.
+ Martin Rohbeck, Charlotte Bunne, Edward De Brouwer, Jan-Christian Huetter, Anne Biton, Kelvin Y. Chen, Aviv Regev, and Romain Lopez. Modeling complex system dynamics with flow matching across time and conditions. In ICLR, 2025. [...] Dynamic understanding of semi-relaxed optimal transport.",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell multi-omics alignment optimal transport manifold 2024 2025 bioinformatics,4,CelLink: integrating single-cell multi-omics data with weak feature ...,https://academic.oup.com/nar/article/53/22/gkaf1270/8363852,academic.oup.com,0.9997284,"Abstract. Single-cell multi-omics technologies capture complementary molecular layers, enabling a comprehensive view of cellular states and functions. Howe.",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),cell state alignment trajectory smoothing geometric learning 2024 2025,1,Geometry-preserving vector field reconstruction of high-dimensional cell-state dynamics using ddHodge | Nature Communications,https://www.nature.com/articles/s41467-025-67782-6,www.nature.com,0.99965405,"trajectory analyses of cell fate conceptualized by the epigenetic landscape. Additionally, we identified genes that influence the stability of the cell state. [...] of the tangent spaces. We also considered smoothing (regularization) along the curved axes on the data manifold. In the smoothing process, the axes of adjacent tangent spaces should be matched (Fig. 3A, middle; xu and xv, yu and yv); therefore, using idea of parallel transport in differential geometry20.""),24.""),25.""), we developed a method for designing near-parallel coordinate axes for high-dimensional data using a discrete connection Laplacian (sheaf Laplacian)25.""),26.""),27.""),28."") (Fig. 3A, bottom; Supplementary Notes). [...] Next, using velocities sampled from the artificial dynamics simulated on a sphere (Methods), we reconstructed the dynamics with smoothing on the data manifold (Fig. 3C). The potential and divergence were reconstructed with peaks at the east and west ends of the sphere, and the curl was concentrated at the north and south ends, reproducing values approximately identical to the theoretical values (Fig. 3C; inset images, MSEs: 1.0 × 10−3, 4.0 × 10−4, and 1.0 × 10−3, respectively). We further verified the importance of the subspace alignment procedure using an asymmetric saddle-shaped potential example (Supplementary Figure S3). While smoothing results with unaligned axes significantly deviate from theoretical values of the Hessian matrix, subspace alignment using the sheaf Laplacian enables",False
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),cell state alignment trajectory smoothing geometric learning 2024 2025,2,Revealing a coherent cell-state landscape across single ... - Nature,https://www.nature.com/articles/s41587-025-02950-z,www.nature.com,0.9996111,"Single-cell studies often involve continuous state transitions sampled across different conditions, where cell states may only partially overlap. Methods that make explicit assumptions about the data structure—such as requiring matched clusters—often fail in these scenarios and produce distorted embeddings. We systematically tested this by simulating batch effects on trajectories, loops and trees with varying degrees of state overlap (Fig. 3b–d and Extended Data Fig. 3c,d). Many competing methods exhibited poor alignment and introduced artificial structures. In contrast, both CONCORD variants consistently recovered the correct topology with reduced noise, even when the overlap between batches was minimal. [...] and Betti curves) are shown for each method. The H0 point at infinity was excluded from the persistence diagram and curve. d, Performance on a complex trajectory with three loops, highlighting the same diagnostic plots as in c. e,f, Summary of key geometric and topological performance metrics for the cluster simulation (e) and the complex trajectory simulation (f). g, kNN graph visualization of the latent spaces from a complex-tree simulation, with zoomed-in views of the highlighted branch. [...] a, Two-batch, five-cluster simulation with imbalanced batch sizes. Heat maps show the noise-free ground truth and the input data with noise and batch effects. Latent spaces from each method are visualized by UMAPs, colored by batch. Full cluster simulation results are in Extended Data Fig. 3a,b. ‘Contrastive’ refers to naïve contrastive learning that uses the same encoder architecture and objective as CONCORD but with uniform sampling. b, Trajectory simulation with varying degrees of state overlap between batches. The input structure is shown by a heat map and PCA. For each method, the latent space is visualized by a kNN graph (k = 15) colored by simulated time to assess cross-batch integration along the trajectory. c, Loop simulation with varying degrees of state overlap between batches.",False
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),trajectory inference single-cell optimal transport Waddington ICML NeurIPS 2024 2025,6,Generative models of cell dynamics: from Neural ODEs to flow matching | Communications Biology,https://www.nature.com/articles/s42003-026-09758-w,www.nature.com,0.9995453,"the temporal axis serves as a modeling construct for population dynamics26.""). Therefore, optimal transport (OT) methods are well suited when discrete time-point data are available as snapshots of cell populations. In pursuing real-time dynamics inference, utilizing discrete OT to deduce the cell state transitions across distinct time points is a promising approach18.""),48.""),49.""),50.""). In this scenario, Waddington-OT48."") infers ancestor-descendant fates and modeling regulatory programs, revealing a diverse range of developmental programs from single-cell RNA sequencing profiles. Moslin49."") couples matching cellular profiles across time points by leveraging both lineage relations and gene expression similarity, Moscot18."") is a scalable framework for optimal transport in single-cell [...] The concept of trajectory inference is one of the earliest applications of Neural ODEs in single-cell genomics15.""),30. Available at SSRN 4330809 LatentVelo leverages deep learning to compute low-dimensional gene dynamics, embedding cells in a dynamics-based latent space via a variational autoencoder and modeling differentiation with neural ordinary differential equations, enabling accurate prediction of cell trajectories and superior batch correction by focusing on gene expression dynamics.""),44. TrajectoryNet leverages the integration of continuous normalizing flows with dynamic optimal transport to model continuous, non-linear paths in dynamic systems, overcoming the limitations of static optimal transport models by constraining the flow of entities between distributions, showcasing [...] 54. Huguet, G. et al. Manifold interpolating optimal-transport flows for trajectory inference. In Advances in Neural Information Processing Systems. Vol. 35, (eds Koyejo, S. et al.) 29705–29718 (Curran Associates, Inc., 2022). MIOFlow introduces a novel integration of dynamic models, manifold learning, and optimal transport through Neural ODEs and a geodesic autoencoder, offering superior interpolation between static population snapshots by embedding data in a geometry-aware latent space, outperforming existing generative models in capturing continuous population dynamics.",False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),scVelo RNA velocity statistical model trajectory inference theory 2024 2025,4,Benchmarking RNA velocity methods across 17 independent studies,https://www.biorxiv.org/content/10.1101/2025.08.02.668272v1.full-text,www.biorxiv.org,0.9995272,Abstract. RNA velocity techniques offer great potential for unveiling trajectories of cell state transitions in different biological contexts.,False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),scVelo RNA velocity statistical model trajectory inference theory 2024 2025,5,Benchmarking algorithms for RNA velocity inference - bioRxiv,https://www.biorxiv.org/content/10.64898/2026.01.03.697314v1.full-text,www.biorxiv.org,0.99950826,"RNA velocity is a computational framework for single-cell RNA sequencing (scRNA-seq) that estimates the future transcriptional state of individual cells,",False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),scVelo RNA velocity statistical model trajectory inference theory 2024 2025,6,Artificial Intelligence Revolution in Transcriptomics: From Single Cells to Spatial Atlases - PMC,https://pmc.ncbi.nlm.nih.gov/articles/PMC12850002/,pmc.ncbi.nlm.nih.gov,0.9994887,"A pivotal concept for trajectory inference is RNA velocity, which infers cell's future state from its spliced and unspliced mRNA counts. Deep learning significantly enhances RNA velocity analysis. DeepVelo, for instance, extends RNA velocity to complex, multi‐lineage systems where traditional methods (e.g., Velocyto, scVelo) often fail.  [112  ] For more reliable analysis, veloVI provides VAE‐based framework that not only estimates velocities but also quantifies transcriptome‐wide uncertainty for inferred dynamics.  [115  ] [...] Collectively, these developments have advanced TI from simple pseudo temporal ordering toward more mechanistic modeling based on diverse principles (Table  1 ). DeepVelo extends RNA velocity to complex multi‐lineage systems, while subsequent approaches employ diverse deep learning architectures—including VAEs (scTour  [116  ]) and optimal transport‐based methods (TrajectoryNet  [120  ])—to infer celluar dynamics directly.  [112  ] More recently, gene‐centric methods such as GeneTrajectory  [118  ] trace trajectories of gene programs rather than cells, disentangling overlapping process. Together, these models illustrate a progression toward predictive models of cellular dynamics.
+
+#### Table 1.
+
+Comparison of major AI‐driven trajectory inference paradigms. [...] | DeepVelo  [112  ] | Trajectory Inference and Pseudotime Analysis | Deep Learning Framework | Self‐supervised | Extends RNA velocity analysis to complex, multi‐lineage systems where traditional methods often fail. | Input: omics  Data scale: 104 cells  Evaluation metrics: Consistency Score: 0.9 |
+| GPTCelltype  [113  ] | Cell annotation | Large Language Model (GPT‐4) | Self‐supervised | Demonstrates that large models can accurately infer cell types simply by interpreting lists of marker genes, automating the process. | Input: omics  Data scale: 105 cells  Evaluation metrics: Accuracy: 0.75–0.93 |",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell multi-omics alignment optimal transport manifold 2024 2025 bioinformatics,5,scMODAL: a general deep learning framework for comprehensive ...,https://www.nature.com/articles/s41467-025-60333-z,www.nature.com,0.9994887,"challenges, we introduce scMODAL, a deep learning framework tailored for single-cell multi-omics data alignment using feature links. scMODAL integrates datasets with limited known positively correlated features, leveraging neural networks and generative adversarial networks to align cell embeddings and preserve feature topology. Our experiments demonstrate scMODAL’s effectiveness in removing unwanted variation, preserving biological information, and accurately identifying cell subpopulations across diverse datasets. scMODAL not only advances integration tasks but also supports downstream analyses such as feature imputation and feature relationship inference, offering a robust solution for advancing single-cell multi-omics research. [...] Here, we present scMODAL, a general deep learning framework for single-cell multi-omics data alignment with feature links. scMODAL is designed to integrate unpaired datasets with limited numbers of known positively correlated features, which are also referred as “linked” features in the literature27.""). To capture complex relationship between different modalities, we build neural networks to project different single-cell datasets into a common low-dimensional latent space and apply generative adversarial networks (GANs)31."") to align cell embeddings. To accurately find cell population correspondence across datasets, scMODAL utilizes prior information from known linked features to identify anchor cell pairs that can guide integration, while preserving topology structure of all input [...] ## Discussion
+
+In this study, we introduced scMODAL, a novel deep learning framework designed for the integration of single-cell multi-omics data, specifically addressing the challenges associated with datasets that have limited numbers of known correlated features. Our results demonstrate that scMODAL effectively aligns cell embeddings across different modalities, preserves the biological variation, and accurately identifies cell subpopulations. Moreover, scMODAL excels in tasks such as cross-modality feature imputation and inferring feature relationships, which are critical for understanding the underlying cellular processes.",False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),scVelo RNA velocity statistical model trajectory inference theory 2024 2025,7,GraphVelo allows for accurate inference of multimodal velocities ...,https://www.nature.com/articles/s41467-025-62784-w,www.nature.com,0.99942964,"Here, we present GraphVelo, a graph-based machine learning procedure that uses as input the RNA velocities inferred from existing methods and infers velocity",False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),scVelo RNA velocity statistical model trajectory inference theory 2024 2025,8,"Inferring differential dynamics from multi-lineage, multi-omic, and ...",https://www.nature.com/articles/s41467-025-66287-6,www.nature.com,0.9993333,These first RNA velocity inference methods have inherent limitations: each gene is modeled on a separate time scale; gene expression is modeled as a discrete on,False
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell multi-omics alignment optimal transport manifold 2024 2025 bioinformatics,6,Guided co-clustering transfer across unpaired and paired single-cell ...,https://academic.oup.com/bioinformatics/article/41/12/btaf639/8362267,academic.oup.com,0.9992563,"Single-cell multi-omics technologies enable the simultaneous profiling of gene expression and chromatin accessibility, providing complementary insights into",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),single-cell flow estimation optimal transport developmental biology 2024 2025,5,Modeling Microenvironment Trajectories on Spatial Transcriptomics ...,https://neurips.cc/virtual/2025/poster/119831,neurips.cc,0.99918956,"using optimal transport and Variational Flow Matching. Our approach successfully recovers both global spatial architecture and local microenvironment composition across diverse spatiotemporal datasets, from embryonic to brain development. [...] Understanding the evolution of cellular microenvironments in spatiotemporal data is essential for deciphering tissue development and disease progression. While experimental techniques like spatial transcriptomics now enable high-resolution mapping of tissue organization across space and time, current methods that model cellular evolution operate at the single-cell level, overlooking the coordinated development of cellular states in a tissue. We introduce NicheFlow, a flow-based generative model that infers the temporal trajectory of cellular microenvironments across sequential spatial slides. By representing local cell neighborhoods as point clouds, NicheFlow jointly models the evolution of cell states and spatial coordinates using optimal transport and Variational Flow Matching. Our [...] Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Fri, Dec 5, 2025 • 4:30 PM – 7:30 PM PST
+
+# Modeling Microenvironment Trajectories on Spatial Transcriptomics with NicheFlow
+
+Kristiyan Sakalyan ⋅ Alessandro Palma ⋅ Filippo Guerranti ⋅ Fabian Theis ⋅ Stephan Günnemann
+
+Project Page    [Poster]     [OpenReview]
+
+### Abstract",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),multimodal single-cell integration CITE-seq ATAC-seq geometry NeurIPS ICML 2024 2025,1,Multimodal Spatial Omics: From Data Acquisition to Computational Integration,https://arxiv.org/html/2601.12381v1,arxiv.org,0.9991374,"with single-cell or spatial multi-omics data to jointly perform spatial domain identification and, in some cases, deconvolution [162, 169]. SPOTlight adopts a related NMF-based strategy but incorporates prior knowledge through marker genes from scRNA-seq datasets, yielding seeded latent topics that correspond directly to known cell types . [...] some neuronal layers had strong H3K27ac at certain enhancers correlating with neuronal subtype specification, whereas other regions showed H3K27me3 silencing developmental genes in cells that had terminally differentiated. In another application, spatial CUT&\&Tag on diseased tissue could highlight fibrotic regions with abnormal chromatin states, helping explain pathological gene expression. A key challenge of these methods is data sparsity. Even single-cell ATAC-seq exhibits considerable sparsity, which can be further exacerbated in tissue contexts. Aggregating data across neighboring cells within a local region can help mitigate this limitation  [32, 85, 22]. [...] In the standard ATAC-seq, transposase enzymes cut open chromatin regions and insert sequencing adapters to profile open chromatin. Spatial ATAC-seq introduces these transposases into fixed tissue sections and then uses spatial barcoding (often with a DBiT-seq style microfluidic grid) to index the DNA fragments by location. In this approach, transposase (Tn5) flows across the tissue to fragment DNA in situ, then two sets of barcodes (A and B channels) are applied to the tissue as described for DBiT, so that each cut fragment gets tagged with a location-specific barcode. Sequencing these fragments yields a map of open chromatin regions across the tissue. Spatial ATAC-seq has achieved ∼\sim20μ\mum resolution (roughly single-cell level) in tissue sections.",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell multi-omics alignment optimal transport manifold 2024 2025 bioinformatics,7,Riemannian Metric Learning for Alignment of Spatial Multiomics,https://www.biorxiv.org/content/10.64898/2025.12.09.693237v1,www.biorxiv.org,0.99895155,"We introduce Manifold Gromov-Wasserstein ( MGW ), a metric-learning framework that exploits the product structure of spatial multiomics to infer modality-",False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),scVelo RNA velocity statistical model trajectory inference theory 2024 2025,10,KSRV: a Kernel PCA-Based framework for inferring spatial RNA ...,https://pmc.ncbi.nlm.nih.gov/articles/PMC12634034/,pmc.ncbi.nlm.nih.gov,0.9980882,It enables accurately inference of RNA velocity in spatially resolved tissue at single-cell resolution. KSRV was validated by using 10x Visium data and MERFISH,True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),single-cell flow estimation optimal transport developmental biology 2024 2025,6,WFR-FM: Simulation-Free Dynamic Unbalanced Optimal Transport | OpenReview,https://openreview.net/forum?id=1nqu7bK1mm,openreview.net,0.99804294,"minimizing the WFR-FM loss exactly recovers WFR geodesics. Empirically, WFR-FM yields more accurate and robust trajectory inference in single-cell biology, reconstructing consistent dynamics with proliferation and apoptosis, estimating time-varying growth fields, and applying to generative dynamics under imbalanced data. It outperforms state-of-the-art baselines in efficiency, stability, and reconstruction accuracy. Overall, WFR-FM establishes a unified and efficient paradigm for learning dynamical systems from unbalanced snapshots, where not only states but also mass evolve over time. The Python code is available at . [...] Abstract: The Wasserstein–Fisher–Rao (WFR) metric extends dynamic optimal transport (OT) by coupling displacement with change of mass, providing a principled geometry for modeling unbalanced snapshot dynamics. Existing WFR solvers, however, are often unstable, computationally expensive, and difficult to scale. Here we introduce \textbf{WFR Flow Matching (WFR-FM)}, a simulation-free training algorithm that unifies flow matching with dynamic unbalanced OT. Unlike classical flow matching which regresses only a transport vector field, WFR-FM simultaneously regresses a vector field for displacement and a scalar growth rate function for birth–death dynamics, yielding continuous flows under the WFR geometry. Theoretically, we show that minimizing the WFR-FM loss exactly recovers WFR geodesics. [...] back arrowGo to ICLR 2026 Conference homepage
+
+## WFR-FM: Simulation-Free Dynamic Unbalanced Optimal Transport
+
+Download PDF
+
+### Qiangwei Peng, Zihan Wang, Junda Ying, Yuhao Sun, Qing Nie, Lei Zhang, Tiejun Li, Peijie Zhou
+
+Published: 26 Jan 2026, Last Modified: 11 Apr 2026ICLR 2026 PosterEveryoneRevisionsBibTeXCC BY 4.0
+
+Keywords: flow matching; unbalanced optimal transport; Wasserstein-Fisher-Rao
+
+TL;DR: Solve the dynamic unbalanced optimal transport WFR problem by using flow matching",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell data denoising imputation optimal transport 2024 2025 NeurIPS ICML,2,NeurIPS 2025 Thursday 12/4,https://neurips.cc/virtual/2025/day/12/4,neurips.cc,0.9979652,"Variational Regularized Unbalanced Optimal Transport: Single Network, Least Action
+
+Yuhao Sun ⋅ Zhenyi Zhang ⋅ Zihan Wang ⋅ Tiejun Li ⋅ Peijie Zhou
+
+Ctrl-DNA: Controllable Cell-Type-Specific Regulatory DNA Design via Constrained RL
+
+Xingyu Chen ⋅ Shihao Ma ⋅ Runsheng Lin ⋅ Jiecong Lin ⋅ Bo Wang
+
+HiPoNet: A Multi-View Simplicial Complex Network for High Dimensional Point-Cloud and Single-Cell data
+
+Siddharth Viswanath ⋅ Hiren Madhu ⋅ Dhananjay Bhaskar ⋅ Jake Kovalic ⋅ Dave Johnson ⋅ Christopher Tape ⋅ Ian Adelstein ⋅ Rex Ying ⋅ Michael Perlmutter ⋅ Smita Krishnaswamy
+
+Securing the Language of Life: Inheritable Watermarks from DNA Language Models to Proteins
+
+ZAIXI ZHANG ⋅ Ruofan Jin ⋅ Le Cong ⋅ Mengdi Wang [...] ZAIXI ZHANG ⋅ Ruofan Jin ⋅ Le Cong ⋅ Mengdi Wang
+
+Learning Crossmodal Interaction Patterns via Attributed Bipartite Graphs for Single-Cell Omics
+
+Xiaotang Wang ⋅ Xuanwei Lin ⋅ Yun Zhu ⋅ Hao Li ⋅ Yongqi Zhang
+
+ChromFound: Towards A Universal Foundation Model for Single-Cell Chromatin Accessibiltiy Data
+
+Yifeng Jiao ⋅ Yuchen Liu ⋅ Yu Zhang ⋅ Xin Guo ⋅ Yushuai Wu ⋅ Chen Jiang ⋅ Jiyang Li ⋅ Hongwei Zhang ⋅ LIMEI HAN ⋅ Xin Gao ⋅ Yuan Qi ⋅ Yuan Cheng
+
+GeneFlow: Translation of Single-cell Gene Expression to Histopathological Images via Rectified Flow
+
+Mengbo Wang ⋅ Shourya Verma ⋅ Aditya Malusare ⋅ Luopin Wang ⋅ Yiyang Lu ⋅ Vaneet Aggarwal ⋅ Mario Sola ⋅ Ananth Grama ⋅ Nadia Lanman
+
+RAM-W600: A Multi-Task Wrist Dataset and Benchmark for Rheumatoid Arthritis [...] ⋅ Yanfeng Ouyang ⋅ Lianhui Qin ⋅ Elyse Rosenbaum ⋅ Corey Snyder ⋅ Peter Seiler ⋅ Geir Dullerud ⋅ Xiaojia Zhang ⋅ Zuofu Cheng ⋅ Pavan Kumar Hanumolu ⋅ Jian Huang ⋅ Mayank Kulkarni ⋅ Mahdi Namazifar ⋅ Huan Zhang ⋅ Bin Hu",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),trajectory inference single-cell optimal transport Waddington ICML NeurIPS 2024 2025,7,ContextFlow: Context-Aware Flow Matching for Trajectory Inference from Spatial Omics Data | OpenReview,https://openreview.net/forum?id=366HPAs7aP,openreview.net,0.9976404,"Abstract: Inferring trajectories from longitudinal spatially-resolved omics data is fundamental to understanding the dynamics of structural and functional tissue changes in development, regeneration and repair, disease progression, and response to treatment. We propose ContextFlow, a novel context-aware flow matching framework that incorporates prior knowledge to guide the inference of structural tissue dynamics from spatially resolved omics data. Specifically, ContextFlow integrates local tissue organization and ligand-receptor communication patterns into a transition plausibility matrix that regularizes the optimal transport objective. By embedding these contextual constraints, ContextFlow generates trajectories that are not only statistically consistent but also biologically [...] back arrowGo to ICLR 2026 Conference homepage
+
+## ContextFlow: Context-Aware Flow Matching for Trajectory Inference from Spatial Omics Data
+
+Download PDF
+
+### Santanu Rathod, Francesco Ceccarelli, Sean B. Holden, Pietro Lio, Xiao Zhang, Jovan Tanevski
+
+19 Sept 2025 (modified: 11 Feb 2026)Submitted to ICLR 2026EveryoneRevisionsBibTeXCC BY 4.0
+
+Keywords: Flow-matching, optimal transport, spatial omics
+
+TL;DR: We propose a novel approach to incorporate biological prior knowledge into flow-matching framework for spatial omics [...] are not only statistically consistent but also biologically meaningful, making it a generalizable framework for modeling spatiotemporal dynamics from longitudinal, spatially resolved omics data. Evaluated on three datasets, ContextFlow consistently outperforms state-of-the-art flow matching methods across multiple quantitative and qualitative metrics of inference accuracy and biological coherence.",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),multimodal single-cell integration CITE-seq ATAC-seq geometry NeurIPS ICML 2024 2025,3,iAODE for benchmarking and continuum modeling of single-cell ...,https://www.nature.com/articles/s42003-026-09768-8,www.nature.com,0.9974885,"For scATAC-seq, extreme sparsity makes peak-gene link inference sensitive to noise19.""), requiring coherence examination at peak, gene, and multi-modal integration levels simultaneously27.""),28.""). [...] Existing deep generative models for scATAC-seq excel at static representation, batch correction, and multimodal integration but do not explicitly model continuous developmental dynamics; continuity relies on post-hoc metrics. We ask: how to learn a latent space that is both generative and endowed with intrinsic continuous trajectory structure under extreme scATAC-seq sparsity? We propose iAODE (interpretable Accessibility ODE-based variational autoencoder), built on a variational autoencoder (VAE) with zero-inflated negative binomial (ZINB) likelihood for discrete counts and zero inflation. The encoder predicts normalized pseudotime and introduces a Neural ODE vector field in latent space describing continuous chromatin-state evolution; low KL weights (β≤0.1) preserve coupling across [...] A–C For Small (n = 165), Medium (n = 68), and Large (n = 15) scATAC-seq datasets, iAODE is compared with ICA, FA, NMF, PCA, Diffusion Maps (DIFF), and Palantir. Each panel summarizes continuum/manifold-geometry metrics together with embedding-quality metrics computed from UMAP and t-SNE embeddings. Global Friedman or RM-ANOVA tests (all p < 0.001) indicate overall differences across methods. iAODE attains higher scores on Manifold dimensionality, Participation ratio, Noise resilience, Trajectory directionality, CAL, and COR than the linear and graph-based methods examined here, whereas Palantir and Diffusion Maps tend to yield higher ASW and QL, indicating relatively stronger emphasis on local compactness. DIFF Diffusion Maps, UMAP Uniform Manifold Approximation and Projection, t-SNE",False
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),single-cell flow estimation optimal transport developmental biology 2024 2025,7,STORIES: learning cell fate landscapes from spatial transcriptomics ...,https://www.nature.com/articles/s41592-025-02855-4,www.nature.com,0.9969957,"Article  CAS  PubMed   Google Scholar
+20. Shen, X. et al. Inferring cell trajectories of spatial transcriptomics via optimal transport analysis. Cell Syst. 16, 101194 (2025).
+21. Klein, D. et al. Mapping cells through time and space with moscot. Nature 638, 1065–1075 (2025).
+
+    Article  CAS  PubMed  PubMed Central   Google Scholar
+22. Peng, Q., Zhou, P. & Li, T. stVCR: reconstructing spatio-temporal dynamics of cell development using optimal transport. Preprint at bioRxiv  (2024).
+23. Vayer, T., Chapel, L., Flamary, R., Tavenard, R. & Courty, N. Fused Gromov–Wasserstein distance for structured objects. Algorithms 13, 212 (2020). [...] Article  PubMed  PubMed Central   Google Scholar
+12. Bergen, V., Soldatov, R. A., Kharchenko, P. V. & Theis, F. J. RNA velocity—current challenges and future perspectives. Mol. Syst. Biol. 17, e10282 (2021).
+
+    Article  CAS  PubMed  PubMed Central   Google Scholar
+13. Schiebinger, G. et al. Optimal-transport analysis of single-cell gene expression identifies developmental trajectories in reprogramming. Cell 176, 928–943 (2019). [...] Article  CAS  PubMed  PubMed Central   Google Scholar
+28. DeepMind et al. The DeepMind JAX ecosystem. GitHub  (2020).
+29. Cuturi, M. et al. Optimal Transport Tools (OTT): a JAX toolbox for all things Wasserstein. Preprint at  (2022).
+30. Peyré, G. & Cuturi, M. Computational optimal transport: With applications to data science. Found. Trends Mach. Learn. 11, 355–607 (2019).
+
+    Article   Google Scholar
+31. Jordan, R., Kinderlehrer, D. & Otto, F. The variational formulation of the Fokker–Planck equation. SIAM J. Math. Anal. 29, 1–17 (1998).
+
+    Article   Google Scholar
+32. Chen, H. et al. Single-cell trajectories reconstruction, exploration and mapping of omics data with STREAM. Nat. Commun. 10, 1903 (2019).",False
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell multi-omics alignment optimal transport manifold 2024 2025 bioinformatics,8,scMRDR: A scalable and flexible framework for unpaired single-cell ...,https://neurips.cc/virtual/2025/poster/115611,neurips.cc,0.9950177,"In this paper, we introduce a scalable and flexible generative framework called single-cell Multi-omics Regularized Disentangled Representations (scMRDR) for",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell sparsity handling variational inference probabilistic model 2024 2025,2,SAVE: A Generalizable Framework for Multi-Condition Single-Cell Generation with Gene Block Attention,https://arxiv.org/html/2604.16776v1,arxiv.org,0.992597,"Variational Autoencoders (VAEs) have become the foundation of many generative frameworks in single-cell omics, with scVI Lopez et al. (2018) being a notable example. While effective in learning latent representations and enabling batch correction and imputation, such models typically assume simple architectures and are limited in their ability to model complex, combinatorial interactions among multiple external conditions. Addressing this limitation is crucial for simulating realistic cellular responses in multi-conditional settings Luecken et al. (2024). [...] Variational Autoencoders (VAEs) have been widely adopted for modeling single-cell RNA-seq data. Notably, scVI Lopez et al. (2018) introduces a zero-inflated negative binomial (ZINB) likelihood and encodes covariates into the latent space for tasks like batch correction and imputation. However, traditional VAE-based models primarily focus on representation learning rather than flexible data generation across complex conditions Xiong et al. (2022). To improve generative capabilities, recent models have explored more expressive architectures. CFGen Palma et al. , a flow-based model, applies optimal transport-guided diffusion and classifier-free guidance to model conditional distributions. Similarly, scDiffusion Luo et al. (2024) combines latent diffusion with a pre-trained autoencoder [...] Transformer-based models have recently gained traction in single-cell omics, mostly for representation learning. scGPT Cui et al. (2024), scBERT Yang et al. (2022), and Geneformer Theodoris et al. (2023) tokenize gene expression using rank or discretized values, often sacrificing fine-grained quantitative information. GeneCompass Yang et al. (2024) improves upon this by combining rank and absolute expression with regression loss. Some methods directly project expression values into continuous space, with additional strategies to handle zero inflation. TOSICA Chen et al. (2023) uses gene networks to filter unreliable zeros, while scFoundation Hao et al. (2024) introduces special tokens to mask them. CellPLM Wen et al. (2023) models inter-cell relationships via a VAE-Transformer hybrid,",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell sparsity handling variational inference probabilistic model 2024 2025,3,Scalable Single-Cell Gene Expression Generation with Latent Diffusion Models,https://arxiv.org/html/2511.02986v1,arxiv.org,0.992597,"to unseen cell context–perturbation pairs. For both datasets, we restricted analysis to the top 2,000 highly variable genes (HVGs) following adduri2025predicting. We compare our model against established baselines: CPA [lotfollahi2023cpa], scVI [lopez2018deep], scGPT [cui2024scgpt] and STATE-Tx [adduri2025predicting]. [...] To model an exchangeable probabilistic model p​(𝐱ℐ|θ,ℐ)p(\mathbf{x}\_{\mathcal{I}}|{\theta},\mathcal{I}), we introduce mm latent variables (i.e., the number of latents is fixed for all subsets ℐ\mathcal{I}), 𝐙∈ℝm×D\mathbf{Z}\in\mathbb{R}^{m\times D}. By using the family of variational posteriors of the form q​(𝐙|ϕ,𝐱ℐ)q(\mathbf{Z}|\phi,\mathbf{x}\_{\mathcal{I}}), the Evidence Lower BOund (ELBO) is the following: [...] 𝐳i\mathbf{z}\_{i} is generated given 𝐜\mathbf{c}, i.e., p​(𝐱ℐ|ℐ,𝐳ℐ)​p​(𝐳ℐ|𝐜)​p​(𝐜)p(\mathbf{x}\_{\mathcal{I}}|\mathcal{I},\mathbf{z}\_{\mathcal{I}})\ p(\mathbf{z}\_{\mathcal{I}}|\mathbf{c})\ p(\mathbf{c}), where p​(𝐱ℐ|ℐ,𝐳ℐ)=∏i=1|ℐ|p​(𝐱i|𝐳i)p(\mathbf{x}\_{\mathcal{I}}|\mathcal{I},\mathbf{z}\_{\mathcal{I}})=\prod\_{i=1}^{|\mathcal{I}|}p(\mathbf{x}\_{i}|\mathbf{z}\_{i}) and p​(𝐳ℐ|𝐜)=p​(|ℐ|)​∏i=1|ℐ|p​(𝐳i|𝐜)p(\mathbf{z}\_{\mathcal{I}}|\mathbf{c})=p(|\mathcal{I}|)\prod\_{i=1}^{|\mathcal{I}|}p(\mathbf{z}\_{i}|\mathbf{c}). Then, the variational posteriors can take the following form: q​(𝐳ℐ|𝐱ℐ)=δ​(|ℐ|)​∏i=1|ℐ|q​(𝐳i|𝐱i)q(\mathbf{z}\_{\mathcal{I}}|\mathbf{x}\_{\mathcal{I}})=\delta(|\mathcal{I}|)\prod\_{i=1}^{|\mathcal{I}|}q(\mathbf{z}\_{i}|\mathbf{x}\_{i}), where δ​(⋅)\delta(\cdot) is Dirac’s delta,",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),cell state alignment trajectory smoothing geometric learning 2024 2025,4,Learning from Contrasts: Synthesizing Reasoning Paths from Diverse Search Trajectories,https://arxiv.org/html/2604.11365v1,arxiv.org,0.9912209,"Xu et al. (2024a), but applied to synthesizing robust chain-of-thought trajectories. Similar alignment principles are also proving essential for mitigating hallucinations and optimizing tool-calling behaviors in LLMs Xu et al. (2025, 2024b). [...] #### 3.3.2 Local Step-wise Critique via Semantic Alignment
+
+Errors in reasoning are often localized to specific steps. To critique these steps, we must align the trajectories. Since τ+\tau^{+} and τ−\tau^{-} may vary significantly in length and phrasing, rigid index-based alignment is ineffective. [...] We employ Semantic Alignment: 𝒢analyst\mathcal{G}\_{\text{analyst}} scans both trajectories to identify the Semantic Divergence Point, the first step tt where the logic of τ−\tau^{-} substantively departs from τ+\tau^{+}. To operationalize this, we define a “step” as a semantic reasoning act. Following established practices in process supervision Wang et al. (2024), we employ heuristic delimiters to segment trajectories: primary structural boundaries (e.g., \n, \n\n), logical connectors (e.g., “Therefore”, “Hence”), and explicit enumerations. Our preliminary studies indicate that this step-level granularity reduces value estimation variance in MCTS by 18% compared to sentence-level segmentation and improves the analyst’s divergence point identification accuracy to 92% (vs. 64% for",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),trajectory inference single-cell optimal transport Waddington ICML NeurIPS 2024 2025,8,ARTEMIS integrates autoencoders and Schrödinger Bridges to ...,https://academic.oup.com/bioinformatics/article/41/Supplement_1/i189/8199396,academic.oup.com,0.9887554,"The VAE maps input time-series single-cell data to a continuous latent space, where trajectories are reconstructed by solving the Schrödinger bridge problem",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell data denoising imputation optimal transport 2024 2025 NeurIPS ICML,3,ICML Poster sciLaMA: A Single-Cell Representation Learning ...,https://icml.cc/virtual/2025/poster/46669,icml.cc,0.98707944,"LaMs with scRNA-seq tabular data through a paired-VAE architecture. Our approach generates context-aware representations for both cells and genes and outperforms state-of-the-art methods in key single-cell downstream tasks, including batch effect correction, cell clustering, and cell-state-specific gene marker and module identification, while maintaining computational efficiency. sciLaMA offers a computationally efficient, unified framework for comprehensive single-cell data analysis and biologically interpretable gene module discovery. [...] ### Lay Summary [...] that could guide the discovery of biomarkers and potential treatment targets.",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),single-cell flow estimation optimal transport developmental biology 2024 2025,8,scTsI: an effective two-stage imputation method for single-cell RNA-seq data - PMC,https://pmc.ncbi.nlm.nih.gov/articles/PMC12204820/,pmc.ncbi.nlm.nih.gov,0.98677725,"cell correlations and gene correlations, a ZINB decoder to reconstruct the expression matrix, and optimal transport theory for joint representation alignment to enhance cell type identification. [...] 27. Yu  J, Chen  N, Gao  M. et al.  Unsupervised gene-cell collective representation learning with optimal transport. In: Wooldridge M, Dy J, Natarajan S (eds.), Proceedings of the AAAI Conference on Artificial Intelligence. Washington, DC, USA: AAAI Press, 2024;38:356–64. 10.1609/aaai.v38i1.27789. [DOI] [Google Scholar]
+ 28. Kang  Y, Zhang  H, Guan  J. scINRB: Single-cell gene expression imputation with network regularization and bulk RNA-seq data. Brief Bioinform  2024;25:bbae148. [DOI] [PMC free article] [PubMed] [Google Scholar]
+ 29. Cheng  Y, Ma  X, Yuan  L. et al.  Evaluating imputation methods for single-cell RNA-seq data. BMC Bioinformatics  2023;24:302. 10.1186/s12859-023-05417-7. [DOI] [PMC free article] [PubMed] [Google Scholar] [...] low-rank matrix completion–based framework. Among the deep learning–based methods, deep count autoencoder network (DCA)  applies a deep count autoencoder network for capturing nonlinear correlations between genes to impute missing data. DeepImpute  trains deep neural networks with a dropout layer and loss function to perform imputation. Bis  uses an optimal transport-based autoencoder with cell embedding regularization and leverages bulk RNA-seq data for recovering scRNA-seq data. scMGCA  employs a graph convolutional autoencoder with a multinomial-based decoder to characterize the multimodal distribution, which simulates the high probability dropout events of single-cell data. scGCOT  uses attention-based graph autoencoders to learn cell correlations and gene correlations, a ZINB decoder",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell sparsity handling variational inference probabilistic model 2024 2025,5,The future of rapid and automated single-cell data analysis using reference mapping - PMC,https://pmc.ncbi.nlm.nih.gov/articles/PMC11184658/,pmc.ncbi.nlm.nih.gov,0.97423947,"Parallel analysis of individual cells for RNA expression and DNA from targeted tagmentation by sequencing (Paired-Tag) is a sequencing technique that simultaneously profiles of different histone modifications and transcriptome in single cells
+
+A type of variational autoencoder used to integrate multiple modalities of data and learn one single joint latent representation
+
+An algorithm to sample a subset of cells from the entire data. The sampled cells are expected to effectively preserve cellular heterogeneity and gene expression covariance from the full dataset
+
+A computational concept for grouping homogeneous cells based on the similarity of their genetic molecular to represent distinct cell types or states [...] types of generative model in machine learning that combine elements of autoencoders and variational inference. VAEs aim to learn probabilistic mapping between the input data and a latent space, allowing for the generation of new data points. The encoder network maps input data to a probability distribution in the latent space, and the decoder network generates data from samples drawn from this distribution. VAEs are commonly used for tasks like generating novel data samples, data compression, and unsupervised learning
+
+a set of techniques in machine learning and data analysis focused on capturing the underlying structure, or manifold, of high-dimensional data in a lower-dimensional space. The goal is to represent complex data in a way that preserves its underlying geometric relationships [...] Deep learning methods have been developed to address these challenges to predict cellular behaviors. Variational autoencoders (VAE)53 have been the main tool for learning low-dimensional latent representation from single-cell data. An example is scGen52, a VAE combined with latent space vector arithmetics to predict single-cell response to disease and chemical perturbations across cell types and species. Following on from this work, the compositional perturbation autoencoder (CPA)54 has been proposed to extend existing methods to predict combinatorial responses to drugs or genetic perturbations. CPA learns a cell representation as the composition of a basal state combined with learned representation for perturbations and covariates (e.g., cell type, patient, species). Finally, recent",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell sparsity handling variational inference probabilistic model 2024 2025,6,NeurIPS Poster ProDAG: Projected Variational Inference for Directed Acyclic Graphs,https://neurips.cc/virtual/2025/poster/118086,neurips.cc,0.96814114,"Directed acyclic graph (DAG) learning is a central task in structure discovery and causal inference. Although the field has witnessed remarkable advances over the past few years, it remains statistically and computationally challenging to learn a single (point estimate) DAG from data, let alone provide uncertainty quantification. We address the difficult task of quantifying graph uncertainty by developing a Bayesian variational inference framework based on novel, provably valid distributions that have support directly on the space of sparse DAGs. These distributions, which we use to define our prior and variational posterior, are induced by a projection operation that maps an arbitrary continuous distribution onto the space of sparse weighted acyclic adjacency matrices. While this [...] of sparse weighted acyclic adjacency matrices. While this projection is combinatorial, it can be solved efficiently using recent continuous reformulations of acyclicity constraints. We empirically demonstrate that our method, ProDAG, can outperform state-of-the-art alternatives in both accuracy and uncertainty quantification. [...] Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Wed, Dec 3, 2025 • 11:00 AM – 2:00 PM PST
+
+# ProDAG: Projected Variational Inference for Directed Acyclic Graphs
+
+Ryan Thompson ⋅ Edwin Bonilla ⋅ Robert Kohn
+
+ [Poster]     [OpenReview]
+
+### Abstract",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell data denoising imputation optimal transport 2024 2025 NeurIPS ICML,4,NeurIPS 2025 Friday 12/5,https://neurips.cc/virtual/2025/day/12/5,neurips.cc,0.96485513,"When Additive Noise Meets Unobserved Mediators: Bivariate Denoising Diffusion for Causal Discovery
+
+Dominik Meier ⋅ Sujai Hiremath ⋅ PROMIT GHOSAL ⋅ Kyra Gan
+
+Differentiable Structure Learning and Causal Discovery for General Binary Data
+
+Chang Deng ⋅ Bryon Aragam
+
+Less Greedy Equivalence Search
+
+Adiba Ejaz ⋅ Elias Bareinboim
+
+Coupling Generative Modeling and an Autoencoder with the Causal Bridge
+
+Ruolin Meng ⋅ Ming-Yu Chung ⋅ Dhanajit Brahma ⋅ Ricardo Henao ⋅ Lawrence Carin
+
+A Unified Framework for the Transportability of Population-Level Causal Measures
+
+Ahmed Boughdiri ⋅ Clément Berenfeld ⋅ Julie Josse ⋅ Erwan Scornet
+
+Revising and Falsifying Sparse Autoencoder Feature Explanations
+
+George Ma ⋅ Samuel Pfrommer ⋅ Somayeh Sojoudi [...] Hanqun Cao ⋅ Haosen Shi ⋅ Chenyu Wang ⋅ Sinno Pan ⋅ Pheng-Ann Heng
+
+PRESCRIBE: Predicting Single-Cell Responses with Bayesian Estimation
+
+Jiabei Cheng ⋅ Changxi Chi ⋅ Jingbo Zhou ⋅ Hongyi Xin ⋅ Jun Xia
+
+JanusDNA: A Powerful Bi-directional Hybrid DNA Foundation Model
+
+Qihao Duan ⋅ Bingding Huang ⋅ Zhenqiao Song ⋅ Irina Lehmann ⋅ Lei Gu ⋅ Roland Eils ⋅ Benjamin Wild
+
+MTBBench: A Multimodal Sequential Clinical Decision-Making Benchmark in Oncology
+
+Kiril Vasilev ⋅ Alexandre Misrahi ⋅ Eeshaan Jain ⋅ Phil F Cheng ⋅ Petros Liakopoulos ⋅ Olivier Michielin ⋅ Michael Moor ⋅ Charlotte Bunne
+
+DiffLiG: Diffusion-enhanced Liquid Graph with Attention Propagation for Grid-to-Station Precipitation Correction [...] Yuan Chiang ⋅ Tobias Kreiman ⋅ Christine Zhang ⋅ Matthew Kuner ⋅ Elizabeth Weaver ⋅ Ishan Amin ⋅ Hyunsoo Park ⋅ Yunsung Lim ⋅ Jihan Kim ⋅ Daryl Chrzan ⋅ Aron Walsh ⋅ Samuel Blau ⋅ Mark Asta ⋅ Aditi Krishnapriyan
+
+PF∆: A Benchmark Dataset for Power Flow under Load, Generation, and Topology Variations
+
+Ana Rivera Him ⋅ Anvita Bhagavathula ⋅ Alvaro Carbonero ⋅ Priya Donti
+
+TIDMAD: Time Series Dataset for Discovering Dark Matter with AI Denoising
+
+Jessica Fry ⋅ Xinyi Fu ⋅ Zhenghao Fu ⋅ Kaliroë Pappas ⋅ Lindley Winslow ⋅ Aobo Li
+
+Bubbleformer: Forecasting Boiling with Transformers
+
+Sheikh Md Shakeel Hassan ⋅ Xianwei Zou ⋅ Akash Dhruv ⋅ Aparna Chandramowlishwaran
+
+Know Thyself by Knowing Others: Learning Neuron Identity from Population Context",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell sparsity handling variational inference probabilistic model 2024 2025,7,NeurIPS Poster Brain-like Variational Inference,https://neurips.cc/virtual/2025/poster/119894,neurips.cc,0.94891727,"variational inference through membrane potential dynamics, replacing amortized encoders with iterative inference updates. Theoretically, iP-VAE yields several desirable features such as emergent normalization via lateral competition, and hardware-efficient integer spike count representations. Empirically, iP-VAE outperforms both standard VAEs and Gaussian-based predictive coding models in sparsity, reconstruction, and biological plausibility, and scales to complex color image datasets such as CelebA. iP-VAE also exhibits strong generalization to out-of-distribution inputs, exceeding hybrid iterative-amortized VAEs. These results demonstrate how deriving inference algorithms from first principles can yield concrete architectures that are simultaneously biologically plausible and [...] that are simultaneously biologically plausible and empirically effective. [...] Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Wed, Dec 3, 2025 • 11:00 AM – 2:00 PM PST
+
+# Brain-like Variational Inference
+
+Hadi Vafaii · Dekel Galor · Jacob Yates
+
+Project Page    [OpenReview]
+
+### Abstract",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),multimodal single-cell integration CITE-seq ATAC-seq geometry NeurIPS ICML 2024 2025,7,Target identification and assessment in the era of AI - Nature,https://www.nature.com/articles/s41573-026-01412-8,www.nature.com,0.938124,"CAS  PubMed  PubMed Central   Google Scholar
+118. Lindenbaum, O., Stanley, J., Wolf, G. & Krishnaswamy, S. Geometry based data generation. In Advances in Neural Information Processing Systems Vol. 31, 1405–1416 (NeurIPS, 2018).
+119. Zinati, Y., Takiddeen, A. & Emad, A. GRouNdGAN: GRN-guided simulation of single-cell RNA-seq data using causal generative adversarial networks. Nat. Commun. 15, 4055 (2024).
+
+     CAS  PubMed  PubMed Central   Google Scholar
+120. Lotfollahi, M., Wolf, F. A. & Theis, F. J. scGen predicts single-cell perturbation responses. Nat. Methods 16, 715–721 (2019). [...] CAS  PubMed   Google Scholar
+203. Chen, T., Philip, M., Le Cao, K. A. & Tyagi, S. A multi-modal data harmonisation approach for discovery of COVID-19 drug targets. Brief. Bioinform 22, bbab185 (2021).
+
+     PubMed  PubMed Central   Google Scholar
+204. Chaudhary, K., Poirion, O. B., Lu, L. & Garmire, L. X. Deep Learning-based multi-omics integration robustly predicts survival in liver cancer. Clin. Cancer Res. 24, 1248–1259 (2018).
+
+     CAS  PubMed   Google Scholar
+205. Hao, Y. et al. Integrated analysis of multimodal single-cell data. Cell 184, 3573–3587.e29 (2021).
+
+     CAS  PubMed  PubMed Central   Google Scholar
+206. Elbadawi, M., Gaisford, S. & Basit, A. W. Advanced machine-learning techniques in drug discovery. Drug. Discov. Today 26, 769–777 (2021). [...] Google Scholar
+199. Oprea, T. I. et al. Unexplored therapeutic opportunities in the human genome. Nat. Rev. Drug. Discov. 17, 317–332 (2018).
+
+     CAS  PubMed  PubMed Central   Google Scholar
+200. Picard, M., Scott-Boyer, M. P., Bodein, A., Périn, O. & Droit, A. Integration strategies of multi-omics data for machine learning analysis. Comput. Struct. Biotechnol. J. 19, 3735–3746 (2021).
+
+     CAS  PubMed  PubMed Central   Google Scholar
+201. Adossa, N., Khan, S., Rytkönen, K. T. & Elo, L. L. Computational strategies for single-cell multi-omics integration. Comput. Struct. Biotechnol. J. 19, 2588–2596 (2021).
+
+     CAS  PubMed  PubMed Central   Google Scholar
+202. Acosta, J. N., Falcone, G. J., Rajpurkar, P. & Topol, E. J. Multimodal biomedical AI. Nat. Med. 28, 1773–1784 (2022).",False
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),cell state alignment trajectory smoothing geometric learning 2024 2025,6,NeurIPS Poster GSAlign: Geometric and Semantic Alignment Network for Aerial-Ground Person Re-Identification,https://neurips.cc/virtual/2025/poster/117136,neurips.cc,0.92683524,"and semantic misalignment in aerial-ground matching: a Learnable Thin Plate Spline (LTPS) Transformation Module and a Dynamic Alignment Module (DAM). The LTPS module adaptively warps pedestrian features based on a set of learned keypoints, effectively compensating for geometric variations caused by extreme viewpoint changes. In parallel, the DAM estimates visibility-aware representation masks that highlight visible body regions at the semantic level, thereby alleviating the negative impact of occlusions and partial observations in cross-view correspondence. Extensive experiments on the challenging CARGO benchmark demonstrate the effectiveness of GSAlign, achieving significant improvements of +18.8\% in mAP and +16.8\% in Rank-1 accuracy over previous state-of-the-art methods. [...] Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Fri, Dec 5, 2025 • 11:00 AM – 2:00 PM PST
+
+# GSAlign: Geometric and Semantic Alignment Network for Aerial-Ground Person Re-Identification
+
+Qiao Li ⋅ Jie Li ⋅ Yukang Zhang ⋅ Lei Tan ⋅ Jing Chen ⋅ Jiayi Ji
+
+ [Slides]     [Poster]     [OpenReview]
+
+### Abstract [...] ### Video
+
+Chat is not available.
+
+Successful Page Load
+
+| NeurIPS uses cookies for essential functions only. We do not sell your personal information. Our Privacy Policy » |  |",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),single-cell flow estimation optimal transport developmental biology 2024 2025,9,Trajectory inference for aging time courses of single-cell snapshots,https://www.biorxiv.org/content/10.64898/2025.12.18.694987v1.full-text,www.biorxiv.org,0.92523,"In this work, we propose a novel TI method specifically designed to reconstruct debiased cell trajectories at all ages in these time courses simultaneously. Our",False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell data denoising imputation optimal transport 2024 2025 NeurIPS ICML,5,Machine Learning Sep 2025 - arXiv,https://www.arxiv.org/list/cs.LG/2025-09?skip=875&show=500,www.arxiv.org,0.9224824,"Xiaochuan Gong, Jie Hao, Mingrui Liu
+
+    Comments: NeurIPS 2025
+
+    Subjects: Machine Learning (cs.LG); Optimization and Control (math.OC)
+
+ arXiv:2509.15400 [pdf, html, other]
+:   Title: Exploring multimodal implicit behavior learning for vehicle navigation in simulated cities
+
+    Eric Aislan Antonelo, Gustavo Claudio Karl Couto, Christian Möller
+
+    Comments: ENIAC conference
+
+    Subjects: Machine Learning (cs.LG); Artificial Intelligence (cs.AI); Robotics (cs.RO)
+
+ arXiv:2509.15420 [pdf, html, other]
+:   Title: Top-$k$ Feature Importance Ranking
+
+    Yuxi Chen, Tiffany Tang, Genevera Allen
+
+    Subjects: Machine Learning (cs.LG); Machine Learning (stat.ML)
+
+ arXiv:2509.15429 [pdf, html, other]
+:   Title: Random Matrix Theory-guided sparse PCA for single-cell RNA-seq data [...] Zihao Feng, Xiaoxue Wang, Bowen Wu, Hailong Cao, Tiejun Zhao, Qun Yu, Baoxun Wang
+
+    Subjects: Machine Learning (cs.LG); Computation and Language (cs.CL)
+
+ arXiv:2509.14722 [pdf, html, other]
+:   Title: Towards Pre-trained Graph Condensation via Optimal Transport
+
+    Yeyu Yan, Shuai Zheng, Wenjun Hui, Xiangkai Zhu, Dong Chen, Zhenfeng Zhu, Yao Zhao, Kunlun He
+
+    Subjects: Machine Learning (cs.LG)
+
+ arXiv:2509.14723 [pdf, html, other]
+:   Title: Transcoder-based Circuit Analysis for Interpretable Single-Cell Foundation Models
+
+    Sosuke Hosokawa, Toshiharu Kawakami, Satoshi Kodera, Masamichi Ito, Norihiko Takeda
+
+    Subjects: Machine Learning (cs.LG)
+
+ arXiv:2509.14724 [pdf, html, other]
+:   Title: One-step Multi-view Clustering With Adaptive Low-rank Anchor-graph Learning [...] arXiv:2509.14444 [pdf, html, other]
+:   Title: FedAVOT: Exact Distribution Alignment in Federated Learning via Masked Optimal Transport
+
+    Herlock (SeyedAbolfazl)Rahimi, Dionysis Kalogerias
+
+    Comments: 5 pages, 1 figure, ICASSP
+
+    Subjects: Machine Learning (cs.LG); Machine Learning (stat.ML)
+
+ arXiv:2509.14472 [pdf, html, other]
+:   Title: H-Alpha Anomalyzer: An Explainable Anomaly Detector for Solar H-Alpha Observations
+
+    Mahsa Khazaei, Azim Ahmadzadeh, Alexei Pevtsov, Luca Bertello, Alexander Pevtsov
+
+    Subjects: Machine Learning (cs.LG); Instrumentation and Methods for Astrophysics (astro-ph.IM); Solar and Stellar Astrophysics (astro-ph.SR)
+
+ arXiv:2509.14488 [pdf, html, other]
+:   Title: Decentralized Optimization with Topology-Independent Communication",False
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell multi-omics alignment optimal transport manifold 2024 2025 bioinformatics,10,Securing diagonal integration of multimodal single-cell data against ...,https://academic.oup.com/bioinformatics/article/41/6/btaf345/8162456,academic.oup.com,0.6859495,A novel diagnostic method designed to detect potential artificial integrations resulting from ambiguous mappings in diagonal data integration.,True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),geodesic inference single-cell manifold developmental trajectory 2024 2025 theory,1,Generating and navigating single cell dynamics via a geodesic bridge between nonlinear transcriptional and linear latent manifolds,https://www.biorxiv.org/content/10.64898/2026.03.31.715478v1.full.pdf,www.biorxiv.org,0.6271529,"Transcriptomics Applied to Embryonic Stem Cells.  Cell  161 ,
+
+1187 –1201 (2015). 
+
+2.  Hackenberg, M., Canal Guitart, L., Backofen, R. & Binder, H. 
+
+Evaluating discrepancies in dimensionality reduction for time -
+
+series single -cell RNA -sequencing data.  Briefings in 
+
+Bioinformatics  26 , bbaf287 (2025). 
+
+3.  Schiebinger, G.  et al.  Optimal -Transport Analysis of Single -Cell 
+
+Gene Expression Identifies Developmental Trajectories in 
+
+Reprogramming.  Cell  176 , 928 -943.e22 (2019). 
+
+4.  Klein, D.  et al.  Mapping cells through time and space with 
+
+moscot.  Nature  638 , 1065 –1075 (2025). 
+
+5.  Tronstad, M., Karlsson, J. & Dahlin, J. S. MultistageOT: 
+
+Multistage optimal transport infers trajectories from a snapshot 
+
+of single -cell data. Preprint at 
+
+ (2025). [...] Manifold Interpolation. Preprint at 
+
+ (2025). 
+
+20.  Diepeveen, W. & Needell, D. Manifold Learning with 
+
+Normalizing Flows: Towards Regularity, Expressivity and Iso -
+
+Riemannian Geometry. Preprint at 
+
+ (2025). 
+
+> .CC-BY-NC-ND 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted April 2, 2026. ; doi: bioRxiv preprint
+
+21.  Huguet, G.  et al.  Manifold Interpolating Optimal -Transport 
+
+Flows for Trajectory Inference. Preprint at 
+
+ (2022). 
+
+22.  Ardizzone, L.  et al.  Framework for Easily Invertible Architectures 
+
+(FrEIA). (2018). [...] Modeling Cellular Dynamics. Preprint at 
+
+ (2020). 
+
+15.  Sha, Y., Qiu, Y., Zhou, P. & Nie, Q. Reconstructing growth and 
+
+dynamic trajectories from single -cell transcriptomics data.  Nat 
+
+Mach Intell  6, 25 –39 (2023). 
+
+16.  Zhang, Z., Li, T. & Zhou, P. Learning stochastic dynamics from 
+
+snapshots through regularized unbalanced optimal transport. 
+
+Preprint at  (2025). 
+
+17.  Yao, Z., Su, J. & Yau, S. -T. Manifold fitting with CycleGAN.  Proc. 
+
+Natl. Acad. Sci. U.S.A.  121 , e2311436121 (2024). 
+
+18.  Pooladian, A. -A., Domingo -Enrich, C., Chen, R. T. Q. & Amos, B. 
+
+Neural Optimal Transport with Lagrangian Costs. Preprint at 
+
+ (2024). 
+
+19.  Palma, A., Rybakov, S., Hetzel, L., Günnemann, S. & Theis, F. J. 
+
+Enforcing Latent Euclidean Geometry in Single -Cell VAEs for",False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),zero-inflated negative binomial single-cell denoising 2024 2025 bioinformatics,1,Denoising Single-Cell RNA-Seq Data with a Deep Learning ...,https://www.biorxiv.org/content/10.1101/2025.05.20.655104v1.full-text,www.biorxiv.org,0.5818027,"To overcome these issues, we present ZILLNB, a novel computational framework that integrates zero-inflated negative binomial regression with deep generative",False
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cross-modality single-cell alignment graph matching optimal transport 2024 2025,1,SpateCV: cross-modality alignment regularization of cell types ...,https://pmc.ncbi.nlm.nih.gov/articles/PMC12574271/,pmc.ncbi.nlm.nih.gov,0.5335682,A unified computational framework for single-cell data integration with optimal transport. ... Learning latent embedding of multi-modal single cell data and cross,True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),zero-inflated negative binomial single-cell denoising 2024 2025 bioinformatics,2,Representation learning of single-cell RNA-seq data - PMC,https://pmc.ncbi.nlm.nih.gov/articles/PMC12990802/,pmc.ncbi.nlm.nih.gov,0.52422476,"Several modifications of these pretraining setups have been proposed. In read-depth-aware pretraining, introduced in scFoundation and adapted by scPRINT (Kalfon et al. 2025), the input may consist of downsampled counts, and the task is to reconstruct the original counts. This is signaled to the model by a special token that encodes the desired total number of counts in the output. Some methods combine masked reconstruction with additional supervised loss terms for predicting cell type or other cell metadata (e.g., scMulan and scPRINT) or sequencing technology (e.g., TranscriptFormer). Others use Poisson (TranscriptFormer) or zero-inflated negative binomial (scPRINT) likelihoods to account for count data statistics. [...] 72. Pearce JD, Simmonds SE, Mahmoudabadi G, Krishnan L, Palla G, Istrate A-M, Tarashansky A, Nelson B, Valenzuela O, Li D, et al. 2025. A cross-species generative cell atlas across 1.5 billion years of evolution: the TranscriptFormer single-cell model. bioRxiv 10.1101/2025.04.25.650731 [DOI]
+73. Pearson K. 1901. On lines and planes of closest fit to systems of points in space. Lond Edinb Dubl Phil Mag J Sci 2: 559–572. 10.1080/14786440109462720 [DOI] [Google Scholar]
+74. Pierson E, Yau C. 2015. ZIFA: dimensionality reduction for zero-inflated single-cell gene expression analysis. Genome Biol 16: 241. 10.1186/s13059-015-0805-z [DOI] [PMC free article] [PubMed] [Google Scholar] [...] 29. Elyanow R, Dumitrascu B, Engelhardt BE, Raphael BJ. 2020. netNMF-Sc: leveraging gene–gene interactions for imputation and dimensionality reduction in single-cell expression analysis. Genome Res 30: 195–204. 10.1101/gr.251603.119 [DOI] [PMC free article] [PubMed] [Google Scholar]
+30. Eraslan G, Simon LM, Mircea M, Mueller NS, Theis FJ. 2019. Single-cell RNA-seq denoising using a deep count autoencoder. Nat Commun 10: 390. 10.1038/s41467-018-07931-2 [DOI] [PMC free article] [PubMed] [Google Scholar]
+31. Fang Z, Zheng R, Li M. 2024. scMAE: a masked autoencoder for single-cell RNA-seq clustering. Bioinformatics 40: btae020. 10.1093/bioinformatics/btae020 [DOI] [PMC free article] [PubMed] [Google Scholar]",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cell atlas integration correspondence matching spatial transcriptomics 2024 2025,2,Integrating single-cell and spatial transcriptomics reveals the cellular heterogeneity of vestibular schwannoma | npj Precision Oncology,https://www.nature.com/articles/s41698-025-01028-y,www.nature.com,0.52290934,"### Cell type decomposition
+
+To spatially resolve cell-type distributions across histological structures, we performed reference-guided deconvolution of the ST data using our integrated scRNA-seq dataset as a cellular atlas. Through application of RCTD25.""), we systematically mapped cell-type signatures from the scRNA-seq reference to spatially resolve transcriptomic profiles.
+
+### Gene ontology (GO) [...] (2024).""),42 growth factor: a key player in cancer progression and a promising therapeutic target. Oncogene 39, 2040–2054 (2020).""),43.""),44.""). [...] To identify compositional cluster ecotypes, we applied the ISCHIA (Identifying Spatial Co-occurrence in Healthy and InflAmed tissues; v.1.0.0.0) algorithm implemented26. Mol. Syst. Biol. 20, 98–119 (2024).""). The optimal number of clusters (k) was determined to be five, using the elbow method on the mean cluster variance plot over a range of k from 2–30. PCA was used for dimensionality reduction before inputting visium data into ISCHIA. The Composition.cluster() function was then applied to the PCA dimensions of the gene expression spots. This function grouped the spots into ten distinct clusters, each representing a unique cellular composition. These clusters, or “spatial ecotypes”, were identified based on the principle that functionally related cell types tend to co-occur in specific",False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell sparsity handling variational inference probabilistic model 2024 2025,8,Sample continuation in Bayesian hierarchical model via variational ...,https://arxiv.org/html/2604.15469v1,arxiv.org,0.5117166,"To track the change in the posterior, we adopt particle based variational inference methods, specifically Stein Variational Gradient Descent (SVGD). SVGD",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cell atlas integration correspondence matching spatial transcriptomics 2024 2025,3,Integrated single-cell transcriptomic atlas of human gastric and colorectal tissues across diverse phenotypes | Scientific Data,https://www.nature.com/articles/s41597-026-07108-3,www.nature.com,0.49187145,"Google Scholar
+50. Luecken, M. D. et al. Benchmarking atlas-level data integration in single-cell genomics. Nature Methods 19, 41–50,  (2022).
+
+    Google Scholar
+51. Tsubosaka, A. et al. Stomach encyclopedia: Combined single-cell and spatial transcriptomics reveal cell diversity and homeostatic regulation of human stomach. Cell Rep. 42, 113236,  (2023).
+
+    Google Scholar
+52. Li, Y. et al. CAF-macrophage crosstalk in tumour microenvironments governs the response to immune checkpoint blockade in gastric cancer peritoneal metastases. Gut 74, 350,  (2025).
+
+    Google Scholar
+53. Elmentaite, R. et al. Cells of the human intestinal tract mapped across space and time. Nature 597, 250–255,  (2021). [...] Google Scholar
+57. Zappia, L. & Lun, A. zellkonverter: Conversion Between scRNA-seq Objects. R package version 1.19.0,  (2025).
+58. Cannoodt, R., Zappia, L., Morgan, M. & Deconinck, L. anndataR: AnnData interoperability in R. R package version 0.99.0,  (2025).
+59. Go, Y., Uesugi, A. & Lim, S. B. Cross-phenotype single-cell transcriptomic atlas of the human gastrointestinal tract.  (2025).
+60. Wang, Y., Song, W., Yu, S., Liu, Y. & Chen, Y.-G. Intestinal cellular heterogeneity and disease development revealed by single-cell technology. Cell Regen 11, 26,  (2022). [...] Google Scholar
+90. Nurieva, R. I. et al. Bcl6 Mediates the Development of T Follicular Helper Cells. Science 325, 1001–1005,  (2009).
+
+    Google Scholar
+91. Shi, S. et al. CXCR6 defines therapeutic subtypes of CD4+ cytotoxic T cell lineage for adoptive cell transfer therapy in pediatric B cell acute lymphoblastic leukemia. Int. Immunopharmacol. 132, 111972,  (2024).
+
+    Google Scholar
+92. Lan, F. et al. GZMK-expressing CD8+ T cells promote recurrent airway inflammatory diseases. Nature 638, 490–498,  (2025).
+
+    Google Scholar
+93. Tiberti, S. et al. GZMKhigh CD8+ T effector memory cells are associated with CD15high neutrophil abundance in non-metastatic colorectal tumors and predict poor clinical outcome. Nat. Commun. 13, 6752,  (2022).",False
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),RNA velocity pseudotime mathematical theory scVelo 2024 2025 bioinformatics,1,[PDF] GraphVelo allows for accurate inference of multimodal velocities ...,https://www.biorxiv.org/content/10.1101/2024.12.03.626638v4.full.pdf,www.biorxiv.org,0.48806435,(a) Peak RNA velocity across pseudotime for highly variable genes. ... gene sets: i) scVelo RNA velocity based on all velocity genes; ii) scVelo RNA velocity,False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),zero-inflated negative binomial single-cell denoising 2024 2025 bioinformatics,3,"stGRL: spatial domain identification, denoising, and imputation ...",https://pmc.ncbi.nlm.nih.gov/articles/PMC12211972/,pmc.ncbi.nlm.nih.gov,0.4687669,stGRL employs an encoder-decoder architecture with a zero-inflated negative binomial (ZINB) distribution to reconstruct input data while effectively addressing,True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),zero-inflated negative binomial single-cell denoising 2024 2025 bioinformatics,4,Applications of AI to single-cell and spatial transcriptomics - PMC,https://pmc.ncbi.nlm.nih.gov/articles/PMC12886477/,pmc.ncbi.nlm.nih.gov,0.4687669,"For instance, loss functions can use negative binomial or zero-inflated negative binomial distributions, which are appropriate for single-cell and spatial",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cell atlas integration correspondence matching spatial transcriptomics 2024 2025,4,A comprehensive review of spatial transcriptomics data alignment and integration - PMC,https://pmc.ncbi.nlm.nih.gov/articles/PMC12199153/,pmc.ncbi.nlm.nih.gov,0.45871297,"process. STalign  utilizes diffeomorphic metric mapping, a landmark-free image registration technique which finds a smooth mapping between all voxels in the images. The process begins with rasterization, converting vector graphics into a raster image, followed by representing the spatial locations of individual cells using varifold measures. Gaussian kernels are then applied to smooth out the spatial distribution of cells, reducing noise and refining spatial relationships. It solves the mapping that minimizes dissimilarity between images, guided by an objective function comprising regularization and matching terms. This objective function incorporates a Gaussian mixture model that groups similar data points based on their inherent structure to decompose the spatial data into matching [...] Fourth, GB algorithms are particularly suitable for finding OT cost minimization. The objective is to identify an alignment that minimizes a defined cost function, which often represents the spatial distance between corresponding nodes (spots) in different slices. This approach leverages the inherent spatial relationships within the data to establish meaningful correspondences between spatial locations, facilitating the integration and analysis of gene expression patterns across multiple tissue slices. Graph matching algorithms can serve better observation on the correspondence as it preserve the spatial relationship between each spots. SLAT  and BiGATAE  focus on aligning datasets by minimizing the cost of a bipartite matching problem of their spatial graphs. SLAT  utilizes a lightweight [...] Both types of tasks outlined in Table 1 aim to improve resolution and enhance gene expression coverage in ST data. This process helps eliminate redundancies and noise in the raw data, making it more suitable for downstream analysis. Additionally, aligning and integrating the data preserves the spatial context, which is crucial for gaining deeper insights into biological processes. The alignment and integration of ST data can utilize the full potential of the dataset, improving spatial domain identification and enabling a comprehensive 3D view of the tissue section, which can potentially lead to the visualization of a complete tissue atlas. This process greatly benefits downstream analyses such as tissue profiling [7, 12], cellular trajectory analysis , and cell-type identification [7, 14,",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cross-modality single-cell alignment graph matching optimal transport 2024 2025,3,Virtual Cells: From Conceptual Frameworks to Biomedical Applications,https://arxiv.org/html/2509.18220v1,arxiv.org,0.38852578,"At the single-cell level, careful handling of batch effects and cross-platform alignment remains central. Various methods such as canonical correlation, mutual nearest neighbors, variational autoencoders, and optimal transport have been employed to integrate RNA, ATAC, protein, and spatial measurements, thereby aiding in the creation of atlases, lineage inference, and the initiation of simulations . Manifold and graph-based alignment improves cross-modal harmonization; however, excessive correction can obscure genuine biological signals. Joint embeddings and graph neighborhoods, as demonstrated by Stuart and Satija, effectively capture both shared and modality-specific signals, thereby improving reference mapping and perturbation analysis . Despite of these advancements, the challenges of [...] Single-cell resolution benchmarking has been thoroughly investigated. Luecken et al. evaluated atlas-level integration strategies, establishing benchmarks for scalability, batch correction, and the preservation of biological signals . Argelaguet et al. conducted an examination of matched and unmatched modalities, highlighting that excessive correction may obscure genuine signals, while insufficient correction could amplify false clusters. The assessments included CCA, MNN, VAEs, and optimal transport, following established protocols and providing guidance for atlas-scale benchmarks. Stuart and Satija introduced joint embeddings and graph neighborhoods for integrative single-cell analysis, showing improved downstream reproducibility across laboratories . Efremova and Teichmann improved [...] Advances in multimodal modeling have been particularly impactful at the single-cell level, where high-dimensional data streams must be harmonized. Stuart et al. devised methodologies for the integration of RNA, ATAC, protein, and spatial modalities, illustrating that manifold alignment, canonical correlation, and variational autoencoders improve cross-modal harmonization, despite persistent challenges such as over-correction and modality imbalance . Satija et al. illustrated that joint embeddings and graph neighborhoods successfully capture both shared and modality-specific signals, resulting in precise integrated atlases and perturbation models, while highlighting challenges including batch drift and missing features . Johnson et al. defined ”living” Virtual Cells that constantly combine",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cell atlas integration correspondence matching spatial transcriptomics 2024 2025,5,"A single-cell, spatial transcriptomic atlas of the Arabidopsis life cycle - PMC",https://pmc.ncbi.nlm.nih.gov/articles/PMC12416547/,pmc.ncbi.nlm.nih.gov,0.38769087,"a and b, Quality metrics of the Curio spatial transcriptomics dataset of germinating seeds. Log10 values of (a) the number of transcripts and (b) the number of genes detected per spot in spatial coordinates. Scale bar length is depicted. c, Representative micrograph of a cryosectioned seed. Regions of the seedling that correspond to clusters in the spatial transcriptomic dataset are false colored accordingly. Scale bar length is depicted. d, Dimensionality reduction and de novo clustering of spatial transcriptomics data of 1.25-day-old germinating seeds. e and f, Mapping of clusters to spatial coordinates. Colors correspond to cell types and anatomical regions of germinating seeds (c). g to m, Cross-comparison of spatial transcriptomics derived cluster markers in the matched droplet-based [...] a, The collected tissues over the ten developmental time points spanning the plant life cycle, including imbibed and germinating seeds (0 days and 1.25 days); three stages of seedling development (3 days, 6 days and 12 days); developing and fully expanded rosettes (21 days and 30 days); the stem (37 days), including basal, apical and branched regions; flower tissue (stages 6–15; ref. 30); and siliques (stages 2–10; ref. 29). Developmental time points surrounded by solid lines denote matching single-nucleus and spatial transcriptomic datasets. b,c, Paired single-nucleus and spatial transcriptomic datasets generated in our study. d, Uniform manifold approximation and projection (UMAP) plots of each dataset with select cluster annotations displayed for each dataset. e, Spatial transcriptomic [...] transcriptome atlases as a foundational dataset of the Arabidopsis life cycle. These datasets reveal diverse molecular identities integrating cell type and state, including universal and development- and organ-specific cell-type marker genes.",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),RNA velocity pseudotime mathematical theory scVelo 2024 2025 bioinformatics,5,InterVelo: a mutually enhancing model for estimating pseudotime ...,https://pmc.ncbi.nlm.nih.gov/articles/PMC12552101/,pmc.ncbi.nlm.nih.gov,0.38546777,"RNA velocity has become a powerful tool for uncovering transcriptional dynamics in snapshot single-cell data. However, current RNA velocity approaches often",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cell atlas integration correspondence matching spatial transcriptomics 2024 2025,6,An integrated transcriptomic cell atlas of human endoderm-derived organoids | Nature Genetics,https://www.nature.com/articles/s41588-025-02182-6,www.nature.com,0.35421017,"Single-cell transcriptome sequencing technologies have advanced organoid research by offering a powerful set of experimental and computational tools to investigate cell types present in these complex 3D models. Despite immense progress, it remains a challenge to understand and quantify organoid fidelity and to place variation between organoid datasets into a larger context. To begin to address these challenges, we have built an integrated cell atlas of organoids that model endoderm-derived tissues, incorporating organoid datasets that have been generated from multiple different types of stem cells and protocols. We have established a framework for integration and harmonized cell-type annotation, which makes interpreting cell heterogeneity between organoid datasets tractable. Harmonization [...] the diverse data (Fig. 1e and Extended Data Fig. 1e). The integrated atlas was reannotated based on the most frequent cell type in each cluster, resulting in 5 cell classes at level 1, 48 cell types at level 2 and 51 cell subtypes at level 3 (Fig. 1f–h and Extended Data Fig. 1f). Comparing annotations before and after integration with annotations in the original manuscripts showed a high consistency across most cell-type labels (Extended Data Fig. 2a–c). Inconsistencies were related to states on continuous differentiation trajectories and nomenclature granularity between publications (Supplementary Table 3). Integration performance was unaffected by stem cell source, single-cell method or tissue type, but dataset origin substantially influenced integration outcomes (Extended Data Fig. 3 [...] between organoid datasets tractable. Harmonization of cell-type annotation and nomenclature is challenging, and we envision that comprehensive integrated reference atlases across the human lifespan will enhance the robustness of cell annotation in organoid datasets. With regard to atlas building, single-cell transcriptome data from diverse experimental designs can introduce strong technical noise because of batch effects, protocol variation, genomic method and other technical biases, making data integration challenging. To overcome this, we evaluated existing integration methods and identified a suitable model based on bioconservation and integration metrics. This integration method, scPoli, is structured to incorporate additional data, enabling rapid comparison of datasets through the",False
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),RNA velocity pseudotime mathematical theory scVelo 2024 2025 bioinformatics,6,Using pseudotime derivative on single-cell RNA sequencing data to ...,https://academic.oup.com/bioinformaticsadvances/article/5/1/vbaf123/8152879,academic.oup.com,0.35140064,"We utilize a well-established pseudotime method, along with the predicted and real expression of genes to calculate the velocity of individual genes. We then",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),zero-inflated negative binomial single-cell denoising 2024 2025 bioinformatics,5,From noise to models to numbers: Evaluating negative binomial ...,https://pmc.ncbi.nlm.nih.gov/articles/PMC13046287/,pmc.ncbi.nlm.nih.gov,0.34283602,"The Negative Binomial (NB) distribution is widely used to approximate transcript count distributions in single-cell RNA sequencing (scRNA-seq) data,",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cell atlas integration correspondence matching spatial transcriptomics 2024 2025,7,Integration of imaging-based and sequencing-based spatial omics mapping on the same tissue section via DBiTplus | Nature Methods,https://www.nature.com/articles/s41592-025-02948-0,www.nature.com,0.32856226,"We developed a workflow integrating the mxIF cell-by-protein and DBiTplus spot-by-gene matrices into a unified feature matrix with cell-type labels and spatial coordinates (Fig. 1b), starting with whole-cell segmentation of the mxIF data using Mesmer14."") and quality-control steps. The mxIF datasets were annotated via MaxFuse11."") integration with a reference single-cell RNA-sequencing (scRNA-seq) dataset such as the Mouse Organogenesis Cell Atlas15.""). Utilizing tissue boundary detection and image transformation, mxIF and DBiT-seq images were co-registered to enable accurate matching and alignment of the same cells across modalities (Extended Data Fig. 1e). Cell-type counts from mxIF segmentation masks were mapped to DBiTplus spots, which were subdivided into pure cell-type sub-spots for [...] clustering identified eight clusters, with clusters 2 and 3 corresponding to the diencephalon, mesencephalon and telencephalon, evidenced by the expression of Zbtb20 and Id4 (embryonic neocortex, forebrain; Extended Data Fig. 2d,e). Spatial patterns of select genes—Sox11, Col2a1 and Sox2—matched in situ hybridization data from the Allen Brain Atlas and the Mouse Organogenesis Spatiotemporal Transcriptomic Atlas (MOSTA) from STOmicsDB16."") (Extended Data Fig. 2f). Clusters 0 (control) and 2 (test) showed remarkably similar spatial distributions and 1,109 overlapping genes, underscoring the ability of DBiTplus to generate high-quality spatial transcriptome data and recapitulate tissue biology (Extended Data Fig. 2g). [...] ## Discussion
+
+Spatial multi-omics integrates genomics, transcriptomics, proteomics and metabolomics while preserving spatial context, providing a comprehensive view of molecular processes in tissues. Traditional approaches utilize separate assays on adjacent tissue sections limiting alignment and multimodal integration accuracy due to tissue heterogeneity. To overcome this, we developed DBiTplus, which combines unbiased transcriptome-wide spatial sequencing with mxIF (CODEX or CellScape) on the same tissue section, compatible with both OCT-frozen and FFPE samples. We optimized enzymatic cDNA retrieval using RNase H, while preserving tissue architecture for multiplexed imaging.",False
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell manifold alignment geometric integration theory 2024 2025 NeurIPS,1,NeurIPS 2025 Workshops,https://neurips.cc/virtual/2025/loc/san-diego/events/workshop,neurips.cc,0.32607877,"The fields of biological and artificial intelligence are increasingly converging on a shared principle: the geometry and topology of real-world structure play a central role in building efficient, robust, and interpretable representations. In neuroscience, mounting evidence suggests that neural circuits encode task and environmental structure through low-dimensional manifolds, conserved symmetries, and structured transformations. In deep learning, principles such as sparsity, equivariance, and compositionality are guiding the development of more generalizable and interpretable models, including new approaches to foundation model distillation. The NeurReps workshop brings these threads together, fostering dialogue among machine learning researchers, neuroscientists, and mathematicians to [...] researchers, neuroscientists, and mathematicians to uncover unifying geometric principles of neural representation. Just as geometry and symmetry once unified the models of 20th-century physics, we believe they may now illuminate the computational foundations of intelligence. [...] Show more
+
+ View full details
+
+Workshop
+
+### Symmetry and Geometry in Neural Representations
+
+Francisco Acosta · Chase van de Geijn · Simone Azeglio · Christian A Shewmake · Sophia Sanborn · Nina Miolane
+
+Dec 7, 8:00 AM - 5:00 PM    Upper Level Ballroom 6A",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),geodesic inference single-cell manifold developmental trajectory 2024 2025 theory,4,Multi-Step Latent Forecasting in LLM Reasoning Trajectories via ...,https://arxiv.org/html/2604.18464v1,arxiv.org,0.32553178,"Semantic Tube Prediction (STP) (Huang et al., 2026) provides a theoretical and practical framework for this. Building on the Geodesic Hypothesis, which insists that error-free token sequences trace locally linear geodesics on a smooth semantic manifold, STP adds a supplementary cosine-displacement loss during fine-tuning that forces consecutive hidden-state displacement vectors to be parallel. The resulting “Semantic Tube” confines trajectories to a tubular neighborhood of the geodesic, improving signal-to-noise ratio and enabling 16×16\times data efficiency gains. [...] ℒNTP\mathcal{L}\_{\text{NTP}} creates a tradeoff. Removing the language modeling loss yields 2×2\times better MLP prediction at the cost of 3.7 pp GSM8K accuracy—generation quality vs. geometric purity (§5.1, §6.1).
+
+Negative finding. Geometric smoothness does not encode step correctness (AUC ≈0.5\approx 0.5; §A.2): the Semantic Tube captures organized thinking, not correct thinking.
+
+## 2 Background
+
+### 2.1 Semantic Tube Prediction
+
+Huang et al. (2026) propose the Geodesic Hypothesis, which describes that token sequences generated by LLMs trace geodesics on a smooth semantic manifold, and deviations from these geodesics represent noise. They formalize this as the STP loss: [...] ## 6 Analysis
+
+### 6.1 Manifold Structure",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cell atlas integration correspondence matching spatial transcriptomics 2024 2025,8,"An image-based transcriptomics atlas reveals the regional and microbiota-dependent molecular, cellular, and spatial structure of the murine gut - PMC",https://pmc.ncbi.nlm.nih.gov/articles/PMC12927598/,pmc.ncbi.nlm.nih.gov,0.31063214,"### Data and code availability
+
+All MERFISH measurements are available on Dryad (DOI listed in the key resources table). Custom scripts are available on Zenodo (DOI listed in the key resources table). Bulk RNA-seq data generated in this paper are available on GEO (accession number listed in the key resources table). The accession numbers for all publicly available scRNA-seq data used in the analysis in this paper are in the key resources table. A web-based viewer of this atlas is available at moffittlab.github.io/visualization/2025\_XuMurineGIAtlas/.
+
+KEY RESOURCES TABLE [...] This integration revealed spatially distinct enrichment patterns (Figure 6F). For instance, receptors for bile acid derivatives and SCFAs were enriched in the mucosa, with SCFA receptors especially abundant in the colonic mucosa but also present in the myenteric and submucosal plexuses. In contrast, receptors for alkylamines and indoles were more broadly distributed. While such patterns were mostly regionally conserved, there were some exceptions, such as the increased indole receptor expression in the lower mucosa in the distal colon. [...] ## DISCUSSION
+
+The gut contains a diverse array of cell types, each tuned to sense distinct host-, diet-, and microbe-derived molecules. To explore these capabilities, we generated a spatial transcriptomic atlas of sensory-related genes across the mouse lower digestive tract, under both SPF and GF conditions. With its high-cellular- and -spatial-resolution, we envision that this atlas may prove to be a useful resource for a deeper understanding of the spatial organization of gut sensation.",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cross-modality single-cell alignment graph matching optimal transport 2024 2025,4,1 Introduction - arXiv,https://arxiv.org/html/2604.07383v1,arxiv.org,0.30554238,"as a general alignment tool in cross-city transfer, domain adaptation, and representation learning (Chen et al., 2020; Alqahtani et al., 2021; Wang et al., 2024; Li et al., 2024b; Courty et al., 2016), with transferability analyses further clarifying when OT-based alignment is most effective (Tan et al., 2024, 2021). Moreover, because transport is largely geometry-driven, we design a decision-relevant OT-weighted contrastive objective: the coupling defines soft positives by weighting target candidates with transported mass, concentrating similarity on transport-supported pairs without brittle nearest-neighbor matches (Genevay et al., 2018). This coupling-aware contrastive loss sharpens semantic separation while preserving OT’s capacity control, producing locally aligned yet non-collapsed [...] |  |  |  |  |
+ ---  --- |
+|  | 𝐏=diag​(𝐮(T))​𝐊​diag​(𝐯(T))∈ℝ+ns×nt.\mathbf{P}=\mathrm{diag}\!\big(\mathbf{u}^{(T)}\big)\,\mathbf{K}\,\mathrm{diag}\!\big(\mathbf{v}^{(T)}\big)\in\mathbb{R}^{n\_{s}\times n\_{t}}\_{+}. |  | (8) |
+
+The alternating normalizations in (7) encourage a well-spread, non-degenerate coupling 𝐏\mathbf{P} while remaining fully differentiable. The entropic temperature ε\varepsilon controls matching sharpness: smaller values yield peaked but less stable couplings, whereas larger values produce diffuse alignments. Since costs are computed on ℓ2\ell\_{2}-normalized embeddings, we use a moderate ε=0.15\varepsilon=0.15.
+
+Given 𝐏\mathbf{P}, we define the OT alignment loss as the (soft) expected transport cost: [...] To address these degeneracies, we propose SCOT (Semantic Correspondence via Optimal Transport), which learns an explicit soft correspondence for cross-city alignment (Fig. 3). SCOT builds on optimal transport (OT), which compares two distributions by solving for a minimum-cost transport plan (coupling) that moves mass between point sets (Villani, 2021; Villani and others, 2008). We adopt entropic OT (Cuturi, 2013): its marginal (capacity) constraints control how much matching mass each region can send and receive, discouraging many-to-one shortcuts and yielding a structured many-to-many correspondence, while fast Sinkhorn iterations make it practical at urban scale (Cuturi, 2013; Peyré et al., 2019). This has motivated OT as a general alignment tool in cross-city transfer, domain",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cell atlas integration correspondence matching spatial transcriptomics 2024 2025,9,NeurIPS Poster SAINT: Sequence-Aware Integration for Spatial Transcriptomics Multi-View Clustering,https://neurips.cc/virtual/2025/poster/119155,neurips.cc,0.30111587,"Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Thu, Dec 4, 2025 • 11:00 AM – 2:00 PM PST
+
+# SAINT: Sequence-Aware Integration for Spatial Transcriptomics Multi-View Clustering
+
+Zeyu Zhu ⋅ KE LIANG ⋅ Lingyuan Meng ⋅ Meng Liu ⋅ Suyuan Liu ⋅ Renxiang Guan ⋅ Miaomiao Li ⋅ Wanwei Liu ⋅ Xinwang Liu
+
+ [Poster]     [OpenReview]
+
+### Abstract [...] Spatial transcriptomics (ST) technologies provide gene expression measurements with spatial resolution, enabling the dissection of tissue structure and function. A fundamental challenge in ST analysis is clustering spatial spots into coherent functional regions. While existing models effectively integrate expression and spatial signals, they largely overlook sequence-level biological priors encoded in the DNA sequences of expressed genes. To bridge this gap, we propose SAINT (Sequence-Aware Integration for Nucleotide-informed Transcriptomics), a unified framework that augments spatial representation learning with nucleotide-derived features. We construct sequence-augmented datasets across 14 tissue sections from three widely used ST benchmarks (DLPFC, HBC, and MBA), retrieving reference [...] ST benchmarks (DLPFC, HBC, and MBA), retrieving reference DNA sequences for each expressed gene and encoding them using a pretrained Nucleotide Transformer. For each spot, gene-level embeddings are aggregated via expression-weighted and attention-based pooling, then fused with spatial-expression representations through a late fusion module. Extensive experiments demonstrate that SAINT consistently improves clustering performance across multiple datasets. Experiments validate the superiority, effectiveness, sensitivity, and transferability of our framework, confirming the complementary value of incorporating sequence-level priors into spatial transcriptomics clustering.",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),RNA velocity pseudotime mathematical theory scVelo 2024 2025 bioinformatics,8,Deciphering cell-fate trajectories using spatiotemporal single ... - PMC,https://pmc.ncbi.nlm.nih.gov/articles/PMC12764811/,pmc.ncbi.nlm.nih.gov,0.27262008,"For instance, recent surveys have reviewed or benchmarked pseudotime inference methods, summarized RNA velocity approaches, and highlighted optimal transport",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell data denoising imputation optimal transport 2024 2025 NeurIPS ICML,7,2025 Spotlight Posters - ICML 2026,https://icml.cc/virtual/2025/events/2025SpotlightPosters,icml.cc,0.26133093,"Handling missing values at test time is challenging for machine learning models, especially when aiming for both high accuracy and interpretability. Established approaches often add bias through imputation or excessive model complexity via missingness indicators. Moreover, either method can obscure interpretability, making it harder to understand how the model utilizes the observed variables in predictions. We propose \missingness-avoiding\ (MA) machine learning, a general framework for training models to rarely require the values of missing (or imputed) features at test time. We create tailored MA learning algorithms for decision trees, tree ensembles, and sparse linear models by incorporating classifier-specific regularization terms in their learning objectives. The tree-based models [...] our approach exhibits consistent visual similarity to neural network outputs, with lower mean squared error than previously proposed methods. [...] We propose a simple, training-free mechanism which explains the generalization behaviour of diffusion models. By comparing pre-trained diffusion models to their theoretically optimal empirical counterparts, we identify a shared local inductive bias across a variety of network architectures. From this observation, we hypothesize that network denoisers generalize through localized denoising operations, as these operations approximate the training objective well over much of the training distribution. To validate our hypothesis, we introduce novel denoising algorithms which aggregate local empirical denoisers to replicate network behaviour. Comparing these algorithms to network denoisers across forward and reverse diffusion processes, our approach exhibits consistent visual similarity to",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell manifold alignment geometric integration theory 2024 2025 NeurIPS,2,NeurIPS 2025 Papers,https://neurips.cc/virtual/2025/papers.html,neurips.cc,0.2448145,"# NeurIPS 2025 Papers
+# NeurIPS 2025
+
+Skip to yearly menu barSkip to main content
+
+## Main Navigation
+
+Image 1: conference_logo
+
+   NeurIPS
+       Code of Ethics
+
+  
+
+       Code of Conduct
+
+  
+
+       Create Profile
+
+  
+
+       Journal To Conference Track
+
+  
+
+       Diversity & Inclusion
+
+  
+
+       Proceedings
+
+  
+
+       Future Meetings
+
+  
+
+       Press
+
+  
+
+       Exhibitor Information
+
+  
+
+       Contact NeurIPS
+
+  
+
+       Help/FAQ
+
+  
+
+       Privacy Policy
+
+  
+
+       Downloads
+
+   My Stuff
+
+Login
+
+   Image 2: San Diego graphic San Diego 
+   Image 3: Atlanta graphicSydney
+   Image 4: Atlanta graphicAtlanta
+   Image 5: Mexico City graphicMexico City
+
+   Select Year: (2025)
+       2026
+
+  
+
+       2025
+
+  
+
+       2024
+
+  
+
+       2022
+
+  
+
+       2021
+
+  
+
+       2020 [...] Socials
+
+  
+
+       Careers
+
+   Workshops
+   Exhibitors
+   [](
+   Help
+       FAQ
+
+  
+
+       Organizers
+
+  
+
+       Help via Chat
+
+   Expo
+
+ Layout:
+
+mini compact topic detail 
+
+ × 
+
+ shuffle 
+
+by
+
+ We use cookies to store which papers have been visited. 
+
+ I agree 
+
+Successful Page Load
+
+NeurIPS uses cookies for essential functions only. We do not sell your personal information. Our Privacy Policy »Accept
+
+ We use cookies to store which papers have been visited. 
+
+ I agree [...] 2022
+
+  
+
+       2021
+
+  
+
+       2020
+
+  
+
+       2019
+
+  
+
+       2018
+
+  
+
+       2017
+
+  
+
+       2016
+
+  
+
+       2015
+
+  
+
+       2014
+
+  
+
+       2013
+
+  
+
+       2012
+
+  
+
+       2011
+
+  
+
+       2010
+
+  
+
+       2009
+
+  
+
+       2008
+
+  
+
+       2007
+
+  
+
+       2006
+
+  
+
+       Earlier Conferences
+
+  
+
+       2023
+
+   Start Here
+   Schedule
+   Tutorials
+   Main Conference
+       Invited Talks
+
+  
+
+       Orals
+
+  
+
+       Papers
+
+  
+
+       Competitions
+
+  
+
+       Datasets & Benchmarks
+
+  
+
+       Journal Track
+
+  
+
+       Creative AI Track
+
+  
+
+       Outstanding Paper Awards
+
+  
+
+       Creative AI
+
+  
+
+       Spotlights
+
+  
+
+       Awards
+
+   Community
+       Affinity Events
+
+  
+
+       Socials
+
+  
+
+       Careers",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),geodesic inference single-cell manifold developmental trajectory 2024 2025 theory,6,Energy-oriented Diffusion Bridge for Image Restoration with Foundational Diffusion Models,https://arxiv.org/html/2604.10983v1,arxiv.org,0.24129757,"a novel, low-energy, data manifold geodesic trajectory. This trajectory is theoretically more efficient and better suited to the unidirectional nature of image restoration, avoiding the unnecessary re-noising phases of previous bridge models (Sec. 4.1). Second, we derive the E-Bridge-Solver, a principled, single-step mapping function obtained through the analytical inversion of our trajectory equation. Crucially, based on the E-Bridge-Solver, we train the E-Bridge by enforcing a continuous-time consistency optimization objective to further boost its performance. This ensures the solver produces a stable, high-fidelity output from any point on the trajectory, effectively learning the underlying geometry of the data manifold (Sec. 4.2). [...] Variational Definition of the Geodesic. Let ℳ\mathcal{M} be the data manifold. The geodesic γ​(t)\gamma(t) connecting the starting distribution 𝐘\mathbf{Y} (at t=0t=0) and the target distribution 𝐗\mathbf{X} (at t=T0t=T\_{0}) is defined as the curve that minimizes the kinetic energy functional:
+
+|  |  |  |  |
+ ---  --- |
+|  | E​[γ]=12​∫0T0‖γ˙​(t)‖2​𝑑tE[\gamma]=\frac{1}{2}\int\_{0}^{T\_{0}}||\dot{\gamma}(t)||^{2}dt |  | (12) |
+
+Energy Minimization via Jensen’s Inequality. To find the optimal trajectory μ​(t)=𝔼​[𝐗t]\mu(t)=\mathbb{E}[\mathbf{X}\_{t}] that coincides with this geodesic, we analyze the energy required to traverse the displacement. By applying Jensen’s Inequality to the convex function f​(x)=‖x‖2f(x)=\|x\|^{2} over the interval [0,T0][0,T\_{0}]: [...] where μ˙​(t)\dot{\mu}(t) is the actual velocity of the mean trajectory; btotal​(t,𝐗t)b\_{\text{total}}(t,\mathbf{X}\_{t}) is the total drift vector field governing the Stochastic Differential Equation (SDE); and ∥⋅∥μ​(t)\|\cdot\|\_{\mu(t)} is the Riemannian metric norm at the point μ​(t)\mu(t).
+
+Dynamics of the Geodesic Bridge. The geodesic bridge process is governed by the following SDE on the manifold:
+
+|  |  |  |  |
+ ---  --- |
+|  | d​𝐗t=(b​(𝐗t)+bg​e​o​(t,𝐗t))⏟btotal​(t,𝐗t)​d​t+σ​(𝐗t)​d​𝐖t.d\mathbf{X}\_{t}=\underbrace{\left(b(\mathbf{X}\_{t})+b\_{geo}(t,\mathbf{X}\_{t})\right)}\_{b\_{\text{total}}(t,\mathbf{X}\_{t})}dt+\sigma(\mathbf{X}\_{t})d\mathbf{W}\_{t}. |  | (48) |
+
+The specific control drift bg​e​ob\_{geo} is constructed to enforce tracing geodesic trajectories:",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell manifold alignment geometric integration theory 2024 2025 NeurIPS,3,NeurIPS Poster GeoDynamics: A Geometric State‑Space Neural Network for Understanding Brain Dynamics on Riemannian Manifolds,https://neurips.cc/virtual/2025/poster/136222,neurips.cc,0.23675482,"Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Fri, Dec 5, 2025 • 4:30 PM – 7:30 PM PST
+
+# GeoDynamics: A Geometric State‑Space Neural Network for Understanding Brain Dynamics on Riemannian Manifolds
+
+Tingting Dan ⋅ Jiaqi Ding ⋅ Guorong Wu
+
+ [OpenReview]
+
+### Abstract [...] Chat is not available.
+
+Successful Page Load
+
+| NeurIPS uses cookies for essential functions only. We do not sell your personal information. Our Privacy Policy » |  | [...] State‑space models (SSMs) have become a cornerstone for unraveling brain dynamics, capturing how latent neural states evolve over time and give rise to observed signals. By combining deep learning’s flexibility with SSMs’ principled dynamical structure, recent studies have achieved powerful fits to functional neuroimaging data. However, most approaches still view the brain as a set of loosely connected regions or impose oversimplified network priors, falling short of a truly holistic, self‐organized dynamical system perspective. Brain functional connectivity (FC) at each time point naturally forms a symmetric positive definite (SPD) matrix, which lives on a curved Riemannian manifold rather than in Euclidean space. Capturing the trajectories of these SPD matrices is key to understanding",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cell atlas integration correspondence matching spatial transcriptomics 2024 2025,10,Spatial single-cell atlas reveals regional variations in healthy and diseased human lung | Nature Communications,https://www.nature.com/articles/s41467-025-65704-0,www.nature.com,0.22116598,"Here, we generated a representative topographic atlas of the healthy adult lung by combining sections from distinct anatomic locations of the respiratory system from four donors of different age and gender. We used three different, multiplexed spatially-resolved transcriptomic (SRT) approaches to obtain complementary results. This included two targeted imaging-based methods with cellular resolution: a highly-multiplex HybISS15 for spatially resolved transcriptomics in human and mouse brain tissue. Nucleic Acids Res 48, e112 (2020)."") in order to target the majority of cell types, and a highly-sensitive SCRINSHOT16."") in order to detect a more limited number of cell types and states by variations in gene expression levels. We also employed an unbiased method of mRNA detection with lower [...] We generated a reference topographic atlas of three representative regions in the adult human lung from four healthy donors, which included representatives of different age, sex and smoking status, yet only of one ethnicity. The histologically pre-assessed samples were analysed with ST, combining Visium unbiased transcriptomics with expression maps at cellular resolution for 162 genes with HybISS and 64 genes with SCRINSHOT. The targeted methods mapped 478,894 cells defining the location of 35 major cell types and discovered additional region-related cell variability. This variability includes new epithelial cell states, such as the S100A8/9 cell state in the trachea, which included a KRT13-positive cell subset, and SERPINB3 and HSPB1 positive populations in the intermediate layer of the [...] The large size of the adult human lung precludes in-scale mapping of the full tissue. Instead, available atlases of the adult human lung rely on sampling of distinct anatomic regions from different donors1.""),2.""),3.""),4.""),6.""),9.""),10.""),11.""),12.""),13.""),14.""). For example, extensive proximal airway epithelial sampling allowed identification of nasal cell types, including nasal-specific serous, goblet and club cells3.""). Thorough characterization of distal airways focused on bronchial secretory cell populations, and defined the AT0 intermediate cell state, characterized by the co-expression of bronchial secretory and alveolar epithelial Type 2 (AT2) markers9.""). A recent integration of scRNA-seq data has created a comprehensive cellular catalog of the healthy human lung, counting a",False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),scRNA-seq quality control dropout noise modeling theory NeurIPS ICML 2024 2025,3,NeurIPS Poster scGeneScope: A Treatment-Matched Single Cell Imaging and Transcriptomics Dataset and Benchmark for Treatment Response Modeling,https://neurips.cc/virtual/2025/poster/121808,neurips.cc,0.21835291,"Understanding cellular responses to chemical interventions is critical to the discovery of effective therapeutics. Because individual biological techniques often measure only one axis of cellular response at a time, high-quality multimodal datasets are needed to unlock a holistic understanding of how cells respond to treatments and to advance computational methods that integrate modalities. However, many techniques destroy cells and thus preclude paired measurements, and attempts to match disparate unimodal datasets are often confounded by data being generated in incompatible experimental settings. Here we introduce scGeneScope, a multimodal single‑cell RNA sequencing (scRNA-seq) and Cell Painting microscopy image dataset conditionally paired by chemical treatment, designed to facilitate [...] models. Multiprofile integration improved performance in both the unimodal and multimodal settings, with gains more consistent in the former. Evaluation of unimodal models for MoA identification demonstrated that recent scRNA-seq foundation models deployed zero-shot were consistently outperformed by classic fit-to-data methods, underscoring the need for careful, realistic benchmarking in machine learning for biology. We release the scGeneScope dataset and benchmarking code to support further research. [...] paired by chemical treatment, designed to facilitate the development and benchmarking of unimodal, multimodal, and multiple profile machine learning methods for cellular profiling. 28 chemicals, each acting on distinct biological pathways or mechanisms of action (MoAs), were applied to U2-OS cells in two experimental data generation rounds, creating paired sets of replicates that were then profiled independently by scRNA‑seq or Cell Painting. Using scGeneScope, we derive a replicate- and experiment-split treatment identification benchmark simulating MoA discovery under realistic laboratory variability conditions and evaluate unimodal, multimodal, and multiprofile models ranging in complexity from linear approaches to recent foundation models. Multiprofile integration improved performance",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell sparsity handling variational inference probabilistic model 2024 2025,9,DOLPHIN advances single-cell transcriptomics beyond gene level by leveraging exon and junction reads | Nature Communications,https://www.nature.com/articles/s41467-025-61580-w,www.nature.com,0.20561504,"a Preprocessing of single-cell RNA-seq data, including quantification of exon-mapped reads and exon-exon junction reads. b Construction of gene-specific exon graphs, where nodes represent exons and edges represent junctions, aggregated to form an exon graph for each cell. c Learning cell embeddings from exon-level quantification and junction reads through a Variational Graph Autoencoder (VGAE). Each exon graph is converted into feature matrices (Xi) and normalized adjacency matrices (ANi), which are processed by a Graph Attention Network (GAT) layer to capture exon dependencies. The output (Hi) from the GAT layer is then passed to a Variational Autoencoder (VAE) that projects graph representations into a latent space (Z), defined by mean (μ) and standard deviation (σ) parameters, with a [...] DOLPHIN captures a richer and more detailed transcriptional landscape compared to traditional approaches that rely solely on gene-level counts. Built on a variational graph autoencoder (VGAE) framework26.""),27.""), DOLPHIN learns cell embeddings that preserve fine-grained exon usage patterns and splicing information, enabling more accurate and informative representations of cellular states. These enhanced embeddings not only improve downstream analyses such as cell clustering and differential gene analysis but also support more sensitive AS detection. Specifically, DOLPHIN uses the learned embeddings to identify neighboring cells with similar exon and splicing profiles, aggregates junction reads across neighbors to amplify splicing signals, and substantially enhances AS detection under the [...] shares the same VAE-based architecture as DOLPHIN, scQuint relies exclusively on intron-level input and does not leverage exon read counts. As such, it serves as a conceptually aligned baseline for evaluating how AS feature representations influence the quality of learned cell embeddings. SCASL, on the other hand, performs clustering based on junction-derived AS probabilities, which are iteratively imputed using a KNN-based strategy and clustered using spectral clustering. Given its objective of cell-type inference from splicing features, SCASL also provides a relevant point of comparison for DOLPHIN’s exon graph-based framework. Since scQuint is not recommended for use with 10X Genomics Chromium data due to its strong \(3{\prime}\) bias and limited junction detection, and SCASL performs",False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),scRNA-seq quality control dropout noise modeling theory NeurIPS ICML 2024 2025,4,ICML 2025 Orals,https://icml.cc/virtual/2025/events/oral,icml.cc,0.19146407,"rate schedules, datasets, and architectures, including transformers trained on next-token prediction. This collapse breaks down when hyperparameters are scaled suboptimally, providing a practical indicator of proper scaling. We explain these phenomena by connecting collapse to the power-law structure in typical neural scaling laws, and analyzing a simple but effective model of SGD noise dynamics that accurately captures how learning rate schedules deform loss curves away from power laws while preserving universality, and why learning rate decay suppresses variance to enable supercollapse. [...] long-context tasks, our algorithms demonstrate significant speedups of up to 2.8x over standard autoregressive decoding. By enabling any off-the-shelf model to serve as a drafter and requiring no retraining, this work substantially broadens the applicability of the SD framework in practice. [...] Understanding neural network training dynamics at scale is an important open problem. Although realistic model architectures, optimizers, and data interact in complex ways that make predictive theory challenging, we show that compute-optimally trained models exhibit remarkably precise collective regularities. Specifically, loss curves from models of varying sizes collapse onto a single universal curve when training compute and loss are normalized to unity at the end of training. With learning rate decay, discrepancies between normalized curves fall below the noise floor of individual models' loss curves across random seeds, yielding an exceptionally tight collapse we term ""supercollapse."" We observe supercollapse across learning rate schedules, datasets, and architectures, including",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),geodesic inference single-cell manifold developmental trajectory 2024 2025 theory,7,"PHLOWER leverages single-cell multimodal data to infer complex, multi-branching cell differentiation trajectories | Nature Methods",https://www.nature.com/articles/s41592-025-02870-5,www.nature.com,0.18594754,"More formally, for groups gi and gj and bin k, their corresponding edges in cumulative space are defined as set \({{\bf{V}}}\_{i}^{k}\), \({{\bf{V}}}\_{j}^{k}\). We then estimate the average edge coordinate per bin to serve as backbones for every group, that is, as shown in equation (24):
+
+$$\overline{{b}\_{i}^{k}}=\frac{1}{M}\sum \_{v\in {{\bf{V}}}\_{i}^{k}}v,$$
+
+(24)
+
+where \(M=| {{\bf{V}}}\_{i}^{k}|\) is the number of edges in the bin. We also consider the average distance between edges in a bin to have an estimate of the compactness of edges in a bin and trajectory, as shown in equation (25):
+
+$$\overline{{\sigma }\_{i}^{k}}=\frac{1}{{M}^{2}}\sum \_{u\in {{\bf{V}}}\_{i}^{k}}\sum \_{v\in {{\bf{V}}}\_{i}^{k}}{\left\Vert u-v\right\Vert }\_{2}.$$
+
+(25) [...] PHLOWER uses the discrete HL and its associated Hodge decomposition to obtain embeddings of cell differentiation trajectories. The Graph Laplacian (a zero-order HL) is a matrix representation of graphs, where samples are encoded as vertices and distances as edge weights. Particular eigenvectors of the Graph Laplacian are used to obtain an embedding representing cells in the graph, forming the basis for methods in clustering analysis15.""), nonlinear dimension reduction12.""), trajectory inference and pseudotime estimation in single-cell data13.""),14.""). In PHLOWER, we represent single-cell data as an SC, that is, a higher-order generalization of a graph, consisting of nodes (0-simplices), edges (1-simplices) and triangles (2-simplices). The spectral decomposition of the HL can be used to [...] We propose here PHLOWER. Simplicial complexes (SCs) are generalizations of graphs that allow not only for nodes and edges, but also triangles and other higher-order structures to be present11.""). The discrete Hodge Laplacian (HL) on SCs represents a generalization of the well-known graph Laplacian explored in diffusion maps12."") and trajectory inference for single-cell data13.""),14.""). PHLOWER uses SCs as representation of single-cell multimodal data, where a node represents a cell and an edge indicates a potential cell differentiation event. The harmonic component obtained via spectral decomposition of the HL on an SC allows the creation of edge-flow embeddings (cell differentiation events) and trajectory embeddings (cell differentiation paths)11.""). These represent cell differentiation",False
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),multimodal single-cell integration CITE-seq ATAC-seq geometry NeurIPS ICML 2024 2025,9,NeurIPS Poster CellVerse: Do Large Language Models Really Understand Cell Biology?,https://neurips.cc/virtual/2025/poster/121757,neurips.cc,0.1710612,"Recent studies have demonstrated the feasibility of modeling single-cell data as natural languages and the potential of leveraging powerful large language models (LLMs) for understanding cell biology. However, a comprehensive evaluation of LLMs' performance on language-driven single-cell analysis tasks still remains unexplored. Motivated by this challenge, we introduce CellVerse, a unified language-centric question-answering benchmark that integrates four types of single-cell multi-omics data and encompasses three hierarchical levels of single-cell analysis tasks: cell type annotation (cell-level), drug response prediction (drug-level), and perturbation analysis (gene-level). Going beyond this, we systematically evaluate the performance across 14 open-source and closed-source LLMs ranging [...] significant challenges still remain in applying LLMs to cell biology. By introducing CellVerse, we lay the foundation for advancing cell biology through natural languages and hope this paradigm could facilitate next-generation single-cell analysis. Project Page: [...] Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Thu, Dec 4, 2025 • 4:30 PM – 7:30 PM PST
+
+# CellVerse: Do Large Language Models Really Understand Cell Biology?
+
+Fan Zhang ⋅ Tianyu Liu ⋅ Zhihong Zhu ⋅ Hao Wu ⋅ Haixin Wang ⋅ Donghao Zhou ⋅ Yefeng Zheng ⋅ Kun Wang ⋅ Xian Wu ⋅ Pheng-Ann Heng
+
+ [Poster]     [OpenReview]
+
+### Abstract",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),zero-inflated negative binomial single-cell denoising 2024 2025 bioinformatics,6,An AI system to help scientists write expert-level empirical software,https://arxiv.org/html/2509.06503v1,arxiv.org,0.16926883,Flexible comparison of batch correction methods for single-cell RNA-seq using BatchBench. ... Three-level model: Negative Binomial observation layer,True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),zero-inflated negative binomial single-cell denoising 2024 2025 bioinformatics,7,Imputing missing values in single-cell RNA-sequencing data - PMC,https://pmc.ncbi.nlm.nih.gov/articles/PMC12908672/,pmc.ncbi.nlm.nih.gov,0.1520955,This method identifies dropout events using a Poisson–negative binomial mixture model and subsequently imputes the missing values using a decision tree,True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell manifold alignment geometric integration theory 2024 2025 NeurIPS,5,NeurIPS Poster Graph Your Own Prompt,https://neurips.cc/virtual/2025/poster/119667,neurips.cc,0.1416731,"Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Wed, Dec 3, 2025 • 11:00 AM – 2:00 PM PST
+
+# Graph Your Own Prompt
+
+Xi Ding · Lei Wang · Piotr Koniusz · Yongsheng Gao
+
+Project Page    [Slides]     [Poster]     [OpenReview]
+
+### Abstract [...] ### Video
+
+Chat is not available.
+
+Successful Page Load
+
+| NeurIPS uses cookies for essential functions only. We do not sell your personal information. Our Privacy Policy » |  | [...] derived by modulating softmax prediction similarities with intra-class indicators. This alignment enforces that feature-level relationships reflect class-consistent prediction behavior, acting as a semantic regularizer throughout the network. Unlike prior work, GCR introduces a multi-layer, cross-space graph alignment mechanism with adaptive weighting, where layer importance is learned from graph discrepancy magnitudes. This allows the model to prioritize semantically reliable layers and suppress noisy ones, enhancing feature quality without modifying the architecture or training procedure. GCR is model-agnostic, lightweight, and improves semantic structure across various networks and datasets. Experiments show that GCR promotes cleaner feature structure, stronger intra-class cohesion,",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),geodesic inference single-cell manifold developmental trajectory 2024 2025 theory,9,Riemannian Motion Generation A Unified Framework for Human ...,https://arxiv.org/html/2603.15016v1,arxiv.org,0.13856693,"where vt​(𝒙t∣𝒙1)v\_{t}(\bm{x}\_{t}\mid\bm{x}\_{1}) denotes the target conditional velocity.
+In Euclidean space, this target is typically induced by the linear interpolation between 𝒙0\bm{x}\_{0} and 𝒙1\bm{x}\_{1}, which yields a simple closed-form velocity field.
+Recent work extends the same principle to Riemannian manifolds (Chen and Lipman, 2023; Lipman et al., 2024), replacing Euclidean linear paths with geodesics and defining target velocities in the corresponding tangent spaces.
+Consistently, the geodesic degrades to the linear interpolation when the manifold is the Euclidean space, which means that the Riemannian flow matching is a strict generalization of the Euclidean case. [...] |  |  |  |
+ --- 
+|  | μ=(μ𝒯,μℛ,μℛ,…,μℛ⏟J​ times)∈ℳRMG.\mu=(\mu\_{\mathscr{T}},\underbrace{\mu\_{\mathscr{R}},\mu\_{\mathscr{R}},\dots,\mu\_{\mathscr{R}}}\_{J\text{ times}})\in\mathcal{M}\_{\mathrm{RMG}}. |  |
+
+### 3.3 Training and Inference
+
+We train a time-dependent vector field on the motion manifold ℳ\mathcal{M} with Riemannian flow matching.
+Let 𝒙1∼pdata\bm{x}\_{1}\sim p\_{\mathrm{data}} denote a real motion sample and 𝒙0∼p0\bm{x}\_{0}\sim p\_{0} a prior sample (Section˜3.2).
+For t∼𝒰​[0,1]t\sim\mathcal{U}[0,1], we construct the interpolation state on the geodesic from 𝒙0\bm{x}\_{0} to 𝒙1\bm{x}\_{1}:
+
+|  |  |  |
+ --- 
+|  | 𝒙t=Exp𝒙0​(t​Log𝒙0​(𝒙1)),\bm{x}\_{t}\;=\;\mathrm{Exp}\_{\bm{x}\_{0}}\!\big(t\,\mathrm{Log}\_{\bm{x}\_{0}}(\bm{x}\_{1})\big), |  | [...] In conclusion, we proposed Riemannian Motion Generation (RMG), a unified geometric framework for human motion representation and generation. Instead of treating motion as an unconstrained Euclidean vector, we modeled it on a product manifold and learned generation dynamics with Riemannian flow matching. This design yields a compact representation, ℝ3×(𝕊3)J\mathbb{R}^{3}\times(\mathbb{S}^{3})^{J}, together with a geometry-consistent training and inference pipeline based on geodesic interpolation, tangent-space vector-field learning, and manifold-preserving integration.",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell manifold alignment geometric integration theory 2024 2025 NeurIPS,6,NeurIPS Poster Distributional Autoencoders Know the Score,https://neurips.cc/virtual/2025/poster/119870,neurips.cc,0.13565545,"a manifold that can be approximated by the encoder, latent components beyond the manifold dimension are conditionally independent of the data distribution - carrying no additional information - and thus reveal the intrinsic dimension. Together, these results show that a single model can learn the data distribution and its intrinsic dimension with exact guarantees simultaneously, unifying two longstanding goals of unsupervised learning. [...] The Distributional Principal Autoencoder (DPA) combines distributionally correct reconstruction with principal-component-like interpretability of the encodings. In this work, we provide exact theoretical guarantees on both fronts. First, we derive a closed-form relation linking each optimal level-set geometry to the data-distribution score. This result explains DPA's empirical ability to disentangle factors of variation of the data, as well as allows the score to be recovered directly from samples. When the data follows the Boltzmann distribution, we demonstrate that this relation yields an approximation of the minimum free-energy path for the Müller–Brown potential in a single fit. Second, we prove that if the data lies on a manifold that can be approximated by the encoder, latent [...] Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Thu, Dec 4, 2025 • 4:30 PM – 7:30 PM PST
+
+# Distributional Autoencoders Know the Score
+
+Andrej Leban
+
+Project Page    [Slides]     [Poster]     [OpenReview]
+
+### Abstract",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell manifold alignment geometric integration theory 2024 2025 NeurIPS,7,RNNs perform task computations by dynamically warping neural ...,https://neurips.cc/virtual/2025/poster/115257,neurips.cc,0.13313346,"Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Wed, Dec 3, 2025 • 4:30 PM – 7:30 PM PST
+
+# RNNs perform task computations by dynamically warping neural representations
+
+Arthur Pellegrino ⋅ Angus Chadwick
+
+ [Poster]     [OpenReview]
+
+### Abstract [...] ### Video
+
+Chat is not available.
+
+Successful Page Load
+
+| NeurIPS uses cookies for essential functions only. We do not sell your personal information. Our Privacy Policy » |  | [...] manifold topology and geometry of a dynamical system from the manifold of its inputs. By characterising the time-varying geometry of RNNs, we show that dynamic warping is a fundamental feature of their computations.",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cross-modality single-cell alignment graph matching optimal transport 2024 2025,6,Multitask benchmarking of single-cell multimodal omics integration methods | Nature Methods,https://www.nature.com/articles/s41592-025-02856-3,www.nature.com,0.12959012,"may explain their relatively low performance when assessed by SCS. Alignment results and their quantification from another representative dataset D64 generated by the MERFISH technology are shown in Supplementary Fig. 7a,b. [...] ### Benchmark cross integration methods [...] (5) feature selection, (6) imputation and (7) spatial registration. Using panels of evaluation metrics, each tailor-made for a specific task (Fig. 1d), we evaluated 40 integration methods (Fig. 1e) across the 4 data integration categories on 64 real datasets and 22 simulated datasets. In particular, we included 18 vertical integration methods, 14 diagonal integration methods, 12 mosaic integration methods and 15 cross integration methods. This Registered Report provides a comprehensive view of methods designed for single-cell multimodal omics data integration and serves as (1) a much-needed guide for single-cell integration across modalities to the research community and (2) a foundation to foster future research and application of computational methods for single-cell multimodal omics",False
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell manifold alignment geometric integration theory 2024 2025 NeurIPS,8,A Closer Look at NTK Alignment: Linking Phase Transitions in Deep ...,https://neurips.cc/virtual/2025/poster/118981,neurips.cc,0.119747646,"### Video
+
+Chat is not available.
+
+Successful Page Load
+
+| NeurIPS uses cookies for essential functions only. We do not sell your personal information. Our Privacy Policy » |  | [...] Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Fri, Dec 5, 2025 • 11:00 AM – 2:00 PM PST
+
+# A Closer Look at NTK Alignment: Linking Phase Transitions in Deep Image Regression
+
+Giuseppe Castiglione ⋅ Christopher L Buckley ⋅ Ivor Simpson
+
+ [OpenReview]
+
+### Abstract [...] Deep neural networks trained with gradient descent exhibit varying rates of learning for different patterns. However, the complexity of fitting models to data makes direct elucidation of the dynamics of learned patterns challenging. To circumvent this, many works have opted to characterize phases of learning through summary statistics known as order parameters. In this work, we propose a unifying framework for constructing order parameters based on the Neural Tangent Kernel (NTK), in which the relationship with the data set is more transparent. In particular, we derive a local approximation of the NTK for a class of deep regression models (SIRENs) trained to reconstruct natural images. In so doing, we analytically connect three seemingly distinct phase transitions: the emergence of wave",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell manifold alignment geometric integration theory 2024 2025 NeurIPS,9,Modeling Cell Dynamics and Interactions with Unbalanced Mean ...,https://neurips.cc/virtual/2025/poster/117377,neurips.cc,0.11376677,"Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Fri, Dec 5, 2025 • 4:30 PM – 7:30 PM PST
+
+# Modeling Cell Dynamics and Interactions with Unbalanced Mean Field Schrödinger Bridge
+
+Zhenyi Zhang ⋅ Zihan Wang ⋅ Yuhao Sun ⋅ Tiejun Li ⋅ Peijie Zhou
+
+ [OpenReview]
+
+### Abstract [...] ### Video
+
+Chat is not available.
+
+Successful Page Load
+
+| NeurIPS uses cookies for essential functions only. We do not sell your personal information. Our Privacy Policy » |  | [...] Modeling the dynamics from sparsely time-resolved snapshot data is crucial for understanding complex cellular processes and behavior. Existing methods leverage optimal transport, Schrödinger bridge theory, or their variants to simultaneously infer stochastic, unbalanced dynamics from snapshot data. However, these approaches remain limited in their ability to account for cell-cell interactions. This integration is essential in real-world scenarios since intercellular communications are fundamental life processes and can influence cell state-transition dynamics. To address this challenge, we formulate the Unbalanced Mean-Field Schrödinger Bridge (UMFSB) framework to model unbalanced stochastic interaction dynamics from snapshot data. Inspired by this framework, we further propose",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell data denoising imputation optimal transport 2024 2025 NeurIPS ICML,8,Track: San Diego Poster Session 4 - NeurIPS 2026,https://neurips.cc/virtual/2025/loc/san-diego/session/128334,neurips.cc,0.105210535,"Poster
+
+#106
+
+##### Evaluating multiple models using labeled and unlabeled data
+
+Divya Shanmugam · Shuvom Sadhuka · Manish Raghavan · John Guttag · Bonnie Berger · Emma Pierson [...] Poster
+
+#102
+
+##### Preserving LLM Capabilities through Calibration Data Curation: From Analysis to Optimization
+
+Bowei He · Lihao Yin · Hui-Ling Zhen · Shuqi LIU · Han Wu · Xiaokun Zhang · Mingxuan Yuan · Chen Ma [...] contribution from other wait-and-see parties, that party should receive a reward of higher value for sharing data earlier. To this end, we propose a fair and time-aware data sharing framework, including novel time-aware incentives. We develop new methods for deciding reward values to satisfy these incentives. We further illustrate how to generate model rewards that realize the reward values and empirically demonstrate the properties of our methods on synthetic and real-world datasets.",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),zero-inflated negative binomial single-cell denoising 2024 2025 bioinformatics,8,GDSim: accurate simulation for single-cell transcriptomes based on ...,https://pmc.ncbi.nlm.nih.gov/articles/PMC13076945/,pmc.ncbi.nlm.nih.gov,0.1002869,"By transforming the generative task into a sequence of conditional denoising problems, GDSim avoids directly modeling the highly irregular and high-dimensional",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),scRNA-seq quality control dropout noise modeling theory NeurIPS ICML 2024 2025,9,NeurIPS Poster scPilot: Large Language Model Reasoning Toward Automated Single-Cell Analysis and Discovery,https://neurips.cc/virtual/2025/poster/117633,neurips.cc,0.09933926,"### Video
+
+Chat is not available.
+
+Successful Page Load
+
+| NeurIPS uses cookies for essential functions only. We do not sell your personal information. Our Privacy Policy » |  | [...] Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Fri, Dec 5, 2025 • 4:30 PM – 7:30 PM PST
+
+# scPilot: Large Language Model Reasoning Toward Automated Single-Cell Analysis and Discovery
+
+Yiming Gao ⋅ Zhen Wang ⋅ Jefferson Chen ⋅ Mark Antkowiak ⋅ Mengzhou Hu ⋅ JungHo Kong ⋅ Dexter Pratt ⋅ Jieyuan Liu ⋅ Enze Ma ⋅ Zhiting Hu ⋅ Eric Xing
+
+ [OpenReview]
+
+### Abstract [...] We present scPilot, the first systematic framework to practice \textit{omics-native reasoning}: a large language model (LLM) converses in natural language while directly inspecting single-cell RNA-seq data and on-demand bioinformatics tools. scPilot converts core single-cell analyses, i.e., cell-type annotation, developmental-trajectory reconstruction, and transcription-factor targeting, into step-by-step reasoning problems that the model must solve, justify, and, when needed, revise with new evidence. To measure progress, we release \scbench, a suite of 9 expertly curated datasets and graders that faithfully evaluate the omics-native reasoning capability of scPilot w.r.t various LLMs. Experiments with o1 show that \textit{iterative} omics-native reasoning lifts average accuracy by 11\%",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),single-cell manifold alignment geometric integration theory 2024 2025 NeurIPS,10,Joint Hierarchical Representation Learning of Samples and ...,https://neurips.cc/virtual/2025/poster/117671,neurips.cc,0.09282766,"### Video
+
+Chat is not available.
+
+Successful Page Load
+
+| NeurIPS uses cookies for essential functions only. We do not sell your personal information. Our Privacy Policy » |  | [...] Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Spotlight Poster  Wed, Dec 3, 2025 • 4:30 PM – 7:30 PM PST
+
+# Joint Hierarchical Representation Learning of Samples and Features via Informed Tree-Wasserstein Distance
+
+Ya-Wei Eileen Lin ⋅ Ronald Coifman ⋅ Gal Mishne ⋅ Ronen Talmon
+
+ [Poster]     [OpenReview]
+
+### Abstract [...] of the data. We provide a theoretical analysis showing that our method converges. We show that our method can be integrated into hyperbolic graph convolutional networks as a pre-processing technique, improving performance in link prediction and node classification tasks. In addition, our method outperforms baselines in sparse approximation and unsupervised Wasserstein distance learning tasks on word-document and single-cell RNA-sequencing datasets.",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cross-modality single-cell alignment graph matching optimal transport 2024 2025,7,Nicheformer: a foundation model for single-cell and spatial omics | Nature Methods,https://www.nature.com/articles/s41592-025-02814-z,www.nature.com,0.0926305,"A cell integrates its spatial context, that is, its cellular neighborhood by cell interaction and communication, which is reflected in the cell’s transcriptomic profile. This property has been used successfully to learn cell-type communication profiles from coexpressed receptor–ligand interactions66.""), to reconstruct spatial gene expression from spatial context and anchor points using optimal transport67.""),68."") and to determine cell interactions beyond known receptor–ligands via graph neural networks56.""). With Nicheformer, we build upon these results and show that we can predict spatial context from a cell’s gene expression profiles alone with consistent accuracy. We found that, for example, immune cell neighborhoods in the brain are most likely encoded in the gene expression [...] (Methods). For spatial composition tasks, we defined a distance-based spatially homogeneous niche around each cell and asked the model to predict local density or cell-type composition. The tasks are formulated as prediction problems operating on Nicheformer’s pretrained embedding (Fig. 1e), which differ from typical integrated spaces by capturing a cross-modality, cross-tissue and cross-species representation suited for downstream inference. [...] Altogether, this demonstrates Nicheformer’s ability to learn powerful cell representations by capturing nuanced spatial information. Linear probing already surpasses existing baselines, highlighting the effectiveness of the representation. Fine-tuning further refines this representation, emphasizing the importance of task-specific adaptation for capturing subtle cellular variations. Notably, Nicheformer enables the direct transfer of spatially aware annotations from spatial to dissociated single-cell data by using a simple linear layer. This capability unlocks new possibilities for analyzing single-cell data across different modalities.
+
+### Nicheformer predicts neighborhood compositions in spatial and dissociated single-cell data",False
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),scRNA-seq quality control dropout noise modeling theory NeurIPS ICML 2024 2025,10,NeurIPS Poster seq-JEPA: Autoregressive Predictive Learning of Invariant-Equivariant World Models,https://neurips.cc/virtual/2025/poster/118974,neurips.cc,0.08531997,"### Video
+
+Chat is not available.
+
+Successful Page Load
+
+| NeurIPS uses cookies for essential functions only. We do not sell your personal information. Our Privacy Policy » |  | [...] Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Wed, Dec 3, 2025 • 4:30 PM – 7:30 PM PST
+
+# seq-JEPA: Autoregressive Predictive Learning of Invariant-Equivariant World Models
+
+Hafez Ghaemi · Eilif B. Muller · Shahab Bakhtiari
+
+ [OpenReview]
+
+### Abstract [...] demonstrates strong performance on both equivariant and invariant benchmarks without sacrificing one for the other. Furthermore, it excels at tasks that inherently require aggregating a sequence of observations, such as path integration across actions and predictive learning across eye movements.",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),zero-inflated negative binomial single-cell denoising 2024 2025 bioinformatics,9,scE2EGAE: enhancing single-cell RNA-Seq data analysis through ...,https://pmc.ncbi.nlm.nih.gov/articles/PMC12108024/,pmc.ncbi.nlm.nih.gov,0.07938873,"In this paper, we design a graph autoencoder which performs denoising on scRNA-Seq data as the downstream task. Results: We evaluate scE2EGAE on eight public",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),single-cell data denoising imputation optimal transport 2024 2025 NeurIPS ICML,9,Beyond the Academic Monoculture: A Unified Framework and Industrial Perspective for Attributed Graph Clustering,https://arxiv.org/html/2603.20829v1,arxiv.org,0.065604836,"| LSEnet  | ICML’24 | Lorentz GCN | Softmax (Tree) | Joint | Structural Entropy (Hyperbolic) | O​(N2)O(N^{2}) |
+| FVD  | TPAMI’25 | GCN + VAE | Prototype | Joint | Wavelet-Enhanced Variational Bound | O​(N2)O(N^{2}) |
+| ASIL  | TPAMI’26 | Lorentz GCN | Softmax (Tree) | Joint | Augmented Structural Entropy Learning | O​(N2)O(N^{2}) |
+| Hybrid Coordination Methods | | | | | | |
+| HoLe  | CIKM’23 | GCN | K-Means | Hybrid | Homophily-Enhanced Structure Learning | O​(N2)O(N^{2}) |
+| CLEAR  | TIST’23 | GCN | K-Means | Hybrid | Optimal Transport + Graph Refinement | O​(N+M)O(N+M) |
+| HSAN  | AAAI’23 | GCN | K-Means | Hybrid | Hard Sample Aware Contrastive | O​(N2)O(N^{2}) |
+| CCGC  | AAAI’23 | GCN | K-Means | Hybrid | Cluster-Guided Contrastive | O​(N2)O(N^{2}) | [...] | Deep Decoupled Methods | | | | | | |
+| GAE  | NeurIPS-W’16 | GCN | K-Means | Decoupled | Adjacency Reconstruction | O​(N2)O(N^{2}) |
+| ARGA  | IJCAI’18 | GCN | K-Means | Decoupled | Reconstruction + Adversarial Reg. | O​(N2)O(N^{2}) |
+| DGI  | ICLR’19 | GCN | K-Means | Decoupled | Mutual Info Maximization (Local-Global) | O​(N+M)O(N+M) |
+| MVGRL  | ICML’20 | GCN | K-Means | Decoupled | Multi-View Mutual Info | O​(N+M)O(N+M) |
+| CCASSG  | NeurIPS’21 | GCN | K-Means | Decoupled | Feature Decorrelation (Barlow Twins) | O​(N+M)O(N+M) |
+| S3GC  | NeurIPS’22 | GCN | K-Means | Decoupled | Scalable Contrastive (Random Walk) | O​(N2)O(N^{2}) |
+| DCRN  | AAAI’22 | Mixed GNN | K-Means | Decoupled | Dual Correlation Reduction | O​(N2)O(N^{2}) | [...] Iterative Self-Training.
+The most common hybrid pattern performs alternating optimization: cluster assignments from one cycle serve as pseudo-supervision for the encoder in the next. CLEAR  iteratively refines assignments via optimal transport to suppress noisy inter-class edges. CDRS  promotes only high-confidence assignments as supervisory signals. FastDGC  performs periodic graph structure updates decoupled from main gradient computation, and MetaGC  applies meta-learning-based reweighting to down-weight ambiguous edges. CGC  and gCooL  jointly learn community partitions and representations within a unified contrastive framework.",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),trajectory inference single-cell optimal transport Waddington ICML NeurIPS 2024 2025,10,DestinyNet: A deep-learning framework for cell-fate analysis from ...,https://pmc.ncbi.nlm.nih.gov/articles/PMC13083642/,pmc.ncbi.nlm.nih.gov,0.059646945,"DestinyNet is a deep-learning framework for analyzing lineage-tracing single-cell sequencing data that integrates fate clustering, fate-flow inference, and fate",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cross-modality single-cell alignment graph matching optimal transport 2024 2025,8,2025.12.28.696775v1.full.pdf,https://www.biorxiv.org/content/10.64898/2025.12.28.696775v1.full.pdf,www.biorxiv.org,0.05323092,"learning (Table 2), with specific details provided for each method in the 487 following sections. 488 [...] > .CC-BY-NC-ND 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted December 29, 2025. ; doi: bioRxiv preprint
+
+𝑦𝑦 = 𝑓𝑓  (𝑤𝑤 𝑖𝑖 𝑥𝑥 𝑖𝑖 ) + 𝑏𝑏 𝑛𝑛 𝑖𝑖=1 255 [...] A graph is a set of nodes (vertices) and edges (links), where each edge connects a pair of nodes (Figure 366 3E). An attributed graph is a graph in which each node and edge is associated with one or more features, 367 called attributes (Figure 3E). Graph neural networks (GNNs) are neural network architectures 368 specifically designed to operate on graph-structured data [42,49]. Attributed graphs are commonly used 369 in GNNs and other applications where each component of the graph carries additional information 370 beyond just connectivity (Figure 3E). In general, graphs do not have a canonical or fixed node ordering, 371 and therefore graph operations are typically defined to be independent of node ordering. Accordingly, 372 GNNs are designed to preserve the permutation symmetry of the",False
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),cell state alignment trajectory smoothing geometric learning 2024 2025,7,Tracing the Representation Geometry of Language Models from ...,https://neurips.cc/virtual/2025/poster/119054,neurips.cc,0.05242457,"Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Fri, Dec 5, 2025 • 4:30 PM – 7:30 PM PST
+
+# Tracing the Representation Geometry of Language Models from Pretraining to Post-training
+
+Melody Li · Kumar Krishna Agrawal · Arna Ghosh · Komal Teru · Adam Santoro · Guillaume Lajoie · Blake Richards
+
+Project Page    [OpenReview]
+
+### Abstract [...] consolidation, selectively preserving variance along dominant eigendirections while contracting others, a transition marked with significant improvement in downstream task performance. We show these phases can emerge from a fundamental interplay of cross-entropy optimization under skewed token frequencies and representational bottlenecks (d ≪ |V|). Post-training further transforms geometry: SFT and DPO drive “entropy-seeking” dynamics to integrate specific instructional or preferential data, improving in-distribution performance while degrading out-of-distribution robustness. Conversely, RLVR induces “compression-seeking” , enhancing reward alignment but reducing generation diversity. [...] ### Video
+
+Chat is not available.
+
+Successful Page Load
+
+| NeurIPS uses cookies for essential functions only. We do not sell your personal information. Our Privacy Policy » |  |",True
+b2_multimodal_integration,B2 — 多模态单细胞数据整合 (Multi-Modal & Cross-Assay Integration),cross-modality single-cell alignment graph matching optimal transport 2024 2025,9,Evaluating Language Model Agents on Real-World AI Research,https://arxiv.org/html/2602.15112v1,arxiv.org,0.04191884,"|  |  |  |  |  |
+ ---  --- 
+| Paper | Abbrv | Conference | Category | Evaluation Metric |
+| Incorporating Domain Knowledge into Materials Tokenization (Oh et al., 2025) | mdt | ACL SAC Highlights | NLP, Tokenization, Physical Sciences | Micro-F1, Macro-F1 |
+| Test-time Adaptation for Cross-modal Retrieval with Query Shift (Li et al., 2025) | cmr | ICLR Spotlight | Multimodality, Information Retrieval | Text-to-Image Recall, Image-to-Text Recall |
+| TIMING: Temporality-Aware Integrated Gradients for Time Series Explanation (Jang et al., 2025) | tim | ICML Spotlight | Time Series, Explainability | CPD, AUP, AUR | [...] We source tasks from oral and spotlight papers at ICML, ICLR, and ACL, spanning continual learning, reinforcement learning, tokenization, cross-modal retrieval, and time-series explanation. Selecting 2025 papers mitigates contamination risks present in benchmarks derived from older tasks (Nathani et al., 2025; Zou et al., 2025). From each paper we preserve the datasets, evaluation scripts, and baseline methods but withhold the core method, leaving baselines as lower bounds and the author’s solution as a soft upper bound, enabling direct comparison to expert attempts. Grading uses paper’s original evaluation scripts, avoiding the reliability issues of LLM-judges. All tasks run on a single GPU for up to 24 hours in isolated containers, enabling reproducibility without cluster-scale compute [...] Additionally, we select 3 tasks for the development set sourced from 2024-2025 papers, and use them to tune our agent scaffolding (e.g., prompting, tools, context summarization).
+Overall benchmark construction process is illustrated in Figure 2.",True
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),cell state alignment trajectory smoothing geometric learning 2024 2025,9,NeurIPS Poster JADE: Joint Alignment and Deep Embedding for Multi-Slice Spatial Transcriptomics,https://neurips.cc/virtual/2025/poster/115972,neurips.cc,0.035012625,"Skip to yearly menu bar
+
+## Main Navigation
+
+conference_logo
+
+ NeurIPS 
+  + Code of Ethics  
+
+  + Code of Conduct  
+
+  + Create Profile  
+
+  + Journal To Conference Track  
+
+  + Diversity & Inclusion  
+
+  + Proceedings  
+
+  + Future Meetings  
+
+  + Press  
+
+  + Exhibitor Information  
+
+  + Contact NeurIPS  
+
+  + Help/FAQ  
+
+  + Privacy Policy  
+
+  + Downloads
+ My Stuff
+
+ Login
+
+Poster  Wed, Dec 3, 2025 • 11:00 AM – 2:00 PM PST
+
+# JADE: Joint Alignment and Deep Embedding for Multi-Slice Spatial Transcriptomics
+
+Yuanchuan Guo ⋅ Jun Liu ⋅ Huimin Cheng ⋅ Ying Ma
+
+ [Poster]     [OpenReview]
+
+### Abstract [...] and Stereo-seq axolotl brain datasets. By bridging spatial alignment and feature integration, JADE provides a scalable and accurate solution for cross-slice analysis of ST data. [...] tissue slices. Unlike existing methods, JADE adopts a roundtrip framework in which each iteration alternates between alignment and embedding refinement. To infer alignment, we employ attention mechanisms that dynamically assess and weight the importance of different embedding dimensions, allowing the model to focus on the most alignment-relevant features while suppressing noise. To the best of our knowledge, JADE is the first method that jointly optimizes alignment and representation learning in a shared latent space, enabling robust multi-slice integration. We demonstrate that JADE outperforms existing alignment and embedding methods across multiple evaluation metrics in the 10x Visium human dorsolateral prefrontal cortex (DLPFC) and Stereo-seq axolotl brain datasets. By bridging spatial",True
+b1_sc_qc_noise,B1 — 单细胞数据质控: 噪声建模与稀疏数据处理 (QC: Noise & Sparsity Modeling),zero-inflated negative binomial single-cell denoising 2024 2025 bioinformatics,10,ACNP 64th Annual Meeting: Poster Abstracts P1-P291 | Neuropsychopharmacology,https://www.nature.com/articles/s41386-025-02279-w,www.nature.com,0.014415935,"Methods: Adolescents from the New York Metro area had semi-structured diagnostic interviews with trained clinicians. Depression severity was measured using the clinician-rated Children’s Depression Rating Scale–Revised. Cannabis use patterns were assessed via clinician interviews, self-reports, and urine toxicology. Use frequency was defined by clinician consensus as none, tried once, low, moderate, or heavy. Structural MRI (T1w MPRAGE and T2w SPACE; 0.9 mm isotropic) and RFT fMRI (2.3 mm isotropic; TR = 1s) were acquired and processed using Human Connectome Project–style methods, including ICA-FIX denoising and MSMAll alignment. RFT trials presented a monetary cue (0, 10, 50, or ? cents), a brief flanker stimulus (unique letter among 5), a window to identify the unique letter, and [...] Methods: We conducted a retrospective analysis using a database prepared from data captured in annual reports submitted to the Ontario Review Board by 12 forensic programs in Canada. We utilized statistical analyses based on negative binomial regression to evaluate associations between polypharmacy and incidences of violence.
+
+Results: Among 1104 patients in the databases, 37.8% (n = 417) were on antipsychotic polypharmacy. The most frequent combination was with Olanzapine or Quetiapine. Significant associations were observed between antipsychotic polypharmacy and patients with increased incidences of physical violence to objects, self-harm, and verbal aggression. [...] Methods: We conducted a narrative review of 42 scientific articles published between 2020 and 2024, selected from PubMed and Scopus, including randomized controlled trials, meta-analyses, and international practice guidelines (NICE, APA, WPA). These data were supplemented by an observational study of 80 patients (aged 18–65 years), diagnosed according to DSM-5 and ICD-11, followed for 12 months in both outpatient and inpatient settings.",False
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),cell state alignment trajectory smoothing geometric learning 2024 2025,10,3d-OT: a deep geometry-aware framework for heterogeneous slices ...,https://www.nature.com/articles/s41592-026-03034-9,www.nature.com,0.006314365,"Here we propose 3d-OT, a deep geometry-aware framework that leverages spatial geometric and multi-omics information for feature extraction, spatial domains",False
+b3_trajectory_alignment,B3 — 轨迹推断与细胞状态对齐 (Trajectory Inference & Cell State Alignment),single-cell flow estimation optimal transport developmental biology 2024 2025,10,Simplex-Constrained Neural Topic VAEs with Flow Refinement for ...,https://www.biorxiv.org/content/10.64898/2026.03.26.714651v2.full-text,www.biorxiv.org,0.00462753,"We introduce Topic-FM, a family of neural topic VAEs in which a logistic-normal Dirichlet prior constrains the latent vector to the probability simplex, turning",False
