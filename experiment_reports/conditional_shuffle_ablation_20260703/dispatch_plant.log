@@ -1,0 +1,50 @@
+Dispatching 24 plant run(s) across GPUs [1, 2, 3, 4, 5, 6].
+[launch] GPU1 <- SRP182008__zero__seed42
+[launch] GPU2 <- SRP182008__zero__seed43
+[launch] GPU3 <- SRP182008__zero__seed44
+[launch] GPU4 <- SRP182008__swap_global__seed42
+[launch] GPU5 <- SRP182008__swap_global__seed43
+[launch] GPU6 <- SRP182008__swap_global__seed44
+[done] GPU2 -> SRP182008__zero__seed43 OK
+[launch] GPU2 <- SRP182008__swap_lib__seed42
+[done] GPU3 -> SRP182008__zero__seed44 OK
+[launch] GPU3 <- SRP182008__swap_lib__seed43
+[done] GPU4 -> SRP182008__swap_global__seed42 OK
+[launch] GPU4 <- SRP182008__swap_lib__seed44
+[done] GPU5 -> SRP182008__swap_global__seed43 OK
+[done] GPU6 -> SRP182008__swap_global__seed44 OK
+[launch] GPU5 <- SRP182008__swap_ndet__seed42
+[launch] GPU6 <- SRP182008__swap_ndet__seed43
+[done] GPU1 -> SRP182008__zero__seed42 OK
+[launch] GPU1 <- SRP182008__swap_ndet__seed44
+[done] GPU2 -> SRP182008__swap_lib__seed42 OK
+[launch] GPU2 <- CRA002977_1__zero__seed42
+[done] GPU3 -> SRP182008__swap_lib__seed43 OK
+[launch] GPU3 <- CRA002977_1__zero__seed43
+[done] GPU4 -> SRP182008__swap_lib__seed44 OK
+[launch] GPU4 <- CRA002977_1__zero__seed44
+[done] GPU5 -> SRP182008__swap_ndet__seed42 OK
+[launch] GPU5 <- CRA002977_1__swap_global__seed42
+[done] GPU6 -> SRP182008__swap_ndet__seed43 OK
+[launch] GPU6 <- CRA002977_1__swap_global__seed43
+[done] GPU1 -> SRP182008__swap_ndet__seed44 OK
+[launch] GPU1 <- CRA002977_1__swap_global__seed44
+[done] GPU2 -> CRA002977_1__zero__seed42 OK
+[launch] GPU2 <- CRA002977_1__swap_lib__seed42
+[done] GPU3 -> CRA002977_1__zero__seed43 OK
+[launch] GPU3 <- CRA002977_1__swap_lib__seed43
+[done] GPU4 -> CRA002977_1__zero__seed44 OK
+[launch] GPU4 <- CRA002977_1__swap_lib__seed44
+[done] GPU5 -> CRA002977_1__swap_global__seed42 OK
+[launch] GPU5 <- CRA002977_1__swap_ndet__seed42
+[done] GPU6 -> CRA002977_1__swap_global__seed43 OK
+[done] GPU1 -> CRA002977_1__swap_global__seed44 OK
+[launch] GPU6 <- CRA002977_1__swap_ndet__seed43
+[launch] GPU1 <- CRA002977_1__swap_ndet__seed44
+[done] GPU2 -> CRA002977_1__swap_lib__seed42 OK
+[done] GPU3 -> CRA002977_1__swap_lib__seed43 OK
+[done] GPU4 -> CRA002977_1__swap_lib__seed44 OK
+[done] GPU5 -> CRA002977_1__swap_ndet__seed42 OK
+[done] GPU1 -> CRA002977_1__swap_ndet__seed44 OK
+[done] GPU6 -> CRA002977_1__swap_ndet__seed43 OK
+PLANT DONE

@@ -1,0 +1,72 @@
+{
+  "dataset": "Macosko",
+  "seed": 42,
+  "n_clusters": 12,
+  "runtime_seconds": 224.99927854537964,
+  "corruption": "zero",
+  "mask_prob": 0.4,
+  "mean_effective_change_rate": 0.40000236833308433,
+  "n_nuisance_bins": 10,
+  "n_joint_bins": 5,
+  "donor_pool": {
+    "n_bins": 1,
+    "pool_mean": 44808.0,
+    "pool_min": 44808.0,
+    "pool_max": 44808.0,
+    "pool_median": 44808.0,
+    "pool_cell_weighted_mean": 44808.0,
+    "bin_sizes": [
+      44808
+    ]
+  },
+  "nuisance_meta": {
+    "nuisance_source": "adata.X",
+    "inferred_mode": "raw",
+    "fallback_used": false,
+    "n_cells": 44808,
+    "library_min": 207.0,
+    "library_median": 692.0,
+    "library_max": 49231.0,
+    "n_detected_min": 86.0,
+    "n_detected_median": 482.0,
+    "n_detected_max": 8105.0,
+    "zero_rate_min": 0.661,
+    "zero_rate_median": 0.976,
+    "zero_rate_max": 0.999
+  },
+  "variance_weight": 0.02,
+  "force_gate": 1.0,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.7493527941439029,
+      "nmi": 0.6459277366315872,
+      "ari": 0.6960454782245903,
+      "f1_macro": 0.4077529522575374,
+      "fmi": 0.8249076940023369,
+      "v_measure": 0.6459277366315872,
+      "homogeneity": 0.7904335474126818,
+      "completeness": 0.5460920516003458,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 1.033291220664978,
+    "std_median": 1.0597360134124756,
+    "std_max": 2.1809849739074707,
+    "effective_dim_pr": 114.16849650942063,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 128
+  },
+  "cluster_aligned": {
+    "cluster_aligned_eff_dim": 1.6843468262874215,
+    "between_class_scatter_trace": 5769021.646852154
+  },
+  "final_scmae_loss": 0.4468281594344548,
+  "cluster_mass_min": 0.009819675058025352,
+  "cluster_mass_max": 0.5593420817711123,
+  "final_gate": 1.0
+}

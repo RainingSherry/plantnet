@@ -1,0 +1,81 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "seed": 42,
+  "n_clusters": 5,
+  "runtime_seconds": 72.51646447181702,
+  "corruption": "swap_lib",
+  "mask_prob": 0.4,
+  "mean_effective_change_rate": 0.03320204682221284,
+  "n_nuisance_bins": 10,
+  "n_joint_bins": 5,
+  "donor_pool": {
+    "n_bins": 10,
+    "pool_mean": 955.2,
+    "pool_min": 955.0,
+    "pool_max": 956.0,
+    "pool_median": 955.0,
+    "pool_cell_weighted_mean": 955.2001675041876,
+    "bin_sizes": [
+      956,
+      955,
+      955,
+      955,
+      955,
+      956,
+      955,
+      955,
+      955,
+      955
+    ]
+  },
+  "nuisance_meta": {
+    "nuisance_source": "adata.X",
+    "inferred_mode": "raw",
+    "fallback_used": false,
+    "n_cells": 9552,
+    "library_min": 1456.0,
+    "library_median": 3244.5,
+    "library_max": 58330.0,
+    "n_detected_min": 510.0,
+    "n_detected_median": 1182.0,
+    "n_detected_max": 5921.0,
+    "zero_rate_min": 0.809,
+    "zero_rate_median": 0.952,
+    "zero_rate_max": 0.977
+  },
+  "variance_weight": 0.02,
+  "force_gate": 1.0,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.9535175879396985,
+      "nmi": 0.833028003201487,
+      "ari": 0.9210647902559925,
+      "f1_macro": 0.7083662143754251,
+      "fmi": 0.9647615827501356,
+      "v_measure": 0.833028003201487,
+      "homogeneity": 0.8671132828274248,
+      "completeness": 0.8015210816324363,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 1.0110106468200684,
+    "std_median": 1.0420362949371338,
+    "std_max": 1.1720852851867676,
+    "effective_dim_pr": 127.79101750092605,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 128
+  },
+  "cluster_aligned": {
+    "cluster_aligned_eff_dim": 1.1606027783499042,
+    "between_class_scatter_trace": 1193358.3521868347
+  },
+  "final_scmae_loss": 0.44355752903061946,
+  "cluster_mass_min": 0.018006700167504188,
+  "cluster_mass_max": 0.7002721943048577,
+  "final_gate": 1.0
+}

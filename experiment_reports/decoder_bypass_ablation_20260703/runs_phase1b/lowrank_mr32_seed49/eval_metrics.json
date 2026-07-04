@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "decoder-bypass ablation",
+  "seed": 49,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6242412069273344,
+      "nmi": 0.5919888299545109,
+      "ari": 0.4591244836680104,
+      "f1_macro": 0.37828886024927727,
+      "fmi": 0.6639447141659129,
+      "v_measure": 0.5919888299545109,
+      "homogeneity": 0.7891797270442704,
+      "completeness": 0.47364101465097547,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

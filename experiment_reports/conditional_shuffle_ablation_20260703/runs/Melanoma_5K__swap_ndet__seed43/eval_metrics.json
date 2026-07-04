@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "conditional-shuffle ablation",
+  "seed": 43,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7146022601373809,
+      "nmi": 0.7175650141676405,
+      "ari": 0.6524598294020469,
+      "f1_macro": 0.5198286084203287,
+      "fmi": 0.7211291762871552,
+      "v_measure": 0.7175650141676405,
+      "homogeneity": 0.7492435869480378,
+      "completeness": 0.6884565617530218,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

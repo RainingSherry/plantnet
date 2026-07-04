@@ -1,0 +1,73 @@
+{
+  "dataset": "SRP182008",
+  "seed": 44,
+  "n_clusters": 15,
+  "runtime_seconds": 129.95421743392944,
+  "corruption": "swap_global",
+  "mask_prob": 0.4,
+  "mean_effective_change_rate": 0.03226714336688702,
+  "mean_designed_mask_rate": 0.39998644291638186,
+  "n_nuisance_bins": 10,
+  "n_joint_bins": 5,
+  "donor_pool": {
+    "n_bins": 1,
+    "pool_mean": 13514.0,
+    "pool_min": 13514.0,
+    "pool_max": 13514.0,
+    "pool_median": 13514.0,
+    "pool_cell_weighted_mean": 13514.0,
+    "bin_sizes": [
+      13514
+    ]
+  },
+  "nuisance_meta": {
+    "nuisance_source": "adata.raw.X",
+    "inferred_mode": "raw",
+    "fallback_used": false,
+    "n_cells": 13514,
+    "library_min": 500.0,
+    "library_median": 1889.5,
+    "library_max": 39150.0,
+    "n_detected_min": 234.0,
+    "n_detected_median": 1007.0,
+    "n_detected_max": 3812.0,
+    "zero_rate_min": 0.753,
+    "zero_rate_median": 0.962,
+    "zero_rate_max": 0.998
+  },
+  "variance_weight": 0.02,
+  "force_gate": 1.0,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.5893887820038478,
+      "nmi": 0.6168489940318654,
+      "ari": 0.4467156966723797,
+      "f1_macro": 0.5050306173373064,
+      "fmi": 0.5156439784779083,
+      "v_measure": 0.6168489940318655,
+      "homogeneity": 0.5865275779327301,
+      "completeness": 0.6504763363768593,
+      "n_pred_clusters": 15,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 0.9704980850219727,
+    "std_median": 1.0522181987762451,
+    "std_max": 1.4348788261413574,
+    "effective_dim_pr": 124.05071134991792,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 122
+  },
+  "cluster_aligned": {
+    "cluster_aligned_eff_dim": 2.455767592039264,
+    "between_class_scatter_trace": 1577249.7190891798
+  },
+  "final_scmae_loss": 0.44778364037091917,
+  "cluster_mass_min": 0.007621725617877756,
+  "cluster_mass_max": 0.22458191505105815,
+  "final_gate": 1.0
+}

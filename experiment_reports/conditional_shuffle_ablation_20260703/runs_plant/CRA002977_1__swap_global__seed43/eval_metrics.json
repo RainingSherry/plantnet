@@ -1,0 +1,25 @@
+{
+  "dataset": "CRA002977_1",
+  "method": "conditional-shuffle ablation",
+  "seed": 43,
+  "n_clusters": 7,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.6756188910203709,
+      "nmi": 0.562779425339846,
+      "ari": 0.510684814415006,
+      "f1_macro": 0.5673815016334938,
+      "fmi": 0.6979628516905022,
+      "v_measure": 0.5627794253398459,
+      "homogeneity": 0.6292297180106211,
+      "completeness": 0.5090235937093031,
+      "n_pred_clusters": 7,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

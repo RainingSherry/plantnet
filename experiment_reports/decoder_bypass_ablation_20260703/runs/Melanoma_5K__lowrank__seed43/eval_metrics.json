@@ -1,0 +1,25 @@
+{
+  "dataset": "Melanoma_5K",
+  "method": "decoder-bypass ablation",
+  "seed": 43,
+  "n_clusters": 9,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7148238422335476,
+      "nmi": 0.720170683237762,
+      "ari": 0.6525276768617111,
+      "f1_macro": 0.5243750193245107,
+      "fmi": 0.7212155200349339,
+      "v_measure": 0.7201706832377619,
+      "homogeneity": 0.7506730462732695,
+      "completeness": 0.6920503566556886,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

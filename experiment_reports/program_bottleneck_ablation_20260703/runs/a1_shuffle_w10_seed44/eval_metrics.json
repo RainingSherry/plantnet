@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "program-bottleneck ablation",
+  "seed": 44,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7503570790930191,
+      "nmi": 0.6512523129154714,
+      "ari": 0.6949345627503521,
+      "f1_macro": 0.404847706463163,
+      "fmi": 0.8242593852992368,
+      "v_measure": 0.6512523129154713,
+      "homogeneity": 0.7862931444247803,
+      "completeness": 0.5557976177064917,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

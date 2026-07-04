@@ -3,12 +3,27 @@ from __future__ import annotations
 
 import csv
 import json
+import statistics
+from collections import defaultdict
 from pathlib import Path
 
 
 def load_summary(path: Path) -> dict:
     with open(path, "r", encoding="utf-8") as handle:
         return json.load(handle)
+
+
+def mean_sd(values: list[float]) -> tuple[float, float]:
+    if not values:
+        return float("nan"), float("nan")
+    if len(values) == 1:
+        return float(values[0]), 0.0
+    return float(statistics.mean(values)), float(statistics.stdev(values))
+
+
+def fmt_mean_sd(values: list[float], digits: int = 4) -> str:
+    mean, sd = mean_sd(values)
+    return f"{mean:.{digits}f} +/- {sd:.{digits}f}"
 
 
 def main() -> int:
@@ -55,6 +70,29 @@ def main() -> int:
         if not rows:
             handle.write("No completed runs found under `runs/*/summary.json`.\n")
         else:
+            groups = defaultdict(list)
+            for row in rows:
+                groups[(row["mix_mode"], row["variance_weight"])].append(row)
+
+            handle.write("## Arm-level aggregate\n\n")
+            handle.write(
+                "| mix | varw | n | ARI mean+/-sd | NMI mean+/-sd | "
+                "eff_dim mean+/-sd | std_min mean+/-sd | dims_std>1 mean+/-sd |\n"
+            )
+            handle.write("|---|---:|---:|---:|---:|---:|---:|---:|\n")
+            for key in sorted(groups, key=lambda item: (str(item[0]), float(item[1]))):
+                group_rows = groups[key]
+                mix_mode, variance_weight = key
+                handle.write(
+                    f"| {mix_mode} | {variance_weight} | {len(group_rows)} | "
+                    f"{fmt_mean_sd([float(row['ari']) for row in group_rows])} | "
+                    f"{fmt_mean_sd([float(row['nmi']) for row in group_rows])} | "
+                    f"{fmt_mean_sd([float(row['effective_dim_pr']) for row in group_rows], 1)} | "
+                    f"{fmt_mean_sd([float(row['std_min']) for row in group_rows], 3)} | "
+                    f"{fmt_mean_sd([float(row['dims_std_gt_1p0']) for row in group_rows], 1)} |\n"
+                )
+
+            handle.write("\n## Per-run details\n\n")
             handle.write("| run | mix | varw | ARI | NMI | eff_dim | std_min | std_med | dims_std>1 |\n")
             handle.write("|---|---:|---:|---:|---:|---:|---:|---:|---:|\n")
             for row in rows:

@@ -1,0 +1,13 @@
+{
+  "data_path": "methods/DeepLearning/scMAEs/benchmark_data/Quake_10x_Spleen.h5ad",
+  "save_dir": "experiment_reports/objective_swap_scmae_20260704/runs/pca_quake_seed44",
+  "dataset_name": "Quake_10x_Spleen",
+  "label_key": "auto",
+  "input_mode": "auto",
+  "n_top_genes": 1000,
+  "target_sum": 10000.0,
+  "scale_input": true,
+  "n_clusters": 0,
+  "pca_dim": 128,
+  "seed": 44
+}

@@ -1,0 +1,48 @@
+{
+  "dataset": "Macosko",
+  "seed": 44,
+  "n_clusters": 12,
+  "runtime_seconds": 308.38363909721375,
+  "program_mode": "nmf",
+  "program_dim": 32,
+  "program_weight": 0.02,
+  "split_mode": "none",
+  "type_dim": 128,
+  "enc_width": 128,
+  "variance_weight": 0.02,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.4875022317443314,
+      "nmi": 0.5943904740545273,
+      "ari": 0.34114743454326046,
+      "f1_macro": 0.39245865003350966,
+      "fmi": 0.5697352730041801,
+      "v_measure": 0.5943904740545272,
+      "homogeneity": 0.8180478791663667,
+      "completeness": 0.46677296739827057,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 1.0295370817184448,
+    "std_median": 1.0551600456237793,
+    "std_max": 2.838425874710083,
+    "effective_dim_pr": 95.39525696199712,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 128
+  },
+  "cluster_aligned": {
+    "cluster_aligned_eff_dim": 1.7905650763262018,
+    "between_class_scatter_trace": 6167991.201142476
+  },
+  "program_r2": 0.642097910651054,
+  "final_program_loss": 0.4395194523675101,
+  "final_base_loss": 0.535104353087289,
+  "cluster_mass_min": 0.006338153901089091,
+  "cluster_mass_max": 0.2819585788252098,
+  "final_gate": 1.0
+}

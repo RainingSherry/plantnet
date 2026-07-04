@@ -1,0 +1,17 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+Device=cuda:4 dataset=Melanoma_5K cells=4513 clusters=9 corruption=swap_ndet donor_pool_mean=451.3 n_bins=10 mask_prob=0.4 varw=0.02 nuisance_src=adata.X
+Epoch 001/80 loss=0.4785 scmae=0.4529 sharp=0.0000 var=0.7150 eff_change=0.040 gate=1.000
+Epoch 010/80 loss=0.4451 scmae=0.4440 sharp=0.0000 var=0.0013 eff_change=0.039 gate=1.000
+Epoch 020/80 loss=0.4446 scmae=0.4438 sharp=0.0000 var=0.0012 eff_change=0.039 gate=1.000
+Epoch 030/80 loss=0.4776 scmae=0.4438 sharp=0.1876 var=0.0018 eff_change=0.040 gate=1.000
+Epoch 040/80 loss=0.5198 scmae=0.4439 sharp=0.2147 var=0.0026 eff_change=0.040 gate=1.000
+Epoch 050/80 loss=0.5192 scmae=0.4436 sharp=0.2141 var=0.0008 eff_change=0.040 gate=1.000
+Epoch 060/80 loss=0.5117 scmae=0.4434 sharp=0.1925 var=0.0015 eff_change=0.039 gate=1.000
+Epoch 070/80 loss=0.5104 scmae=0.4435 sharp=0.1892 var=0.0006 eff_change=0.039 gate=1.000
+Epoch 080/80 loss=0.5077 scmae=0.4435 sharp=0.1813 var=0.0003 eff_change=0.040 gate=1.000
+[RESULT] Melanoma_5K corruption=swap_ndet ARI=0.6524598294020469 NMI=0.7175650141676405 eff_change=0.039 donor_pool_mean=451.3 aligned_eff_dim=1.3

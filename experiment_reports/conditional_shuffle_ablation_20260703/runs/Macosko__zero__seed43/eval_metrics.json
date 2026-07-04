@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "conditional-shuffle ablation",
+  "seed": 43,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.7575656132833423,
+      "nmi": 0.6614831160386409,
+      "ari": 0.705651185375968,
+      "f1_macro": 0.4393260507982177,
+      "fmi": 0.8309071272726557,
+      "v_measure": 0.661483116038641,
+      "homogeneity": 0.7953144485548312,
+      "completeness": 0.566205099757527,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

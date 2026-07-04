@@ -1,0 +1,40 @@
+{
+  "corruption": "swap_ndet",
+  "nuisance_meta": {
+    "nuisance_source": "adata.raw.X",
+    "inferred_mode": "raw",
+    "fallback_used": false,
+    "n_cells": 13514,
+    "library_min": 500.0,
+    "library_median": 1889.5,
+    "library_max": 39150.0,
+    "n_detected_min": 234.0,
+    "n_detected_median": 1007.0,
+    "n_detected_max": 3812.0,
+    "zero_rate_min": 0.753,
+    "zero_rate_median": 0.962,
+    "zero_rate_max": 0.998
+  },
+  "n_nuisance_bins": 10,
+  "n_joint_bins": 5,
+  "donor_pool": {
+    "n_bins": 10,
+    "pool_mean": 1351.4,
+    "pool_min": 1351.0,
+    "pool_max": 1352.0,
+    "pool_median": 1351.0,
+    "pool_cell_weighted_mean": 1351.4001775936067,
+    "bin_sizes": [
+      1352,
+      1351,
+      1352,
+      1351,
+      1351,
+      1352,
+      1351,
+      1352,
+      1351,
+      1351
+    ]
+  }
+}

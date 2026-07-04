@@ -1,0 +1,48 @@
+{
+  "kmeans_known_k": {
+    "acc": 0.32317889662560256,
+    "nmi": 0.3509805842582117,
+    "ari": 0.184564853278552,
+    "f1_macro": 0.1183695556780235,
+    "fmi": 0.43043560017598437,
+    "v_measure": 0.35098058425821166,
+    "homogeneity": 0.47510390000749975,
+    "completeness": 0.27827882316291197,
+    "n_pred_clusters": 12,
+    "silhouette": NaN,
+    "protocol": "fixed",
+    "cluster_method": "kmeans_known_k",
+    "uses_known_k": true
+  },
+  "direct_prototype_argmax": {
+    "acc": 0.7735002678093198,
+    "nmi": 0.5819078001424018,
+    "ari": 0.7403202064233927,
+    "f1_macro": 0.12758121381500045,
+    "fmi": 0.8725227801045042,
+    "v_measure": 0.5819078001424018,
+    "homogeneity": 0.4522734043762526,
+    "completeness": 0.8157148230068627,
+    "n_pred_clusters": 2,
+    "silhouette": NaN,
+    "protocol": "fixed",
+    "cluster_method": "direct_prototype_argmax",
+    "uses_known_k": true
+  },
+  "pca_kmeans_known_k": {
+    "acc": 0.9039903588644885,
+    "nmi": 0.8044185807713302,
+    "ari": 0.8867663600718061,
+    "f1_macro": 0.6856190783543212,
+    "fmi": 0.9399472369243664,
+    "v_measure": 0.8044185807713302,
+    "homogeneity": 0.8137902315421828,
+    "completeness": 0.7952603214124415,
+    "n_pred_clusters": 12,
+    "silhouette": NaN,
+    "protocol": "fixed",
+    "cluster_method": "kmeans_known_k",
+    "uses_known_k": true,
+    "pca_dim": 128
+  }
+}

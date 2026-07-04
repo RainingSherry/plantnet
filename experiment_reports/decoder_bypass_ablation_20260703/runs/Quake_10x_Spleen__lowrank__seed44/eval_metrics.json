@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "decoder-bypass ablation",
+  "seed": 44,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.9482830820770519,
+      "nmi": 0.8260185219412152,
+      "ari": 0.9192868620224963,
+      "f1_macro": 0.6893163966900039,
+      "fmi": 0.9639647691902804,
+      "v_measure": 0.8260185219412152,
+      "homogeneity": 0.8614489731925395,
+      "completeness": 0.7933873697743823,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

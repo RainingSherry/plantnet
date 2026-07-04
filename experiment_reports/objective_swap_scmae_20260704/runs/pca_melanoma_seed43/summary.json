@@ -1,0 +1,57 @@
+{
+  "dataset": "Melanoma_5K",
+  "seed": 43,
+  "n_clusters": 9,
+  "runtime_seconds": 2.695128917694092,
+  "method": "pca_kmeans_baseline",
+  "assignment_mode": "pca",
+  "variance_weight": 0.0,
+  "entropy_weight": 0.0,
+  "confidence_weight": 0.0,
+  "latent_dim": 128,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6589851539995568,
+      "nmi": 0.7094704789651722,
+      "ari": 0.5679097944072609,
+      "f1_macro": 0.5681681122065557,
+      "fmi": 0.6981402031132589,
+      "v_measure": 0.7094704789651722,
+      "homogeneity": 0.636233087693507,
+      "completeness": 0.8017620673270408,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true,
+      "pca_dim": 128
+    },
+    "pca_kmeans_known_k": {
+      "acc": 0.6589851539995568,
+      "nmi": 0.7094704789651722,
+      "ari": 0.5679097944072609,
+      "f1_macro": 0.5681681122065557,
+      "fmi": 0.6981402031132589,
+      "v_measure": 0.7094704789651722,
+      "homogeneity": 0.636233087693507,
+      "completeness": 0.8017620673270408,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true,
+      "pca_dim": 128
+    },
+    "direct_prototype_argmax": {}
+  },
+  "std_profile": {
+    "std_min": 1.1780728101730347,
+    "std_median": 1.436899185180664,
+    "std_max": 6.325992584228516,
+    "effective_dim_pr": 44.47421038909584,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 128
+  },
+  "cluster_mass_min": 0.0044316419233325945,
+  "cluster_mass_max": 0.4992244626634168
+}

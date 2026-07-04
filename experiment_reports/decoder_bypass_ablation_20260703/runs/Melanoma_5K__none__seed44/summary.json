@@ -1,0 +1,42 @@
+{
+  "dataset": "Melanoma_5K",
+  "seed": 44,
+  "n_clusters": 9,
+  "runtime_seconds": 23.938942670822144,
+  "decoder_mode": "none",
+  "mask_rank": 16,
+  "variance_weight": 0.02,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.8165300243740305,
+      "nmi": 0.7496289349886257,
+      "ari": 0.7479454622434455,
+      "f1_macro": 0.583956698198824,
+      "fmi": 0.7990284217174266,
+      "v_measure": 0.7496289349886257,
+      "homogeneity": 0.7630830966297653,
+      "completeness": 0.7366409826981333,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 1.04867422580719,
+    "std_median": 1.1921783685684204,
+    "std_max": 1.4907398223876953,
+    "effective_dim_pr": 125.38522291634989,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 128
+  },
+  "cluster_aligned": {
+    "cluster_aligned_eff_dim": 1.3923737449687918,
+    "between_class_scatter_trace": 752152.5851777326
+  },
+  "final_base_loss": 0.4664340510087855,
+  "cluster_mass_min": 0.004653224019499224,
+  "cluster_mass_max": 0.2661200974961223,
+  "final_gate": 1.0
+}

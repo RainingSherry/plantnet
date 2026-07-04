@@ -1,0 +1,42 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "seed": 43,
+  "n_clusters": 5,
+  "runtime_seconds": 50.408395528793335,
+  "decoder_mode": "lowrank",
+  "mask_rank": 16,
+  "variance_weight": 0.02,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.948178391959799,
+      "nmi": 0.8315693197508597,
+      "ari": 0.9206056079962421,
+      "f1_macro": 0.7284546904968139,
+      "fmi": 0.9645599378467262,
+      "v_measure": 0.8315693197508597,
+      "homogeneity": 0.866914639626811,
+      "completeness": 0.7989932497434757,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 1.0403472185134888,
+    "std_median": 1.0752416849136353,
+    "std_max": 1.210249423980713,
+    "effective_dim_pr": 127.41816055276918,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 128
+  },
+  "cluster_aligned": {
+    "cluster_aligned_eff_dim": 1.1126042904524531,
+    "between_class_scatter_trace": 1294567.568387465
+  },
+  "final_base_loss": 0.4482840339879732,
+  "cluster_mass_min": 0.02386934673366834,
+  "cluster_mass_max": 0.7006909547738693,
+  "final_gate": 1.0
+}

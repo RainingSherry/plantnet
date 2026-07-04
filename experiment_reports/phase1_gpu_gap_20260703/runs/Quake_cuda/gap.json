@@ -1,0 +1,24 @@
+{
+  "dataset": "Quake_cuda",
+  "device": "cuda",
+  "n_cells": 9552,
+  "n_genes": 1000,
+  "n_clusters": 5,
+  "epochs": 30,
+  "cpu_threads": 48,
+  "timings_sec": {
+    "load": 3.616669606999494,
+    "neighbor_pca_knn": 2.7299538529478014,
+    "kmeans_init": 0.507136064930819,
+    "train_total": 17.666136007755995,
+    "train_per_epoch": 0.5888712002585331,
+    "eval_kmeans": 0.3850173329701647
+  },
+  "total_measured_sec": 24.904912865604274,
+  "cpu_classic_sec": 7.238776857848279,
+  "cpu_classic_frac": 0.2906565823743806,
+  "gpu_util_mean": 5.975,
+  "gpu_util_p90": 10.100000000000001,
+  "gpu_mem_peak_mb_smi": 6419.0,
+  "torch_peak_mem_mb": 130.566144
+}

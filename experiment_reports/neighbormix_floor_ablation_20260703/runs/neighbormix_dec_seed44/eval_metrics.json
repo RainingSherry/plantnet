@@ -1,0 +1,25 @@
+{
+  "dataset": "Macosko",
+  "method": "NeighborMix x std-floor ablation",
+  "seed": 44,
+  "n_clusters": 12,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.455074986609534,
+      "nmi": 0.6083531963293907,
+      "ari": 0.331914612340645,
+      "f1_macro": 0.44975509327509905,
+      "fmi": 0.5618073039532617,
+      "v_measure": 0.6083531963293906,
+      "homogeneity": 0.8408349778596611,
+      "completeness": 0.47658311667212344,
+      "n_pred_clusters": 12,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

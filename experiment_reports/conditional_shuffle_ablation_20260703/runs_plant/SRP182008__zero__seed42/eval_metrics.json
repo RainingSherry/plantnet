@@ -1,0 +1,25 @@
+{
+  "dataset": "SRP182008",
+  "method": "conditional-shuffle ablation",
+  "seed": 42,
+  "n_clusters": 15,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.5843569631493266,
+      "nmi": 0.5927997071660277,
+      "ari": 0.4058442356100688,
+      "f1_macro": 0.5392053008885138,
+      "fmi": 0.47219241670997136,
+      "v_measure": 0.5927997071660276,
+      "homogeneity": 0.5771179226929044,
+      "completeness": 0.6093575248957249,
+      "n_pred_clusters": 15,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

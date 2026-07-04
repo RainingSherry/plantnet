@@ -1,0 +1,15 @@
+{
+  "data_path": "methods/DeepLearning/scMAEs/benchmark_data/Macosko.h5ad",
+  "save_dir": "experiment_reports/objective_swap_scmae_20260704/kfree_runs/pca_leiden_macosko_seed42",
+  "dataset_name": "Macosko",
+  "label_key": "resolved_label",
+  "input_mode": "auto",
+  "n_top_genes": 1000,
+  "target_sum": 10000.0,
+  "scale_input": true,
+  "pca_dim": 128,
+  "n_neighbors": 15,
+  "seed": 42,
+  "resolutions": "0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.8,1.0,1.2,1.5,2.0,2.5,3.0",
+  "silhouette_sample": 5000
+}

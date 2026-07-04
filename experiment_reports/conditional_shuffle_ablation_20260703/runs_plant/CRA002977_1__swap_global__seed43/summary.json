@@ -1,0 +1,73 @@
+{
+  "dataset": "CRA002977_1",
+  "seed": 43,
+  "n_clusters": 7,
+  "runtime_seconds": 113.07309007644653,
+  "corruption": "swap_global",
+  "mask_prob": 0.4,
+  "mean_effective_change_rate": 0.04092035784040179,
+  "mean_designed_mask_rate": 0.3999947955122306,
+  "n_nuisance_bins": 10,
+  "n_joint_bins": 5,
+  "donor_pool": {
+    "n_bins": 1,
+    "pool_mean": 10947.0,
+    "pool_min": 10947.0,
+    "pool_max": 10947.0,
+    "pool_median": 10947.0,
+    "pool_cell_weighted_mean": 10947.0,
+    "bin_sizes": [
+      10947
+    ]
+  },
+  "nuisance_meta": {
+    "nuisance_source": "adata.raw.X",
+    "inferred_mode": "raw",
+    "fallback_used": false,
+    "n_cells": 10947,
+    "library_min": 500.0,
+    "library_median": 12088.0,
+    "library_max": 81200.0,
+    "n_detected_min": 219.0,
+    "n_detected_median": 2849.0,
+    "n_detected_max": 8714.0,
+    "zero_rate_min": 0.556,
+    "zero_rate_median": 0.944,
+    "zero_rate_max": 0.997
+  },
+  "variance_weight": 0.02,
+  "force_gate": 1.0,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6756188910203709,
+      "nmi": 0.562779425339846,
+      "ari": 0.510684814415006,
+      "f1_macro": 0.5673815016334938,
+      "fmi": 0.6979628516905022,
+      "v_measure": 0.5627794253398459,
+      "homogeneity": 0.6292297180106211,
+      "completeness": 0.5090235937093031,
+      "n_pred_clusters": 7,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 0.9827695488929749,
+    "std_median": 1.030843734741211,
+    "std_max": 1.519467830657959,
+    "effective_dim_pr": 122.7465102476914,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 124
+  },
+  "cluster_aligned": {
+    "cluster_aligned_eff_dim": 1.3567860612531648,
+    "between_class_scatter_trace": 1260210.3392322708
+  },
+  "final_scmae_loss": 0.4444034071195693,
+  "cluster_mass_min": 0.047866995523887824,
+  "cluster_mass_max": 0.5216040924454188,
+  "final_gate": 1.0
+}

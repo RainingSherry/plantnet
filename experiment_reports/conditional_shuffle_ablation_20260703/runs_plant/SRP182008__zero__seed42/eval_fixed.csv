@@ -1,0 +1,2 @@
+dataset,method,seed,corruption,donor_pool_mean,n_bins,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
+SRP182008,conditional-shuffle ablation,42,zero,13514.0,1,0.5843569631493266,0.5927997071660277,0.4058442356100688,0.5392053008885138,0.47219241670997136,0.5927997071660276,0.5771179226929044,0.6093575248957249,15,,fixed,kmeans_known_k,True

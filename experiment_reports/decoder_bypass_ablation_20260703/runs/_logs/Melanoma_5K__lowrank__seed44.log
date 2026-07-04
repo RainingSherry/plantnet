@@ -1,0 +1,17 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+Device=cuda:5 dataset=Melanoma_5K cells=4513 clusters=9 decoder_mode=lowrank mask_rank=16 varw=0.02
+Epoch 001/80 loss=0.4760 base=0.4760 sharp=0.0000 var=0.7095 gate=1.000
+Epoch 010/80 loss=0.4443 base=0.4443 sharp=0.0000 var=0.0013 gate=1.000
+Epoch 020/80 loss=0.4438 base=0.4438 sharp=0.0000 var=0.0000 gate=1.000
+Epoch 030/80 loss=0.4579 base=0.4579 sharp=0.0807 var=0.0023 gate=1.000
+Epoch 040/80 loss=0.4769 base=0.4769 sharp=0.0947 var=0.0005 gate=1.000
+Epoch 050/80 loss=0.4778 base=0.4778 sharp=0.0973 var=0.0003 gate=1.000
+Epoch 060/80 loss=0.4747 base=0.4747 sharp=0.0881 var=0.0001 gate=1.000
+Epoch 070/80 loss=0.4717 base=0.4717 sharp=0.0798 var=0.0003 gate=1.000
+Epoch 080/80 loss=0.4673 base=0.4673 sharp=0.0671 var=0.0002 gate=1.000
+[RESULT] Melanoma_5K decoder_mode=lowrank ARI=0.7370276766531106 NMI=0.7438765154733308 aligned_eff_dim=1.4

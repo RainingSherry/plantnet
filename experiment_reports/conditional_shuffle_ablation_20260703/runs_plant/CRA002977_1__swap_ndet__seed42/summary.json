@@ -1,0 +1,82 @@
+{
+  "dataset": "CRA002977_1",
+  "seed": 42,
+  "n_clusters": 7,
+  "runtime_seconds": 100.9423451423645,
+  "corruption": "swap_ndet",
+  "mask_prob": 0.4,
+  "mean_effective_change_rate": 0.03955043364025298,
+  "mean_designed_mask_rate": 0.3999764499210176,
+  "n_nuisance_bins": 10,
+  "n_joint_bins": 5,
+  "donor_pool": {
+    "n_bins": 10,
+    "pool_mean": 1094.7,
+    "pool_min": 1094.0,
+    "pool_max": 1095.0,
+    "pool_median": 1095.0,
+    "pool_cell_weighted_mean": 1094.700191833379,
+    "bin_sizes": [
+      1095,
+      1095,
+      1095,
+      1094,
+      1095,
+      1095,
+      1094,
+      1095,
+      1095,
+      1094
+    ]
+  },
+  "nuisance_meta": {
+    "nuisance_source": "adata.raw.X",
+    "inferred_mode": "raw",
+    "fallback_used": false,
+    "n_cells": 10947,
+    "library_min": 500.0,
+    "library_median": 12088.0,
+    "library_max": 81200.0,
+    "n_detected_min": 219.0,
+    "n_detected_median": 2849.0,
+    "n_detected_max": 8714.0,
+    "zero_rate_min": 0.556,
+    "zero_rate_median": 0.944,
+    "zero_rate_max": 0.997
+  },
+  "variance_weight": 0.02,
+  "force_gate": 1.0,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.6948935781492647,
+      "nmi": 0.6027784517896915,
+      "ari": 0.5322529792754249,
+      "f1_macro": 0.6090467931708536,
+      "fmi": 0.709543229993634,
+      "v_measure": 0.6027784517896915,
+      "homogeneity": 0.6844008840988034,
+      "completeness": 0.5385503241012181,
+      "n_pred_clusters": 7,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 0.9871836304664612,
+    "std_median": 1.0544674396514893,
+    "std_max": 1.4779695272445679,
+    "effective_dim_pr": 124.19284223286452,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 122
+  },
+  "cluster_aligned": {
+    "cluster_aligned_eff_dim": 1.6451623866599328,
+    "between_class_scatter_trace": 1302411.927829639
+  },
+  "final_scmae_loss": 0.4443859394107546,
+  "cluster_mass_min": 0.04814104320818489,
+  "cluster_mass_max": 0.5045217867909016,
+  "final_gate": 1.0
+}

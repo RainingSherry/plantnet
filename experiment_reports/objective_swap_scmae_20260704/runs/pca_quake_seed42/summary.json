@@ -1,0 +1,57 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "seed": 42,
+  "n_clusters": 5,
+  "runtime_seconds": 3.2934858798980713,
+  "method": "pca_kmeans_baseline",
+  "assignment_mode": "pca",
+  "variance_weight": 0.0,
+  "entropy_weight": 0.0,
+  "confidence_weight": 0.0,
+  "latent_dim": 128,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.9474455611390284,
+      "nmi": 0.7985836885078743,
+      "ari": 0.8884507524456887,
+      "f1_macro": 0.555911881535153,
+      "fmi": 0.9521076843325389,
+      "v_measure": 0.7985836885078742,
+      "homogeneity": 0.7519095525803948,
+      "completeness": 0.8514358322697191,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true,
+      "pca_dim": 128
+    },
+    "pca_kmeans_known_k": {
+      "acc": 0.9474455611390284,
+      "nmi": 0.7985836885078743,
+      "ari": 0.8884507524456887,
+      "f1_macro": 0.555911881535153,
+      "fmi": 0.9521076843325389,
+      "v_measure": 0.7985836885078742,
+      "homogeneity": 0.7519095525803948,
+      "completeness": 0.8514358322697191,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true,
+      "pca_dim": 128
+    },
+    "direct_prototype_argmax": {}
+  },
+  "std_profile": {
+    "std_min": 1.0689173936843872,
+    "std_median": 1.4888358116149902,
+    "std_max": 6.914041996002197,
+    "effective_dim_pr": 43.07025339846352,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 128
+  },
+  "cluster_mass_min": 0.000628140703517588,
+  "cluster_mass_max": 0.7204773869346733
+}

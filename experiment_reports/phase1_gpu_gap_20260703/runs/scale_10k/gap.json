@@ -1,0 +1,24 @@
+{
+  "dataset": "scale_10k",
+  "device": "cuda",
+  "n_cells": 10000,
+  "n_genes": 1000,
+  "n_clusters": 15,
+  "epochs": 2,
+  "cpu_threads": 16,
+  "timings_sec": {
+    "load": 0.44250249001197517,
+    "neighbor_pca_knn": 2.886411381070502,
+    "kmeans_init": 1.0602431939914823,
+    "train_total": 1.26463356486056,
+    "train_per_epoch": 0.63231678243028,
+    "eval_kmeans": 1.0058036990230903
+  },
+  "total_measured_sec": 6.65959432895761,
+  "cpu_classic_sec": 5.39496076409705,
+  "cpu_classic_frac": 0.8101035134585283,
+  "gpu_util_mean": 1.4166666666666667,
+  "gpu_util_p90": 2.9000000000000004,
+  "gpu_mem_peak_mb_smi": 6405.0,
+  "torch_peak_mem_mb": 130.694144
+}

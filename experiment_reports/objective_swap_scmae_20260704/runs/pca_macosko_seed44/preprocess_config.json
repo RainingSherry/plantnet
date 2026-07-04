@@ -1,0 +1,14 @@
+{
+  "file_path": "methods/DeepLearning/scMAEs/benchmark_data/Macosko.h5ad",
+  "counts_source": "adata.X",
+  "input_mode": "raw",
+  "normalization": "normalize_total(target_sum=10000.0) + log1p when raw",
+  "hvg": {
+    "n_top_genes": 1000,
+    "flavor": "seurat"
+  },
+  "scale_input": true,
+  "selected_n_genes": 1000,
+  "seed": 44,
+  "label_key": "resolved_label"
+}

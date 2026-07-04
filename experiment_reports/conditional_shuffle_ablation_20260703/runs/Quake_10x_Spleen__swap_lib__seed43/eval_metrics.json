@@ -1,0 +1,25 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "method": "conditional-shuffle ablation",
+  "seed": 43,
+  "n_clusters": 5,
+  "fixed": {
+    "kmeans_known_k": {
+      "acc": 0.928287269681742,
+      "nmi": 0.7888576477226665,
+      "ari": 0.9051996429797888,
+      "f1_macro": 0.639563960088342,
+      "fmi": 0.9574203231208236,
+      "v_measure": 0.7888576477226666,
+      "homogeneity": 0.8404388946936799,
+      "completeness": 0.7432417930445211,
+      "n_pred_clusters": 5,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "oracle": {},
+  "sweep": []
+}

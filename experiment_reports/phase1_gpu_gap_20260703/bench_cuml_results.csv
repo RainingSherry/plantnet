@@ -1,0 +1,13 @@
+dataset,step,cpu_sklearn_s,gpu_cuml_s,speedup,cpu_status,gpu_status
+real_10k,pca,0.154,0.018,8.4,ok,ok
+real_10k,kmeans,4.129,0.200,20.7,ok,ok
+real_10k,knn,0.527,0.019,27.6,ok,ok
+real_50k,pca,0.226,0.030,7.5,ok,ok
+real_50k,kmeans,19.301,0.758,25.4,ok,ok
+real_50k,knn,3.586,0.342,10.5,ok,ok
+real_86k,pca,0.295,0.025,11.7,ok,ok
+real_86k,kmeans,27.440,0.844,32.5,ok,ok
+real_86k,knn,8.124,1.027,7.9,ok,ok
+real_200k_xspecies,pca,0.559,0.036,15.4,ok,ok
+real_200k_xspecies,kmeans,64.298,2.096,30.7,ok,ok
+real_200k_xspecies,knn,38.976,5.451,7.2,ok,ok

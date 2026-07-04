@@ -1,0 +1,24 @@
+{
+  "dataset": "Melanoma_cuda",
+  "device": "cuda",
+  "n_cells": 4513,
+  "n_genes": 1000,
+  "n_clusters": 9,
+  "epochs": 30,
+  "cpu_threads": 48,
+  "timings_sec": {
+    "load": 3.1097695799544454,
+    "neighbor_pca_knn": 0.7214877420337871,
+    "kmeans_init": 0.4608239160152152,
+    "train_total": 8.125869538169354,
+    "train_per_epoch": 0.27086231793897847,
+    "eval_kmeans": 0.37328713200986385
+  },
+  "total_measured_sec": 12.791237908182666,
+  "cpu_classic_sec": 4.6653683700133115,
+  "cpu_classic_frac": 0.3647315766856963,
+  "gpu_util_mean": 5.857142857142857,
+  "gpu_util_p90": 11.0,
+  "gpu_mem_peak_mb_smi": 6419.0,
+  "torch_peak_mem_mb": 130.617344
+}

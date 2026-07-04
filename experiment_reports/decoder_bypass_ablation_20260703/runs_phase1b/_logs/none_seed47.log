@@ -1,0 +1,17 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+Device=cuda:5 dataset=Macosko cells=44808 clusters=12 decoder_mode=none mask_rank=16 varw=0.02
+Epoch 001/80 loss=0.4553 base=0.4553 sharp=0.0000 var=0.2172 gate=1.000
+Epoch 010/80 loss=0.4473 base=0.4473 sharp=0.0000 var=0.0029 gate=1.000
+Epoch 020/80 loss=0.4470 base=0.4470 sharp=0.0000 var=0.0022 gate=1.000
+Epoch 030/80 loss=0.4893 base=0.4893 sharp=0.2378 var=0.0277 gate=1.000
+Epoch 040/80 loss=0.5355 base=0.5355 sharp=0.2510 var=0.0088 gate=1.000
+Epoch 050/80 loss=0.5365 base=0.5365 sharp=0.2537 var=0.0064 gate=1.000
+Epoch 060/80 loss=0.5371 base=0.5371 sharp=0.2552 var=0.0054 gate=1.000
+Epoch 070/80 loss=0.5379 base=0.5379 sharp=0.2571 var=0.0054 gate=1.000
+Epoch 080/80 loss=0.5380 base=0.5380 sharp=0.2571 var=0.0057 gate=1.000
+[RESULT] Macosko decoder_mode=none ARI=0.35726228547008493 NMI=0.5898960760478705 aligned_eff_dim=1.8

@@ -1,0 +1,72 @@
+{
+  "dataset": "Melanoma_5K",
+  "seed": 44,
+  "n_clusters": 9,
+  "runtime_seconds": 31.895958185195923,
+  "corruption": "swap_global",
+  "mask_prob": 0.4,
+  "mean_effective_change_rate": 0.04090377987132353,
+  "n_nuisance_bins": 10,
+  "n_joint_bins": 5,
+  "donor_pool": {
+    "n_bins": 1,
+    "pool_mean": 4513.0,
+    "pool_min": 4513.0,
+    "pool_max": 4513.0,
+    "pool_median": 4513.0,
+    "pool_cell_weighted_mean": 4513.0,
+    "bin_sizes": [
+      4513
+    ]
+  },
+  "nuisance_meta": {
+    "nuisance_source": "adata.X",
+    "inferred_mode": "raw",
+    "fallback_used": false,
+    "n_cells": 4513,
+    "library_min": 93160.0,
+    "library_median": 98103.0,
+    "library_max": 99654.0,
+    "n_detected_min": 472.0,
+    "n_detected_median": 2801.0,
+    "n_detected_max": 8219.0,
+    "zero_rate_min": 0.673,
+    "zero_rate_median": 0.95,
+    "zero_rate_max": 0.988
+  },
+  "variance_weight": 0.02,
+  "force_gate": 1.0,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.7148238422335476,
+      "nmi": 0.7215851553383696,
+      "ari": 0.6511633815842195,
+      "f1_macro": 0.5203672294105719,
+      "fmi": 0.7201228554493236,
+      "v_measure": 0.7215851553383696,
+      "homogeneity": 0.750969769386799,
+      "completeness": 0.6944135244194104,
+      "n_pred_clusters": 9,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 1.0130187273025513,
+    "std_median": 1.1014623641967773,
+    "std_max": 1.3977872133255005,
+    "effective_dim_pr": 126.18911418418224,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 128
+  },
+  "cluster_aligned": {
+    "cluster_aligned_eff_dim": 1.3694073280616306,
+    "between_class_scatter_trace": 626843.4199568027
+  },
+  "final_scmae_loss": 0.44357666899176207,
+  "cluster_mass_min": 0.002437403057832927,
+  "cluster_mass_max": 0.2570352315532905,
+  "final_gate": 1.0
+}

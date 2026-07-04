@@ -1,0 +1,24 @@
+{
+  "dataset": "Macosko_cuda",
+  "device": "cuda",
+  "n_cells": 44808,
+  "n_genes": 1000,
+  "n_clusters": 12,
+  "epochs": 30,
+  "cpu_threads": 48,
+  "timings_sec": {
+    "load": 7.1005528080277145,
+    "neighbor_pca_knn": 46.230090736062266,
+    "kmeans_init": 4.688906554947607,
+    "train_total": 84.94632478128187,
+    "train_per_epoch": 2.8315441593760626,
+    "eval_kmeans": 3.8980396089609712
+  },
+  "total_measured_sec": 146.86391448928043,
+  "cpu_classic_sec": 61.91758970799856,
+  "cpu_classic_frac": 0.42159838870778504,
+  "gpu_util_mean": 5.418502202643172,
+  "gpu_util_p90": 10.0,
+  "gpu_mem_peak_mb_smi": 6419.0,
+  "torch_peak_mem_mb": 130.655744
+}

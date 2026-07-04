@@ -1,0 +1,22 @@
+{
+  "dataset_name": "CRA002977_1",
+  "n_cells": 10947,
+  "n_genes_original": 53678,
+  "n_genes": 1000,
+  "label_key": "Celltype",
+  "n_cell_types": 7,
+  "cell_type_counts": {
+    "Companion cell": 213,
+    "Leaf guard cell": 519,
+    "Leaf pavement cell": 784,
+    "Mesophyll": 6837,
+    "Phloem parenchyma": 352,
+    "S phase": 285,
+    "Xylem": 1957
+  },
+  "counts_source": "adata.raw.X",
+  "input_mode": "raw",
+  "has_raw": true,
+  "has_layers_counts": false,
+  "scale_input": false
+}

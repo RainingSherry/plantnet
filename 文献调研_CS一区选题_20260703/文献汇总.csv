@@ -1,0 +1,57 @@
+category,子方向,title,venue_year,tier,url,与选题关系
+A_单细胞聚类方法,对比+图,Learning Adaptive Cell Graphs with Contrastive Guidance (scAGC),2025 / arXiv,CS方法,https://arxiv.org/html/2508.09180v1,当前最强对比聚类基线之一;要复现对照
+A_单细胞聚类方法,对比+收缩,JojoSCL: Shrinkage Contrastive Learning for scRNA Clustering,2025 / arXiv,CS方法,https://arxiv.org/html/2506.00410,对比聚类SOTA;10数据集
+A_单细胞聚类方法,多视图对比GNN,Decoupled GNNs based on multi-view contrastive learning for scRNA clustering,2025 / Brief Bioinform,生信一区,https://academic.oup.com/bib/article/doi/10.1093/bib/bbaf198/8131469,多视图对比;可对照
+A_单细胞聚类方法,对抗图对比,Deep clustering of scRNA-seq using adversarial graph contrastive learning,2025 / PMC,生信,https://pmc.ncbi.nlm.nih.gov/articles/PMC12368859/,对抗+图对比
+A_单细胞聚类方法,图+对比,Graph and Contrastive-Based Representation Learning for scRNA Clustering,2025 / PubMed,生信,https://pubmed.ncbi.nlm.nih.gov/41191468,细胞对+对比
+A_单细胞聚类方法,精炼对比,Refinement Contrastive Learning of Cell-Gene Associations,2025 / arXiv,CS方法,https://arxiv.org/html/2512.10640,cell-gene关联;跨scRNA+空间
+A_单细胞聚类方法,结构深度聚类,scASDC: Attention Enhanced Structural Deep Clustering,2024 / arXiv,CS方法,https://arxiv.org/html/2408.05258v1,注意力+结构聚类SOTA声称
+A_单细胞聚类方法,图割嵌入,Efficient Deep Structural Clustering via Deep Cut-informed Graph Embedding (scDCGE),2024 / arXiv,CS方法,https://arxiv.org/html/2404.06167v2,解over-smoothing;与我们CutAware相关
+A_单细胞聚类方法,经典基线,scDeepCluster: model-based deep learning clustering,2019 / Nat Mach Intell,里程碑,https://www.researchgate.net/publication/332308793,必比经典基线
+A_单细胞聚类方法,约束聚类,scDCC: Model-based deep embedding for constrained clustering,2021 / Nat Commun,里程碑,https://link.springer.com/10.1038/s41467-021-22008-3,必比经典基线
+A_单细胞聚类方法,多尺度,A robust multi-scale clustering framework for scRNA-seq,2025 / Sci Rep,生信,https://www.nature.com/articles/s41598-025-03603-6,多尺度聚类
+A_单细胞聚类方法,Siamese图Transformer,Deep Siamese Graph Transformer Network for scRNA Clustering,2026 / arXiv,CS方法,https://arxiv.org/html/2606.18672,最新图Transformer聚类
+B_表示学习降维,解耦VAE,DRVI: Unsupervised Deep Disentangled Representation of Single-Cell Omics,2025 / ICLR,CS一区,https://www.iclr.cc/virtual/2025/35984,ICLR;解耦表示;上游降维
+B_表示学习降维,变分框架,A Variational Framework for Single Cell Representation Learning,2025 / arXiv,CS方法,https://arxiv.org/abs/2505.04891,变分表示学习
+B_表示学习降维,多组学解耦,scMRDR: scalable framework for unpaired multi-omics integration,2025 / NeurIPS,CS一区,https://proceedings.neurips.cc/paper_files/paper/2025/hash/e34d214dfb5b80212ac1b565aa41af55-Abstract-Conference.html,NeurIPS;多组学表示
+B_表示学习降维,综述,Representation learning of single-cell RNA-seq data,2025 / review,综述,https://pubmed.ncbi.nlm.nih.gov/41506911/,表示学习全景综述
+B_表示学习降维,结构保持评估,Framework for local/global structure preservation in scRNA DR,2023 / bioRxiv,评估,https://www.biorxiv.org/content/10.1101/2023.11.23.568428v2,降维质量的label-free评估指标
+C_下游任务,轨迹推断,Joint trajectory inference using deep learning with mixture prior,2024 / PMC,生信,https://pmc.ncbi.nlm.nih.gov/articles/PMC11406253/,下游;轨迹
+C_下游任务,GRN推断,GRN Inference from Pre-trained scRNA Transformer + Joint Graph Learning,2024 / arXiv,CS方法,https://arxiv.org/html/2407.18181v1,下游;基因调控网
+C_下游任务,可解释GRN,EnsembleRegNet: Interpretable DL for transcriptional network inference,2025 / PMC,生信,https://pmc.ncbi.nlm.nih.gov/articles/PMC12871948/,下游;可解释GRN
+C_下游任务,细胞通讯,GraphComm: graph-based DL for cell-cell communication,2025 / Sci Rep,生信,https://www.nature.com/articles/s41598-025-20812-1,下游;细胞通讯
+C_下游任务,细胞互作动力学,A Multi-Agent Neural Network for Cellular Interaction Dynamics,2025 / PMLR,CS方法,https://proceedings.mlr.press/v311/rocha25a.html,下游;多agent神经网络
+D_GPU加速单细胞,核心工具,rapids-singlecell: GPU-accelerated single-cell analysis at scale,2026 / arXiv,系统,https://arxiv.org/abs/2603.02402,★桥梁核心;scanpy GPU化 最高938x
+D_GPU加速单细胞,生态,scverse core expansion (rapids-singlecell 入核心),2025 / scverse,生态,https://scverse.org/blog/2025-core-expansion/,GPU单细胞已成主流生态
+D_GPU加速单细胞,产业,NVIDIA Single Cell Analysis Blueprint,2025 / NVIDIA,产业,http://build.nvidia.com/nvidia/single-cell-analysis,产业级需求佐证
+E_LLM_GPU内核agent,标准benchmark,KernelBench: Can LLMs Write Efficient GPU Kernels?,2025 / arXiv(ICML-w),CS一区,https://arxiv.org/abs/2502.10517,★毕业论文核心benchmark;250 PyTorch workload
+E_LLM_GPU内核agent,benchmark扩展,KernelBench-X: Comprehensive Benchmark for LLM GPU Kernels,2026 / arXiv,CS方法,https://arxiv.org/abs/2605.04956,Triton;任务结构>方法
+E_LLM_GPU内核agent,agent搜索,AutoKernel: Autonomous GPU Kernel Optimization via Agent Search,2026 / arXiv,CS方法,https://arxiv.org/html/2603.21331v1,agent迭代搜索内核
+E_LLM_GPU内核agent,硬件反馈agent,CudaForge: Agent Framework with Hardware Feedback for CUDA,2025 / arXiv,CS方法,https://arxiv.org/html/2511.01884,Coder+Judge双agent+Nsight反馈
+E_LLM_GPU内核agent,多agent剖析,KernelPro: Profiling-Reasoned Multi-Agent Kernel Optimization,2025 / arXiv,CS方法,https://arxiv.org/html/2511.06345v1,闭环多agent生成-剖析-优化
+E_LLM_GPU内核agent,HPC自动调优,VibeCodeHPC: Agent-Based Iterative Auto-Tuner for HPC,2025 / arXiv,CS方法,https://arxiv.org/html/2510.00031v1,C matmul->CUDA多agent
+E_LLM_GPU内核agent,代码迁移,PARACODEX: autonomous LLM agent parallelizes and migrates code,2026 / ACL,CS一区,https://aclanthology.org/anthology-files/anthology-files/anthology-files/pdf/acl/2026.acl-long.732.pdf,★自动并行化+迁移代码
+E_LLM_GPU内核agent,科学码翻译,LASSI: Self-Correcting Pipeline for Translating Parallel Scientific Codes,2024 / arXiv,CS方法,https://arxiv.org/abs/2407.01638,OpenMP->CUDA 80%成功
+E_LLM_GPU内核agent,C++转CUDA,LLM-Based Porting of Optimized C++ to CUDA (deopt-reopt),2026 / arXiv,CS方法,https://arxiv.org/html/2606.06063,去优化再优化的迁移
+E_LLM_GPU内核agent,异构自动并行,Auto-Parallelization for Heterogeneous Systems (LLM),2026 / arXiv,CS方法,https://arxiv.org/html/2512.19250v1,平均6.8x峰值43x
+E_LLM_GPU内核agent,跨架构效率,Can LLMs Write Efficient Code Across Architectures?,2026 / arXiv,CS方法,https://arxiv.org/html/2606.04023,跨架构效率评测
+E_LLM_GPU内核agent,仓库级迁移benchmark,ParEval-Repo: Repository-level HPC Translation Benchmark,2025 / arXiv,CS方法,https://arxiv.org/abs/2506.20938v2,★最接近的对手:仓库级迁移,但是HPC迷你应用非领域算法;差异化锚点
+E_LLM_GPU内核agent,自训RL模型,Kevin-32B: Multi-Turn RL for Writing CUDA Kernels,2025 / arXiv,CS方法,https://arxiv.org/html/2507.11948v1,自训模型标杆(QwQ-32B RL 56->82%);说明"训模型"已挤,别当主新意
+E_LLM_GPU内核agent,大规模agentRL,CUDA Agent: Large-Scale Agentic RL for CUDA Kernel Generation,2026 / arXiv,CS方法,https://arxiv.org/abs/2602.24286,大规模agentic RL SOTA;重资源
+E_LLM_GPU内核agent,在线RL真机奖励,Improving HPC Code Gen via Online RL with Real-Machine Rewards,2026 / arXiv,CS方法,https://arxiv.org/html/2602.12049v1,真机加速比做RL奖励;毕业论文可借范式
+I_正确性验证,内核正确性幻觉,The Correctness Illusion in LLM-Generated GPU Kernels,2026 / arXiv,CS方法,https://arxiv.org/html/2606.20128,★证明LLM内核过弱测试实则错;坐实"正确性判据是脊梁"
+I_正确性验证,CUDA形式化验证,ProofWright: Towards Agentic Formal Verification of CUDA,2025 / arXiv,CS方法,https://arxiv.org/abs/2511.12294,agent+形式化验证;bit级;我们做统计级差异化
+I_正确性验证,数值不一致,LLM Program Generation for Numerical Inconsistencies Across Compilers,2025 / arXiv,CS方法,https://ar5iv.labs.arxiv.org/html/2509.00256,数值一致性检测;佐证正确性难
+F_LLM科研agent,生信数据分析,Multi-agent LLM framework self-evolving for biomedical data analyses,2026 / Nat Biomed Eng,顶刊,https://www.nature.com/articles/s41551-026-01634-6,★自进化多agent做生信分析
+F_LLM科研agent,自动科学分析,Towards Fully Automated Scientific Analysis,2025 / arXiv,CS方法,https://arxiv.org/html/2508.07043v1,LLM迭代计算+工具
+F_LLM科研agent,自主发现综述,Autonomous Agents for Scientific Discovery,2025 / arXiv,综述,https://arxiv.org/abs/2510.09901,agent科研全景
+F_LLM科研agent,数据科学agent综述,LLM Agents for Data Science: Survey,2025 / arXiv,综述,https://arxiv.org/html/2510.04023v1,数据科学工作流agent综述
+G_benchmark赛道,自监督benchmark,Benchmarking Self-Supervised Learning for Single-Cell Data,2025 / ICML spotlight,CS一区,https://arxiv.org/abs/2506.10031,★ICML spotlight;SSL单细胞benchmark范式
+G_benchmark赛道,聚类benchmark,Comprehensive Benchmarking of Clustering Algorithms for scRNA (scCluBench),2025 / arXiv,benchmark,https://arxiv.org/abs/2512.02471,★本仓库同名;直接相关
+G_benchmark赛道,LLM懂细胞吗,Do LLMs Really Understand Cell Biology?,2025 / NeurIPS D&B,CS一区,https://proceedings.neurips.cc/paper_files/paper/2025/hash/619cdaf77fd7bda767d0c3a9b1c1d218-Abstract-Datasets_and_Benchmarks_Track.html,NeurIPS D&B单细胞范式
+G_benchmark赛道,FM局限,Zero-shot evaluation reveals limitations of single-cell FMs,2025 / Genome Biol,生信一区,https://genomebiology.biomedcentral.com/articles/10.1186/s13059-025-03574-x,FM聚类会被简单方法打败
+H_植物单细胞,植物聚类模型,PhytoCluster: generative DL for clustering plant scRNA-seq,2025 / aBIOTECH,生信,https://link.springer.com/article/10.1007/s42994-025-00196-6,★唯一植物专用聚类;直接对手
+H_植物单细胞,植物FM,scAraFM: Arabidopsis-specific foundation model,2026 / ICLR,CS一区,https://iclr.cc/virtual/2026/10017745,植物FM+跨域鲁棒性
+H_植物单细胞,植物FM,A Foundation Model for Single-cell Expression Atlases in Plants,2025 / PubMed,生信,https://pubmed.ncbi.nlm.nih.gov/40094454/,植物基础模型
+H_植物单细胞,综述,Foundation Model: A New Era for Plant Single-cell Genomics,2025 / PMC,综述,https://pmc.ncbi.nlm.nih.gov/articles/PMC12380448/,植物FM综述;选题背景
+H_植物单细胞,图谱,A single-cell spatial transcriptomic atlas of Arabidopsis life cycle,2025 / Nat Plants,数据,https://www.nature.com/articles/s41477-025-02072-z,植物空间图谱数据源

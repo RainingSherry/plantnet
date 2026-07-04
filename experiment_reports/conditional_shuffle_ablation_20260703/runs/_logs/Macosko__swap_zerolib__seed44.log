@@ -1,0 +1,17 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+Device=cuda:5 dataset=Macosko cells=44808 clusters=12 corruption=swap_zerolib donor_pool_mean=1948.2 n_bins=23 mask_prob=0.4 varw=0.02 nuisance_src=adata.X
+Epoch 001/80 loss=0.4559 scmae=0.4488 sharp=0.0000 var=0.2047 eff_change=0.023 gate=1.000
+Epoch 010/80 loss=0.4475 scmae=0.4470 sharp=0.0000 var=0.0049 eff_change=0.023 gate=1.000
+Epoch 020/80 loss=0.4472 scmae=0.4469 sharp=0.0000 var=0.0020 eff_change=0.023 gate=1.000
+Epoch 030/80 loss=0.4923 scmae=0.4467 sharp=0.2454 var=0.0426 eff_change=0.023 gate=1.000
+Epoch 040/80 loss=0.5318 scmae=0.4468 sharp=0.2326 var=0.0326 eff_change=0.023 gate=1.000
+Epoch 050/80 loss=0.5331 scmae=0.4468 sharp=0.2362 var=0.0309 eff_change=0.023 gate=1.000
+Epoch 060/80 loss=0.5321 scmae=0.4469 sharp=0.2331 var=0.0327 eff_change=0.023 gate=1.000
+Epoch 070/80 loss=0.5329 scmae=0.4469 sharp=0.2355 var=0.0316 eff_change=0.023 gate=1.000
+Epoch 080/80 loss=0.5313 scmae=0.4469 sharp=0.2309 var=0.0302 eff_change=0.023 gate=1.000
+[RESULT] Macosko corruption=swap_zerolib ARI=0.8589543343473173 NMI=0.7275419305941523 eff_change=0.023 donor_pool_mean=1948.2 aligned_eff_dim=1.9

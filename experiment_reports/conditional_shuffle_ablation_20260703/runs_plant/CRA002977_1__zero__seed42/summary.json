@@ -1,0 +1,73 @@
+{
+  "dataset": "CRA002977_1",
+  "seed": 42,
+  "n_clusters": 7,
+  "runtime_seconds": 66.4092390537262,
+  "corruption": "zero",
+  "mask_prob": 0.4,
+  "mean_effective_change_rate": 0.40002004213276365,
+  "mean_designed_mask_rate": 0.40002004213276365,
+  "n_nuisance_bins": 10,
+  "n_joint_bins": 5,
+  "donor_pool": {
+    "n_bins": 1,
+    "pool_mean": 10947.0,
+    "pool_min": 10947.0,
+    "pool_max": 10947.0,
+    "pool_median": 10947.0,
+    "pool_cell_weighted_mean": 10947.0,
+    "bin_sizes": [
+      10947
+    ]
+  },
+  "nuisance_meta": {
+    "nuisance_source": "adata.raw.X",
+    "inferred_mode": "raw",
+    "fallback_used": false,
+    "n_cells": 10947,
+    "library_min": 500.0,
+    "library_median": 12088.0,
+    "library_max": 81200.0,
+    "n_detected_min": 219.0,
+    "n_detected_median": 2849.0,
+    "n_detected_max": 8714.0,
+    "zero_rate_min": 0.556,
+    "zero_rate_median": 0.944,
+    "zero_rate_max": 0.997
+  },
+  "variance_weight": 0.02,
+  "force_gate": 1.0,
+  "fixed_metrics": {
+    "kmeans_known_k": {
+      "acc": 0.7570110532566,
+      "nmi": 0.5652288841739139,
+      "ari": 0.6888839231163203,
+      "f1_macro": 0.5280157100520871,
+      "fmi": 0.8182386873893664,
+      "v_measure": 0.565228884173914,
+      "homogeneity": 0.5930318034001265,
+      "completeness": 0.5399161681832075,
+      "n_pred_clusters": 7,
+      "silhouette": NaN,
+      "protocol": "fixed",
+      "cluster_method": "kmeans_known_k",
+      "uses_known_k": true
+    }
+  },
+  "std_profile": {
+    "std_min": 1.0297918319702148,
+    "std_median": 1.0775476694107056,
+    "std_max": 1.3535326719284058,
+    "effective_dim_pr": 126.659513124244,
+    "dims_std_gt_0p1": 128,
+    "dims_std_gt_1p0": 128
+  },
+  "cluster_aligned": {
+    "cluster_aligned_eff_dim": 1.2437732507789632,
+    "between_class_scatter_trace": 1277517.987344036
+  },
+  "final_scmae_loss": 0.44430780481724513,
+  "cluster_mass_min": 0.032703023659450076,
+  "cluster_mass_max": 0.6038183977345392,
+  "final_gate": 1.0
+}

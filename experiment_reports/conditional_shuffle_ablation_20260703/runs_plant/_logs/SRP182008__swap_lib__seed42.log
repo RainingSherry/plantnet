@@ -1,0 +1,17 @@
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/louvain/__init__.py:54: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+/data/luolie/conda/envs/scssl_bench_py310/lib/python3.10/site-packages/scanpy/preprocessing/_highly_variable_genes.py:220: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  disp_grouped = df.groupby('mean_bin')['dispersions']
+Device=cuda:2 dataset=SRP182008 cells=13514 clusters=15 corruption=swap_lib donor_pool_mean=1351.4 n_bins=10 mask_prob=0.4 varw=0.02 nuisance_src=adata.raw.X
+Epoch 001/80 loss=0.4716 scmae=0.4521 sharp=0.0000 var=0.7485 eff_change=0.032 gate=1.000
+Epoch 010/80 loss=0.4486 scmae=0.4477 sharp=0.0000 var=0.0071 eff_change=0.032 gate=1.000
+Epoch 020/80 loss=0.4478 scmae=0.4471 sharp=0.0000 var=0.0042 eff_change=0.032 gate=1.000
+Epoch 030/80 loss=0.4942 scmae=0.4477 sharp=0.2583 var=0.0009 eff_change=0.032 gate=1.000
+Epoch 040/80 loss=0.5676 scmae=0.4478 sharp=0.3372 var=0.0019 eff_change=0.032 gate=1.000
+Epoch 050/80 loss=0.5676 scmae=0.4478 sharp=0.3368 var=0.0016 eff_change=0.032 gate=1.000
+Epoch 060/80 loss=0.5651 scmae=0.4477 sharp=0.3293 var=0.0012 eff_change=0.032 gate=1.000
+Epoch 070/80 loss=0.5663 scmae=0.4478 sharp=0.3315 var=0.0074 eff_change=0.032 gate=1.000
+Epoch 080/80 loss=0.5666 scmae=0.4479 sharp=0.3319 var=0.0097 eff_change=0.032 gate=1.000
+[RESULT] SRP182008 corruption=swap_lib ARI=0.36914744277354566 NMI=0.5642271660908098 eff_change=0.032 donor_pool_mean=1351.4 aligned_eff_dim=2.2
