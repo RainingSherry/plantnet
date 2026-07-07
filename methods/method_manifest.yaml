@@ -187,6 +187,37 @@ methods:
     framework: PyTorch
     required_artifacts: *canonical_artifacts
 
+  - key: scrcl
+    name: scRCL
+    full_name: Refinement Contrastive Learning of Cell-Gene Associations
+    path: methods/DeepLearning/scRCL/run.py
+    category: DeepLearning
+    authenticity: SOURCE_ADAPTED
+    smoke: PENDING
+    gpu_policy: PASS
+    default_in_formal: false
+    framework: PyTorch+PyG
+    required_artifacts: *canonical_artifacts
+    source_path: THPengL/scRCL@6da37870445a391953a3c85970a5ccf53c8e4b9a
+    target_path: methods/DeepLearning/scRCL
+    runtime:
+      env_name: plantnet-scrcl
+      backend: conda
+      description: "Dedicated scRCL PyTorch Geometric environment"
+    extra_args:
+      - --loss_chunk_size
+      - "1024"
+    source_files:
+      - scRCL_upstream/
+      - run.py
+      - README_PLANTNET.md
+    known_deviations:
+      - Complete upstream source is vendored; run.py is only a benchmark adapter.
+      - Ground-truth labels are not used for training-time best-epoch selection.
+      - Final epoch embedding is evaluated once with the benchmark standard metrics.
+      - Upstream clustering.py device comparisons are patched from identity to equality.
+      - Upstream model.py supports optional chunked cell-cell losses to avoid OOM while preserving the original equations.
+
   - key: varfloor_scmae
     name: VarFloor-scMAE
     full_name: zero-mask scMAE + DEC + per-dimension std-floor
