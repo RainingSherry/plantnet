@@ -14,6 +14,7 @@ class CutAwareAutoEncoder(_BaseAutoEncoder):
 
     def __init__(self, num_genes: int, n_clusters: int, edge_feature_dim: int = 5, **kwargs):
         dropout_rate = float(kwargs.get("dropout", 0.0))
+        contrast_projection_dim = int(kwargs.pop("contrast_projection_dim", 0) or 0)
         super().__init__(num_genes=num_genes, **kwargs)
         if n_clusters <= 1:
             raise ValueError(f"n_clusters must be > 1 for cut-aware training, got {n_clusters}.")
@@ -26,12 +27,26 @@ class CutAwareAutoEncoder(_BaseAutoEncoder):
             nn.Dropout(dropout_rate),
             nn.Linear(self.hidden_size, 1),
         )
+        if contrast_projection_dim > 0:
+            self.contrast_projector = nn.Sequential(
+                nn.Linear(self.hidden_size, self.hidden_size),
+                nn.GELU(),
+                nn.Dropout(dropout_rate),
+                nn.Linear(self.hidden_size, contrast_projection_dim),
+            )
+        else:
+            self.contrast_projector = None
 
     def cluster_logits(self, latent: torch.Tensor) -> torch.Tensor:
         return self.cluster_head(latent)
 
     def cluster_probs(self, latent: torch.Tensor, temperature: float = 1.0) -> torch.Tensor:
         return torch.softmax(self.cluster_logits(latent) / max(float(temperature), 1e-6), dim=1)
+
+    def contrast_projection(self, latent: torch.Tensor) -> torch.Tensor:
+        if self.contrast_projector is None:
+            return latent
+        return self.contrast_projector(latent)
 
     def edge_gate_logits(
         self,

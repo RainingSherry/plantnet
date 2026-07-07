@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
+import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
 CURRENT_DIR = Path(__file__).resolve().parent
@@ -60,6 +61,7 @@ def parse_args():
             "canm_cut_ot_warm",
             "canm_mix_plus_cut_warm",
             "canm_cut_reweighted_mix",
+            "canm_cut_reweighted_mix_contrast",
             "canm_gated_cut_mix",
             "canm_gated_cut_warm",
             "canm_attention_fusion_probe",
@@ -105,6 +107,12 @@ def parse_args():
     parser.add_argument("--gate_temperature", type=float, default=1.0)
     parser.add_argument("--gate_min", type=float, default=0.05)
     parser.add_argument("--attention_probe_weight", type=float, default=0.0)
+    parser.add_argument("--contrast_weight", type=float, default=0.05)
+    parser.add_argument("--contrast_temperature", type=float, default=0.2)
+    parser.add_argument("--contrast_start_epoch", type=int, default=5)
+    parser.add_argument("--contrast_neighbor_positive_weight", type=float, default=0.5)
+    parser.add_argument("--contrast_hard_negative_weight", type=float, default=1.0)
+    parser.add_argument("--contrast_projection_dim", type=int, default=128)
     parser.add_argument("--ot_temperature", type=float, default=0.2)
     parser.add_argument("--ot_iterations", type=int, default=3)
     parser.add_argument("--cluster_temperature", type=float, default=1.0)
@@ -155,7 +163,8 @@ def save_graph_outputs(save_dir: Path, graph, edge_reliability, edge_weights, ed
 
 def maybe_apply_cut_reweight(args, save_dir: Path, graph, edge_weights, edge_summary, n_clusters: int, suffix: str = ""):
     cut_reweight_summary = {}
-    if args.variant_name in {"canm_cut_reweighted_mix", "canm_gated_cut_mix", "canm_gated_cut_warm"}:
+    cut_labels = None
+    if args.variant_name in {"canm_cut_reweighted_mix", "canm_cut_reweighted_mix_contrast", "canm_gated_cut_mix", "canm_gated_cut_warm"}:
         cut_labels, edge_weights, cut_reweight_summary = apply_cluster_cut_reweight(
             graph=graph,
             edge_weights=edge_weights,
@@ -166,7 +175,91 @@ def maybe_apply_cut_reweight(args, save_dir: Path, graph, edge_weights, edge_sum
         np.save(save_dir / f"graph_cut_seed_clusters{suffix}.npy", cut_labels)
         save_json(cut_reweight_summary, str(save_dir / f"cut_reweight_summary{suffix}.json"))
         edge_summary = {**edge_summary, **cut_reweight_summary}
-    return edge_weights, edge_summary, cut_reweight_summary
+    return edge_weights, edge_summary, cut_reweight_summary, cut_labels
+
+
+def cut_reweighted_contrastive_loss(
+    model: CutAwareAutoEncoder,
+    anchor_latent: torch.Tensor,
+    mixed_latent: torch.Tensor,
+    batch_indices: np.ndarray,
+    graph,
+    cut_labels: np.ndarray | None,
+    temperature: float,
+    neighbor_positive_weight: float,
+    hard_negative_weight: float,
+) -> tuple[torch.Tensor, dict]:
+    """Masked weighted InfoNCE for the cut-reweighted NeighborMix view.
+
+    Positives are the same cell across original/mixed views plus high-confidence
+    same-partition KNN cells. Different-partition non-neighbors are negatives,
+    and cross-partition KNN cells receive the hard-negative weight.
+    """
+    device = anchor_latent.device
+    dtype = anchor_latent.dtype
+    batch_size = int(anchor_latent.shape[0])
+    zero = torch.zeros((), dtype=dtype, device=device)
+    empty_stats = {
+        "contrast_loss": 0.0,
+        "mean_positives": 0.0,
+        "mean_negatives": 0.0,
+        "mean_hard_negatives": 0.0,
+        "valid_batch_fraction": 0.0,
+    }
+    if batch_size <= 1:
+        return zero, empty_stats
+
+    idx = np.asarray(batch_indices, dtype=np.int64)
+    neighbor_mask_np = np.zeros((batch_size, batch_size), dtype=bool)
+    if graph.indices.shape[1] > 0:
+        batch_pos = {int(cell): pos for pos, cell in enumerate(idx.tolist())}
+        for row_pos, cell in enumerate(idx.tolist()):
+            for nb in graph.indices[int(cell)].tolist():
+                col_pos = batch_pos.get(int(nb))
+                if col_pos is not None:
+                    neighbor_mask_np[row_pos, col_pos] = True
+
+    max_idx = int(idx.max()) if idx.size else -1
+    if cut_labels is not None and len(cut_labels) > max_idx:
+        part = np.asarray(cut_labels, dtype=np.int64)[idx]
+        same_partition_np = part[:, None] == part[None, :]
+    else:
+        same_partition_np = np.eye(batch_size, dtype=bool)
+    eye_np = np.eye(batch_size, dtype=bool)
+
+    pos_mask_np = eye_np | (neighbor_mask_np & same_partition_np)
+    hard_neg_np = neighbor_mask_np & (~same_partition_np)
+    neg_mask_np = (~same_partition_np) & (~eye_np)
+
+    pos_weight_np = np.where(eye_np, 1.0, np.where(pos_mask_np, float(neighbor_positive_weight), 0.0)).astype(np.float32)
+    neg_weight_np = np.where(hard_neg_np, float(hard_negative_weight), np.where(neg_mask_np, 1.0, 0.0)).astype(np.float32)
+    candidate_weight_np = pos_weight_np + neg_weight_np
+    valid_np = (pos_weight_np.sum(axis=1) > 0.0) & (neg_weight_np.sum(axis=1) > 0.0)
+    if not np.any(valid_np):
+        return zero, empty_stats
+
+    z_anchor = F.normalize(model.contrast_projection(anchor_latent), dim=1, p=2)
+    z_mixed = F.normalize(model.contrast_projection(mixed_latent), dim=1, p=2)
+    logits = torch.matmul(z_anchor, z_mixed.t()) / max(float(temperature), 1e-6)
+    logits = logits - logits.max(dim=1, keepdim=True).values.detach()
+    exp_logits = torch.exp(logits)
+
+    pos_weight = torch.as_tensor(pos_weight_np, dtype=dtype, device=device)
+    candidate_weight = torch.as_tensor(candidate_weight_np, dtype=dtype, device=device)
+    valid = torch.as_tensor(valid_np, dtype=torch.bool, device=device)
+    numerator = (exp_logits * pos_weight).sum(dim=1).clamp_min(1e-12)
+    denominator = (exp_logits * candidate_weight).sum(dim=1).clamp_min(1e-12)
+    row_loss = -torch.log(numerator / denominator)
+    loss = row_loss[valid].mean()
+
+    stats = {
+        "contrast_loss": float(loss.detach().cpu()),
+        "mean_positives": float(pos_weight_np[valid_np].sum(axis=1).mean()),
+        "mean_negatives": float(neg_weight_np[valid_np].sum(axis=1).mean()),
+        "mean_hard_negatives": float(hard_neg_np[valid_np].sum(axis=1).mean()),
+        "valid_batch_fraction": float(np.mean(valid_np)),
+    }
+    return loss, stats
 
 
 def main():
@@ -205,6 +298,13 @@ def main():
         args.cut_weight = 0.0
         args.ot_weight = 0.0
         args.attention_probe_weight = 0.0
+        args.contrast_weight = 0.0
+    elif args.variant_name == "canm_cut_reweighted_mix_contrast":
+        args.pseudo_weight = max(float(args.pseudo_weight), 0.2)
+        args.cut_weight = 0.0
+        args.ot_weight = 0.0
+        args.attention_probe_weight = 0.0
+        args.contrast_weight = max(float(args.contrast_weight), 0.0)
     elif args.variant_name == "canm_gated_cut_mix":
         args.pseudo_weight = max(float(args.pseudo_weight), 0.2)
         args.cut_weight = 0.0
@@ -262,7 +362,7 @@ def main():
         prune_quantile=args.edge_prune_quantile,
     )
     edge_summary = {"edge_reliability_mode": args.edge_reliability_mode, **edge_summary}
-    edge_weights, edge_summary, cut_reweight_summary = maybe_apply_cut_reweight(
+    edge_weights, edge_summary, cut_reweight_summary, cut_labels = maybe_apply_cut_reweight(
         args=args,
         save_dir=save_dir,
         graph=graph,
@@ -280,18 +380,21 @@ def main():
         dropout=args.dropout,
         masked_data_weight=args.masked_data_weight,
         mask_loss_weight=args.mask_loss_weight,
+        contrast_projection_dim=args.contrast_projection_dim if args.variant_name == "canm_cut_reweighted_mix_contrast" else 0,
     ).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     gated_mix_enabled = args.variant_name in {"canm_gated_cut_mix", "canm_gated_cut_warm"}
-    pseudo_enabled = args.variant_name in {"canm_mix_plus_cut", "canm_mix_plus_cut_warm", "canm_cut_reweighted_mix", "canm_gated_cut_mix", "canm_gated_cut_warm"} and float(args.pseudo_weight) > 0.0
+    pseudo_enabled = args.variant_name in {"canm_mix_plus_cut", "canm_mix_plus_cut_warm", "canm_cut_reweighted_mix", "canm_cut_reweighted_mix_contrast", "canm_gated_cut_mix", "canm_gated_cut_warm"} and float(args.pseudo_weight) > 0.0
     cut_enabled = float(args.cut_weight) > 0.0 and int(args.cut_neighbors) > 0
     ot_enabled = float(args.ot_weight) > 0.0
     attention_probe_enabled = float(args.attention_probe_weight) > 0.0
+    contrast_enabled = args.variant_name == "canm_cut_reweighted_mix_contrast" and float(args.contrast_weight) > 0.0
 
     history = {
         "loss": [],
         "scmae_loss": [],
         "pseudo_loss": [],
+        "contrast_loss": [],
         "cut_loss": [],
         "ot_loss": [],
         "attention_probe_loss": [],
@@ -304,6 +407,10 @@ def main():
         "mean_mix_delta": [],
         "mean_gate": [],
         "gate_effective_neighbors": [],
+        "contrast_mean_positives": [],
+        "contrast_mean_negatives": [],
+        "contrast_hard_negatives": [],
+        "contrast_valid_batch_fraction": [],
         "cluster_mass_min": [],
         "cluster_mass_max": [],
         "assignment_entropy": [],
@@ -323,6 +430,13 @@ def main():
             loss = scmae_loss
 
             pseudo_loss = torch.zeros((), dtype=scmae_loss.dtype, device=device)
+            contrast_loss_value = torch.zeros((), dtype=scmae_loss.dtype, device=device)
+            contrast_stats = {
+                "mean_positives": 0.0,
+                "mean_negatives": 0.0,
+                "mean_hard_negatives": 0.0,
+                "valid_batch_fraction": 0.0,
+            }
             mix_info = {"mean_mix_delta": 0.0}
             if pseudo_enabled:
                 gate_losses = {
@@ -364,6 +478,20 @@ def main():
                     sample_weight=sample_weight,
                 )
                 loss = loss + float(args.pseudo_weight) * pseudo_loss
+                if contrast_enabled and epoch >= int(args.contrast_start_epoch):
+                    mixed_latent = model.encoder(x_prime)
+                    contrast_loss_value, contrast_stats = cut_reweighted_contrastive_loss(
+                        model=model,
+                        anchor_latent=latent,
+                        mixed_latent=mixed_latent,
+                        batch_indices=idx_np,
+                        graph=graph,
+                        cut_labels=cut_labels,
+                        temperature=args.contrast_temperature,
+                        neighbor_positive_weight=args.contrast_neighbor_positive_weight,
+                        hard_negative_weight=args.contrast_hard_negative_weight,
+                    )
+                    loss = loss + float(args.contrast_weight) * contrast_loss_value
                 if gated_mix_enabled:
                     loss = loss + float(args.gate_prior_weight) * gate_losses["gate_prior_loss"]
                     loss = loss + float(args.gate_entropy_weight) * gate_losses["gate_entropy_loss"]
@@ -429,6 +557,7 @@ def main():
             totals["loss"] += float(loss.detach().cpu())
             totals["scmae_loss"] += float(scmae_loss.detach().cpu())
             totals["pseudo_loss"] += float(pseudo_loss.detach().cpu())
+            totals["contrast_loss"] += float(contrast_loss_value.detach().cpu())
             totals["cut_loss"] += float(cut_loss_value.detach().cpu())
             totals["ot_loss"] += float(ot_loss_value.detach().cpu())
             totals["attention_probe_loss"] += float(attention_loss_value.detach().cpu())
@@ -441,6 +570,10 @@ def main():
             totals["mean_mix_delta"] += float(mix_info["mean_mix_delta"])
             totals["mean_gate"] += float(mix_info.get("mean_gate", 0.0))
             totals["gate_effective_neighbors"] += float(mix_info.get("gate_effective_neighbors", 0.0))
+            totals["contrast_mean_positives"] += float(contrast_stats.get("mean_positives", 0.0))
+            totals["contrast_mean_negatives"] += float(contrast_stats.get("mean_negatives", 0.0))
+            totals["contrast_hard_negatives"] += float(contrast_stats.get("mean_hard_negatives", 0.0))
+            totals["contrast_valid_batch_fraction"] += float(contrast_stats.get("valid_batch_fraction", 0.0))
             totals["cluster_mass_min"] += float(cut_stats.get("cluster_mass_min", mean_q.min().detach().cpu()))
             totals["cluster_mass_max"] += float(cut_stats.get("cluster_mass_max", mean_q.max().detach().cpu()))
             totals["assignment_entropy"] += float(cut_stats.get("assignment_entropy", (-(q * q.clamp_min(1e-8).log()).sum(dim=1).mean()).detach().cpu()))
@@ -451,7 +584,8 @@ def main():
         if epoch == 1 or epoch == args.epochs or epoch % 10 == 0:
             print(
                 f"Epoch {epoch:03d}/{args.epochs} loss={history['loss'][-1]:.4f} "
-                f"scmae={history['scmae_loss'][-1]:.4f} cut={history['cut_loss'][-1]:.4f} "
+                f"scmae={history['scmae_loss'][-1]:.4f} pseudo={history['pseudo_loss'][-1]:.4f} "
+                f"contrast={history['contrast_loss'][-1]:.4f} cut={history['cut_loss'][-1]:.4f} "
                 f"ot={history['ot_loss'][-1]:.4f} gate={history['mean_gate'][-1]:.3f} "
                 f"mass=[{history['cluster_mass_min'][-1]:.3f},{history['cluster_mass_max'][-1]:.3f}]",
                 flush=True,
@@ -475,7 +609,7 @@ def main():
                 prune_quantile=args.edge_prune_quantile,
             )
             edge_summary = {"edge_reliability_mode": args.edge_reliability_mode, **edge_summary}
-            edge_weights, edge_summary, cut_reweight_summary = maybe_apply_cut_reweight(
+            edge_weights, edge_summary, cut_reweight_summary, cut_labels = maybe_apply_cut_reweight(
                 args=args,
                 save_dir=save_dir,
                 graph=graph,
@@ -497,6 +631,22 @@ def main():
     save_json(history, str(save_dir / "training_history.json"))
     save_json(cut_diag, str(save_dir / "cut_diagnostics.json"))
     save_json(sim_diag, str(save_dir / "embedding_similarity_diagnostics.json"))
+    contrast_diag = {
+        "contrast_enabled": bool(contrast_enabled),
+        "contrast_weight": float(args.contrast_weight),
+        "contrast_temperature": float(args.contrast_temperature),
+        "contrast_start_epoch": int(args.contrast_start_epoch),
+        "contrast_neighbor_positive_weight": float(args.contrast_neighbor_positive_weight),
+        "contrast_hard_negative_weight": float(args.contrast_hard_negative_weight),
+        "contrast_projection_dim": int(args.contrast_projection_dim) if contrast_enabled else 0,
+        "mean_contrast_loss": float(np.mean(history["contrast_loss"])) if history["contrast_loss"] else 0.0,
+        "final_contrast_loss": float(history["contrast_loss"][-1]) if history["contrast_loss"] else 0.0,
+        "mean_positives": float(np.mean(history["contrast_mean_positives"])) if history["contrast_mean_positives"] else 0.0,
+        "mean_negatives": float(np.mean(history["contrast_mean_negatives"])) if history["contrast_mean_negatives"] else 0.0,
+        "mean_hard_negatives": float(np.mean(history["contrast_hard_negatives"])) if history["contrast_hard_negatives"] else 0.0,
+        "mean_valid_batch_fraction": float(np.mean(history["contrast_valid_batch_fraction"])) if history["contrast_valid_batch_fraction"] else 0.0,
+    }
+    save_json(contrast_diag, str(save_dir / "contrast_diagnostics.json"))
     save_graph_outputs(save_dir, graph, edge_reliability, edge_weights, edge_summary)
     torch.save(
         {
@@ -507,6 +657,7 @@ def main():
             "edge_weight_summary": edge_summary,
             "cut_diagnostics": cut_diag,
             "embedding_similarity_diagnostics": sim_diag,
+            "contrast_diagnostics": contrast_diag,
         },
         save_dir / "model.pt",
     )
@@ -527,6 +678,9 @@ def main():
                 "cut_weight": float(args.cut_weight),
                 "ot_weight": float(args.ot_weight),
                 "pseudo_weight": float(args.pseudo_weight),
+                "contrast_enabled": bool(contrast_enabled),
+                "contrast_weight": float(args.contrast_weight),
+                "contrast_temperature": float(args.contrast_temperature),
                 "cut_cross_weight": float(args.cut_cross_weight),
                 "gate_prior_weight": float(args.gate_prior_weight),
                 "gate_entropy_weight": float(args.gate_entropy_weight),
@@ -565,10 +719,18 @@ def main():
         "cut_enabled": bool(cut_enabled),
         "ot_enabled": bool(ot_enabled),
         "attention_probe_enabled": bool(attention_probe_enabled),
+        "contrast_enabled": bool(contrast_enabled),
+        "contrast_weight": float(args.contrast_weight),
+        "contrast_temperature": float(args.contrast_temperature),
+        "contrast_start_epoch": int(args.contrast_start_epoch),
+        "contrast_neighbor_positive_weight": float(args.contrast_neighbor_positive_weight),
+        "contrast_hard_negative_weight": float(args.contrast_hard_negative_weight),
+        "contrast_projection_dim": int(args.contrast_projection_dim) if contrast_enabled else 0,
         "edge_weight_summary": edge_summary,
         "cut_reweight_summary": cut_reweight_summary,
         "cut_diagnostics": cut_diag,
         "embedding_similarity_diagnostics": sim_diag,
+        "contrast_diagnostics": contrast_diag,
         "fixed_metrics": result["fixed"] if result is not None else {},
         "label_leakage": False,
     }

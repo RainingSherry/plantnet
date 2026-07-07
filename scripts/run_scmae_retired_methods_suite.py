@@ -99,6 +99,53 @@ RETIRED_METHODS = [
             "alpha=0.9,neighbor_k=5,mix_neighbors=4,tau=0.2,knn_pca_dim=50"
         ),
     ),
+    RetiredMethod(
+        key="canm_cut_reweighted_mix",
+        path=PROJECT_ROOT / "experimental_retired_models" / "CutAware_NeighborMix_scMAE" / "run.py",
+        source_path="experimental_retired_models/CutAware_NeighborMix_scMAE/run.py",
+        method_name="CutAware_NeighborMix_scMAE",
+        variant_name="canm_cut_reweighted_mix",
+        extra_args=["--no_save_h5ad"],
+        parameter_signature=(
+            "epochs=80,n_top_genes=1000,input_mode=auto,target_sum=10000,"
+            "scale_input=true,hidden_size=128,dropout=0.0,masked_data_weight=0.75,"
+            "mask_loss_weight=0.7,mask_ratio=0.4,neighbor_k=10,mix_neighbors=4,"
+            "mix_alpha=0.8,edge_reliability_mode=sim_mutual_snn_distance,"
+            "cut_cross_weight=0.05,pseudo_weight=0.2,cut_weight=0.0,ot_weight=0.0"
+        ),
+    ),
+    RetiredMethod(
+        key="canm_cut_reweighted_mix_contrast",
+        path=PROJECT_ROOT / "experimental_retired_models" / "CutAware_NeighborMix_scMAE" / "run.py",
+        source_path="experimental_retired_models/CutAware_NeighborMix_scMAE/run.py",
+        method_name="CutAware_NeighborMix_scMAE",
+        variant_name="canm_cut_reweighted_mix_contrast",
+        extra_args=[
+            "--no_save_h5ad",
+            "--contrast_weight",
+            "0.05",
+            "--contrast_temperature",
+            "0.2",
+            "--contrast_start_epoch",
+            "5",
+            "--contrast_neighbor_positive_weight",
+            "0.5",
+            "--contrast_hard_negative_weight",
+            "1.0",
+            "--contrast_projection_dim",
+            "128",
+        ],
+        parameter_signature=(
+            "epochs=80,n_top_genes=1000,input_mode=auto,target_sum=10000,"
+            "scale_input=true,hidden_size=128,dropout=0.0,masked_data_weight=0.75,"
+            "mask_loss_weight=0.7,mask_ratio=0.4,neighbor_k=10,mix_neighbors=4,"
+            "mix_alpha=0.8,edge_reliability_mode=sim_mutual_snn_distance,"
+            "cut_cross_weight=0.05,pseudo_weight=0.2,cut_weight=0.0,ot_weight=0.0,"
+            "contrast_weight=0.05,contrast_temperature=0.2,contrast_start_epoch=5,"
+            "contrast_neighbor_positive_weight=0.5,contrast_hard_negative_weight=1.0,"
+            "contrast_projection_dim=128"
+        ),
+    ),
 ]
 
 
