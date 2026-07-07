@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Dict, Tuple
 
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 
 from experimental_retired_models.NeighborMix_scMAE.model import AutoEncoder as _BaseAutoEncoder
@@ -10,6 +11,25 @@ from experimental_retired_models.NeighborMix_scMAE.model import AutoEncoder as _
 
 class AutoEncoder(_BaseAutoEncoder):
     """scMAE AutoEncoder with gate-weighted per-sample loss."""
+
+    def __init__(self, *args, contrast_projection_dim: int = 0, **kwargs):
+        dropout_rate = float(kwargs.get("dropout", 0.0))
+        super().__init__(*args, **kwargs)
+        projection_dim = int(contrast_projection_dim or 0)
+        if projection_dim > 0:
+            self.contrast_projector = nn.Sequential(
+                nn.Linear(self.hidden_size, self.hidden_size),
+                nn.GELU(),
+                nn.Dropout(dropout_rate),
+                nn.Linear(self.hidden_size, projection_dim),
+            )
+        else:
+            self.contrast_projector = None
+
+    def contrast_projection(self, latent: torch.Tensor) -> torch.Tensor:
+        if self.contrast_projector is None:
+            return latent
+        return self.contrast_projector(latent)
 
     def loss_mask_weighted(
         self,
