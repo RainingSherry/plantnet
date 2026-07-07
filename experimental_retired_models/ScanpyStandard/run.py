@@ -146,12 +146,10 @@ def main():
         )
 
     from sklearn.preprocessing import LabelEncoder
-    Y_true = np.array(adata.obs[label_col])
-    le = LabelEncoder()
-    Y = le.fit_transform(Y_true)
-    n_clusters_gt = len(np.unique(Y))
-    n_clusters = args.n_clusters if args.n_clusters > 0 else n_clusters_gt
-    print(f'Ground truth: {n_clusters_gt} cell types, target clusters: {n_clusters}')
+    raw_labels = np.asarray(adata.obs[label_col].astype(str))
+    n_clusters_gt_raw = len(np.unique(raw_labels))
+    n_clusters = args.n_clusters if args.n_clusters > 0 else n_clusters_gt_raw
+    print(f'Ground truth before QC: {n_clusters_gt_raw} cell types, target clusters: {n_clusters}')
 
     # =========================================================================
     # Step 2: 质控（QC）— 过滤低质量细胞和基因
@@ -173,6 +171,14 @@ def main():
     sc.pp.filter_cells(adata, min_genes=args.min_genes)
     sc.pp.filter_genes(adata, min_cells=args.min_cells)
     print(f'After filtering: {adata.n_obs} cells, {adata.n_vars} genes')
+
+    Y_true = np.asarray(adata.obs[label_col].astype(str))
+    le = LabelEncoder()
+    Y = le.fit_transform(Y_true)
+    n_clusters_gt = len(np.unique(Y))
+    if args.n_clusters <= 0:
+        n_clusters = n_clusters_gt
+    print(f'Ground truth after QC: {n_clusters_gt} cell types, target clusters: {n_clusters}')
 
     # 保存原始数据到 adata.raw（用于后续基因表达量回溯）
     adata.raw = adata.copy()

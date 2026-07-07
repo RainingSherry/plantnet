@@ -217,8 +217,9 @@ class DescModel(object):
             self.autoencoder.save_weights(os.path.join(self.save_dir,'ae_weights.h5'))
             self.encoder.save_weights(os.path.join(self.save_dir,'encoder_weights.h5'))
             print('Pretrained weights are saved to %s /ae_weights.h5' % self.save_dir)
-        #save autoencoder model
-        self.autoencoder.save(os.path.join(self.save_dir,"autoencoder_model.h5"))
+        # Keras/TF 2.x can segfault when serializing this legacy custom model to
+        # full HDF5. The benchmark only needs weights plus final embeddings.
+        print('Skipping full autoencoder_model.h5 save; ae_weights.h5 has been saved.')
         #initialize cluster centers using louvain if n_clusters is not exist
         features=self.extract_features(self.x)
         features=np.asarray(features)
@@ -269,10 +270,10 @@ class DescModel(object):
         self.model.load_weights(weights)
 
     def extract_features(self, x):
-        return self.encoder.predict(x)
+        return self.encoder(x, training=False).numpy()
 
     def predict(self, x):  # predict cluster labels using the output of clustering layer
-        q = self.model.predict(x, verbose=0)
+        q = self.model(x, training=False).numpy()
         return q.argmax(1)
 
     @staticmethod
@@ -296,7 +297,7 @@ class DescModel(object):
                 self.encoder.save_weights(os.path.join(self.save_dir,'encoder_weights_resolution_'+str(self.resolution)+"_"+str(ite)+'.h5'))
                 print('Fine tuning encoder weights are saved to %s/encoder_weights.h5' % self.save_dir) 
             if ite % update_interval ==0:
-                q=self.model.predict(self.x,verbose=0)
+                q=self.model(self.x, training=False).numpy()
                 p=self.target_distribution(q)
                 y_pred=q.argmax(1)
                 delta_label = np.sum(y_pred != y_pred_last).astype(np.float32) / y_pred.shape[0]
@@ -309,8 +310,8 @@ class DescModel(object):
             idx=index_array[index * self.batch_size: min((index+1) * self.batch_size, self.x.shape[0])]
             loss = self.model.train_on_batch(x=self.x[idx], y=p[idx])
             index = index + 1 if (index + 1) * self.batch_size <= self.x.shape[0] else 0
-        #save encoder model
-        self.encoder.save(os.path.join(self.save_dir,"encoder_model.h5"))
+        # Save final encoder weights without serializing the legacy custom model.
+        self.encoder.save_weights(os.path.join(self.save_dir, "encoder_model_weights.h5"))
         #load model
         #encoder=load_model("encoder.h5")
         #
@@ -320,7 +321,7 @@ class DescModel(object):
         x=y0.value_counts()
         print(x.sort_index(ascending=True))
         Embedded_z=self.extract_features(self.x)
-        q=self.model.predict(self.x,verbose=0)
+        q=self.model(self.x, training=False).numpy()
         return Embedded_z,q
 
              
@@ -335,7 +336,7 @@ class DescModel(object):
             if self.save_encoder_weights and ite%save_encoder_step==0: #save ae_weights for every 5 iterations
                 self.encoder.save_weights(os.path.join(self.save_dir,'encoder_weights_resolution_'+str(self.resolution)+"_"+str(ite)+'.h5'))
                 print('Fine tuning encoder weights are saved to %s/encoder_weights.h5' % self.save_dir)
-            q = self.model.predict(self.x, verbose=0)
+            q = self.model(self.x, training=False).numpy()
             p = self.target_distribution(q)  # update the auxiliary target distribution p
             # evaluate the clustering performance
             y_pred = q.argmax(1)
@@ -353,8 +354,8 @@ class DescModel(object):
                 self.model.fit(x=self.x,y=p,epochs=epochs_fit,batch_size=self.batch_size,callbacks=callbacks,shuffle=True,verbose=True)
             else:
                 self.model.fit(x=self.x,y=p,epochs=epochs_fit,batch_size=self.batch_size,shuffle=True,verbose=True)
-        #save encoder model
-        self.encoder.save(os.path.join(self.save_dir,"encoder_model.h5"))
+        # Save final encoder weights without serializing the legacy custom model.
+        self.encoder.save_weights(os.path.join(self.save_dir, "encoder_model_weights.h5"))
         #load model
         #encoder=load_model("encoder.h5")
         #

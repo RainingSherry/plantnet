@@ -436,8 +436,20 @@ import json
 import functools
 import operator
 import collections
-import jgraph
+try:
+    import jgraph
+except Exception as exc:
+    jgraph = None
+    _JGRAPH_IMPORT_ERROR = exc
+else:
+    _JGRAPH_IMPORT_ERROR = None
 import tqdm
+
+
+def _require_jgraph():
+    if jgraph is None:
+        raise ImportError("CellTypeDAG requires jgraph, but it could not be imported.") from _JGRAPH_IMPORT_ERROR
+    return jgraph
 
 
 class dotdict(dict):
@@ -524,7 +536,8 @@ class CellTypeDAG(object):
     """细胞类型层级DAG（与utils.py一致）"""
 
     def __init__(self, graph=None, vdict=None):
-        self.graph = jgraph.Graph(directed=True) if graph is None else graph
+        jg = _require_jgraph()
+        self.graph = jg.Graph(directed=True) if graph is None else graph
         self.vdict = {} if vdict is None else vdict
 
     @classmethod
@@ -548,7 +561,8 @@ class CellTypeDAG(object):
     def load_obo(cls, file):
         import pronto
         ont = pronto.Ontology(file)
-        graph, vdict = jgraph.Graph(directed=True), {}
+        jg = _require_jgraph()
+        graph, vdict = jg.Graph(directed=True), {}
         for item in ont:
             if not item.id.startswith("CL"):
                 continue

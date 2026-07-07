@@ -387,7 +387,7 @@ def main():
         if epoch % 50 == 0:
             print(f'Pre-train Epoch {epoch}/{args.epochs}, Loss: {loss.item():.6f}')
             # 更新kmeans以供后续使用
-            z_np = z.cpu().numpy()
+            z_np = z.detach().cpu().numpy()
             kmeans = KMeans(n_clusters=n_clusters, random_state=args.seed, n_init=20).fit(z_np)
             centers = torch.tensor(kmeans.cluster_centers_)
             if args.cuda:
@@ -512,7 +512,7 @@ def main():
 
         # 评估
         with torch.no_grad():
-            kmeans = KMeans(n_clusters=n_clusters, random_state=args.seed, n_init=20).fit(z.cpu().numpy())
+            kmeans = KMeans(n_clusters=n_clusters, random_state=args.seed, n_init=20).fit(z.detach().cpu().numpy())
             y_pred = kmeans.labels_
             pseudo_labels = torch.LongTensor(kmeans.labels_)
             if args.cuda:
@@ -526,7 +526,7 @@ def main():
             if loss.item() < best_loss:
                 best_loss = loss.item()
                 best_epoch = epoch
-                best_embedding = z.cpu().numpy()
+                best_embedding = z.detach().cpu().numpy()
                 best_y_pred = y_pred
                 torch.save(Model.state_dict(), os.path.join(args.save_dir, 'best_model.pkl'))
 

@@ -221,7 +221,7 @@ methods:
   - key: varfloor_scmae
     name: VarFloor-scMAE
     full_name: zero-mask scMAE + DEC + per-dimension std-floor
-    path: methods/DeepLearning/scMAE_DEC_StdFloor/run.py
+    path: experimental_retired_models/scMAE_DEC_StdFloor/run.py
     category: DeepLearning
     authenticity: VERIFIED
     smoke: PASS
@@ -262,9 +262,11 @@ methods:
     reason: TensorFlow/Keras dependency
     source_path: OtherMode/scCluBench-main/DeepLearning/scDeepCluster
     runtime:
-      env_name: plantnet-tf1
+      env_name: plantnet-tf212-cpu
       backend: conda
-      description: "TensorFlow 2.x + Keras for scDeepCluster, scNAME, scziDesk"
+      description: "TensorFlow/Keras 2.12 CPU environment for scDeepCluster"
+    extra_args:
+      - --no_cuda
 
   - key: scname
     name: scNAME
@@ -339,9 +341,11 @@ methods:
     framework: TensorFlow
     source_path: OtherMode/scCluBench-main/DeepLearning/desc
     runtime:
-      env_name: plantnet-desc
+      env_name: plantnet-tf212-cpu
       backend: conda
-      description: "TensorFlow 2.x + Keras for DESC (separate env from plantnet-tf1)"
+      description: "TensorFlow/Keras 2.12 CPU environment for DESC"
+    extra_args:
+      - --no_cuda
     source_files:
       - run.py
       - desc/__init__.py
@@ -390,9 +394,9 @@ methods:
     framework: PyTorch
     source_path: OtherMode/scCluBench-main/GNN/scCDCG
     runtime:
-      env_name: plantnet-sccdcg
+      env_name: plantnet-sccdcg-h100
       backend: conda
-      description: "scCDCG PyTorch environment"
+      description: "scCDCG PyTorch environment with H100-compatible CUDA"
     source_files:
       - run.py
       - model.py

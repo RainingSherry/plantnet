@@ -94,6 +94,55 @@ def decode_vector(values):
     return decoded
 
 
+def read_dataframe_index(group):
+    index_key = group.attrs.get('_index')
+    if isinstance(index_key, bytes):
+        index_key = index_key.decode('utf-8')
+    if index_key and index_key in group:
+        return decode_vector(group[index_key][...])
+    if '_index' in group:
+        return decode_vector(group['_index'][...])
+    available = list(group.keys())
+    raise KeyError(f'No dataframe index found. Available keys: {available}, attrs: {dict(group.attrs)}')
+
+
+def read_obs_column(obs, column):
+    values = obs[column]
+    if isinstance(values, h5py.Group):
+        encoding = values.attrs.get('encoding-type')
+        if isinstance(encoding, bytes):
+            encoding = encoding.decode('utf-8')
+        if encoding == 'categorical' and 'codes' in values and 'categories' in values:
+            categories = decode_vector(values['categories'][...])
+            codes = values['codes'][...]
+            return [categories[int(code)] if int(code) >= 0 else '' for code in codes]
+        raise TypeError(f'Unsupported h5ad obs column group {column!r} with keys {list(values.keys())}')
+    return decode_vector(values[...])
+
+
+def resolve_label_column(obs, preferred='Celltype'):
+    candidates = [
+        preferred, 'resolved_label', 'cell_type', 'Celltype', 'celltype',
+        'cell_label', 'label', 'maintype', 'type',
+    ]
+    for candidate in candidates:
+        if candidate and candidate in obs:
+            return candidate
+    raise KeyError(f'No label column found in h5ad obs. Available columns: {list(obs.keys())}')
+
+
+def format_10x_ids(ids, prefix):
+    formatted = []
+    for idx, value in enumerate(ids):
+        value = str(value)
+        if not value:
+            value = str(idx)
+        if value.replace('.', '', 1).isdigit():
+            value = f'{prefix}_{value}'
+        formatted.append(value)
+    return formatted
+
+
 def read_csr(group):
     shape = tuple(group.attrs['shape'])
     return sp.csr_matrix((group['data'][...], group['indices'][...], group['indptr'][...]), shape=shape)
@@ -102,18 +151,22 @@ def read_csr(group):
 def load_labels_from_h5ad(data_path, label_col='Celltype'):
     with h5py.File(data_path, 'r') as handle:
         obs = handle['obs']
-        cell_ids = decode_vector(obs['_index'][...])
-        if label_col not in obs:
-            raise KeyError(f'Label column {label_col!r} not found in h5ad obs. Available columns: {list(obs.keys())}')
-        labels = decode_vector(obs[label_col][...])
-    return dict(zip(cell_ids, labels)), len(set(labels))
+        cell_ids = read_dataframe_index(obs)
+        label_col = resolve_label_column(obs, label_col)
+        labels = read_obs_column(obs, label_col)
+    label_map = dict(zip(cell_ids, labels))
+    for cell_id, label in zip(cell_ids, labels):
+        cell_id = str(cell_id)
+        if cell_id.replace('.', '', 1).isdigit():
+            label_map.setdefault(f'cell_{cell_id}', label)
+    return label_map, len(set(labels))
 
 
 def export_h5ad_to_10x(data_path, output_root):
     with h5py.File(data_path, 'r') as handle:
         matrix = read_csr(handle['X']).transpose().tocoo().astype(np.int32)
-        cell_ids = decode_vector(handle['obs']['_index'][...])
-        gene_ids = decode_vector(handle['var']['_index'][...])
+        cell_ids = format_10x_ids(read_dataframe_index(handle['obs']), 'cell')
+        gene_ids = format_10x_ids(read_dataframe_index(handle['var']), 'gene')
 
     ensure_dir(output_root)
 

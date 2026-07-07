@@ -1,0 +1,37 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{authblk}
+\usepackage[margin=1in]{geometry}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+% VarFloor-scMAE: 论文主文件。章节内容见 sections/*.tex。
+% 论证蓝图: 论证蓝图.md ; 数据: ../../results/260629全benchmark结果.csv
+
+\title{Diagnosing and Correcting Per-Dimension Variance Collapse in\\
+Deep Embedded Clustering of Single-Cell RNA-seq Data}
+
+\author[1]{Author One}
+\author[1]{Author Two}
+\affil[1]{Affiliation}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\input{sections/00_abstract}
+\input{sections/01_introduction}
+\input{sections/02_methods}
+\input{sections/03_results}
+\input{sections/04_discussion}
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\end{document}

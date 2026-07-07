@@ -165,8 +165,8 @@ class SDCN_Deep(nn.Module):
 
         self.v = v
         self.zinb_loss = ZINBLoss()
-        if device == 'cuda':
-            self.zinb_loss = self.zinb_loss.cuda()
+        if torch.device(device).type == 'cuda':
+            self.zinb_loss = self.zinb_loss.to(torch.device(device))
 
     def forward(self, x, adj):
         # AE forward
@@ -294,6 +294,8 @@ def main():
 
     # Set device
     args.cuda = not args.no_cuda and torch.cuda.is_available()
+    if args.cuda:
+        torch.cuda.set_device(args.gpu)
     device = torch.device(f'cuda:{args.gpu}' if args.cuda else 'cpu')
     print(f'Using device: {device}')
 
@@ -326,11 +328,17 @@ def main():
 
     # Get raw counts for ZINB loss
     if adata.raw is not None:
-        raw_counts = adata.raw.X
+        try:
+            raw_counts = adata.raw[:, adata.var_names].X
+        except Exception:
+            raw_counts = adata.raw.X
         if hasattr(raw_counts, 'toarray'):
             raw_counts = raw_counts.toarray()
         raw_counts = np.array(raw_counts).astype(np.float32)
     else:
+        raw_counts = X.copy()
+    if raw_counts.shape[1] != X.shape[1]:
+        print(f'WARNING: raw_counts has {raw_counts.shape[1]} genes, expected {X.shape[1]}. Using X as counts.')
         raw_counts = X.copy()
 
     # Get number of clusters from data if not specified
@@ -341,8 +349,7 @@ def main():
     # Build graph
     print('Building KNN graph...')
     adj = build_graph(X, k=args.k_neighbors)
-    if args.cuda:
-        adj = adj.cuda()
+    adj = adj.to(device)
 
     # Initialize model
     print('Initializing scDSC (gse70256) model...')
@@ -358,7 +365,7 @@ def main():
         n_z2=args.n_z2,
         n_z3=args.n_z3,
         n_clusters=n_clusters,
-        device='cuda' if args.cuda else 'cpu'
+        device=device
     ).to(device)
 
     # Pretrain autoencoder

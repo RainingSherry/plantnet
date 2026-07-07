@@ -278,7 +278,7 @@ def main():
 
     adata_raw = sc.read_h5ad(args.data_path)
     label_col = None
-    for candidate in ['cell_type', 'Celltype', 'celltype', 'cell_label', 'label']:
+    for candidate in ['resolved_label', 'cell_type', 'Celltype', 'celltype', 'cell_label', 'label', 'maintype', 'type']:
         if candidate in adata_raw.obs.columns:
             label_col = candidate
             break

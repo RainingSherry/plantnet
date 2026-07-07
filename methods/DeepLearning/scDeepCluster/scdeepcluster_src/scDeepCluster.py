@@ -18,7 +18,7 @@ from sklearn import metrics
 import h5py
 import scanpy as sc
 from .layers import ConstantDispersionLayer, SliceLayer, ColWiseMultLayer
-from .loss import poisson_loss, NB, ZINB
+from .loss import poisson_loss, NB, ZINB, _nan2inf
 from .preprocess import read_dataset, normalize
 import tensorflow as tf
 
@@ -29,6 +29,84 @@ tf.random.set_seed(2211)
 
 MeanAct = lambda x: tf.clip_by_value(K.exp(x), 1e-5, 1e6)
 DispAct = lambda x: tf.clip_by_value(tf.nn.softplus(x), 1e-4, 1e4)
+
+def _zinb_loss_from_tensors(y_true, y_pred, theta, pi, ridge_lambda=0.0, scale_factor=1.0):
+    """Same ZINB objective as loss.ZINB.loss, evaluated inside a Keras train_step."""
+    eps = 1e-10
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32) * scale_factor
+    theta = tf.minimum(theta, 1e6)
+
+    t1 = tf.math.lgamma(theta + eps) + tf.math.lgamma(y_true + 1.0) - tf.math.lgamma(y_true + theta + eps)
+    t2 = (theta + y_true) * tf.math.log(1.0 + (y_pred / (theta + eps))) + (
+        y_true * (tf.math.log(theta + eps) - tf.math.log(y_pred + eps))
+    )
+    nb_case = t1 + t2 - tf.math.log(1.0 - pi + eps)
+    zero_nb = tf.pow(theta / (theta + y_pred + eps), theta)
+    zero_case = -tf.math.log(pi + ((1.0 - pi) * zero_nb) + eps)
+    result = tf.where(tf.less(y_true, 1e-8), zero_case, nb_case)
+    result += ridge_lambda * tf.square(pi)
+    result = _nan2inf(result)
+    return tf.reduce_mean(result)
+
+
+class ZINBAutoencoderTrainingModel(Model):
+    def __init__(self, inputs, outputs, ridge_lambda=0.0, **kwargs):
+        super().__init__(inputs=inputs, outputs=outputs, **kwargs)
+        self.ridge_lambda = ridge_lambda
+        self.loss_tracker = tf.keras.metrics.Mean(name='loss')
+
+    @property
+    def metrics(self):
+        return [self.loss_tracker]
+
+    def train_step(self, data):
+        x, y_true, _ = tf.keras.utils.unpack_x_y_sample_weight(data)
+        with tf.GradientTape() as tape:
+            y_pred, theta, pi = self(x, training=True)
+            loss = _zinb_loss_from_tensors(y_true, y_pred, theta, pi, ridge_lambda=self.ridge_lambda)
+            if self.losses:
+                loss += tf.add_n(self.losses)
+        gradients = tape.gradient(loss, self.trainable_variables)
+        self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+        self.loss_tracker.update_state(loss)
+        return {'loss': self.loss_tracker.result()}
+
+
+class ZINBClusteringTrainingModel(Model):
+    def __init__(self, inputs, outputs, ridge_lambda=0.0, loss_weights=None, **kwargs):
+        super().__init__(inputs=inputs, outputs=outputs, **kwargs)
+        self.ridge_lambda = ridge_lambda
+        self.loss_weights = loss_weights if loss_weights is not None else [1, 1]
+        self.loss_tracker = tf.keras.metrics.Mean(name='loss')
+        self.clustering_loss_tracker = tf.keras.metrics.Mean(name='clustering_loss')
+        self.zinb_loss_tracker = tf.keras.metrics.Mean(name='zinb_loss')
+
+    @property
+    def metrics(self):
+        return [self.loss_tracker, self.clustering_loss_tracker, self.zinb_loss_tracker]
+
+    def train_step(self, data):
+        x, y, _ = tf.keras.utils.unpack_x_y_sample_weight(data)
+        y_cluster, y_counts = y
+        with tf.GradientTape() as tape:
+            q, y_pred, theta, pi = self(x, training=True)
+            clustering_loss = tf.reduce_mean(tf.keras.losses.kullback_leibler_divergence(y_cluster, q))
+            zinb_loss = _zinb_loss_from_tensors(y_counts, y_pred, theta, pi, ridge_lambda=self.ridge_lambda)
+            loss = self.loss_weights[0] * clustering_loss + self.loss_weights[1] * zinb_loss
+            if self.losses:
+                loss += tf.add_n(self.losses)
+        gradients = tape.gradient(loss, self.trainable_variables)
+        self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+        self.loss_tracker.update_state(loss)
+        self.clustering_loss_tracker.update_state(clustering_loss)
+        self.zinb_loss_tracker.update_state(zinb_loss)
+        return {
+            'loss': self.loss_tracker.result(),
+            'clustering_loss': self.clustering_loss_tracker.result(),
+            'zinb_loss': self.zinb_loss_tracker.result(),
+        }
+
 
 def cluster_acc(y_true, y_pred):
     """
@@ -196,10 +274,22 @@ class SCDeepCluster(object):
         mean = self.autoencoder.get_layer(name='mean').output
         zinb = ZINB(pi, theta=disp, ridge_lambda=self.ridge, debug=self.debug)
         self.loss = zinb.loss
+        self.autoencoder_train_model = ZINBAutoencoderTrainingModel(
+            self.autoencoder.input,
+            [self.autoencoder.output, disp, pi],
+            ridge_lambda=self.ridge,
+            name='scdeepcluster_autoencoder_train'
+        )
 
         clustering_layer = ClusteringLayer(self.n_clusters, alpha=self.alpha, name='clustering')(hidden)
         self.model = Model(inputs=[self.autoencoder.input[0], self.autoencoder.input[1]],
                            outputs=[clustering_layer, self.autoencoder.output])
+        self.cluster_train_model = ZINBClusteringTrainingModel(
+            self.model.input,
+            [clustering_layer, self.autoencoder.output, disp, pi],
+            ridge_lambda=self.ridge,
+            name='scdeepcluster_train'
+        )
 
         self.pretrained = False
         self.centers = []
@@ -207,9 +297,9 @@ class SCDeepCluster(object):
 
     def pretrain(self, x, y, batch_size=256, epochs=200, optimizer='adam', ae_file='ae_weights.h5'):
         print('...Pretraining autoencoder...')
-        self.autoencoder.compile(loss=self.loss, optimizer=optimizer)
+        self.autoencoder_train_model.compile(optimizer=optimizer)
         es = EarlyStopping(monitor="loss", patience=50, verbose=1)
-        self.autoencoder.fit(x=x, y=y, batch_size=batch_size, epochs=epochs, callbacks=[es])
+        self.autoencoder_train_model.fit(x=x, y=y, batch_size=batch_size, epochs=epochs, callbacks=[es])
         self.autoencoder.save_weights(ae_file)
         print('Pretrained weights are saved to ./' + str(ae_file))
         self.pretrained = True
@@ -232,7 +322,8 @@ class SCDeepCluster(object):
     def fit(self, x_counts, sf, y, raw_counts, batch_size=256, maxiter=2e4, tol=1e-3, update_interval=140,
             ae_weights=None, save_dir='./results/scDeepCluster', loss_weights=[1,1], optimizer='adadelta'):
 
-        self.model.compile(loss=['kld', self.loss], loss_weights=loss_weights, optimizer=optimizer)
+        self.cluster_train_model.loss_weights = loss_weights
+        self.cluster_train_model.compile(optimizer=optimizer)
 
         print('Update interval', update_interval)
         save_interval = int(x_counts.shape[0] / batch_size) * 5  # 5 epochs
@@ -293,15 +384,22 @@ class SCDeepCluster(object):
 
             # train on batch
             if (index + 1) * batch_size > x_counts.shape[0]:
-                loss = self.model.train_on_batch(x=[x_counts[index * batch_size::], sf[index * batch_size:]],
-                                                 y=[p[index * batch_size::], raw_counts[index * batch_size::]])
+                loss_dict = self.cluster_train_model.train_on_batch(
+                    x=[x_counts[index * batch_size::], sf[index * batch_size:]],
+                    y=[p[index * batch_size::], raw_counts[index * batch_size::]],
+                    return_dict=True
+                )
                 index = 0
             else:
-                loss = self.model.train_on_batch(x=[x_counts[index * batch_size:(index + 1) * batch_size], 
-                                                    sf[index * batch_size:(index + 1) * batch_size]],
-                                                 y=[p[index * batch_size:(index + 1) * batch_size],
-                                                    raw_counts[index * batch_size:(index + 1) * batch_size]])
+                loss_dict = self.cluster_train_model.train_on_batch(
+                    x=[x_counts[index * batch_size:(index + 1) * batch_size],
+                       sf[index * batch_size:(index + 1) * batch_size]],
+                    y=[p[index * batch_size:(index + 1) * batch_size],
+                       raw_counts[index * batch_size:(index + 1) * batch_size]],
+                    return_dict=True
+                )
                 index += 1
+            loss = [loss_dict['loss'], loss_dict['clustering_loss'], loss_dict['zinb_loss']]
 
             # save intermediate model
             if ite % save_interval == 0:

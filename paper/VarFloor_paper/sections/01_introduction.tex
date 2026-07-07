@@ -1,0 +1,73 @@
+\section{Introduction}
+
+Single-cell RNA sequencing (scRNA-seq) resolves gene expression at the level of
+individual cells, enabling the study of cellular heterogeneity and the identification
+of cell types~\citep{kiselev2019}. Unsupervised clustering is the primary route to cell
+type identification, and it serves two distinct goals: recovering abundant cell types
+and discovering rare populations whose low abundance makes them difficult to detect.
+Both goals matter biologically, but they are not measured equally by the metrics in
+common use.
+
+Clustering methods for scRNA-seq fall into three families. The first reduces the
+expression matrix and applies a conventional algorithm, for example principal component
+analysis followed by $k$-means, or a shared-nearest-neighbor graph followed by Louvain
+or Leiden community detection~\citep{leiden2019}. The second couples representation
+learning with the clustering objective; deep embedded clustering (DEC)~\citep{dec2016}
+and its single-cell descendants scDeepCluster~\citep{scdeepcluster2019} and
+scDCC~\citep{scdcc2021} train an autoencoder while pulling the latent codes toward
+trainable cluster centers. The third uses self-supervised objectives; scMAE~\citep{scmae2024}
+perturbs gene expression, predicts which entries were corrupted, and reconstructs the
+original values, learning representations that capture gene--gene dependencies.
+
+A recent comprehensive benchmark reports a consistent and, at first sight, paradoxical
+result: coupling the clustering objective into representation learning does not help.
+Across a large and diverse collection of datasets, DEC ranks near the bottom of all
+methods, while a self-supervised masked autoencoder without any clustering-specific loss
+is among the most robust~\citep{scclubench2025}. The same benchmark attributes the weak
+performance of most methods to a decoupling of embedding learning from clustering
+optimization, which yields embedding spaces that are not conducive to clustering. This
+raises a specific question: DEC does not decouple these objectives---it optimizes them
+jointly---so why does it rank last?
+
+We answer this question by opening the DEC latent space and measuring its per-dimension
+variance. The confidence-gated Kullback--Leibler sharpening that defines DEC pulls cells
+toward a small set of centers and, as a side effect, collapses the variance of most
+latent coordinates: the effective dimensionality, measured as the participation ratio
+of the per-dimension variance spectrum, falls from $114$ to $60$ on Macosko~\citep{macosko2015}.
+Because $k$-means read-out operates on this collapsed space, its ability to separate fine
+subpopulations degrades. The correction follows directly from the diagnosis. A
+per-dimension variance floor, identical to the variance term of
+VICReg~\citep{vicreg2022}, penalizes any coordinate whose batch standard deviation drops
+below one and prevents the collapse. This choice is supported by two independent findings
+from a self-supervised benchmark on single-cell data: VICReg-style variance regularization
+is among the strongest generic mechanisms, and moderate to large embedding dimensionalities
+consistently improve results~\citep{scsslbench2025}.
+
+Two further design choices are grounded in the same benchmark and in our own ablations.
+First, we retain zero-masking as the corruption operator rather than neighbor-based
+augmentation, because random masking is reported to be the most effective augmentation
+for single-cell data~\citep{scsslbench2025}, and because in our experiments neighbor
+mixing has a net effect on ARI of $-0.001$, indistinguishable from zero. Second, we apply
+the variance floor to the full clustering latent rather than to a reserved subspace,
+because splitting the latent removes clustering capacity and collapses performance in
+direct tests.
+
+The contributions of this work are the following.
+\begin{enumerate}
+\item We diagnose per-dimension variance collapse as the failure mode of DEC on scRNA-seq
+data, quantifying the drop in effective dimensionality from $114$ to $60$ and the
+associated $2.5\times$ increase in seed-to-seed variance.
+\item We correct it with a single VICReg variance-floor term inside an scMAE+DEC backbone,
+improving ARI over DEC by $0.272$ on average (17 of 18 datasets) and restoring the
+effective dimensionality to $114$.
+\item We re-evaluate clustering under macro-F1 and rare-cluster recall, and show that ARI
+systematically over-credits sharpening methods---VarFloor-scMAE moves from third to sixth
+place when the ranking metric changes---and that rare-cell recall establishes no clear
+winner among all methods examined.
+\item We include a plain PCA+$k$-means baseline with a known number of clusters and full
+dataset coverage, which proves unexpectedly strong and constrains the claims that can be
+made for any deep method.
+\end{enumerate}
+
+We do not claim to surpass the scMAE backbone in accuracy. Our contribution is diagnostic
+and corrective with respect to DEC, and evaluative with respect to rare-cell discovery.

@@ -168,10 +168,22 @@ import json
 import functools
 import operator
 import collections
-import jgraph
+try:
+    import jgraph
+except Exception as exc:
+    jgraph = None
+    _JGRAPH_IMPORT_ERROR = exc
+else:
+    _JGRAPH_IMPORT_ERROR = None
 import numpy as np
 import scipy.sparse
 import tqdm
+
+
+def _require_jgraph():
+    if jgraph is None:
+        raise ImportError("CellTypeDAG requires jgraph, but it could not be imported.") from _JGRAPH_IMPORT_ERROR
+    return jgraph
 
 
 class dotdict(dict):
@@ -364,7 +376,8 @@ class CellTypeDAG(object):
     """
 
     def __init__(self, graph=None, vdict=None):
-        self.graph = jgraph.Graph(directed=True) if graph is None else graph
+        jg = _require_jgraph()
+        self.graph = jg.Graph(directed=True) if graph is None else graph
         self.vdict = {} if vdict is None else vdict
 
     @classmethod
@@ -400,7 +413,8 @@ class CellTypeDAG(object):
         """
         import pronto
         ont = pronto.Ontology(file)
-        graph, vdict = jgraph.Graph(directed=True), {}
+        jg = _require_jgraph()
+        graph, vdict = jg.Graph(directed=True), {}
 
         for item in ont:
             # 只处理 CL（Cell Ontology）类型的条目

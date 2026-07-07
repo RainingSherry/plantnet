@@ -35,6 +35,7 @@ from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import LabelEncoder
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from preprocess import prepare_data_for_model
 from utils import save
 
 
@@ -342,26 +343,19 @@ def main():
     os.makedirs(args.save_dir, exist_ok=True)
 
     print('Loading data...')
-    adata = sc.read_h5ad(args.data_path)
-    label_col = None
-    for candidate in ['cell_type', 'Celltype', 'celltype', 'cell_label', 'label']:
-        if candidate in adata.obs.columns:
-            label_col = candidate
-            break
-    if label_col is None:
-        raise KeyError(f"No cell type label column found. Available obs columns: {list(adata.obs.columns)}")
-
-    Y = np.array(adata.obs[label_col])
+    X_df, Y, _, adata = prepare_data_for_model(
+        args.data_path,
+        size_factors=False,
+        filter_min_counts=True,
+        logtrans_input=True,
+        normalize_input=True,
+        n_top_genes=args.n_top_genes,
+    )
+    Y = np.array(Y)
     if Y.dtype.kind not in ['i', 'u']:
         Y = LabelEncoder().fit_transform(Y)
 
-    adata = adata.copy()
-
-    # The unified benchmark already provides normalized log1p HVG2000 in X.
-    # Re-running scanpy normalize/HVG here would break the shared protocol and,
-    # in the current environment, can also hit numba-related scanpy bugs.
-    X_source = adata.X
-    X = X_source.toarray().astype(np.float32) if hasattr(X_source, 'toarray') else np.array(X_source, dtype=np.float32)
+    X = X_df.to_numpy(dtype=np.float32)
     X = np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0)
 
     n_clusters = args.n_clusters if args.n_clusters > 0 else len(np.unique(Y))

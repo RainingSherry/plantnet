@@ -1,0 +1,26 @@
+\begin{abstract}
+\noindent\textbf{Motivation:} Clustering is a foundational step in single-cell RNA
+sequencing (scRNA-seq) analysis, supporting both the identification of common cell
+types and the discovery of rare populations. Deep embedded clustering (DEC) couples
+the clustering objective with representation learning, yet in comprehensive benchmarks
+DEC-style models rank near the bottom, and the reason for this failure has not been
+characterized.
+
+\noindent\textbf{Results:} We identify a concrete failure mode of DEC on scRNA-seq
+data: per-dimension variance collapse of the clustering latent. The confidence-gated
+KL sharpening that drives DEC compresses the embedding onto a small number of active
+coordinates, reducing the effective dimensionality from 114 to 60 and degrading
+$k$-means read-out. Building on a masked-autoencoder (scMAE) backbone with zero-masking,
+we add a single per-dimension variance-floor term, borrowed from VICReg, that penalizes
+any latent coordinate whose batch standard deviation falls below one. This term restores
+the effective dimensionality to 114, improves the Adjusted Rand Index (ARI) over plain
+DEC by $0.272$ on average across 18 datasets (winning on 17), improves Normalized Mutual
+Information by $0.238$ (winning on all 18), and lowers seed-to-seed variance by a factor
+of $2.5$. We state explicitly that the resulting model, VarFloor-scMAE, matches rather
+than surpasses the accuracy of the scMAE backbone; its contribution is diagnostic and
+corrective with respect to DEC. A re-evaluation under macro-F1 and rare-cluster recall
+shows that ARI systematically over-credits sharpening methods, and that rare-cell
+discovery remains an open problem that no method examined here, including ours, resolves.
+
+\noindent\textbf{Availability:} Code and processed data are available on request.
+\end{abstract}
