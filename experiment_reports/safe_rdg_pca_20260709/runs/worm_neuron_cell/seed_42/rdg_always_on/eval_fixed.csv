@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+worm_neuron_cell,Safe-RDG-PCA,42,rdg_always_on,0.5076445293836598,0.4534249208286463,0.15526647465850382,0.4599302260862782,0.4092722311110704,0.4534249208286463,0.3563503546631937,0.6231902033221524,10,,fixed,kmeans_known_k,True,rdg_always_on,6.169958591461182

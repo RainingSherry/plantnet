@@ -1,0 +1,3 @@
+dataset,seed,variant,source_variant,graph_enabled,tau,ari,nmi,acc,q_total
+Pollen,42,safe_rdg_calibrated_threshold,rdg_always_on,True,0.0,0.8700415764190499,0.8955787312019604,0.8571428571428571,0.7744577071822498
+Wang,42,safe_rdg_calibrated_threshold,rdg_always_on,True,0.0,0.9694165426212082,0.9240608670102626,0.9930664985817838,0.7007474376409446

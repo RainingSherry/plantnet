@@ -1,0 +1,10 @@
+{
+  "variant": "pca_kmeans",
+  "q_cell": 0.547519668795929,
+  "q_gene": 0.6961972004205965,
+  "q_total": 0.6218584346082627,
+  "heuristic_threshold": 0.45,
+  "graph_enabled": false,
+  "uses_graph_clustering": false,
+  "uses_rdg_graph": false
+}

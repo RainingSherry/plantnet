@@ -1,0 +1,139 @@
+{
+  "dataset": "Wang",
+  "variant": "pca_kmeans",
+  "runtime_seconds": 13.599667310714722,
+  "config": {
+    "raw_pca_dim": 128,
+    "cell_knn_k": 15,
+    "cell_spectral_dim": 30,
+    "final_knn_k": 15,
+    "spectral_dim": 0,
+    "kmeans_n_init": 50,
+    "epsilon_jaccard": 0.001,
+    "mutual_boost_eta": 0.5,
+    "gene_bootstrap_B": 20,
+    "gene_bootstrap_cell_fraction": 0.8,
+    "gene_knn_k": 10,
+    "gene_edge_stability_threshold": 0.5,
+    "min_module_size": 3,
+    "max_module_size": 300,
+    "gene_pca_dim": 20,
+    "lambda_cell": 1.0,
+    "lambda_gene": 1.0,
+    "w0": 1.0,
+    "wc": 1.0,
+    "wg": 1.0,
+    "heuristic_threshold": 0.45,
+    "eps": 1e-08
+  },
+  "preprocess_profile": {
+    "dataset_name": "Wang",
+    "n_cells": 9519,
+    "n_genes_original": 14561,
+    "n_genes": 1000,
+    "label_key": "resolved_label",
+    "n_cell_types": 2,
+    "cell_type_counts": {
+      "alveolar type 1": 7426,
+      "alveolar type 2": 2093
+    },
+    "counts_source": "adata.X_log1p_fallback",
+    "input_mode": "log1p",
+    "has_raw": false,
+    "has_layers_counts": false,
+    "scale_input": true,
+    "original_data_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/result/scmae_all_methods_20260705_full/converted_data/Wang.h5ad",
+    "loaded_data_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/result/scmae_all_methods_20260705_full/converted_data/Wang.h5ad",
+    "compat_loader": "scmae_family"
+  },
+  "raw_pca_explained_variance_sum": 0.6450404829811305,
+  "gene_pca_explained_variance_sum": 0.9885794334113598,
+  "effective_rank": {
+    "Z_raw": 127.99983615984809,
+    "Z_cell": 29.999991000002527,
+    "Z_gene": 8.999999189855686,
+    "Z_dual": 166.99972110977407,
+    "Z_final": 127.99983615984809
+  },
+  "graphs": {
+    "A_pca": {
+      "n_nodes": 9519,
+      "n_edges": 109215,
+      "density": 0.002410878136451133,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 8.584017209100528,
+      "degree_std": 3.810531590327208,
+      "degree_max": 39.79555892944336,
+      "degree_gini": 0.2197454095166207
+    },
+    "A_cell_reliable": {
+      "n_nodes": 9519,
+      "n_edges": 109215,
+      "density": 0.002410878136451133,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 1.0872367377283272,
+      "degree_std": 1.2779472118860797,
+      "degree_max": 9.085495948791504,
+      "degree_gini": 0.5174362934743069,
+      "mutual_edge_ratio": 0.4702174598172077,
+      "mean_shared_neighbor_jaccard": 0.15504693621151816,
+      "edge_weight_mean": 0.06291013604474556,
+      "edge_weight_p10": 0.002695697341941486,
+      "edge_weight_p90": 0.16185111217253578,
+      "spectral_gap_proxy": 0.003008928391957544
+    },
+    "A_gene_graph": {
+      "stable_edge_ratio": 0.8453,
+      "candidate_edge_count": 17405,
+      "stable_edge_count": 8453,
+      "method": "leiden_fixed",
+      "n_gene_modules": 10,
+      "module_size_min": 17,
+      "module_size_median": 109.0,
+      "module_size_max": 171,
+      "module_size_entropy": 0.9540690270797753
+    },
+    "A_gene_cell": {
+      "n_nodes": 9519,
+      "n_edges": 101732,
+      "density": 0.002245693856864411,
+      "n_connected_components": 2,
+      "largest_component_ratio": 0.9826662464544595,
+      "degree_mean": 9.15133993006395,
+      "degree_std": 3.0051718065413633,
+      "degree_max": 19.69322967529297,
+      "degree_gini": 0.18601157025863202
+    },
+    "A_final_dual": {
+      "n_nodes": 9519,
+      "n_edges": 114716,
+      "density": 0.0025323105461807277,
+      "n_connected_components": 2,
+      "largest_component_ratio": 0.9981090450677592,
+      "degree_mean": 8.386317566589769,
+      "degree_std": 4.60019354227253,
+      "degree_max": 44.973690032958984,
+      "degree_gini": 0.2695955292690926
+    }
+  },
+  "gate": {
+    "variant": "pca_kmeans",
+    "q_cell": 0.5483892106338722,
+    "q_gene": 0.8485172446177791,
+    "q_total": 0.6984532276258257,
+    "heuristic_threshold": 0.45,
+    "graph_enabled": false,
+    "uses_graph_clustering": false,
+    "uses_rdg_graph": false
+  },
+  "clusters": {
+    "n_pred_clusters": 2,
+    "cluster_size_min": 2565,
+    "cluster_size_median": 4759.5,
+    "cluster_size_max": 6954,
+    "cluster_size_entropy": 0.8406902185288629,
+    "singleton_cluster_count": 0
+  }
+}

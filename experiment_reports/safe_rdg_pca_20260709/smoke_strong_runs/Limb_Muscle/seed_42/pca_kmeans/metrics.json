@@ -1,0 +1,18 @@
+{
+  "acc": 0.655154771041187,
+  "nmi": 0.5985589862723709,
+  "ari": 0.44747325960621226,
+  "f1_macro": 0.593064360589238,
+  "fmi": 0.600825159797116,
+  "v_measure": 0.598558986272371,
+  "homogeneity": 0.5530727693513066,
+  "completeness": 0.6521974913889523,
+  "n_pred_clusters": 6,
+  "silhouette": NaN,
+  "protocol": "fixed",
+  "cluster_method": "kmeans_known_k",
+  "uses_known_k": true,
+  "variant": "pca_kmeans",
+  "method_raw": "pca_kmeans",
+  "runtime_seconds": 6.2876129150390625
+}

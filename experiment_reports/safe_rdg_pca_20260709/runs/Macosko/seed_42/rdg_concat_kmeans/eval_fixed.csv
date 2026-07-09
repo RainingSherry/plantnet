@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+Macosko,Safe-RDG-PCA,42,rdg_concat_kmeans,0.6206927334404571,0.5727416741871354,0.39656954851438836,0.5024458025759292,0.6224365141334637,0.5727416741871354,0.678567669974866,0.4954705785045116,12,,fixed,kmeans_known_k,True,rdg_concat_kmeans,107.27998948097229

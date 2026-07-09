@@ -1,0 +1,65 @@
+{
+  "q_correlations": {
+    "n": 12,
+    "spearman_q_cell_delta_ari": -0.1328671328671329,
+    "pearson_q_cell_delta_ari": 0.3506083403870031,
+    "spearman_q_gene_delta_ari": 0.013986013986013986,
+    "pearson_q_gene_delta_ari": 0.36999656899182953,
+    "spearman_q_total_delta_ari": 0.06993006993006995,
+    "pearson_q_total_delta_ari": 0.3956598661689285
+  },
+  "negative_controls": {
+    "available": true,
+    "variants": {
+      "neg_degree_shuffle_graph": {
+        "n_runs": 12,
+        "n_datasets": 4,
+        "delta_ari_vs_pca_mean": -0.12077135996289172,
+        "regret_vs_pca_mean": 0.24760702851923935,
+        "negative_transfer_rate": 0.5,
+        "positive_gain_rate": 0.5,
+        "mean_positive_gain_when_any": 0.2536713371126952
+      },
+      "neg_random_cell_graph": {
+        "n_runs": 12,
+        "n_datasets": 4,
+        "delta_ari_vs_pca_mean": -0.0764638912848803,
+        "regret_vs_pca_mean": 0.1795838222521954,
+        "negative_transfer_rate": 0.5833333333333334,
+        "positive_gain_rate": 0.4166666666666667,
+        "mean_positive_gain_when_any": 0.24748783432155616
+      },
+      "neg_shuffled_gene_cell_graph": {
+        "n_runs": 12,
+        "n_datasets": 4,
+        "delta_ari_vs_pca_mean": -0.2837319006808517,
+        "regret_vs_pca_mean": 0.2860454583507183,
+        "negative_transfer_rate": 0.9166666666666666,
+        "positive_gain_rate": 0.08333333333333333,
+        "mean_positive_gain_when_any": 0.02776269203839917
+      }
+    }
+  },
+  "success": {
+    "pca_ari_mean": 0.3876698961216713,
+    "safe_rdg_heuristic": {
+      "mean_or_median_noninferior_to_pca": true,
+      "strong_dataset_drop_count_gt_0p03": 1,
+      "weak_dataset_best_gain": 0.7509771400017916,
+      "graph_activation_count": 12,
+      "enabled_graph_mean_gain": 0.06737136237294555,
+      "mean_regret_lt_always_on": false,
+      "negative_transfer_lt_always_on": false
+    },
+    "safe_rdg_calibrated_threshold": {
+      "mean_or_median_noninferior_to_pca": true,
+      "strong_dataset_drop_count_gt_0p03": 1,
+      "weak_dataset_best_gain": 0.7507324870599228,
+      "graph_activation_count": 12,
+      "enabled_graph_mean_gain": 0.22669019575249216,
+      "mean_regret_lt_always_on": true,
+      "negative_transfer_lt_always_on": false
+    },
+    "oracle_gain_mean_vs_pca": 0.33615010981569454
+  }
+}

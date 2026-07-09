@@ -1,0 +1,57 @@
+{
+  "q_correlations": {},
+  "negative_controls": {
+    "available": true,
+    "variants": {
+      "neg_degree_shuffle_graph": {
+        "n_runs": 2,
+        "n_datasets": 2,
+        "delta_ari_vs_pca_mean": -0.2535210356753488,
+        "regret_vs_pca_mean": 0.39087642521373495,
+        "negative_transfer_rate": 0.5,
+        "positive_gain_rate": 0.5,
+        "mean_positive_gain_when_any": 0.27471077907677227
+      },
+      "neg_random_cell_graph": {
+        "n_runs": 2,
+        "n_datasets": 2,
+        "delta_ari_vs_pca_mean": -0.2922663908307844,
+        "regret_vs_pca_mean": 0.39421137678500795,
+        "negative_transfer_rate": 0.5,
+        "positive_gain_rate": 0.5,
+        "mean_positive_gain_when_any": 0.20388997190844715
+      },
+      "neg_shuffled_gene_cell_graph": {
+        "n_runs": 2,
+        "n_datasets": 2,
+        "delta_ari_vs_pca_mean": -0.39290515022300543,
+        "regret_vs_pca_mean": 0.39290515022300543,
+        "negative_transfer_rate": 1.0,
+        "positive_gain_rate": 0.0,
+        "mean_positive_gain_when_any": null
+      }
+    }
+  },
+  "success": {
+    "pca_ari_mean": 0.40963593812242954,
+    "safe_rdg_heuristic": {
+      "mean_or_median_noninferior_to_pca": true,
+      "strong_dataset_drop_count_gt_0p03": 0,
+      "weak_dataset_best_gain": 0.8360520459606966,
+      "graph_activation_count": 2,
+      "enabled_graph_mean_gain": 0.4957729036124001,
+      "mean_regret_lt_always_on": false,
+      "negative_transfer_lt_always_on": false
+    },
+    "safe_rdg_calibrated_threshold": {
+      "mean_or_median_noninferior_to_pca": true,
+      "strong_dataset_drop_count_gt_0p03": 0,
+      "weak_dataset_best_gain": 0.8366476622687465,
+      "graph_activation_count": 2,
+      "enabled_graph_mean_gain": 0.5100931213976996,
+      "mean_regret_lt_always_on": false,
+      "negative_transfer_lt_always_on": false
+    },
+    "oracle_gain_mean_vs_pca": 0.5119551449350161
+  }
+}

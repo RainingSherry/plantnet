@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+Quake_Smart-seq2_Lung,Safe-RDG-PCA,3047,neg_shuffled_gene_cell_graph,0.4928400954653938,0.311290344348775,0.2658478045473648,0.3487822337952195,0.4138434656502586,0.311290344348775,0.3456018737906534,0.28317644332760444,11,,fixed,kmeans_known_k,True,neg_shuffled_gene_cell_graph,4.934579849243164

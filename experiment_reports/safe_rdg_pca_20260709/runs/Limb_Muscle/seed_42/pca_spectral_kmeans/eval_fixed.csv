@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+Limb_Muscle,Safe-RDG-PCA,42,pca_spectral_kmeans,0.7001790739319519,0.6199842126297733,0.4566647752823708,0.5070261961644908,0.6607289954488542,0.6199842126297733,0.5050487613959936,0.8026443869437248,6,,fixed,kmeans_known_k,True,pca_spectral_kmeans,5.742570877075195

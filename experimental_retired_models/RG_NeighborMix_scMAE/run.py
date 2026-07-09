@@ -96,6 +96,7 @@ def parse_args():
     parser.add_argument("--gpu", type=int, default=1)
     parser.add_argument("--no_cuda", action="store_true")
     parser.add_argument("--no_save_h5ad", action="store_true")
+    parser.add_argument("--lightweight_outputs", action="store_true")
     return parser.parse_args()
 
 
@@ -260,6 +261,8 @@ def main():
     else:
         args.contrast_weight = 0.0
         args.contrast_projection_dim = 0
+    if args.lightweight_outputs:
+        args.save_neighbor_diagnostics = False
     if args.mix_mode == "attention" and not args.allow_attention_phase2:
         raise ValueError("--mix_mode attention is reserved for phase 2. Pass --allow_attention_phase2 true only after phase-1 criteria pass.")
     if args.hidden_dim and not args.hidden_size:
@@ -296,7 +299,8 @@ def main():
     n_clusters = int(args.n_clusters) if args.n_clusters and args.n_clusters > 0 else int(len(np.unique(labels)))
     save_json(bundle.profile, str(save_dir / "dataset_profile.json"))
     save_json(bundle.preprocess_config, str(save_dir / "preprocess_config.json"))
-    np.save(save_dir / "gene_names.npy", bundle.gene_names.astype(str))
+    if not args.lightweight_outputs:
+        np.save(save_dir / "gene_names.npy", bundle.gene_names.astype(str))
 
     graph = build_pca_knn_graph(data_np, k=args.neighbor_k, pca_dim=args.knn_pca_dim, tau=args.tau, seed=args.seed)
     edge_reliability, edge_weights, edge_summary = compute_edge_reliability(
@@ -336,10 +340,11 @@ def main():
         np.save(save_dir / "neighbor_distance.npy", graph.distance)
         save_json(graph.profile, str(save_dir / "neighbor_graph_profile.json"))
         save_json(graph.profile, str(save_dir / "train_knn_diagnostics.json"))
-    np.save(save_dir / "edge_reliability.npy", edge_reliability)
-    np.save(save_dir / "node_gate.npy", node_gate)
-    np.save(save_dir / "pseudo_perturbation.npy", perturb_proxy)
-    if contrast_partitions is not None:
+    if not args.lightweight_outputs:
+        np.save(save_dir / "edge_reliability.npy", edge_reliability)
+        np.save(save_dir / "node_gate.npy", node_gate)
+        np.save(save_dir / "pseudo_perturbation.npy", perturb_proxy)
+    if contrast_partitions is not None and not args.lightweight_outputs:
         np.save(save_dir / "contrast_partition_labels.npy", contrast_partitions.astype(np.int64))
     save_json({"edge_reliability_mode": args.edge_reliability_mode, **edge_summary}, str(save_dir / "edge_weight_summary.json"))
     save_json({"edge_reliability_mode": args.edge_reliability_mode, **edge_summary}, str(save_dir / "neighbor_reliability_summary.json"))
@@ -494,24 +499,25 @@ def main():
             )
 
     embedding, labels_out = family.extract_embedding(model, eval_loader, device)
-    np.save(save_dir / "embedding_final.npy", embedding.astype(np.float32))
-    np.save(save_dir / "embeddings_base.npy", embedding.astype(np.float32))
-    np.save(save_dir / "labels.npy", labels_out.astype(np.int64))
-    family.save_embedding_h5(save_dir / "embedding.h5", embedding, labels_out)
     save_json(history, str(save_dir / "training_history.json"))
-    torch.save(
-        {
-            "model_state": model.state_dict(),
-            "args": vars(args),
-            "gene_names": bundle.gene_names.astype(str),
-            "neighbor_graph_profile": graph.profile,
-            "edge_weight_summary": edge_summary,
-            "gate_summary": gate_summary,
-            "contrast_partition_summary": contrast_partition_summary,
-            "contrast_enabled": bool(contrast_enabled),
-        },
-        save_dir / "model.pt",
-    )
+    if not args.lightweight_outputs:
+        np.save(save_dir / "embedding_final.npy", embedding.astype(np.float32))
+        np.save(save_dir / "embeddings_base.npy", embedding.astype(np.float32))
+        np.save(save_dir / "labels.npy", labels_out.astype(np.int64))
+        family.save_embedding_h5(save_dir / "embedding.h5", embedding, labels_out)
+        torch.save(
+            {
+                "model_state": model.state_dict(),
+                "args": vars(args),
+                "gene_names": bundle.gene_names.astype(str),
+                "neighbor_graph_profile": graph.profile,
+                "edge_weight_summary": edge_summary,
+                "gate_summary": gate_summary,
+                "contrast_partition_summary": contrast_partition_summary,
+                "contrast_enabled": bool(contrast_enabled),
+            },
+            save_dir / "model.pt",
+        )
 
     contrast_diag = {
         "contrast_enabled": bool(contrast_enabled),
@@ -592,6 +598,7 @@ def main():
         "gate_summary": gate_summary,
         "contrast_enabled": bool(contrast_enabled),
         "contrast_diagnostics": contrast_diag,
+        "lightweight_outputs": bool(args.lightweight_outputs),
         "fixed_metrics": result["fixed"] if result is not None else {},
         "label_leakage": False,
     }

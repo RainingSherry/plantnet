@@ -1,0 +1,28 @@
+{
+  "q_correlations": {},
+  "negative_controls": {
+    "available": false
+  },
+  "success": {
+    "pca_ari_mean": 0.616675610850384,
+    "safe_rdg_heuristic": {
+      "mean_or_median_noninferior_to_pca": true,
+      "strong_dataset_drop_count_gt_0p03": 0,
+      "weak_dataset_best_gain": null,
+      "graph_activation_count": 2,
+      "enabled_graph_mean_gain": 0.3014366162102141,
+      "mean_regret_lt_always_on": false,
+      "negative_transfer_lt_always_on": false
+    },
+    "safe_rdg_calibrated_threshold": {
+      "mean_or_median_noninferior_to_pca": true,
+      "strong_dataset_drop_count_gt_0p03": 0,
+      "weak_dataset_best_gain": null,
+      "graph_activation_count": 2,
+      "enabled_graph_mean_gain": 0.3277394310184266,
+      "mean_regret_lt_always_on": false,
+      "negative_transfer_lt_always_on": false
+    },
+    "oracle_gain_mean_vs_pca": 0.3300853263369872
+  }
+}

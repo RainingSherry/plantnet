@@ -1,0 +1,10 @@
+{
+  "variant": "safe_rdg_heuristic",
+  "q_cell": 0.4514107075940389,
+  "q_gene": 0.8821934777572581,
+  "q_total": 0.6668020926756485,
+  "heuristic_threshold": 0.45,
+  "graph_enabled": true,
+  "uses_graph_clustering": true,
+  "uses_rdg_graph": true
+}

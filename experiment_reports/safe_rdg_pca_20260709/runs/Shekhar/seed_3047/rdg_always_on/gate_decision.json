@@ -1,0 +1,10 @@
+{
+  "variant": "rdg_always_on",
+  "q_cell": 0.5432925906162217,
+  "q_gene": 0.6958858187568466,
+  "q_total": 0.6195892046865341,
+  "heuristic_threshold": 0.45,
+  "graph_enabled": true,
+  "uses_graph_clustering": true,
+  "uses_rdg_graph": true
+}

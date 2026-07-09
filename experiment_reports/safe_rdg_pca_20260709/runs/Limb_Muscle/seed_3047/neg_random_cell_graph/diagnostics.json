@@ -1,0 +1,179 @@
+{
+  "dataset": "Limb_Muscle",
+  "variant": "neg_random_cell_graph",
+  "runtime_seconds": 6.960989236831665,
+  "config": {
+    "raw_pca_dim": 128,
+    "cell_knn_k": 15,
+    "cell_spectral_dim": 30,
+    "final_knn_k": 15,
+    "spectral_dim": 0,
+    "kmeans_n_init": 50,
+    "epsilon_jaccard": 0.001,
+    "mutual_boost_eta": 0.5,
+    "gene_bootstrap_B": 20,
+    "gene_bootstrap_cell_fraction": 0.8,
+    "gene_knn_k": 10,
+    "gene_edge_stability_threshold": 0.5,
+    "min_module_size": 3,
+    "max_module_size": 300,
+    "gene_pca_dim": 20,
+    "lambda_cell": 1.0,
+    "lambda_gene": 1.0,
+    "w0": 1.0,
+    "wc": 1.0,
+    "wg": 1.0,
+    "heuristic_threshold": 0.45,
+    "eps": 1e-08
+  },
+  "preprocess_profile": {
+    "dataset_name": "Limb_Muscle",
+    "n_cells": 3909,
+    "n_genes_original": 23341,
+    "n_genes": 1000,
+    "label_key": "resolved_label",
+    "n_cell_types": 6,
+    "cell_type_counts": {
+      "B cell": 461,
+      "T cell": 320,
+      "endothelial cell": 1330,
+      "macrophage": 308,
+      "mesenchymal stem cell": 1136,
+      "skeletal muscle satellite cell": 354
+    },
+    "counts_source": "adata.X",
+    "input_mode": "raw",
+    "has_raw": false,
+    "has_layers_counts": false,
+    "scale_input": true,
+    "original_data_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/result/scmae_all_methods_20260705_full/converted_data/Limb_Muscle.h5ad",
+    "loaded_data_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/result/scmae_all_methods_20260705_full/converted_data/Limb_Muscle.h5ad",
+    "compat_loader": "scmae_family"
+  },
+  "raw_pca_explained_variance_sum": 0.46909061970654875,
+  "gene_pca_explained_variance_sum": 0.9911869913339615,
+  "effective_rank": {
+    "Z_raw": 127.9998361601655,
+    "Z_cell": 29.999991000002566,
+    "Z_gene": 9.999998999997064,
+    "Z_dual": 167.999717760412,
+    "Z_final": 9.999999000000066
+  },
+  "graphs": {
+    "A_pca": {
+      "n_nodes": 3909,
+      "n_edges": 40893,
+      "density": 0.00535375807816149,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 8.462757995775759,
+      "degree_std": 2.721031243763981,
+      "degree_max": 29.636157989501953,
+      "degree_gini": 0.1645989053555006
+    },
+    "A_cell_reliable": {
+      "n_nodes": 3909,
+      "n_edges": 40893,
+      "density": 0.00535375807816149,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 1.370087251065732,
+      "degree_std": 1.2021726404155102,
+      "degree_max": 7.70936393737793,
+      "degree_gini": 0.43547390006607034,
+      "mutual_edge_ratio": 0.6051675620363264,
+      "mean_shared_neighbor_jaccard": 0.18994761452410378,
+      "edge_weight_mean": 0.08162541936208961,
+      "edge_weight_p10": 0.006020947857486888,
+      "edge_weight_p90": 0.20383183927300158,
+      "spectral_gap_proxy": 0.0030293954355536945
+    },
+    "A_gene_graph": {
+      "stable_edge_ratio": 0.7377,
+      "candidate_edge_count": 21861,
+      "stable_edge_count": 7377,
+      "method": "leiden_fixed",
+      "n_gene_modules": 11,
+      "module_size_min": 32,
+      "module_size_median": 77.0,
+      "module_size_max": 208,
+      "module_size_entropy": 0.9345826809760501
+    },
+    "A_gene_cell": {
+      "n_nodes": 3909,
+      "n_edges": 42563,
+      "density": 0.00557239637788344,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 8.725879126192975,
+      "degree_std": 3.1737608634841514,
+      "degree_max": 17.357810974121094,
+      "degree_gini": 0.20687722425486665
+    },
+    "A_final_dual": {
+      "n_nodes": 3909,
+      "n_edges": 43689,
+      "density": 0.005719813578773808,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 8.283400304910929,
+      "degree_std": 3.4481391047008607,
+      "degree_max": 36.05104064941406,
+      "degree_gini": 0.21673771866507985
+    },
+    "negative_controls": {
+      "A_random_cell": {
+        "n_nodes": 3909,
+        "n_edges": 40893,
+        "density": 0.00535375807816149,
+        "n_connected_components": 1,
+        "largest_component_ratio": 1.0,
+        "degree_mean": 1.3715621419222375,
+        "degree_std": 0.502462797224278,
+        "degree_max": 3.9898812770843506,
+        "degree_gini": 0.2045578990390624
+      },
+      "A_degree_shuffle_cell": {
+        "n_nodes": 3909,
+        "n_edges": 40752,
+        "density": 0.005335298197765804,
+        "n_connected_components": 1,
+        "largest_component_ratio": 1.0,
+        "degree_mean": 1.3654188874601005,
+        "degree_std": 0.5950148870544176,
+        "degree_max": 5.729065418243408,
+        "degree_gini": 0.22973350003804383
+      },
+      "A_shuffled_gene_cell": {
+        "n_nodes": 3909,
+        "n_edges": 39606,
+        "density": 0.005185262574124275,
+        "n_connected_components": 1,
+        "largest_component_ratio": 1.0,
+        "degree_mean": 9.232520870309743,
+        "degree_std": 2.590271016291198,
+        "degree_max": 20.986717224121094,
+        "degree_gini": 0.15633990982842816
+      }
+    }
+  },
+  "gate": {
+    "variant": "neg_random_cell_graph",
+    "q_cell": 0.6303831646888014,
+    "q_gene": 0.8711456552439685,
+    "q_total": 0.7507644099663849,
+    "heuristic_threshold": 0.45,
+    "graph_enabled": true,
+    "uses_graph_clustering": true,
+    "uses_rdg_graph": false,
+    "negative_control": "random_cell_graph"
+  },
+  "clusters": {
+    "n_pred_clusters": 6,
+    "cluster_size_min": 27,
+    "cluster_size_median": 555.5,
+    "cluster_size_max": 1370,
+    "cluster_size_entropy": 0.8388042584247429,
+    "singleton_cluster_count": 0
+  }
+}

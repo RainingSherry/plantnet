@@ -1,0 +1,10 @@
+{
+  "variant": "rdg_concat_kmeans",
+  "q_cell": 0.5396569645862338,
+  "q_gene": 0.8003032617391183,
+  "q_total": 0.669980113162676,
+  "heuristic_threshold": 0.45,
+  "graph_enabled": false,
+  "uses_graph_clustering": false,
+  "uses_rdg_graph": false
+}

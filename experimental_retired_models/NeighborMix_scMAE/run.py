@@ -208,6 +208,7 @@ def parse_args():
     parser.add_argument("--gpu", type=int, default=1)
     parser.add_argument("--no_cuda", action="store_true")
     parser.add_argument("--no_save_h5ad", action="store_true")
+    parser.add_argument("--lightweight_outputs", action="store_true")
     return parser.parse_args()
 
 
@@ -825,21 +826,22 @@ def main():
             )
 
     embedding, labels_out = family.extract_embedding(model, eval_loader, device)
-    np.save(save_dir / "embedding_final.npy", embedding.astype(np.float32))
-    np.save(save_dir / "embeddings_base.npy", embedding.astype(np.float32))
-    np.save(save_dir / "labels.npy", labels_out.astype(np.int64))
-    np.save(save_dir / "gene_names.npy", bundle.gene_names.astype(str))
-    family.save_embedding_h5(save_dir / "embedding.h5", embedding, labels_out)
     save_json(history, str(save_dir / "training_history.json"))
-    torch.save(
-        {
-            "model_state": model.state_dict(),
-            "args": vars(args),
-            "gene_names": bundle.gene_names.astype(str),
-            "neighbor_profile": neighbor_profile,
-        },
-        save_dir / "model.pt",
-    )
+    if not args.lightweight_outputs:
+        np.save(save_dir / "embedding_final.npy", embedding.astype(np.float32))
+        np.save(save_dir / "embeddings_base.npy", embedding.astype(np.float32))
+        np.save(save_dir / "labels.npy", labels_out.astype(np.int64))
+        np.save(save_dir / "gene_names.npy", bundle.gene_names.astype(str))
+        family.save_embedding_h5(save_dir / "embedding.h5", embedding, labels_out)
+        torch.save(
+            {
+                "model_state": model.state_dict(),
+                "args": vars(args),
+                "gene_names": bundle.gene_names.astype(str),
+                "neighbor_profile": neighbor_profile,
+            },
+            save_dir / "model.pt",
+        )
 
     result = None
     eval_extra = {
@@ -887,7 +889,8 @@ def main():
         "n_cells": int(data_np.shape[0]),
         "n_genes": int(data_np.shape[1]),
         "n_clusters": int(n_clusters),
-        "embedding_path": str((save_dir / "embedding_final.npy").resolve()),
+        "embedding_path": "" if args.lightweight_outputs else str((save_dir / "embedding_final.npy").resolve()),
+        "lightweight_outputs": bool(args.lightweight_outputs),
         "fixed_metrics": result["fixed"] if result is not None else {},
         "note": "Pseudo-cell branch is used only as an anchor-recovery training view; final embeddings are extracted from clean real cells.",
     }

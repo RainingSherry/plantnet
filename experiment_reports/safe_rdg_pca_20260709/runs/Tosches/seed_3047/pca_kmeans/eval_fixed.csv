@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+Tosches,Safe-RDG-PCA,3047,pca_kmeans,0.6540934419202743,0.7655430520339943,0.5624581650262663,0.5728135175247066,0.6371736497266861,0.7655430520339942,0.7517198743794361,0.7798841348135314,15,,fixed,kmeans_known_k,True,pca_kmeans,31.079072952270508

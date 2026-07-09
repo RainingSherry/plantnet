@@ -1,0 +1,3 @@
+dataset,seed,variant,source_variant,graph_enabled,tau,ari,nmi,acc,q_total
+Limb_Muscle,42,safe_rdg_calibrated_threshold,rdg_always_on,True,0.0,0.9189558246817529,0.9016982613137511,0.9641852136096188,0.7494606718976824
+Wang,42,safe_rdg_calibrated_threshold,rdg_always_on,True,0.0,0.9698742590558683,0.925049039083919,0.993171551633575,0.6981652604042881

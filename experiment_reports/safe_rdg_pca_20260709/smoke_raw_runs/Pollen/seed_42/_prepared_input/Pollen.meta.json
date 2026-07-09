@@ -1,0 +1,12 @@
+{
+  "dataset_name": "Pollen",
+  "input_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/data/scMAE/Pollen.h5",
+  "output_path": "experiment_reports/safe_rdg_pca_20260709/smoke_raw_runs/Pollen/seed_42/_prepared_input/Pollen.h5ad",
+  "source_format": "h5",
+  "matrix_key": "X",
+  "label_key": "Y",
+  "resolved_label_key": "resolved_label",
+  "n_cells": 301,
+  "n_genes": 21721,
+  "n_clusters": 11
+}

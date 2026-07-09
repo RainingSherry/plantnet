@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+Bach,Safe-RDG-PCA,42,neg_degree_shuffle_graph,0.33393719806763283,0.004444865383771653,0.00010021438826490173,0.06730642259366998,0.460009304872062,0.004444865383771653,0.0022768505792686877,0.0929868358597762,8,,fixed,kmeans_known_k,True,neg_degree_shuffle_graph,43.302757263183594

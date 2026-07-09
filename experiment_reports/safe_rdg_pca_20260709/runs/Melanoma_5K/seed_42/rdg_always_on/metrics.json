@@ -1,0 +1,18 @@
+{
+  "acc": 0.6315089740748947,
+  "nmi": 0.630622612305064,
+  "ari": 0.49222483570110837,
+  "f1_macro": 0.5594708746898214,
+  "fmi": 0.6449285815220357,
+  "v_measure": 0.630622612305064,
+  "homogeneity": 0.5623826161808791,
+  "completeness": 0.7177101916249444,
+  "n_pred_clusters": 9,
+  "silhouette": NaN,
+  "protocol": "fixed",
+  "cluster_method": "kmeans_known_k",
+  "uses_known_k": true,
+  "variant": "rdg_always_on",
+  "method_raw": "rdg_always_on",
+  "runtime_seconds": 6.960802316665649
+}

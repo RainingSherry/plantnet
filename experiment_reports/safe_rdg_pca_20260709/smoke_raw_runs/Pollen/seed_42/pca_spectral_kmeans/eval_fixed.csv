@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+Pollen,Safe-RDG-PCA,42,pca_spectral_kmeans,0.5681063122923588,0.6136775820396204,0.37214848666506173,0.5117115762033383,0.44775851337179207,0.6136775820396204,0.6035048330547569,0.624199157001327,11,,fixed,kmeans_known_k,True,pca_spectral_kmeans,3.910520553588867

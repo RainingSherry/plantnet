@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+Quake_10x_Spleen,Safe-RDG-PCA,42,rdg_cell_only,0.7966917922948074,0.2606646508353356,0.28309716302449095,0.480799888855166,0.7765638625367474,0.2606646508353356,0.18722257149881766,0.42891628697316536,5,,fixed,kmeans_known_k,True,rdg_cell_only,13.376598358154297

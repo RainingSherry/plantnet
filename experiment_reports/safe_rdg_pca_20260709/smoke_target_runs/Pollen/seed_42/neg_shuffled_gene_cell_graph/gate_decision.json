@@ -1,0 +1,11 @@
+{
+  "variant": "neg_shuffled_gene_cell_graph",
+  "q_cell": 0.620019468855643,
+  "q_gene": 0.9291337020627985,
+  "q_total": 0.7745765854592208,
+  "heuristic_threshold": 0.45,
+  "graph_enabled": true,
+  "uses_graph_clustering": true,
+  "uses_rdg_graph": false,
+  "negative_control": "shuffled_gene_module_cell_graph"
+}

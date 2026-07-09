@@ -1,0 +1,142 @@
+{
+  "dataset": "Quake_10x_Spleen",
+  "variant": "safe_rdg_heuristic",
+  "runtime_seconds": 13.999305725097656,
+  "config": {
+    "raw_pca_dim": 128,
+    "cell_knn_k": 15,
+    "cell_spectral_dim": 30,
+    "final_knn_k": 15,
+    "spectral_dim": 0,
+    "kmeans_n_init": 50,
+    "epsilon_jaccard": 0.001,
+    "mutual_boost_eta": 0.5,
+    "gene_bootstrap_B": 20,
+    "gene_bootstrap_cell_fraction": 0.8,
+    "gene_knn_k": 10,
+    "gene_edge_stability_threshold": 0.5,
+    "min_module_size": 3,
+    "max_module_size": 300,
+    "gene_pca_dim": 20,
+    "lambda_cell": 1.0,
+    "lambda_gene": 1.0,
+    "w0": 1.0,
+    "wc": 1.0,
+    "wg": 1.0,
+    "heuristic_threshold": 0.45,
+    "eps": 1e-08
+  },
+  "preprocess_profile": {
+    "dataset_name": "Quake_10x_Spleen",
+    "n_cells": 9552,
+    "n_genes_original": 23341,
+    "n_genes": 1000,
+    "label_key": "resolved_label",
+    "n_cell_types": 5,
+    "cell_type_counts": {
+      "0": 6886,
+      "1": 1930,
+      "2": 42,
+      "3": 464,
+      "4": 230
+    },
+    "counts_source": "adata.X",
+    "input_mode": "raw",
+    "has_raw": false,
+    "has_layers_counts": false,
+    "scale_input": true,
+    "original_data_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/result/scmae_all_methods_20260705_full/converted_data/Quake_10x_Spleen.h5ad",
+    "loaded_data_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/result/scmae_all_methods_20260705_full/converted_data/Quake_10x_Spleen.h5ad",
+    "compat_loader": "scmae_family"
+  },
+  "raw_pca_explained_variance_sum": 0.6056302341166884,
+  "gene_pca_explained_variance_sum": 0.9940308928489685,
+  "effective_rank": {
+    "Z_raw": 127.99983615494695,
+    "Z_cell": 29.999991000002645,
+    "Z_gene": 12.999998308995902,
+    "Z_dual": 170.9997075833142,
+    "Z_final": 9.999999000000075
+  },
+  "graphs": {
+    "A_pca": {
+      "n_nodes": 9552,
+      "n_edges": 108808,
+      "density": 0.0023853255738785365,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 8.577139270714978,
+      "degree_std": 3.68118340260862,
+      "degree_max": 34.09967803955078,
+      "degree_gini": 0.21857471231072956
+    },
+    "A_cell_reliable": {
+      "n_nodes": 9552,
+      "n_edges": 108808,
+      "density": 0.0023853255738785365,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 1.1808227982182504,
+      "degree_std": 1.364621733255545,
+      "degree_max": 9.6146821975708,
+      "degree_gini": 0.526943203308937,
+      "mutual_edge_ratio": 0.48118369625907315,
+      "mean_shared_neighbor_jaccard": 0.16569921808444252,
+      "edge_weight_mean": 0.06860913367769293,
+      "edge_weight_p10": 0.0005422393372383591,
+      "edge_weight_p90": 0.18314489020291208,
+      "spectral_gap_proxy": 0.002540812253743363
+    },
+    "A_gene_graph": {
+      "stable_edge_ratio": 0.6299,
+      "candidate_edge_count": 38929,
+      "stable_edge_count": 6299,
+      "method": "leiden_fixed",
+      "n_gene_modules": 14,
+      "module_size_min": 3,
+      "module_size_median": 78.0,
+      "module_size_max": 135,
+      "module_size_entropy": 0.9218572235867211
+    },
+    "A_gene_cell": {
+      "n_nodes": 9552,
+      "n_edges": 99521,
+      "density": 0.0021817328361698205,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 9.15491538951087,
+      "degree_std": 2.96584463101048,
+      "degree_max": 18.17435646057129,
+      "degree_gini": 0.18119202129194512
+    },
+    "A_final_dual": {
+      "n_nodes": 9552,
+      "n_edges": 112693,
+      "density": 0.0024704938506092742,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 8.364794305836941,
+      "degree_std": 4.109118294873961,
+      "degree_max": 38.796669006347656,
+      "degree_gini": 0.2541633377012542
+    }
+  },
+  "gate": {
+    "variant": "safe_rdg_heuristic",
+    "q_cell": 0.5572757230020472,
+    "q_gene": 0.9054643058966801,
+    "q_total": 0.7313700144493637,
+    "heuristic_threshold": 0.45,
+    "graph_enabled": true,
+    "uses_graph_clustering": true,
+    "uses_rdg_graph": true
+  },
+  "clusters": {
+    "n_pred_clusters": 5,
+    "cluster_size_min": 41,
+    "cluster_size_median": 231.0,
+    "cluster_size_max": 7717,
+    "cluster_size_entropy": 0.38679477621529307,
+    "singleton_cluster_count": 0
+  }
+}
