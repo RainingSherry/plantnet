@@ -26,6 +26,7 @@ from scipy.sparse.csgraph import connected_components
 from scipy.sparse.linalg import eigsh
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
+from sklearn.metrics import adjusted_rand_score
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
@@ -47,6 +48,7 @@ VARIANTS = {
     "rdg_concat_kmeans",
     "rdg_always_on",
     "safe_rdg_heuristic",
+    "safe_rdg_pca_u",
     "neg_random_cell_graph",
     "neg_degree_shuffle_graph",
     "neg_shuffled_gene_cell_graph",
@@ -62,6 +64,7 @@ STAGE_A_VARIANTS = [
     "rdg_concat_kmeans",
     "rdg_always_on",
     "safe_rdg_heuristic",
+    "safe_rdg_pca_u",
 ]
 
 NEGATIVE_CONTROL_VARIANTS = [
@@ -78,7 +81,7 @@ class Config:
     cell_spectral_dim: int = 30
     final_knn_k: int = 15
     spectral_dim: int = 0
-    kmeans_n_init: int = 50
+    kmeans_n_init: int = 20
     epsilon_jaccard: float = 1e-3
     mutual_boost_eta: float = 0.5
     gene_bootstrap_B: int = 20
@@ -94,6 +97,17 @@ class Config:
     wc: float = 1.0
     wg: float = 1.0
     heuristic_threshold: float = 0.45
+    stability_repeats: int = 3
+    stability_edge_drop_rate: float = 0.10
+    stability_noise_scale: float = 0.01
+    stability_margin: float = 0.02
+    stability_max_cells: int = 3000
+    assignment_stability_min: float = 0.80
+    graph_stability_min: float = 0.75
+    cluster_entropy_min: float = 0.70
+    largest_cluster_ratio_max: float = 0.80
+    hubness_max: float = 10.0
+    spectral_failure_policy: str = "fail"
     eps: float = 1e-8
 
 
@@ -208,7 +222,14 @@ def zscore_columns(x: np.ndarray) -> np.ndarray:
     return np.nan_to_num(out, nan=0.0, posinf=0.0, neginf=0.0).astype(np.float32)
 
 
-def compute_pca(x: np.ndarray, dim: int, seed: int) -> tuple[np.ndarray, list[float]]:
+def compute_pca_benchmark_compatible(x: np.ndarray, dim: int, seed: int) -> tuple[np.ndarray, list[float]]:
+    n_comp = max(2, min(int(dim), x.shape[0] - 1, x.shape[1] - 1))
+    pca = PCA(n_components=n_comp, random_state=seed)
+    z = pca.fit_transform(np.asarray(x, dtype=np.float64)).astype(np.float32)
+    return z, [float(v) for v in pca.explained_variance_ratio_]
+
+
+def compute_pca_standardized_internal(x: np.ndarray, dim: int, seed: int) -> tuple[np.ndarray, list[float]]:
     n_comp = max(1, min(int(dim), x.shape[0] - 1, x.shape[1] - 1))
     pca = PCA(n_components=n_comp, random_state=seed, svd_solver="randomized")
     z = pca.fit_transform(zscore_columns(x)).astype(np.float32)
@@ -393,24 +414,128 @@ def normalize_graph_symmetric(a: sp.csr_matrix, eps: float = 1e-8) -> sp.csr_mat
     return out.tocsr()
 
 
-def spectral_embedding_from_affinity(a_norm: sp.csr_matrix, dim: int, seed: int) -> np.ndarray:
+def spectral_embedding_from_affinity(a_norm: sp.csr_matrix, dim: int, seed: int, failure_policy: str = "random_fallback") -> tuple[np.ndarray, dict]:
     n = a_norm.shape[0]
     if n <= 2:
-        return np.zeros((n, 1), dtype=np.float32)
+        return np.zeros((n, 1), dtype=np.float32), {"spectral_fallback": False, "reason": "n_le_2"}
     k = max(2, min(int(dim) + 1, n - 1))
     try:
         vals, vecs = eigsh(a_norm.astype(np.float64), k=k, which="LA", tol=1e-3, maxiter=2000)
         order = np.argsort(vals)[::-1]
         vecs = vecs[:, order]
         emb = vecs[:, 1 : min(k, int(dim) + 1)]
-    except Exception:
+        info = {"spectral_fallback": False, "eigenvalues": [float(v) for v in vals[order].tolist()]}
+    except Exception as exc:
+        if failure_policy == "fail":
+            raise RuntimeError(f"spectral_embedding_from_affinity failed: {exc}") from exc
         rng = np.random.default_rng(seed)
         emb = rng.normal(size=(n, max(1, min(int(dim), n - 1))))
-    return zscore_columns(np.asarray(emb, dtype=np.float32))
+        info = {"spectral_fallback": True, "error": str(exc), "failure_policy": failure_policy}
+    return zscore_columns(np.asarray(emb, dtype=np.float32)), info
+
+
+def spectral_embedding_only(a_norm: sp.csr_matrix, dim: int, seed: int, failure_policy: str = "fail") -> np.ndarray:
+    emb, _ = spectral_embedding_from_affinity(a_norm, dim, seed, failure_policy=failure_policy)
+    return emb
 
 
 def kmeans_labels(z: np.ndarray, n_clusters: int, seed: int, n_init: int) -> np.ndarray:
     return KMeans(n_clusters=int(n_clusters), n_init=int(n_init), random_state=int(seed)).fit_predict(z).astype(np.int64)
+
+
+def mean_pairwise_label_ari(assignments: list[np.ndarray]) -> float:
+    if len(assignments) < 2:
+        return 1.0
+    vals = []
+    for i in range(len(assignments)):
+        for j in range(i + 1, len(assignments)):
+            vals.append(adjusted_rand_score(assignments[i], assignments[j]))
+    return float(np.mean(vals)) if vals else 1.0
+
+
+def kmeans_assignment_stability(z: np.ndarray, n_clusters: int, seed: int, repeats: int) -> float:
+    assignments = []
+    for rep in range(max(2, int(repeats))):
+        labels = KMeans(n_clusters=int(n_clusters), n_init=5, random_state=int(seed + 101 * rep)).fit_predict(z)
+        assignments.append(labels.astype(np.int64))
+    return mean_pairwise_label_ari(assignments)
+
+
+def neighbor_set_stability(z: np.ndarray, k: int, seed: int, repeats: int, noise_scale: float) -> float:
+    if z.shape[0] <= 2:
+        return 1.0
+    kk = max(1, min(int(k), z.shape[0] - 1))
+    _, base_idx = compute_knn(z, kk, metric="cosine")
+    base_sets = [set(map(int, row)) for row in base_idx]
+    rng = np.random.default_rng(seed)
+    vals = []
+    scale = np.asarray(z, dtype=np.float32).std(axis=0, keepdims=True) + 1e-6
+    for _ in range(max(1, int(repeats) - 1)):
+        perturbed = np.asarray(z, dtype=np.float32) + rng.normal(0.0, float(noise_scale), size=z.shape).astype(np.float32) * scale
+        _, idx = compute_knn(perturbed, kk, metric="cosine")
+        row_vals = []
+        for a, b in zip(base_sets, idx):
+            bset = set(map(int, b))
+            row_vals.append(len(a & bset) / max(1, len(a | bset)))
+        vals.append(float(np.mean(row_vals)) if row_vals else 0.0)
+    return float(np.mean(vals)) if vals else 1.0
+
+
+def dropout_symmetric_graph(a: sp.csr_matrix, drop_rate: float, seed: int) -> sp.csr_matrix:
+    rng = np.random.default_rng(seed)
+    upper = sp.triu(a.tocsr(), k=1).tocoo()
+    if upper.nnz == 0:
+        return a.copy().tocsr()
+    keep = rng.random(upper.nnz) >= float(drop_rate)
+    if not np.any(keep):
+        keep[rng.integers(0, upper.nnz)] = True
+    rows = np.concatenate([upper.row[keep], upper.col[keep]])
+    cols = np.concatenate([upper.col[keep], upper.row[keep]])
+    vals = np.concatenate([upper.data[keep], upper.data[keep]]).astype(np.float32)
+    out = sp.csr_matrix((vals, (rows, cols)), shape=a.shape, dtype=np.float32)
+    out.eliminate_zeros()
+    return out
+
+
+def graph_or_embedding_perturbation_stability(
+    z: np.ndarray,
+    n_clusters: int,
+    seed: int,
+    cfg: Config,
+    affinity: Any = None,
+    spectral_dim: int = 10,
+) -> float:
+    base = kmeans_labels(z, n_clusters, seed, max(5, cfg.kmeans_n_init // 2))
+    assignments = [base]
+    if affinity is not None:
+        for rep in range(max(1, cfg.stability_repeats - 1)):
+            dropped = dropout_symmetric_graph(affinity, cfg.stability_edge_drop_rate, seed + 211 * (rep + 1))
+            dropped_bar = normalize_graph_symmetric(dropped, eps=cfg.eps)
+            z_rep = spectral_embedding_only(dropped_bar, spectral_dim, seed + 307 * (rep + 1), failure_policy=cfg.spectral_failure_policy)
+            assignments.append(kmeans_labels(z_rep, n_clusters, seed, max(5, cfg.kmeans_n_init // 2)))
+    else:
+        rng = np.random.default_rng(seed + 991)
+        scale = np.asarray(z, dtype=np.float32).std(axis=0, keepdims=True) + 1e-6
+        for _ in range(max(1, cfg.stability_repeats - 1)):
+            z_rep = np.asarray(z, dtype=np.float32) + rng.normal(0.0, cfg.stability_noise_scale, size=z.shape).astype(np.float32) * scale
+            assignments.append(kmeans_labels(z_rep, n_clusters, seed, max(5, cfg.kmeans_n_init // 2)))
+    return mean_pairwise_label_ari(assignments)
+
+
+def cluster_sanity_from_labels(labels: np.ndarray) -> dict:
+    counts = np.bincount(labels.astype(np.int64))
+    if counts.size == 0 or counts.sum() == 0:
+        return {"cluster_size_entropy": 0.0, "largest_cluster_ratio": 1.0}
+    probs = counts.astype(np.float64) / float(counts.sum())
+    entropy = float(-np.sum(probs * np.log(probs + 1e-8)) / np.log(len(counts) + 1e-8)) if len(counts) > 1 else 0.0
+    return {"cluster_size_entropy": entropy, "largest_cluster_ratio": float(probs.max())}
+
+
+def deterministic_stability_subset(n_rows: int, max_cells: int, seed: int) -> np.ndarray | None:
+    if int(max_cells) <= 0 or n_rows <= int(max_cells):
+        return None
+    rng = np.random.default_rng(seed)
+    return np.sort(rng.choice(n_rows, size=int(max_cells), replace=False)).astype(np.int64)
 
 
 def graph_diagnostics(a: sp.csr_matrix) -> dict:
@@ -567,7 +692,7 @@ def compute_module_eigengenes(x: np.ndarray, modules: list[np.ndarray], seed: in
         sub = np.asarray(x[:, module], dtype=np.float32)
         if sub.shape[1] < 3 or float(np.var(sub)) <= 1e-12:
             continue
-        z, _ = compute_pca(sub, 1, seed)
+        z, _ = compute_pca_standardized_internal(sub, 1, seed)
         pc = z[:, 0]
         try:
             corr = np.corrcoef(pc, zscore_columns(sub).T)[0, 1:]
@@ -647,9 +772,12 @@ def write_outputs(
     np.save(save_dir / "labels.npy", labels_true.astype(np.int64))
     np.save(save_dir / "pred_labels.npy", labels_pred.astype(np.int64))
     np.save(save_dir / "pred_labels_mapped.npy", mapped.astype(np.int64))
-    save_embedding_h5(save_dir / "embedding.h5", embedding, labels_true)
+    if getattr(args, "save_embedding_h5", True):
+        save_embedding_h5(save_dir / "embedding.h5", embedding, labels_true)
     save_json(diagnostics, str(save_dir / "diagnostics.json"))
     save_json(gate, str(save_dir / "gate_decision.json"))
+    save_json(diagnostics.get("stability_diagnostics", {}), str(save_dir / "stability_diagnostics.json"))
+    save_json(diagnostics.get("selector_scores", {}), str(save_dir / "selector_scores.json"))
     save_json(vars(args), str(save_dir / "args.json"))
     save_json(preprocess_config, str(save_dir / "preprocess_config.json"))
     return metrics
@@ -674,7 +802,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--cell_spectral_dim", type=int, default=30)
     parser.add_argument("--final_knn_k", type=int, default=15)
     parser.add_argument("--spectral_dim", type=int, default=0)
-    parser.add_argument("--kmeans_n_init", type=int, default=50)
+    parser.add_argument("--kmeans_n_init", type=int, default=20)
     parser.add_argument("--gene_bootstrap_B", type=int, default=20)
     parser.add_argument("--gene_bootstrap_cell_fraction", type=float, default=0.8)
     parser.add_argument("--gene_knn_k", type=int, default=10)
@@ -682,6 +810,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lambda_cell", type=float, default=1.0)
     parser.add_argument("--lambda_gene", type=float, default=1.0)
     parser.add_argument("--heuristic_threshold", type=float, default=0.45)
+    parser.add_argument("--stability_repeats", type=int, default=3)
+    parser.add_argument("--stability_edge_drop_rate", type=float, default=0.10)
+    parser.add_argument("--stability_noise_scale", type=float, default=0.01)
+    parser.add_argument("--stability_margin", type=float, default=0.02)
+    parser.add_argument("--stability_max_cells", type=int, default=3000)
+    parser.add_argument("--assignment_stability_min", type=float, default=0.80)
+    parser.add_argument("--graph_stability_min", type=float, default=0.75)
+    parser.add_argument("--cluster_entropy_min", type=float, default=0.70)
+    parser.add_argument("--largest_cluster_ratio_max", type=float, default=0.80)
+    parser.add_argument("--hubness_max", type=float, default=10.0)
+    parser.add_argument("--spectral_failure_policy", default="fail", choices=["fail", "random_fallback"])
+    parser.add_argument("--save_embedding_h5", type=family.str2bool, default=True)
     parser.add_argument("--include_negative_controls", type=family.str2bool, default=False)
     return parser.parse_args()
 
@@ -701,6 +841,17 @@ def cfg_from_args(args: argparse.Namespace) -> Config:
         lambda_cell=args.lambda_cell,
         lambda_gene=args.lambda_gene,
         heuristic_threshold=args.heuristic_threshold,
+        stability_repeats=args.stability_repeats,
+        stability_edge_drop_rate=args.stability_edge_drop_rate,
+        stability_noise_scale=args.stability_noise_scale,
+        stability_margin=args.stability_margin,
+        stability_max_cells=args.stability_max_cells,
+        assignment_stability_min=args.assignment_stability_min,
+        graph_stability_min=args.graph_stability_min,
+        cluster_entropy_min=args.cluster_entropy_min,
+        largest_cluster_ratio_max=args.largest_cluster_ratio_max,
+        hubness_max=args.hubness_max,
+        spectral_failure_policy=args.spectral_failure_policy,
     )
 
 
@@ -718,19 +869,19 @@ def main() -> int:
     y = np.asarray(bundle.labels, dtype=np.int64)
     n_clusters = int(args.n_clusters if args.n_clusters > 0 else len(np.unique(y)))
 
-    z_raw, raw_var = compute_pca(x, cfg.raw_pca_dim, args.seed)
+    z_raw, raw_var = compute_pca_benchmark_compatible(x, cfg.raw_pca_dim, args.seed)
     a_pca, pca_knn = build_soft_knn_graph(z_raw, cfg.cell_knn_k, eps=cfg.eps)
     a_pca_bar = normalize_graph_symmetric(a_pca, eps=cfg.eps)
 
     a_cell, cell_info = build_reliable_cell_graph(pca_knn, cfg)
     a_cell_bar = normalize_graph_symmetric(a_cell, eps=cfg.eps)
-    z_cell = spectral_embedding_from_affinity(a_cell_bar, cfg.cell_spectral_dim, args.seed)
+    z_cell = spectral_embedding_only(a_cell_bar, cfg.cell_spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy)
 
     a_gene_raw, gene_info = build_bootstrap_stable_gene_graph(x, cfg, args.seed)
     gene_modules, gene_module_info = detect_gene_modules(a_gene_raw, cfg, args.seed)
     module_matrix = compute_module_eigengenes(x, gene_modules, args.seed)
     if module_matrix.shape[1] > 0:
-        z_gene, gene_var = compute_pca(module_matrix, min(cfg.gene_pca_dim, module_matrix.shape[1]), args.seed)
+        z_gene, gene_var = compute_pca_standardized_internal(module_matrix, min(cfg.gene_pca_dim, module_matrix.shape[1]), args.seed)
         a_gene_cell, _ = build_soft_knn_graph(z_gene, cfg.final_knn_k, eps=cfg.eps)
         a_gene_cell_bar = normalize_graph_symmetric(a_gene_cell, eps=cfg.eps)
     else:
@@ -785,6 +936,216 @@ def main() -> int:
             negative_graph(name)
         return negative_graph_cache[f"{name}_bar"]
 
+    def hubness_ratio_from_graph_diag(diag: dict) -> float:
+        return float(diag.get("degree_max", 0.0)) / max(float(diag.get("degree_mean", 0.0)), cfg.eps)
+
+    def branch_specs() -> dict[str, dict]:
+        return {
+            "pca_spectral_kmeans": {
+                "embedding": embedding_cache.setdefault("pca_spectral", spectral_embedding_only(a_pca_bar, spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy)),
+                "affinity": a_pca_bar,
+                "graph_diag": final_pca_diag,
+                "uses_graph_clustering": True,
+                "uses_rdg_graph": False,
+                "uses_rdg_features": False,
+            },
+            "rdg_cell_only": {
+                "embedding": embedding_cache.setdefault("cell_only", spectral_embedding_only((a_pca_bar + a_cell_bar).tocsr(), spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy)),
+                "affinity": (a_pca_bar + a_cell_bar).tocsr(),
+                "graph_diag": graph_diagnostics((a_pca + a_cell).tocsr()),
+                "uses_graph_clustering": True,
+                "uses_rdg_graph": True,
+                "uses_rdg_features": False,
+            },
+            "rdg_gene_only": {
+                "embedding": embedding_cache.setdefault("gene_only", spectral_embedding_only((a_pca_bar + a_gene_cell_bar).tocsr(), spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy)),
+                "affinity": (a_pca_bar + a_gene_cell_bar).tocsr(),
+                "graph_diag": graph_diagnostics((a_pca + a_gene_cell).tocsr()),
+                "uses_graph_clustering": True,
+                "uses_rdg_graph": True,
+                "uses_rdg_features": False,
+            },
+            "rdg_concat_kmeans": {
+                "embedding": z_dual,
+                "affinity": a_final_dual_bar,
+                "graph_diag": graph_diagnostics(a_final_from_dual),
+                "uses_graph_clustering": False,
+                "uses_rdg_graph": False,
+                "uses_rdg_features": True,
+            },
+            "rdg_always_on": {
+                "embedding": embedding_cache.setdefault("always", spectral_embedding_only(a_always, spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy)),
+                "affinity": a_always,
+                "graph_diag": graph_diagnostics((a_pca + a_cell + a_gene_cell).tocsr()),
+                "uses_graph_clustering": True,
+                "uses_rdg_graph": True,
+                "uses_rdg_features": False,
+            },
+        }
+
+    def negative_branch_specs() -> dict[str, dict]:
+        return {
+            "neg_random_cell_graph": {
+                "embedding": embedding_cache.setdefault(
+                    "neg_random_cell_graph",
+                    spectral_embedding_only((a_pca_bar + negative_graph_bar("random_cell")).tocsr(), spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy),
+                ),
+                "affinity": (a_pca_bar + negative_graph_bar("random_cell")).tocsr(),
+                "graph_diag": graph_diagnostics((a_pca + negative_graph("random_cell")).tocsr()),
+            },
+            "neg_degree_shuffle_graph": {
+                "embedding": embedding_cache.setdefault(
+                    "neg_degree_shuffle_graph",
+                    spectral_embedding_only((a_pca_bar + negative_graph_bar("degree_shuffle")).tocsr(), spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy),
+                ),
+                "affinity": (a_pca_bar + negative_graph_bar("degree_shuffle")).tocsr(),
+                "graph_diag": graph_diagnostics((a_pca + negative_graph("degree_shuffle")).tocsr()),
+            },
+            "neg_shuffled_gene_cell_graph": {
+                "embedding": embedding_cache.setdefault(
+                    "neg_shuffled_gene_cell_graph",
+                    spectral_embedding_only((a_pca_bar + negative_graph_bar("shuffled_gene_cell")).tocsr(), spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy),
+                ),
+                "affinity": (a_pca_bar + negative_graph_bar("shuffled_gene_cell")).tocsr(),
+                "graph_diag": graph_diagnostics((a_pca + negative_graph("shuffled_gene_cell")).tocsr()),
+            },
+        }
+
+    def reliability_for_branch(name: str, spec: dict, negative_p95: float | None = None) -> dict:
+        emb = np.asarray(spec["embedding"], dtype=np.float32)
+        pred = kmeans_labels(emb, n_clusters, args.seed, cfg.kmeans_n_init)
+        sanity = cluster_sanity_from_labels(pred)
+        subset = deterministic_stability_subset(emb.shape[0], cfg.stability_max_cells, args.seed + 7001 + len(name))
+        if subset is None:
+            emb_eval = emb
+            affinity_eval = spec.get("affinity")
+            n_eval_cells = int(emb.shape[0])
+            sampled = False
+        else:
+            emb_eval = emb[subset]
+            affinity_eval = spec.get("affinity")
+            if affinity_eval is not None:
+                affinity_eval = affinity_eval.tocsr()[subset, :][:, subset].tocsr()
+            n_eval_cells = int(len(subset))
+            sampled = True
+        assignment_stability = kmeans_assignment_stability(emb_eval, n_clusters, args.seed + len(name), cfg.stability_repeats)
+        neighbor_stability = neighbor_set_stability(emb_eval, cfg.final_knn_k, args.seed + 17 * len(name), cfg.stability_repeats, cfg.stability_noise_scale)
+        perturbation_stability = graph_or_embedding_perturbation_stability(
+            emb_eval,
+            n_clusters,
+            args.seed + 29 * len(name),
+            cfg,
+            affinity=affinity_eval,
+            spectral_dim=spectral_dim,
+        )
+        graph_diag = spec.get("graph_diag", {})
+        hubness = hubness_ratio_from_graph_diag(graph_diag)
+        hubness_penalty = float(np.clip((hubness - cfg.hubness_max) / max(cfg.hubness_max, cfg.eps), 0.0, 1.0))
+        eigengap = spectral_gap_proxy(spec["affinity"]) if spec.get("affinity") is not None else 0.0
+        eigengap_score = float(eigengap / (eigengap + 0.05)) if eigengap > 0 else 0.0
+        base_score = float(
+            0.35 * assignment_stability
+            + 0.25 * neighbor_stability
+            + 0.20 * perturbation_stability
+            + 0.10 * sanity["cluster_size_entropy"]
+            + 0.10 * eigengap_score
+            - 0.20 * hubness_penalty
+        )
+        contrast_score = 0.0 if negative_p95 is None else float(np.clip((base_score - negative_p95) / max(cfg.stability_margin, cfg.eps), 0.0, 1.0))
+        utility = float(0.35 * assignment_stability + 0.25 * neighbor_stability + 0.20 * perturbation_stability + 0.20 * contrast_score - 0.20 * hubness_penalty)
+        passes = bool(
+            assignment_stability >= cfg.assignment_stability_min
+            and perturbation_stability >= cfg.graph_stability_min
+            and sanity["cluster_size_entropy"] >= cfg.cluster_entropy_min
+            and sanity["largest_cluster_ratio"] <= cfg.largest_cluster_ratio_max
+            and hubness <= cfg.hubness_max
+        )
+        return {
+            "branch": name,
+            "assignment_stability": float(assignment_stability),
+            "neighbor_stability": float(neighbor_stability),
+            "graph_perturbation_stability": float(perturbation_stability),
+            "stability_sampled": sampled,
+            "stability_n_cells": n_eval_cells,
+            "stability_max_cells": int(cfg.stability_max_cells),
+            "cluster_size_entropy": float(sanity["cluster_size_entropy"]),
+            "largest_cluster_ratio": float(sanity["largest_cluster_ratio"]),
+            "hubness_ratio": float(hubness),
+            "hubness_penalty": float(hubness_penalty),
+            "eigengap": float(eigengap),
+            "eigengap_score": float(eigengap_score),
+            "base_score": float(base_score),
+            "negative_control_p95": float(negative_p95) if negative_p95 is not None else None,
+            "negative_control_contrast": float(contrast_score),
+            "utility": float(utility),
+            "passes_unsupervised_gate": passes,
+        }
+
+    selector_cache: dict[str, Any] = {}
+
+    def safe_rdg_pca_u_selection() -> tuple[str, np.ndarray, dict, dict, dict]:
+        if "safe_rdg_pca_u" in selector_cache:
+            cached = selector_cache["safe_rdg_pca_u"]
+            return cached["chosen_branch"], cached["embedding"], cached["gate"], cached["stability"], cached["scores"]
+
+        neg_specs = negative_branch_specs()
+        neg_scores = {name: reliability_for_branch(name, spec, None) for name, spec in neg_specs.items()}
+        neg_values = np.asarray([score["base_score"] for score in neg_scores.values()], dtype=np.float64)
+        negative_p95 = float(np.percentile(neg_values, 95)) if neg_values.size else 1.0
+
+        candidates = branch_specs()
+        cand_scores = {name: reliability_for_branch(name, spec, negative_p95) for name, spec in candidates.items()}
+        passed = [name for name, score in cand_scores.items() if score["passes_unsupervised_gate"]]
+        if passed:
+            chosen = max(passed, key=lambda name: cand_scores[name]["utility"])
+            emb = np.asarray(candidates[chosen]["embedding"], dtype=np.float32)
+            chosen_spec = candidates[chosen]
+            selected_gate = {
+                **gate,
+                "variant": "safe_rdg_pca_u",
+                "graph_enabled": bool(chosen != "pca_kmeans"),
+                "fallback_to_pca": False,
+                "chosen_branch": chosen,
+                "uses_graph_clustering": bool(chosen_spec.get("uses_graph_clustering", False)),
+                "uses_rdg_graph": bool(chosen_spec.get("uses_rdg_graph", False)),
+                "uses_rdg_features": bool(chosen_spec.get("uses_rdg_features", False)),
+                "selector_type": "strict_unsupervised_stability_negative_control",
+            }
+        else:
+            chosen = "pca_kmeans"
+            emb = z_raw
+            selected_gate = {
+                **gate,
+                "variant": "safe_rdg_pca_u",
+                "graph_enabled": False,
+                "fallback_to_pca": True,
+                "chosen_branch": "pca_kmeans",
+                "uses_graph_clustering": False,
+                "uses_rdg_graph": False,
+                "uses_rdg_features": False,
+                "selector_type": "strict_unsupervised_stability_negative_control",
+            }
+        stability = {
+            "negative_control_p95": negative_p95,
+            "negative_controls": neg_scores,
+            "candidates": cand_scores,
+            "passed_branches": passed,
+            "chosen_branch": chosen,
+            "thresholds": {
+                "assignment_stability_min": cfg.assignment_stability_min,
+                "graph_stability_min": cfg.graph_stability_min,
+                "cluster_entropy_min": cfg.cluster_entropy_min,
+                "largest_cluster_ratio_max": cfg.largest_cluster_ratio_max,
+                "hubness_max": cfg.hubness_max,
+                "stability_margin": cfg.stability_margin,
+                "stability_max_cells": cfg.stability_max_cells,
+            },
+            "label_free": True,
+        }
+        scores = {"selector": "safe_rdg_pca_u", "chosen_branch": chosen, "candidate_scores": cand_scores, "negative_control_scores": neg_scores}
+        selector_cache["safe_rdg_pca_u"] = {"chosen_branch": chosen, "embedding": emb, "gate": selected_gate, "stability": stability, "scores": scores}
+        return chosen, emb, selected_gate, stability, scores
+
     def select_variant(v: str) -> tuple[np.ndarray, np.ndarray, dict]:
         local_gate = {
             **gate,
@@ -797,48 +1158,52 @@ def main() -> int:
             emb = z_raw
         elif v == "pca_spectral_kmeans":
             local_gate["uses_graph_clustering"] = True
-            emb = embedding_cache.setdefault("pca_spectral", spectral_embedding_from_affinity(a_pca_bar, spectral_dim, args.seed))
+            emb = embedding_cache.setdefault("pca_spectral", spectral_embedding_only(a_pca_bar, spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy))
         elif v == "rdg_cell_only":
             local_gate.update({"graph_enabled": True, "uses_graph_clustering": True, "uses_rdg_graph": True})
             emb = embedding_cache.setdefault(
                 "cell_only",
-                spectral_embedding_from_affinity((a_pca_bar + a_cell_bar).tocsr(), spectral_dim, args.seed),
+                spectral_embedding_only((a_pca_bar + a_cell_bar).tocsr(), spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy),
             )
         elif v == "rdg_gene_only":
             local_gate.update({"graph_enabled": True, "uses_graph_clustering": True, "uses_rdg_graph": True})
             emb = embedding_cache.setdefault(
                 "gene_only",
-                spectral_embedding_from_affinity((a_pca_bar + a_gene_cell_bar).tocsr(), spectral_dim, args.seed),
+                spectral_embedding_only((a_pca_bar + a_gene_cell_bar).tocsr(), spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy),
             )
         elif v == "rdg_concat_kmeans":
+            local_gate.update({"uses_rdg_features": True, "uses_graph_clustering": False, "uses_rdg_graph": False})
             emb = z_dual
         elif v == "rdg_always_on":
             local_gate.update({"graph_enabled": True, "uses_graph_clustering": True, "uses_rdg_graph": True})
-            emb = embedding_cache.setdefault("always", spectral_embedding_from_affinity(a_always, spectral_dim, args.seed))
+            emb = embedding_cache.setdefault("always", spectral_embedding_only(a_always, spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy))
         elif v == "safe_rdg_heuristic":
             if graph_enabled:
                 local_gate.update({"graph_enabled": True, "uses_graph_clustering": True, "uses_rdg_graph": True})
-                emb = embedding_cache.setdefault("safe", spectral_embedding_from_affinity(a_safe, spectral_dim, args.seed))
+                emb = embedding_cache.setdefault("safe", spectral_embedding_only(a_safe, spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy))
             else:
                 local_gate["fallback_to_pca"] = True
                 emb = z_raw
+        elif v == "safe_rdg_pca_u":
+            _, emb, selected_gate, _, _ = safe_rdg_pca_u_selection()
+            local_gate = selected_gate
         elif v == "neg_random_cell_graph":
             local_gate.update({"graph_enabled": True, "uses_graph_clustering": True, "uses_rdg_graph": False, "negative_control": "random_cell_graph"})
             emb = embedding_cache.setdefault(
                 "neg_random_cell_graph",
-                spectral_embedding_from_affinity((a_pca_bar + negative_graph_bar("random_cell")).tocsr(), spectral_dim, args.seed),
+                spectral_embedding_only((a_pca_bar + negative_graph_bar("random_cell")).tocsr(), spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy),
             )
         elif v == "neg_degree_shuffle_graph":
             local_gate.update({"graph_enabled": True, "uses_graph_clustering": True, "uses_rdg_graph": False, "negative_control": "degree_preserving_shuffled_cell_graph"})
             emb = embedding_cache.setdefault(
                 "neg_degree_shuffle_graph",
-                spectral_embedding_from_affinity((a_pca_bar + negative_graph_bar("degree_shuffle")).tocsr(), spectral_dim, args.seed),
+                spectral_embedding_only((a_pca_bar + negative_graph_bar("degree_shuffle")).tocsr(), spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy),
             )
         elif v == "neg_shuffled_gene_cell_graph":
             local_gate.update({"graph_enabled": True, "uses_graph_clustering": True, "uses_rdg_graph": False, "negative_control": "shuffled_gene_module_cell_graph"})
             emb = embedding_cache.setdefault(
                 "neg_shuffled_gene_cell_graph",
-                spectral_embedding_from_affinity((a_pca_bar + negative_graph_bar("shuffled_gene_cell")).tocsr(), spectral_dim, args.seed),
+                spectral_embedding_only((a_pca_bar + negative_graph_bar("shuffled_gene_cell")).tocsr(), spectral_dim, args.seed, failure_policy=cfg.spectral_failure_policy),
             )
         else:
             raise ValueError(f"Unsupported variant: {v}")
@@ -886,6 +1251,10 @@ def main() -> int:
             "clusters": cluster_diagnostics(pred),
             "gate": local_gate,
         }
+        if out_variant == "safe_rdg_pca_u":
+            cached = selector_cache.get("safe_rdg_pca_u", {})
+            local_diag["stability_diagnostics"] = cached.get("stability", {})
+            local_diag["selector_scores"] = cached.get("scores", {})
         if out_variant in NEGATIVE_CONTROL_VARIANTS:
             local_diag["graphs"] = {
                 **diagnostics["graphs"],

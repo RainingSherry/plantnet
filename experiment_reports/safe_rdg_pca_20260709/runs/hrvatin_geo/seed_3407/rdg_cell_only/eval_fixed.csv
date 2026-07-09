@@ -1,2 +1,0 @@
-dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
-hrvatin_geo,Safe-RDG-PCA,3407,rdg_cell_only,0.264117548330002,0.0038366592921253878,-0.0008164080108788166,0.05050200122604042,0.4223101091722978,0.0038366592921253878,0.001987367108716919,0.05522255737230866,9,,fixed,kmeans_known_k,True,rdg_cell_only,194.2136561870575

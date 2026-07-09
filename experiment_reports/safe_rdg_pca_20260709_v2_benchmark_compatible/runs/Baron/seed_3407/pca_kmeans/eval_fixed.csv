@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+Baron,Safe-RDG-PCA,3407,pca_kmeans,0.8051114482436691,0.7830288455639554,0.7490586167603699,0.6203735255458919,0.8109238117706673,0.7830288455639552,0.7444248070118193,0.8258556892789006,14,,fixed,kmeans_known_k,True,pca_kmeans,12.27299165725708

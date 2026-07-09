@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+hrvatin,Safe-RDG-PCA,42,pca_kmeans,0.9151991049600132,0.9075865838917172,0.8741380381033753,0.8421637133801004,0.9002518683084739,0.9075865838917171,0.9172653059972142,0.8981099832924929,8,,fixed,kmeans_known_k,True,pca_kmeans,144.00667262077332

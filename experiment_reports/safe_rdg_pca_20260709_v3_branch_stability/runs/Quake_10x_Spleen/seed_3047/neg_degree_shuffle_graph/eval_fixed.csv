@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+Quake_10x_Spleen,Safe-RDG-PCA,3047,neg_degree_shuffle_graph,0.714824120603015,0.004444434494108677,-0.00770468509171813,0.1681509504208532,0.7431728811062236,0.004444434494108678,0.0023576909212190853,0.03867394503514453,5,,fixed,kmeans_known_k,True,neg_degree_shuffle_graph,13.410149574279785

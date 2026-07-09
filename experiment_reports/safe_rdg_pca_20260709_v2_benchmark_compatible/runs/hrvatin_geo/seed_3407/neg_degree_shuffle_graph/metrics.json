@@ -1,0 +1,18 @@
+{
+  "acc": 0.26347670852469524,
+  "nmi": 0.0005264920053388299,
+  "ari": -4.357869064181081e-05,
+  "f1_macro": 0.04689830573913214,
+  "fmi": 0.42666419714635273,
+  "v_measure": 0.00052649200533883,
+  "homogeneity": 0.00026392877628788437,
+  "completeness": 0.10175875790715064,
+  "n_pred_clusters": 9,
+  "silhouette": NaN,
+  "protocol": "fixed",
+  "cluster_method": "kmeans_known_k",
+  "uses_known_k": true,
+  "variant": "neg_degree_shuffle_graph",
+  "method_raw": "neg_degree_shuffle_graph",
+  "runtime_seconds": 289.9394443035126
+}

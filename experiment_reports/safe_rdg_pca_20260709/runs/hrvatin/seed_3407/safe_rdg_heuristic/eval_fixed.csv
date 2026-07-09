@@ -1,2 +1,0 @@
-dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
-hrvatin,Safe-RDG-PCA,3407,safe_rdg_heuristic,0.8808478017652177,0.8526365300930179,0.8260187069889162,0.8149806855222879,0.8622850899271534,0.852636530093018,0.8624476488317111,0.843046121204391,8,,fixed,kmeans_known_k,True,safe_rdg_heuristic,117.55882740020752

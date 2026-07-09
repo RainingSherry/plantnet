@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+Melanoma_5K,Safe-RDG-PCA,3407,neg_shuffled_gene_cell_graph,0.32661200974961224,0.1819106686535146,0.1526656782515421,0.18218382766942925,0.35685146198102446,0.18191066865351463,0.17607278089938158,0.18814895532469902,9,,fixed,kmeans_known_k,True,neg_shuffled_gene_cell_graph,8.301267623901367

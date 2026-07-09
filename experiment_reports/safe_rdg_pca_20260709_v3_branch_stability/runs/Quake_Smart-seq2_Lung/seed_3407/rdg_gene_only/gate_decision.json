@@ -1,0 +1,10 @@
+{
+  "variant": "rdg_gene_only",
+  "q_cell": 0.6220983400891619,
+  "q_gene": 0.9200305256450445,
+  "q_total": 0.7710644328671032,
+  "heuristic_threshold": 0.45,
+  "graph_enabled": true,
+  "uses_graph_clustering": true,
+  "uses_rdg_graph": true
+}

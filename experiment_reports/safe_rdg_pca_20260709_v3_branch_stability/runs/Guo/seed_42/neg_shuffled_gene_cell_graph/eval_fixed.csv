@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+Guo,Safe-RDG-PCA,42,neg_shuffled_gene_cell_graph,0.3593220338983051,0.21658572796060857,0.11605157093484471,0.3120374398227231,0.22904648050850354,0.21658572796060857,0.22204039046350543,0.2113926389964111,12,,fixed,kmeans_known_k,True,neg_shuffled_gene_cell_graph,9.455293416976929

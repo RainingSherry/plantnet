@@ -1,0 +1,11 @@
+{
+  "variant": "neg_random_cell_graph",
+  "q_cell": 0.46094745667819875,
+  "q_gene": 0.8633689314530296,
+  "q_total": 0.6621581940656142,
+  "heuristic_threshold": 0.45,
+  "graph_enabled": true,
+  "uses_graph_clustering": true,
+  "uses_rdg_graph": false,
+  "negative_control": "random_cell_graph"
+}

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
-Limb_Muscle,Safe-RDG-PCA,3407,neg_shuffled_gene_cell_graph,0.5418265541059094,0.28026283345773473,0.28368172676996545,0.42446418913012335,0.4497997789545098,0.2802628334577347,0.2793784381662471,0.28115284578162647,6,,fixed,kmeans_known_k,True,neg_shuffled_gene_cell_graph,7.234900712966919

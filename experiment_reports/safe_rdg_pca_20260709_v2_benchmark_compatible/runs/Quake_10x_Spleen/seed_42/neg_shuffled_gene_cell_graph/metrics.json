@@ -1,0 +1,18 @@
+{
+  "acc": 0.7448701842546064,
+  "nmi": 0.24359203494004444,
+  "ari": 0.3689971633192905,
+  "f1_macro": 0.4649371896598189,
+  "fmi": 0.7170921083768649,
+  "v_measure": 0.24359203494004447,
+  "homogeneity": 0.2503728592348978,
+  "completeness": 0.23716881453004737,
+  "n_pred_clusters": 5,
+  "silhouette": NaN,
+  "protocol": "fixed",
+  "cluster_method": "kmeans_known_k",
+  "uses_known_k": true,
+  "variant": "neg_shuffled_gene_cell_graph",
+  "method_raw": "neg_shuffled_gene_cell_graph",
+  "runtime_seconds": 16.77107858657837
+}

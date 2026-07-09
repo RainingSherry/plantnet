@@ -1,0 +1,69 @@
+{
+  "old_root": "/home/luolie/biopipeline/dimension-reduction/plantnet/result/scmae_all_methods_20260705_full",
+  "new_run_root": "experiment_reports/safe_rdg_pca_20260709_v2_benchmark_compatible/runs",
+  "n_expected": 48,
+  "n_checked": 48,
+  "tolerance": 1e-10,
+  "passed": false,
+  "n_failures": 3,
+  "max_abs_diff": {
+    "ari_diff": 6.850926814494507e-05,
+    "nmi_diff": 0.00012456616873746107,
+    "acc_diff": 4.143703642323082e-05
+  },
+  "mean_diff": {
+    "ari_diff": -2.2746560662973794e-06,
+    "nmi_diff": -4.9386006665703514e-06,
+    "acc_diff": -8.632715921506421e-07
+  },
+  "mean_abs_diff": {
+    "ari_diff": 2.2746560662973794e-06,
+    "nmi_diff": 4.9386006665703514e-06,
+    "acc_diff": 1.7265431843012842e-06
+  },
+  "failures": [
+    {
+      "dataset": "hrvatin",
+      "seed": 42,
+      "status": "diff_exceeds_tolerance",
+      "old_ari": 0.8742065473715203,
+      "new_ari": 0.8741380381033753,
+      "ari_diff": -6.850926814494507e-05,
+      "old_nmi": 0.9077111500604547,
+      "new_nmi": 0.9075865838917172,
+      "nmi_diff": -0.00012456616873746107,
+      "old_acc": 0.9152405419964365,
+      "new_acc": 0.9151991049600132,
+      "acc_diff": -4.143703642323082e-05
+    },
+    {
+      "dataset": "hrvatin",
+      "seed": 3047,
+      "status": "diff_exceeds_tolerance",
+      "old_ari": 0.8741926297885563,
+      "new_ari": 0.8741642313756239,
+      "ari_diff": -2.8398412932340023e-05,
+      "old_nmi": 0.9077051105519157,
+      "new_nmi": 0.9076812913278044,
+      "nmi_diff": -2.381922411132109e-05,
+      "old_acc": 0.9152198234782248,
+      "new_acc": 0.9152405419964365,
+      "acc_diff": 2.071851821161541e-05
+    },
+    {
+      "dataset": "hrvatin",
+      "seed": 3407,
+      "status": "diff_exceeds_tolerance",
+      "old_ari": 0.8741926297885563,
+      "new_ari": 0.8741803539784513,
+      "ari_diff": -1.2275810104989127e-05,
+      "old_nmi": 0.9077051105519157,
+      "new_nmi": 0.9076164431127691,
+      "nmi_diff": -8.86674391465947e-05,
+      "old_acc": 0.9152198234782248,
+      "new_acc": 0.9151991049600132,
+      "acc_diff": -2.071851821161541e-05
+    }
+  ],
+  "csv": "experiment_reports/safe_rdg_pca_20260709_v2_benchmark_compatible/analysis_full/pca_compatibility_report.csv"
+}

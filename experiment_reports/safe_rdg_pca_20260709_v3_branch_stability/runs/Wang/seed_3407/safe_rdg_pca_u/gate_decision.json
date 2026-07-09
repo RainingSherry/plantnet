@@ -1,0 +1,14 @@
+{
+  "variant": "safe_rdg_pca_u",
+  "q_cell": 0.4940762784830815,
+  "q_gene": 0.8486002933332507,
+  "q_total": 0.6713382859081661,
+  "heuristic_threshold": 0.45,
+  "graph_enabled": false,
+  "fallback_to_pca": true,
+  "chosen_branch": "pca_kmeans",
+  "uses_graph_clustering": false,
+  "uses_rdg_graph": false,
+  "uses_rdg_features": false,
+  "selector_type": "strict_unsupervised_stability_negative_control"
+}

@@ -1,5 +1,19 @@
 # Safe-RDG-PCA Progress
 
+## Benchmark-Compatibility Notice
+
+This run is now marked exploratory / invalid as a direct comparison to the
+20260705 `pca_kmeans_known_k` benchmark. The data source was correct
+(`result/scmae_all_methods_20260705_full/converted_data`), but the Safe-RDG-PCA
+internal PCA/KMeans protocol was not benchmark-compatible: it z-scored before
+PCA, z-scored after PCA, and used KMeans `n_init=50`.
+
+The corrected benchmark-compatible rerun is tracked separately under:
+
+```text
+experiment_reports/safe_rdg_pca_20260709_v2_benchmark_compatible
+```
+
 ## Current Implementation
 
 - Model runner: `experimental_retired_models/Safe_RDG_PCA/run.py`

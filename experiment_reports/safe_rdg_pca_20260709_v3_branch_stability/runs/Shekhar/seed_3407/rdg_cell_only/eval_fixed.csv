@@ -1,0 +1,2 @@
+dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
+Shekhar,Safe-RDG-PCA,3407,rdg_cell_only,0.8306746179649646,0.8014850657475084,0.8317317095186308,0.5972031051372805,0.8677995712167509,0.8014850657475086,0.7542939705406515,0.8549751014466422,18,,fixed,kmeans_known_k,True,rdg_cell_only,58.019869565963745

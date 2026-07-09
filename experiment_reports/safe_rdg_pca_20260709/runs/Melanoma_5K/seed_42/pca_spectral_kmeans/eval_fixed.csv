@@ -1,2 +1,0 @@
-dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
-Melanoma_5K,Safe-RDG-PCA,42,pca_spectral_kmeans,0.3828938621759362,0.32424523055602394,0.09070797333177105,0.21274797294300846,0.41918157385058885,0.3242452305560239,0.2549967572251894,0.4451264937906261,9,,fixed,kmeans_known_k,True,pca_spectral_kmeans,6.960802316665649

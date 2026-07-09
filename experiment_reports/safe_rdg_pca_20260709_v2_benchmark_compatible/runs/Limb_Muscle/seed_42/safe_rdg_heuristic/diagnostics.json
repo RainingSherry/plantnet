@@ -1,0 +1,143 @@
+{
+  "dataset": "Limb_Muscle",
+  "variant": "safe_rdg_heuristic",
+  "runtime_seconds": 4.947545051574707,
+  "config": {
+    "raw_pca_dim": 128,
+    "cell_knn_k": 15,
+    "cell_spectral_dim": 30,
+    "final_knn_k": 15,
+    "spectral_dim": 0,
+    "kmeans_n_init": 20,
+    "epsilon_jaccard": 0.001,
+    "mutual_boost_eta": 0.5,
+    "gene_bootstrap_B": 20,
+    "gene_bootstrap_cell_fraction": 0.8,
+    "gene_knn_k": 10,
+    "gene_edge_stability_threshold": 0.5,
+    "min_module_size": 3,
+    "max_module_size": 300,
+    "gene_pca_dim": 20,
+    "lambda_cell": 1.0,
+    "lambda_gene": 1.0,
+    "w0": 1.0,
+    "wc": 1.0,
+    "wg": 1.0,
+    "heuristic_threshold": 0.45,
+    "eps": 1e-08
+  },
+  "preprocess_profile": {
+    "dataset_name": "Limb_Muscle",
+    "n_cells": 3909,
+    "n_genes_original": 23341,
+    "n_genes": 1000,
+    "label_key": "resolved_label",
+    "n_cell_types": 6,
+    "cell_type_counts": {
+      "B cell": 461,
+      "T cell": 320,
+      "endothelial cell": 1330,
+      "macrophage": 308,
+      "mesenchymal stem cell": 1136,
+      "skeletal muscle satellite cell": 354
+    },
+    "counts_source": "adata.X",
+    "input_mode": "raw",
+    "has_raw": false,
+    "has_layers_counts": false,
+    "scale_input": true,
+    "original_data_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/result/scmae_all_methods_20260705_full/converted_data/Limb_Muscle.h5ad",
+    "loaded_data_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/result/scmae_all_methods_20260705_full/converted_data/Limb_Muscle.h5ad",
+    "compat_loader": "scmae_family"
+  },
+  "raw_pca_explained_variance_sum": 0.46876458819683087,
+  "gene_pca_explained_variance_sum": 0.9911949262022972,
+  "effective_rank": {
+    "Z_raw": 74.29077039951056,
+    "Z_cell": 29.999991000002673,
+    "Z_gene": 9.99999899999598,
+    "Z_dual": 167.9997177601467,
+    "Z_final": 9.999999000000098
+  },
+  "graphs": {
+    "A_pca": {
+      "n_nodes": 3909,
+      "n_edges": 46353,
+      "density": 0.006068587489228464,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 8.276702430035398,
+      "degree_std": 4.256358744568731,
+      "degree_max": 44.20127868652344,
+      "degree_gini": 0.26470338892072154
+    },
+    "A_cell_reliable": {
+      "n_nodes": 3909,
+      "n_edges": 46353,
+      "density": 0.006068587489228464,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 1.4634919966394488,
+      "degree_std": 1.3348009613078107,
+      "degree_max": 8.596059799194336,
+      "degree_gini": 0.4585126275767599,
+      "mutual_edge_ratio": 0.41893067280634433,
+      "mean_shared_neighbor_jaccard": 0.22192762072689348,
+      "edge_weight_mean": 0.08182983012132915,
+      "edge_weight_p10": 0.005957593430343661,
+      "edge_weight_p90": 0.20964637253782292,
+      "spectral_gap_proxy": 0.0034200729196247615
+    },
+    "A_gene_graph": {
+      "stable_edge_ratio": 0.7345,
+      "candidate_edge_count": 21807,
+      "stable_edge_count": 7345,
+      "method": "leiden_fixed",
+      "n_gene_modules": 11,
+      "module_size_min": 35,
+      "module_size_median": 80.0,
+      "module_size_max": 204,
+      "module_size_entropy": 0.948537386414473
+    },
+    "A_gene_cell": {
+      "n_nodes": 3909,
+      "n_edges": 42480,
+      "density": 0.005561529923466121,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 8.737138937747034,
+      "degree_std": 3.1727184811733644,
+      "degree_max": 18.445188522338867,
+      "degree_gini": 0.20647317059549852
+    },
+    "A_final_dual": {
+      "n_nodes": 3909,
+      "n_edges": 45109,
+      "density": 0.005905721594106244,
+      "n_connected_components": 1,
+      "largest_component_ratio": 1.0,
+      "degree_mean": 8.371891309886248,
+      "degree_std": 3.7935305111185698,
+      "degree_max": 30.75560760498047,
+      "degree_gini": 0.23436396858521413
+    }
+  },
+  "gate": {
+    "variant": "safe_rdg_heuristic",
+    "q_cell": 0.5833572526499715,
+    "q_gene": 0.874634331603558,
+    "q_total": 0.7289957921267647,
+    "heuristic_threshold": 0.45,
+    "graph_enabled": true,
+    "uses_graph_clustering": true,
+    "uses_rdg_graph": true
+  },
+  "clusters": {
+    "n_pred_clusters": 6,
+    "cluster_size_min": 56,
+    "cluster_size_median": 399.0,
+    "cluster_size_max": 1688,
+    "cluster_size_entropy": 0.7893543309614611,
+    "singleton_cluster_count": 0
+  }
+}
