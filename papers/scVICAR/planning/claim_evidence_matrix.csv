@@ -1,0 +1,9 @@
+claim_id,claim,evidence,status,boundary
+C1,Graph-vicinal anchor recovery improves a matched scMAE backbone,Confirmatory paired ARI for fixed versus NoMix,needs_confirmatory_results,Dataset-level inference across six frozen datasets
+C2,Topology adaptation improves robustness to contaminated neighbor graphs,Bad-edge injection curves for scVICAR-F versus scVICAR-T,needs_experiment,Robustness claim rather than universal mean superiority
+C3,Topology-informed affinity tracks local graph purity,Post-hoc AUROC and Spearman diagnostics,needs_experiment,Labels are diagnostic only
+C4,scVICAR representations retain downstream biological utility,Marker recovery marker-overlap annotation and low-label probe,needs_experiment,Within-dataset transductive scope
+C5,Vicinal views remain within a bounded local convex hull,Formal proposition and implementation invariant,supported_by_derivation,Assumes nonnegative row-stochastic neighbor weights and gates in [0 1]
+C6,The augmentation is a one-step nonuniform graph diffusion,Algebraic equivalence Xv=X-G(I-P)X,supported_by_derivation,Spectral response requires constant gate and symmetric/reversible graph
+C7,Historical NeighborMix and RG results exceeded scMAE on average,Development table in result/paper_table_overall.csv,supported_development_only,Not independent confirmation and not a significance claim
+

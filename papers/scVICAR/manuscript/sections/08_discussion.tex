@@ -1,0 +1,42 @@
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+scVICAR treats local cell structure as a corruption distribution rather than a
+source of pseudo-labels.  The original anchor remains the target, and the graph
+is absent at clean inference.  This design makes the local perturbation easy to
+bound and gives a clear distinction between fixed vicinal regularization and
+topology-adaptive risk control.
+
+Several limitations are fundamental.  First, a PCA cosine KNN graph remains an
+imperfect biological proxy.  Mutual and shared-neighbor evidence may correlate
+with edge purity, but the affinity is not calibrated and may fail around
+transitions, batches, or rare types.  Second, similarity and cosine distance are
+algebraically redundant in the current kernel; a future implementation should
+either combine their coefficient or introduce an independent distance signal.
+Third, the primary sampler draws by an affinity and reweights by that affinity,
+which sharpens the effective kernel.  We preserve this behavior for fidelity to
+the developed model and evaluate unbiased/full-neighborhood alternatives as
+ablations.
+
+The theory describes the augmentation operator, not a universal clustering
+guarantee.  Its Lipschitz conclusion depends on an unspecified encoder constant,
+and the Taylor interpretation requires smoothness, small perturbations, and a
+small input-direction gradient or centered perturbation; parameter stationarity
+alone is insufficient.  The contamination bound becomes useful only if the
+topology mechanism empirically reduces erroneous weight mass, or contracts the
+overall perturbation through the gate, under the stated radius conditions.
+
+The evaluation also has scope limits.  Known-$K$ KMeans measures embedding
+quality under a supplied cluster count; fixed-resolution Leiden is included to
+show a non-oracle view but does not solve resolution selection.  Six
+confirmatory datasets are stronger evidence than the development table, yet
+they do not cover all tissues, platforms, disease states, or batch structures.
+Low-label probes are transductive and cannot be interpreted as cross-study
+annotation.  Marker evaluation inherits limitations of Wilcoxon ranking and
+reference-label quality.
+
+Finally, the historical 16-dataset experiments participated in method
+development.  We disclose that selection history in the supplement and keep it
+separate from confirmation.  scVICAR-T is not claimed to beat scVICAR-F on
+every dataset; its scientific question is whether topology adaptation provides
+measurable protection when local graphs are contaminated.

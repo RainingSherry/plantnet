@@ -1,0 +1,48 @@
+\documentclass[journal]{IEEEtran}
+
+\usepackage{amsmath,amssymb,amsthm,bm}
+\usepackage{booktabs,multirow}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage[capitalise,noabbrev]{cleveref}
+\usepackage{microtype}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newcommand{\scvicar}{\textsc{scVICAR}}
+\newcommand{\methodF}{\textsc{scVICAR-F}}
+\newcommand{\methodT}{\textsc{scVICAR-T}}
+\graphicspath{{../figures/final/}}
+
+\input{results_macros}
+
+\title{scVICAR: Topology-Adaptive Graph-Vicinal Anchor Recovery for Masked Single-Cell Representation Learning}
+
+\author{Anonymous Authors%
+\thanks{Manuscript prepared for double-anonymous review.  Author and funding information will be restored after acceptance.}}
+
+\begin{document}
+\maketitle
+
+\input{sections/00_abstract}
+\begin{IEEEkeywords}
+single-cell RNA sequencing, masked autoencoder, graph representation learning,
+vicinal risk, clustering, cell-type annotation
+\end{IEEEkeywords}
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_method}
+\input{sections/04_theory}
+\input{sections/05_experiments}
+\input{sections/06_results}
+\input{sections/07_downstream}
+\input{sections/08_discussion}
+\input{sections/08_availability}
+\input{sections/09_conclusion}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\end{document}

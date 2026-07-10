@@ -1,0 +1,17 @@
+\begin{table}[t]
+\centering
+\caption{Fixed-resolution Leiden sensitivity analysis. Values are means (SD) across the six dataset-level seed averages; resolution is 1.0 and is never label-tuned.}
+\label{tab:leiden_overall}
+\begin{tabular}{lccc}
+\toprule
+Method & ARI & NMI & Macro-F1 \\ 
+\midrule
+NoMix & 0.335 (0.093) & 0.648 (0.099) & 0.587 (0.123) \\
+RandomMix & 0.361 (0.122) & 0.658 (0.109) & 0.593 (0.132) \\
+scVICAR-F & 0.347 (0.105) & 0.655 (0.103) & 0.586 (0.136) \\
+T-Edge & 0.343 (0.100) & 0.652 (0.100) & 0.580 (0.129) \\
+T-Gate & 0.342 (0.098) & 0.652 (0.101) & 0.574 (0.128) \\
+scVICAR-T & 0.337 (0.092) & 0.651 (0.097) & 0.573 (0.133) \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,152 @@
+\section{Theoretical Analysis}
+\label{sec:theory}
+
+We characterize the augmentation operator in Eq.~\eqref{eq:unified-view}.
+Throughout, $\widehat P$ is nonnegative and row-stochastic and
+$0\leq g_i\leq1$.  These results bound the location and propagation of a
+vicinal perturbation; they do not by themselves establish improved clustering.
+They apply to mixing-enabled rows; NoMix is the degenerate case $G=0$, for
+which the perturbation is identically zero and no neighbor-support radius is
+needed.
+
+\begin{proposition}[Convex-hull preservation and perturbation budget]
+For each cell $i$,
+\begin{equation}
+ x_i^v\in\operatorname{conv}
+ \bigl(\{x_i\}\cup\{x_j:\widehat p_{ij}>0\}\bigr),
+\end{equation}
+and, with $R_i=\max_{j:\widehat p_{ij}>0}\|x_j-x_i\|_2$,
+\begin{equation}
+ \|x_i^v-x_i\|_2
+ \leq g_i\sum_j\widehat p_{ij}\|x_j-x_i\|_2
+ \leq g_{\max}R_i .
+ \label{eq:radius-bound}
+\end{equation}
+\end{proposition}
+\begin{proof}
+The coefficients of $x_i$ and its sampled neighbors in
+$x_i^v=(1-g_i)x_i+g_i\sum_j\widehat p_{ij}x_j$ are nonnegative and sum to one.
+Moreover,
+$x_i^v-x_i=g_i\sum_j\widehat p_{ij}(x_j-x_i)$; the triangle inequality,
+row-stochasticity, and $g_i\leq g_{\max}$ yield
+Eq.~\eqref{eq:radius-bound}.
+\end{proof}
+
+\begin{corollary}[Lipschitz propagation]
+If encoder $h$ is $L_h$-Lipschitz on the local convex hull, then
+\begin{equation}
+ \|h(x_i^v)-h(x_i)\|_2\leq L_hg_iR_i.
+\end{equation}
+\end{corollary}
+This is a perturbation-propagation bound, not a theorem that training produces
+an invariant or cluster-separable representation.
+
+\begin{proposition}[One-step nonuniform graph diffusion]
+Let $L_{\mathrm{rw}}=I-\widehat P$.  Then
+\begin{equation}
+ X^v=X-GL_{\mathrm{rw}}X.
+ \label{eq:diffusion}
+\end{equation}
+\end{proposition}
+\begin{proof}
+Expanding the right-hand side gives
+$X-GX+G\widehat PX=(I-G)X+G\widehat PX$.
+\end{proof}
+Thus the view is one explicit Euler step with a node-dependent step size.  In
+the additional special case $G=gI$ and a symmetric (or suitably reversible)
+kernel, an eigencomponent of $L_{\mathrm{rw}}$ with eigenvalue $\lambda_r$ is
+multiplied by $1-g\lambda_r$.  This supplies a conditional low-pass
+interpretation and the familiar oversmoothing caution~\cite{li2018laplacian};
+it does not turn scVICAR into a multi-layer graph-propagation model, because the
+step is applied once to a training view only.
+
+\begin{proposition}[Log-linear topology kernel]
+Under $d_{ij}=1-s_{ij}$, positive factors
+$1+\gamma_m m_{ij}>0$ and $1+\gamma_q q_{ij}^{\mathrm{SNN}}>0$, and on edges
+where the implementation's reliability clipping is inactive,
+Eq.~\eqref{eq:topology-affinity} is equivalent to
+\begin{align}
+ r_{ij}&=(\tau^{-1}+\gamma_s+\gamma_d)s_{ij}\nonumber\\
+ &\quad+\log(1+\gamma_m m_{ij})
+ +\log(1+\gamma_q q_{ij}^{\mathrm{SNN}}),\nonumber\\
+ a_{ij}&=\frac{\exp(r_{ij})}
+ {\sum_{\ell\in\mathcal N_i}\exp(r_{i\ell})}.
+ \label{eq:loglinear}
+\end{align}
+\end{proposition}
+\begin{proof}
+Taking logarithms of the unnormalized affinity, substituting
+$p_{ij}^{(0)}\propto\exp(s_{ij}/\tau)$ and $d_{ij}=1-s_{ij}$, and deleting the
+row-constant term $-\gamma_d$ yields Eq.~\eqref{eq:loglinear}.
+\end{proof}
+The affinity is therefore a product-of-experts, or log-linear, graph score.
+Cosine similarity and cosine distance are algebraically redundant here; the
+score is not interpreted as a calibrated edge-correctness probability.
+
+\begin{proposition}[Cross-neighborhood contamination]
+Partition sampled neighbors into a same-class set $S_i$ and a cross-class set
+$C_i$, only for post-hoc analysis.  Define
+$\eta_i=\sum_{j\in C_i}\widehat p_{ij}$ and assume
+$\|x_j-x_i\|_2\leq R_i^{\mathrm{in}}$ on $S_i$ and
+$\|x_j-x_i\|_2\leq R_i^{\mathrm{out}}$ on $C_i$.  Then
+\begin{equation}
+ \|x_i^v-x_i\|_2\leq
+ g_i\left[(1-\eta_i)R_i^{\mathrm{in}}+
+ \eta_iR_i^{\mathrm{out}}\right].
+ \label{eq:contamination}
+\end{equation}
+\end{proposition}
+\begin{proof}
+Split $g_i\sum_j\widehat p_{ij}(x_j-x_i)$ over $S_i$ and $C_i$, apply the
+triangle inequality and the two radius assumptions, and use the respective
+weight masses $1-\eta_i$ and $\eta_i$.
+\end{proof}
+Equation~\eqref{eq:contamination} makes the robustness claim testable.  Holding
+the radii and gate fixed, reducing $\eta_i$ monotonically tightens the bound when
+$R_i^{\mathrm{out}}\geq R_i^{\mathrm{in}}$; reducing $g_i$ contracts the entire
+perturbation bound but does not itself change erroneous edge mass.  An adaptive
+advantage therefore requires a favorable affinity or gate response under these
+conditions.  It is not guaranteed for an arbitrary KNN graph, so we evaluate it
+using controlled bad-edge injection and post-hoc edge-purity diagnostics.
+
+\subsection{Conditional Local-Risk Interpretation}
+
+For fixed model parameters, a fixed minibatch $B$ containing cell $i$, and
+fixed context $X_{B\setminus i}$, let $X_B^{(i\leftarrow v)}$ denote the batch
+obtained by replacing row $i$ with $v$.  Because the implementation draws one
+shared permutation for the entire batch, the relevant corruption-averaged
+anchor risk is the batch-conditional function
+\begin{equation}
+ \Phi_{i,B}(v;X_{B\setminus i})=\mathbb E_{M,\Pi}
+ \!\left[\ell_\theta\!\left(
+ [C_{M,\Pi}(X_B^{(i\leftarrow v)})]_i,x_i\right)\right].
+\end{equation}
+Let $\delta_i(\widehat P)=\sum_j\widehat p_{ij}x_j-x_i$, where $\widehat P$
+also varies with the implemented neighbor sampler.  If the batch-conditional
+$\Phi_{i,B}$ is three times continuously differentiable in the local hull and
+its third derivative is bounded, suppress the fixed context by writing
+$\phi_i(v)=\Phi_{i,B}(v;X_{B\setminus i})$.  Multivariate Taylor expansion gives
+\begin{align}
+ \mathbb E_{\widehat P}\phi_i(x_i+g_i\delta_i)
+ &=\phi_i(x_i)
+ +g_i\nabla_v\phi_i(x_i)^\top
+   \mathbb E_{\widehat P}\delta_i \nonumber\\
+ &\quad+\frac{g_i^2}{2}\operatorname{tr}
+ \left(H_i\mathbb E_{\widehat P}[\delta_i\delta_i^\top]\right)
+ +O\!\left(g_i^3\mathbb E_{\widehat P}\|\delta_i\|_2^3\right).
+ \label{eq:taylor}
+\end{align}
+The first-order term is small only under an additional condition such as an
+approximately centered sampled perturbation or a small input-direction
+gradient $\nabla_v\phi_i(x_i)$; stationarity with respect to model
+parameters alone does not imply this condition.  Under that condition the
+second-order term admits a graph-supported curvature-regularization
+interpretation.  Only under the further approximation of a small residual for a squared
+reconstruction loss does this resemble a directional Jacobian penalty.  We do
+not use Eq.~\eqref{eq:taylor} to claim a proved improvement in clustering.
+
+The analysis also does not establish that the KNN graph respects biological
+boundaries, that the analytic affinity is calibrated, that anchor recovery
+alone separates clean latent classes, or that the encoder Lipschitz constant is
+explicitly controlled.  These are empirical questions addressed by the
+confirmatory, contamination, and downstream experiments.

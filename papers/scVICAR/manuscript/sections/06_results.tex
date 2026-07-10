@@ -1,0 +1,85 @@
+\section{Clustering and Robustness Results}
+\label{sec:results}
+
+\subsection{Confirmatory Matched-Backbone Performance}
+
+All \FormalRunCount{} primary runs completed under one frozen source,
+environment, and orchestration identity, with no failed tasks.  We report
+dataset-level seed averages and retain every prespecified dataset, variant, and
+seed.  Table~\ref{tab:confirmatory_overall}, Figure~\ref{fig:confirmatory}, and the following contrast
+sentences are generated directly from the checksum-verified run master.
+
+\input{generated/confirmatory_results}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{../figures/final/fig2_confirmatory.pdf}
+  \caption{Confirmatory matched-backbone results across six held-out datasets
+  and all three model seeds. (a) Dataset-level paired ARI changes relative to
+  NoMix. (b) ARI distributions for all six matched variants. (c) Prespecified
+  paired effects with dataset-level 95\% confidence intervals. (d) Median
+  runtime under the common training budget. No best seed or dataset is
+  selected.}
+  \label{fig:confirmatory}
+\end{figure*}
+
+The confirmatory clean-graph data therefore do not support a general ARI
+advantage for fixed vicinal recovery.  scVICAR-F improved on one dataset and
+decreased ARI on five, although the mean effect was small.  The full adaptive
+variant was heterogeneous: it improved markedly on Human Pancreas 3 and more
+moderately on Tabula Sapiens Pancreas, while decreasing ARI on Mouse Pancreas 1,
+PRJNA895163, and Blood--Bone Marrow.  Its positive mean T--NoMix effect was not
+distinguishable from zero at the dataset level.  We consequently treat the
+clean analysis as evidence of dataset dependence and reserve the principal
+topology claim for the prespecified contamination experiment.
+
+\subsection{External Baselines}
+
+\input{generated/baseline_results}
+
+\subsection{Component and Negative-Control Ablations}
+
+Random mixing produced the lowest descriptive mean ARI (0.594), below NoMix
+(0.611), arguing against a generic smoothing explanation.  Edge-only weighting
+also did not improve the mean (0.606).  The gate-only variant had the highest
+descriptive mean ARI (0.621), followed by the full model (0.617), but both
+retained substantial between-dataset variation.  Because gate-only versus
+NoMix was not one of the three confirmatory inferential contrasts, this pattern
+is treated as component evidence rather than a new significance claim.  The
+matched design attributes these descriptive differences to corruption
+construction rather than model capacity.  Vicinal variants required roughly
+twice the mean runtime of NoMix in this implementation.
+Figure~\ref{fig:components} shows the corresponding matched component and
+representation-geometry summaries without adding post-hoc inferential tests.
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{../figures/final/fig3_components.pdf}
+  \caption{Matched component and negative-control evidence. Random mixing,
+  fixed vicinal corruption, topology edge weighting, topology gating, and the
+  full adaptive model are compared without changing the backbone or budget.
+  The descriptive gate-only pattern is not promoted to a post-hoc confirmatory
+  hypothesis.}
+  \label{fig:components}
+\end{figure*}
+
+\subsection{Fixed-Resolution Leiden Sensitivity Analysis}
+
+\input{generated/leiden_results}
+
+This analysis is deliberately non-oracle: the resolution and neighborhood size
+were fixed before evaluation, and neither $K$ nor reference labels entered the
+partitioning step.  We interpret it as sensitivity to the post-hoc clustering
+operator, not as a second independent confirmatory experiment.
+
+\subsection{Robustness to Erroneous Edges}
+
+\input{generated/stress_results}
+
+The bad-edge experiment reports degradation curves rather than selecting a
+single favorable contamination level.  Evidence for the adaptive hypothesis
+requires scVICAR-T to lose performance more slowly than scVICAR-F as deliberate
+cross-class mass increases.  Affinity and gate AUROC/Spearman diagnostics test
+the mechanism behind any robustness difference.  If these associations or the
+degradation contrast are absent, we will restrict the topology component to an
+analytic ablation rather than claim reliable edge detection.

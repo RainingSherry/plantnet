@@ -1,0 +1,126 @@
+.staging/
+__pycache__/
+**/__pycache__/
+manuscript/*.aux
+manuscript/*.bbl
+manuscript/*.blg
+manuscript/*.log
+manuscript/*.out
+manuscript/*.pdf
+manuscript/crossref-*.bib
+manuscript/arxiv-*.bib
+figures/final/*.tiff
+
+# ===== GitHub release exclusions =====
+
+# Raw / derived datasets
+*.h5ad
+*.loom
+*.mtx
+data/
+datasets/
+
+# Runtime outputs
+.staging/
+runs/
+logs/
+cache/
+
+# Experiment generated results
+experiments/**/aggregate/
+experiments/**/summary*.csv
+experiments/**/run_metrics.*
+experiments/**/status.json
+experiments/**/rejected*
+experiments/**/recovery*
+
+# Downstream generated source data
+figures/source_data/
+
+# Large generated image formats
+figures/final/*.png
+figures/final/*.svg
+
+# Local manifests containing private paths
+manifests/dataset_upload/
+
+# Model checkpoints
+*.pt
+*.pth
+*.ckpt
+checkpoints/
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# LaTeX build files
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.log
+*.out
+*.synctex.gz
+*.toc
+
+# Private experiment records
+experiments/
+manifests/
+figures/source_data/
+
+# Internal paths
+*remote*
+*status.json
+
+
+# ===== release exclusions =====
+
+# datasets
+*.h5ad
+*.loom
+*.mtx
+data/
+datasets/
+
+# runtime outputs
+.staging/
+runs/
+logs/
+cache/
+
+# generated experiment outputs
+experiments/**/aggregate/
+experiments/**/summary*.csv
+experiments/**/run_metrics.*
+experiments/**/status.json
+experiments/**/recovery*
+
+# generated downstream source data
+figures/source_data/
+
+# local/private manifests
+manifests/dataset_upload/
+
+# model files
+*.pt
+*.pth
+*.ckpt
+checkpoints/
+
+# python cache
+__pycache__/
+*.pyc
+
+# latex cache
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.log
+*.out
+*.synctex.gz
+*.toc

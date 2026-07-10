@@ -1,0 +1,25 @@
+{
+  "protocol_version": "protocol_v1",
+  "primary_endpoint": "ari",
+  "secondary_endpoints": ["nmi", "acc", "f1_macro", "silhouette"],
+  "seeds": [42, 2024, 3407],
+  "split_seeds": [11, 23, 37, 53, 71],
+  "known_k_kmeans_n_init": 20,
+  "leiden_fixed_resolution": 1.0,
+  "oracle_resolution_sweep": false,
+  "class_filter": {
+    "excluded_labels": ["unknown", "nan", "unassigned"],
+    "minimum_cells": 10
+  },
+  "statistics": {
+    "independent_unit": "dataset",
+    "planned_contrasts": [
+      ["fixed", "nomix"],
+      ["topology_full", "nomix"],
+      ["topology_full", "fixed"]
+    ],
+    "multiple_testing": "Holm",
+    "bootstrap_iterations": 10000,
+    "permutation_iterations": 10000
+  }
+}

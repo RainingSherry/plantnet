@@ -1,0 +1,44 @@
+{
+  "verification_status": "verified",
+  "verified_utc": "2026-07-10",
+  "verification_scope": "Markers retained below were checked against the Baron primary article text/main figure and against expression in the frozen benchmark H5AD. Supplement-only macrophage candidates C1QC and TYROBP are excluded pending Table S2 verification.",
+  "use": "Interpretation only; never training, graph construction, scheduling, or model selection",
+  "frozen_case": {
+    "dataset": "Human_Pancreas_3",
+    "model_seed": 42,
+    "split_seed": 11,
+    "variants": [
+      "nomix",
+      "fixed",
+      "topology_full"
+    ]
+  },
+  "markers": {
+    "alpha": ["GCG", "IRX2", "LOXL4"],
+    "beta": ["INS", "IAPP", "PCSK1"],
+    "ductal": ["KRT19", "SPP1", "MUC1"],
+    "acinar": ["PRSS1", "CPA1", "PNLIP"],
+    "delta": ["SST", "LEPR"],
+    "activated_stellate": ["PDGFRA", "COL1A1", "FN1"],
+    "gamma": ["PPY", "SERTM1", "SLITRK6"],
+    "endothelial": ["PLVAP", "PECAM1", "VWF"],
+    "quiescent_stellate": ["RGS5", "ADIRF", "FABP4"],
+    "macrophage": ["SDS"],
+    "mast": ["TPSAB1", "TPSB2"],
+    "epsilon": ["GHRL"],
+    "schwann": ["SOX10", "PMP22", "NGFR"]
+  },
+  "candidate_primary_sources": [
+    {
+      "citation": "Baron et al., Cell Systems (2016), A Single-Cell Transcriptomic Map of the Human and Mouse Pancreas Reveals Inter- and Intra-cell Population Structure",
+      "doi": "10.1016/j.cels.2016.08.011",
+      "verification": "DOI/PMCID and markers used in this panel checked against primary full text/main figure; 8,629 original-paper, 8,569 benchmark-input and 8,562 filtered counts remain explicitly distinguished"
+    },
+    {
+      "citation": "Segerstolpe et al., Cell Metabolism (2016), Single-Cell Transcriptome Profiling of Human Pancreatic Islets in Health and Type 2 Diabetes",
+      "doi": "10.1016/j.cmet.2016.08.020",
+      "verification": "DOI/PMCID checked as corroborating human-islet primary study; not used to select models"
+    }
+  ],
+  "approval_rule": "Figure 6 code refuses to run unless verification_status is exactly 'verified'. Ambient-prone hormone markers must be interpreted jointly with the accompanying non-hormone markers."
+}

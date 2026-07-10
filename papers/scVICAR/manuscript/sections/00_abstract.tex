@@ -1,0 +1,21 @@
+\begin{abstract}
+Masked autoencoding learns single-cell representations from gene-replacement
+corruption but does not explicitly exploit local relationships among cells.  We
+introduce scVICAR, a graph-vicinal anchor-recovery framework that reconstructs
+an original cell from a bounded neighborhood-mixed view.  scVICAR-F uses a
+fixed local perturbation, whereas scVICAR-T combines topology-informed affinity
+with a cell-wise perturbation budget intended to limit exposure to unreliable
+edges.  We show that the augmentation remains in a local convex hull, derive
+input and representation perturbation bounds, express it as one step of
+nonuniform graph diffusion, and bound its sensitivity to cross-class neighbor
+mass.  A frozen matched-backbone study evaluates six confirmatory scRNA-seq
+datasets with three model seeds, component ablations, and controlled bad-edge
+injection.  Biological utility is assessed through held-out marker recovery,
+marker-overlap annotation, and low-label probing of frozen embeddings.  The
+study is designed to test fixed vicinal recovery against scMAE and the adaptive
+variant's robustness under topology contamination, without assuming that
+adaptation is universally superior on clean graphs.  Quantitative statements
+are generated only after the complete preregistered matrix and downstream
+artifacts pass checksum, leakage, and traceability checks.
+\end{abstract}
+

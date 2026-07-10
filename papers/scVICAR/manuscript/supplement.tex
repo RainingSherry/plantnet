@@ -1,0 +1,167 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,longtable,graphicx,url,hyperref}
+\title{Supplementary Information for\\
+\emph{scVICAR: Topology-Adaptive Graph-Vicinal Anchor Recovery for Masked Single-Cell Representation Learning}}
+\author{Anonymous Authors}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Purpose and Evidence Boundary}
+
+This supplement records the complete protocol, model-development boundary, and
+reproducibility checks.  NeighborMix-scMAE and RG-NeighborMix-scMAE were
+developed through broad experiments on 16 datasets.  Those runs motivated the
+fixed and topology-adaptive formulations and therefore are not statistically
+independent confirmation.  Their complete selection history is archived as
+development evidence; only the six frozen datasets in the main paper enter
+confirmatory inference.  The invalid \texttt{hrvatin\_geo} label variant is
+excluded and is not counted as an independent dataset.
+
+The development table suggested mean improvements over scMAE for both earlier
+variants, but their relative ordering was dataset-dependent.  We do not convert
+this observation into a significance or universal-superiority claim.  The
+confirmatory study was frozen before inspecting its scVICAR outputs.
+
+\section{Frozen Dataset Manifest}
+
+\begin{longtable}{p{0.25\linewidth}rrp{0.36\linewidth}}
+\toprule
+Dataset & Cells & $K$ & SHA-256 prefix\\
+\midrule
+\endhead
+Blood--Bone Marrow & 15,486 & 30 &
+\texttt{3f51f1d37285}\\
+Human Pancreas 1 & 2,282 & 6 &
+\texttt{115836148077}\\
+Human Pancreas 3 & 8,562 & 13 &
+\texttt{3449593a0feb}\\
+Mouse Pancreas 1 & 1,865 & 10 &
+\texttt{178a8c89ee1d}\\
+PRJNA895163 & 50,380 & 12 &
+\texttt{4720016d69f5}\\
+Tabula Sapiens Pancreas & 14,116 & 16 &
+\texttt{a73015faf0a9}\\
+\bottomrule
+\end{longtable}
+
+The prefixes are displayed for layout; the machine-readable manifest contains
+the complete 64-character digests.  The primary filter removes normalized labels \texttt{unknown}, \texttt{nan},
+and \texttt{unassigned}, followed by classes with fewer than ten cells.
+Complete-label results are retained as sensitivity analysis.  Dataset labels
+are stored for evaluation and prespecified stress diagnostics but are excluded
+from clean-view optimization, clean graph construction, hyperparameter
+selection, checkpoint selection, and job scheduling.
+
+\section{Unfiltered Full-Label Sensitivity Cohort}
+
+The sensitivity cohort retains every source cell and every string-valued source
+label, including unknown, missing/unassigned, and classes smaller than ten
+cells.  This release is frozen separately and is never pooled with the primary
+cohort:
+\begin{quote}\small
+Release: \path{sensitivity_full_labels_v1}\\
+Freeze: \texttt{0a13b1aad8fa97f5}.
+\end{quote}
+
+\begin{longtable}{p{0.25\linewidth}rrp{0.36\linewidth}}
+\toprule
+Dataset & Cells & Full $K$ & SHA-256 prefix\\
+\midrule
+\endhead
+Blood--Bone Marrow & 15,502 & 35 & \texttt{71fb2bb19eb6}\\
+Human Pancreas 1 & 2,544 & 7 & \texttt{f5a1bc3b1840}\\
+Human Pancreas 3 & 8,569 & 14 & \texttt{63bde3635353}\\
+Mouse Pancreas 1 & 1,886 & 13 & \texttt{59a48f739adc}\\
+PRJNA895163 & 50,380 & 12 & \texttt{0bc8b556e776}\\
+Tabula Sapiens Pancreas & 14,140 & 23 & \texttt{8af6f4eeaca1}\\
+\bottomrule
+\end{longtable}
+
+The sensitivity matrix contains only the three principal variants (NoMix,
+scVICAR-F, and scVICAR-T) at all three model seeds, for 54 runs.  It uses the
+same backbone and optimization budget.  Full $K$ is exposed only to post-hoc
+KMeans; full labels do not enter training or clean graph construction.
+
+\section{Matched Variant Registry}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llll}
+\toprule
+Variant & Mix & Gate & Affinity\\
+\midrule
+NoMix & none & zero & none\\
+Random & random & constant & uniform random\\
+scVICAR-F & local & constant & cosine-softmax\\
+T edge-only & local & constant & topology-informed\\
+T gate-only & local & topology & cosine-softmax\\
+scVICAR-T & local & topology & topology-informed\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All variants use 1,000 selected genes, a 128-dimensional embedding, 80 epochs,
+batch size 256, Adam with learning rate $10^{-3}$, mask ratio 0.4, $k=5$, four
+sampled neighbors, temperature 0.2, and maximum gate 0.1.  If Seurat-style HVG
+selection cannot return exactly 1,000 genes, deterministic empirical variance
+is used as the frozen fallback.  The run fails if more than the requested genes
+remain.
+
+External baselines are separately frozen across six interpreters/environments.
+PCA, original scMAE, and scVI learn their representations without $K$ and use
+it only for post-hoc clustering.  scDCC, scDeepCluster, and scRCL require $K$
+in their published clustering-oriented architecture and are therefore labeled
+known-$K$ training baselines.  Their per-cell labels are withheld from gradient
+updates and checkpoint selection.  Every baseline emits cell identifiers; any
+row-order or cell-set mismatch with the canonical H5AD is a hard failure.
+
+\section{Downstream Leakage Controls}
+
+For every split, reference and evaluation indices are archived and verified to
+form a disjoint complete partition.  Reference labels are used to derive
+reference markers only.  Evaluation labels are not visible during evaluation
+cluster differential expression or marker-overlap assignment.  They are opened
+only for final scoring.  The linear-probe scaler and classifier are fitted in a
+single pipeline on the labeled training subset; the remaining cells are
+transformed only after fitting.  Every model seed and all five split seeds are
+retained.
+
+\section{Statistical Analysis}
+
+The independent unit is the dataset.  Downstream split replicates are averaged
+within run, then model seeds within dataset.  Planned contrasts are scVICAR-F
+versus NoMix, scVICAR-T versus NoMix, and scVICAR-T versus scVICAR-F.  We report
+paired mean and median effects, win/tie/loss counts, a 10,000-replicate
+hierarchical bootstrap interval, and a paired sign-flip permutation test.
+Holm adjustment is applied across the three contrasts separately for each
+endpoint.  Cells, seeds, and splits are not treated as independent biological
+replicates.
+
+\section{Traceability and Failure Recovery}
+
+The canonical run identifier is
+\begin{quote}
+\texttt{dataset--variant--seed--config\_hash}.
+\end{quote}
+The configuration hash covers the resolved protocol, dataset digest, wrapper,
+base model, graph, mixing, diagnostic, preprocessing and shared-utility source
+files, together with the fixed Python binary and key package versions.  Each
+remote directory contains a file-level checksum manifest and a
+completion marker.  Uploads are verified in a partial directory and atomically
+promoted.  Failed runs retain their local staging directory and are never
+included by the aggregate collector.  The scheduler stops before local free
+space falls below 5 GiB.
+
+\section{Negative or Null Results}
+
+All confirmatory and downstream endpoints will be populated from frozen
+aggregates after completeness checks.  If either variant fails to improve over
+NoMix, or if marker/probe endpoints are null, the full result remains in the
+tables and the corresponding claim is narrowed.  scVICAR-T is principally a
+graph-contamination robustness hypothesis; a clean-graph loss to scVICAR-F does
+not justify suppressing the result or changing the frozen protocol.
+
+\end{document}
