@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,num_modules,mask_prob,module_mask_prob,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + MaskFeat gene-module semantic target,42,rank02_maskfeat_gene_module_semantic_full,smoke,scaled encoder + log_expr module semantic targets,32,0.25,0.08,0.6230888544205628,0.6631946586487243,0.5423114607075328,0.5343550971972876,0.630722431279071,0.6631946586487243,0.7222691816785886,0.6130529503332453,9,,fixed,kmeans_known_k,True

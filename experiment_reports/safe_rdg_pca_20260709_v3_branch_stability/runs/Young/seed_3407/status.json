@@ -1,9 +1,0 @@
-{
-  "dataset": "Young",
-  "seed": 3407,
-  "status": "success",
-  "returncode": 0,
-  "runtime_seconds": 20.814785480499268,
-  "command": "/data/luolie/conda/envs/scclubench-main/bin/python /home/luolie/biopipeline/dimension-reduction/plantnet/experimental_retired_models/Safe_RDG_PCA/run.py --data_path experiment_reports/safe_rdg_pca_20260709_v3_branch_stability/converted_data/Young.h5ad --save_dir experiment_reports/safe_rdg_pca_20260709_v3_branch_stability/runs/Young/seed_3407 --dataset_name Young --n_clusters 11 --seed 3407 --variant_name stage_a_all --method_name Safe-RDG-PCA --label_key auto --input_mode auto --n_top_genes 1000 --target_sum 10000 --scale_input true --raw_pca_dim 128 --kmeans_n_init 20 --gene_bootstrap_B 20 --gene_edge_stability_threshold 0.5 --heuristic_threshold 0.45 --stability_repeats 3 --stability_edge_drop_rate 0.1 --stability_noise_scale 0.01 --stability_margin 0.02 --stability_max_cells 3000 --assignment_stability_min 0.8 --graph_stability_min 0.75 --cluster_entropy_min 0.7 --largest_cluster_ratio_max 0.8 --hubness_max 10.0 --spectral_failure_policy fail --save_embedding_h5 false --include_negative_controls true",
-  "error": ""
-}

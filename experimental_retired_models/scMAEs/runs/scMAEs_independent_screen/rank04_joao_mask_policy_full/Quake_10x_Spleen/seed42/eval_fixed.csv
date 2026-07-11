@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,policy_probs,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + JOAO mask policy,42,rank04_joao_mask_policy_full,screen,scaled encoder + JOAO mask policy,swap:0.1398;absorbing:0.4769;module:0.1280;dropout:0.2552,0.7081239530988275,0.6932591764798492,0.5044211313777545,0.7125028532425203,0.7345549024150485,0.6932591764798494,0.8963510497674617,0.5651985906388987,5,,fixed,kmeans_known_k,True

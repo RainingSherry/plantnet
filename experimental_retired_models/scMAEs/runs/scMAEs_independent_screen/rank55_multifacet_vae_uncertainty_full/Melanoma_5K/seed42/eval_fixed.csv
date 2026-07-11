@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + multi-facet VAE uncertainty,42,rank55_multifacet_vae_uncertainty_full,screen,scaled encoder + log-expression targets + optional aligned raw-count NB + multi-facet VAE,0.4655439840460891,0.4135625356889978,0.2986724712951175,0.3863122654741211,0.42807585298975426,0.4135625356889978,0.4449804297028122,0.38628858599708,9,,fixed,kmeans_known_k,True

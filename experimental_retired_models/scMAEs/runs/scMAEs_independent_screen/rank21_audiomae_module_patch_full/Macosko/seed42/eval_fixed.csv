@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + AudioMAE module patch,42,rank21_audiomae_module_patch_full,screen,scaled encoder + log_expr ordered module-patch targets,0.40001785395465095,0.3925023420151922,0.24761835636590154,0.2564804644964265,0.48898808377605885,0.3925023420151922,0.5330332244383621,0.31061154659622686,12,,fixed,kmeans_known_k,True

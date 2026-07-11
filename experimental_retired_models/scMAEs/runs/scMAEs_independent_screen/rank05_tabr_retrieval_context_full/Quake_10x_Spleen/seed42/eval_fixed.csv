@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,retrieval_k,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + TabR retrieval context,42,rank05_tabr_retrieval_context_full,screen,scaled encoder + retrieval context,8,0.692001675041876,0.6320913695987822,0.4796667903289537,0.6406782465474589,0.7183510599855448,0.6320913695987821,0.8330569397801133,0.5092423974783838,5,,fixed,kmeans_known_k,True

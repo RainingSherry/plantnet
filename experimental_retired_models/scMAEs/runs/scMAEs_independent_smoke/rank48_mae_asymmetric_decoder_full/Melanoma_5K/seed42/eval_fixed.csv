@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + MAE asymmetric decoder,42,rank48_mae_asymmetric_decoder_full,smoke,scaled encoder + log-expression targets + MAE asymmetric decoder,0.49390649235541767,0.5812925049775802,0.42531107525634054,0.3845251962162269,0.5618691648220334,0.5812925049775803,0.5798791338675222,0.5827127826948167,9,,fixed,kmeans_known_k,True

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + BEiT gene-token target,42,rank18_beit_gene_token_full,screen,scaled encoder + BEiT gene token target,0.7361809045226131,0.6914077814497275,0.5178935080226177,0.7181686854978298,0.7438814608908938,0.6914077814497275,0.8868397629132827,0.5665563350083869,5,,fixed,kmeans_known_k,True

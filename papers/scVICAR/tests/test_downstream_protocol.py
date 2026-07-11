@@ -214,6 +214,41 @@ def test_dataset_download_is_cached_and_sha_verified(tmp_path: Path, monkeypatch
     assert store.downloads == [remote_path]
 
 
+def test_public_root_placeholders_are_resolved_at_runtime(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(scheduler, "disk_free_gib", lambda _: 100.0)
+    monkeypatch.setattr(scheduler, "REMOTE_DATA_ROOT", "/actual/data")
+    monkeypatch.setattr(scheduler, "REMOTE_RESULT_ROOT", "/actual/results")
+    remote_data = tmp_path / "canonical.h5ad"
+    remote_data.write_bytes(b"canonical dataset bytes")
+    digest = scheduler.sha256_file(remote_data)
+    resolved_data = "/actual/data/datasets/confirmatory_v1/Mouse_Pancreas_1.h5ad"
+    store = FakeStore({resolved_data: remote_data}, tmp_path / "uploaded")
+    manifest = {
+        "Mouse_Pancreas_1": {
+            "sha256": digest,
+            "canonical_filename": "Mouse_Pancreas_1.h5ad",
+            "remote_path": "<SCVICAR_DATA_ROOT>/datasets/confirmatory_v1/Mouse_Pancreas_1.h5ad",
+        }
+    }
+
+    cached = scheduler.ensure_cached_dataset(
+        store, "Mouse_Pancreas_1", manifest, tmp_path / "cache"
+    )
+    run = scheduler.FormalRun.from_row({
+        "run_id": "Mouse_Pancreas_1--nomix--seed42--abcdef0123456789",
+        "dataset": "Mouse_Pancreas_1",
+        "variant": "nomix",
+        "seed": 42,
+        "remote_dir": "<SCVICAR_RESULT_ROOT>/runs/protocol_v1/example",
+    })
+
+    assert cached.is_file()
+    assert store.downloads == [resolved_data]
+    assert run.remote_dir == "/actual/results/runs/protocol_v1/example"
+
+
 def test_scheduler_stops_below_five_gib(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(scheduler, "disk_free_gib", lambda _: 4.99)
     with pytest.raises(scheduler.LowDiskSpaceError, match="stopping before scheduling"):

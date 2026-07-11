@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + scAGC adaptive graph,42,rank15_scagc_adaptive_graph_full,screen,scaled encoder + adaptive graph reliability,0.8860971524288107,0.6186284696821258,0.8211605163769456,0.5528350047661894,0.918989962441709,0.6186284696821259,0.6623254135413729,0.5803404845693644,5,,fixed,kmeans_known_k,True

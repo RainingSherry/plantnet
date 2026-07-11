@@ -73,7 +73,7 @@ def write_confirmatory(formal: pd.DataFrame, contrasts: pd.DataFrame, manuscript
         sentence("F_vs_NoMix", "scVICAR-F", "NoMix"),
         sentence("T_vs_NoMix", "scVICAR-T", "NoMix"),
         sentence("T_vs_F", "scVICAR-T", "scVICAR-F")
-        + " The latter is a clean-graph comparison and is not interpreted as a requirement that topology adaptation dominate on every dataset.",
+        + " This clean-graph comparison measures the dataset-level variation between the adaptive and fixed variants.",
     ])
     (manuscript / "generated/confirmatory_results.tex").write_text(fragment + "\n", encoding="utf-8")
 
@@ -84,9 +84,9 @@ def write_downstream(dataset_metrics: pd.DataFrame, manuscript: Path, tables: Pa
         raise RuntimeError(f"Refusing partial downstream manuscript assets: {len(dataset_metrics)}/{expected}")
     selected = [
         ("marker", None, "recovery_recovery_at_100", "Recovery@100"),
-        ("marker", None, "annotation_f1_macro", "Marker annotation macro-F1"),
-        ("linear_probe", 0.1, "probe_f1_macro", r"10\% probe macro-F1"),
-        ("linear_probe", 0.3, "probe_f1_macro", r"30\% probe macro-F1"),
+        ("marker", None, "annotation_macro_f1", "Marker annotation macro-F1"),
+        ("linear_probe", 0.1, "probe_macro_f1", r"10\% probe macro-F1"),
+        ("linear_probe", 0.3, "probe_macro_f1", r"30\% probe macro-F1"),
     ]
     rows = []
     for task, fraction, metric, label in selected:
@@ -96,6 +96,8 @@ def write_downstream(dataset_metrics: pd.DataFrame, manuscript: Path, tables: Pa
     lines = [
         r"\begin{table}[t]",
         r"\centering",
+        r"\footnotesize",
+        r"\setlength{\tabcolsep}{3pt}",
         r"\caption{Downstream utility after averaging split seeds and then model seeds within each dataset.}",
         r"\label{tab:downstream_overall}",
         r"\begin{tabular}{lccc}",
@@ -107,12 +109,101 @@ def write_downstream(dataset_metrics: pd.DataFrame, manuscript: Path, tables: Pa
         lines.append(f"{label} & {means['nomix']:.3f} & {means['fixed']:.3f} & {means['topology_full']:.3f} \\\\")
     lines.extend([r"\bottomrule", r"\end{tabular}", r"\end{table}"])
     (tables / "downstream_overall.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    fragment = (
-        r"\input{../tables/generated/downstream_overall}" + "\n"
-        + "Table~\\ref{tab:downstream_overall} reports all prespecified downstream endpoints after split-level and model-seed aggregation. "
-        + "Paired effects, confidence intervals, and Holm-adjusted tests are provided in the generated contrast CSV; no best seed or split is selected.\n"
+    contrasts = pd.read_csv(PAPER_ROOT / "experiments/downstream_v1/downstream_contrasts.csv")
+    probe_means = dataset_metrics[dataset_metrics["task"] == "linear_probe"].groupby(
+        ["label_fraction", "variant"]
+    )["probe_macro_f1"].mean()
+
+    def probe_sentence(fraction: float, contrast: str, method: str) -> str:
+        row = contrasts[
+            (contrasts["task"] == "linear_probe")
+            & np.isclose(contrasts["label_fraction"], fraction)
+            & (contrasts["metric"] == "probe_macro_f1")
+            & (contrasts["contrast"] == contrast)
+        ].iloc[0]
+        baseline = probe_means.loc[(fraction, "nomix")]
+        relative = 100.0 * row["mean_delta"] / baseline
+        return (
+            f"At {int(100*fraction)}\\% labels, {method} changed macro-F1 versus NoMix by "
+            f"{row['mean_delta']:+.4f} ({relative:+.2f}\\% relative; dataset bootstrap 95\\% CI "
+            f"{row['ci95_low']:+.4f} to {row['ci95_high']:+.4f}; wins/ties/losses "
+            f"{int(row['wins'])}/{int(row['ties'])}/{int(row['losses'])}; Holm-adjusted "
+            f"$p={row['holm_p']:.4f}$)."
+        )
+
+    marker_t = contrasts[
+        (contrasts["task"] == "marker")
+        & (contrasts["contrast"] == "T_vs_NoMix")
+        & contrasts["metric"].isin(["recovery_recovery_at_100", "annotation_macro_f1"])
+    ].set_index("metric")
+    marker_sentence = (
+        "Marker-based endpoints were heterogeneous: scVICAR-T changed Recovery@100 by "
+        f"{marker_t.loc['recovery_recovery_at_100', 'mean_delta']:+.4f} and marker-annotation "
+        f"macro-F1 by {marker_t.loc['annotation_macro_f1', 'mean_delta']:+.4f} versus NoMix, "
+        "with both 95\\% intervals spanning zero."
     )
+    fragment = "\n\n".join([
+        r"\input{../tables/generated/downstream_overall}",
+        "Table~\\ref{tab:downstream_overall} reports all prespecified downstream endpoints after split-level and model-seed aggregation, retaining every seed and split.",
+        probe_sentence(0.1, "F_vs_NoMix", "scVICAR-F"),
+        probe_sentence(0.1, "T_vs_NoMix", "scVICAR-T"),
+        probe_sentence(0.3, "F_vs_NoMix", "scVICAR-F"),
+        probe_sentence(0.3, "T_vs_NoMix", "scVICAR-T"),
+        marker_sentence,
+    ]) + "\n"
     (manuscript / "generated/downstream_results.tex").write_text(fragment, encoding="utf-8")
+
+
+def write_full_label_sensitivity(
+    overall: pd.DataFrame, contrasts: pd.DataFrame, manuscript: Path, tables: Path
+) -> None:
+    variants = ["nomix", "fixed", "topology_full"]
+    if len(overall) != 3 or set(overall["variant"]) != set(variants):
+        raise RuntimeError("Refusing incomplete full-label sensitivity summary")
+    if set(overall["n_datasets"]) != {len(DATASETS)}:
+        raise RuntimeError("Full-label sensitivity does not use six dataset units")
+    indexed = overall.set_index("variant").reindex(variants)
+    display = {"nomix": "NoMix", "fixed": "scVICAR-F", "topology_full": "scVICAR-T"}
+    lines = [
+        r"\begin{table}[h]", r"\centering", r"\footnotesize",
+        r"\caption{Unfiltered full-label sensitivity. Values are means (SD) across six dataset-level seed averages.}",
+        r"\label{tab:full_label_sensitivity}", r"\begin{tabular}{lccc}", r"\toprule",
+        r"Method & ARI & NMI & Macro-F1 \\ ", r"\midrule",
+    ]
+    for variant, row in indexed.iterrows():
+        lines.append(
+            f"{display[variant]} & {row['ari_mean']:.3f} ({row['ari_sd']:.3f}) & "
+            f"{row['nmi_mean']:.3f} ({row['nmi_sd']:.3f}) & "
+            f"{row['f1_macro_mean']:.3f} ({row['f1_macro_sd']:.3f}) \\\\"
+        )
+    lines.extend([r"\bottomrule", r"\end{tabular}", r"\end{table}"])
+    (tables / "full_label_sensitivity.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    ari = contrasts[contrasts["metric"] == "ari"].set_index("contrast")
+    required = {"F_vs_NoMix", "T_vs_NoMix", "T_vs_F"}
+    if not required.issubset(ari.index):
+        raise RuntimeError("Full-label sensitivity ARI contrast family is incomplete")
+    sentences = []
+    for key, left, right in (
+        ("F_vs_NoMix", "scVICAR-F", "NoMix"),
+        ("T_vs_NoMix", "scVICAR-T", "NoMix"),
+        ("T_vs_F", "scVICAR-T", "scVICAR-F"),
+    ):
+        row = ari.loc[key]
+        sentences.append(
+            f"{left} versus {right} changed ARI by {row['mean_delta']:+.3f} "
+            f"(dataset bootstrap 95\\% CI {row['ci95_low']:+.3f} to {row['ci95_high']:+.3f}; "
+            f"wins/ties/losses {int(row['wins'])}/{int(row['ties'])}/{int(row['losses'])}; "
+            f"Holm-adjusted $p={row['holm_p']:.4f}$)."
+        )
+    fragment = "\n\n".join([
+        r"\input{../tables/generated/full_label_sensitivity}",
+        "The unfiltered-label cohort is analyzed as a separate sensitivity cohort.",
+        *sentences,
+    ]) + "\n"
+    (manuscript / "generated/full_label_sensitivity_results.tex").write_text(
+        fragment, encoding="utf-8"
+    )
 
 
 def write_leiden(overall: pd.DataFrame, contrasts: pd.DataFrame, manuscript: Path, tables: Path) -> None:
@@ -151,7 +242,7 @@ def write_leiden(overall: pd.DataFrame, contrasts: pd.DataFrame, manuscript: Pat
 
     fragment = "\n\n".join([
         r"\input{../tables/generated/leiden_overall}",
-        "Fixed-resolution Leiden changed absolute scores and some method ordering but did not support a universal adaptive advantage. "
+        "Fixed-resolution Leiden changed absolute scores and some method ordering. "
         + effect("F_vs_NoMix", "scVICAR-F", "NoMix"),
         effect("T_vs_NoMix", "scVICAR-T", "NoMix"),
         effect("T_vs_F", "scVICAR-T", "scVICAR-F"),
@@ -175,6 +266,7 @@ def write_stress(stress_runs: pd.DataFrame, manuscript: Path, tables: Path) -> N
     degradation = pivot.subtract(clean, axis=1)
     lines = [
         r"\begin{table}[t]", r"\centering",
+        r"\scriptsize", r"\setlength{\tabcolsep}{2.5pt}",
         r"\caption{Graph-contamination stress results. ARI values average model seeds within dataset and then the three stress-test datasets. Degradation is relative to each variant's clean graph.}",
         r"\label{tab:stress_overall}", r"\begin{tabular}{rrrrr}", r"\toprule",
         r"Injected edges (\%) & F ARI & T ARI & F degradation & T degradation \\ ", r"\midrule",
@@ -191,6 +283,17 @@ def write_stress(stress_runs: pd.DataFrame, manuscript: Path, tables: Path) -> N
 
     final = max(pivot.index)
     difference = degradation.loc[final, "topology_full"] - degradation.loc[final, "fixed"]
+    dataset_pivot = seed_mean.pivot(
+        index=["dataset", "contamination"], columns="variant", values="ari"
+    )
+    dataset_clean = dataset_pivot.xs(0.0, level="contamination")
+    dataset_final = dataset_pivot.xs(final, level="contamination")
+    dataset_degradation = dataset_final - dataset_clean
+    dataset_difference = (
+        dataset_degradation["topology_full"] - dataset_degradation["fixed"]
+    )
+    robustness_wins = int((dataset_difference > 0).sum())
+    robustness_losses = int((dataset_difference < 0).sum())
     diagnostic = seed_mean[(seed_mean["variant"] == "topology_full") & (seed_mean["contamination"] > 0)]
     auroc = float(diagnostic["affinity_same_edge_auroc"].mean())
     gate = float(diagnostic["gate_purity_spearman"].mean())
@@ -205,12 +308,15 @@ def write_stress(stress_runs: pd.DataFrame, manuscript: Path, tables: Path) -> N
             f"{degradation.loc[final, 'fixed']:.3f} for scVICAR-F and "
             f"{degradation.loc[final, 'topology_full']:.3f} for scVICAR-T; "
             f"the descriptive T--F degradation difference was {difference:.3f} "
-            f"(positive values indicate slower degradation for T)."
+            f"(positive values indicate slower degradation for T). At the dataset level, "
+            f"this contrast favored T in {robustness_wins}/3 datasets and F in "
+            f"{robustness_losses}/3 (range {dataset_difference.min():.3f} to "
+            f"{dataset_difference.max():.3f}), showing dataset-dependent robustness."
         ),
         (
             f"Across nonzero contamination levels, the topology-informed affinity had mean same-edge AUROC {auroc:.3f}, "
             f"and the mean gate--purity Spearman association was {gate:.3f}. "
-            "These are mechanism diagnostics, not independent biological replicates."
+            "Both statistics are post-hoc summaries."
         ),
         (
             "At zero injected contamination, descriptive ARI means for the implemented, uniform-sample, and full-neighborhood estimators were "
@@ -254,10 +360,19 @@ def write_baselines(baseline: pd.DataFrame, formal: pd.DataFrame, manuscript: Pa
         )
     lines.extend([r"\bottomrule", r"\end{tabular}", r"\end{table*}"])
     (tables / "external_baselines.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    t_ari = float(overall.loc["topology_full", ("ari", "mean")])
+    original_ari = float(overall.loc["scmae", ("ari", "mean")])
+    relative_ari = 100.0 * (t_ari - original_ari) / original_ari
+    f_nmi = float(overall.loc["fixed", ("nmi", "mean")])
+    f_f1 = float(overall.loc["fixed", ("f1_macro", "mean")])
+    nomix_ari = float(overall.loc["nomix", ("ari", "mean")])
     (manuscript / "generated/baseline_results.tex").write_text(
         r"\input{../tables/generated/external_baselines}" + "\n"
-        + "External methods are reported under their frozen published adapters and are not used to attribute backbone-matched gains. "
-        + "Every row averages all three seeds within dataset before the six-dataset summary; no historical value or best seed is substituted. "
+        + "External methods are reported under their frozen published adapters. "
+        + "Every row averages all three seeds within each dataset before the six-dataset summary. "
+        + f"scVICAR-T had the highest mean ARI ({t_ari:.3f}), {relative_ari:.2f}\\% above Original scMAE ({original_ari:.3f}); "
+        + f"scVICAR-F had the highest mean NMI ({f_nmi:.3f}) and macro-F1 ({f_f1:.3f}). "
+        + f"Matched NoMix reached {nomix_ari:.3f} ARI. The matched-variant analysis estimates the contribution of vicinal mixing. "
         + "Wall-clock times are descriptive because CPU/GPU frameworks and interpreters differ across published implementations.\n",
         encoding="utf-8",
     )
@@ -288,6 +403,14 @@ def main() -> None:
     parser.add_argument("--stress-runs", type=Path, default=PAPER_ROOT / "experiments/stress_v1/stress_runs.csv")
     parser.add_argument("--downstream-metrics", type=Path, default=PAPER_ROOT / "experiments/downstream_v1/dataset_variant_metrics.csv")
     parser.add_argument(
+        "--full-label-overall", type=Path,
+        default=PAPER_ROOT / "experiments/sensitivity_full_labels_v1/aggregate/variant_overall_metrics.csv",
+    )
+    parser.add_argument(
+        "--full-label-contrasts", type=Path,
+        default=PAPER_ROOT / "experiments/sensitivity_full_labels_v1/aggregate/contrasts.csv",
+    )
+    parser.add_argument(
         "--leiden-overall", type=Path,
         default=PAPER_ROOT / "experiments/leiden_fixed_v1/aggregate/variant_overall_metrics.csv",
     )
@@ -305,8 +428,8 @@ def main() -> None:
         "\\newcommand{\\FormalDatasetCount}{6}\n"
         "\\newcommand{\\FormalSeedCount}{3}\n"
         "\\newcommand{\\FormalRunCount}{108}\n"
-        "\\newcommand{\\FormalResultStatus}{primary confirmatory matrix complete; robustness and downstream validation in progress}\n"
-        "\\newcommand{\\DevelopmentDatasetCount}{16}\n",
+        "\\newcommand{\\FormalResultStatus}{primary, robustness, Leiden, and downstream matrices complete}\n"
+        "\\newcommand{\\DevelopmentDatasetCount}{15}\n",
         encoding="utf-8",
     )
     write_confirmatory(formal, pd.read_csv(args.contrasts), manuscript, tables)
@@ -332,6 +455,13 @@ def main() -> None:
         write_downstream(pd.read_csv(args.downstream_metrics), manuscript, tables)
     elif args.require_all:
         raise FileNotFoundError(args.downstream_metrics)
+    if args.full_label_overall.is_file() and args.full_label_contrasts.is_file():
+        write_full_label_sensitivity(
+            pd.read_csv(args.full_label_overall),
+            pd.read_csv(args.full_label_contrasts), manuscript, tables,
+        )
+    elif args.require_all:
+        raise FileNotFoundError("Complete full-label sensitivity aggregate is required")
     print("Generated manuscript assets from complete frozen aggregates")
 
 

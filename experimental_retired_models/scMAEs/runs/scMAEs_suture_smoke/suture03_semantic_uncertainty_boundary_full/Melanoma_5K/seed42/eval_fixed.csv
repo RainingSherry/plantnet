@@ -1,2 +1,0 @@
-dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,suture03_semantic_uncertainty_boundary_full,42,smoke,0.6479060491912253,0.6429219415749919,0.5446799705726554,0.5065254484926787,0.6322914226115701,0.642921941574992,0.6953950684705541,0.5978122219302217,9,,fixed,kmeans_known_k,True

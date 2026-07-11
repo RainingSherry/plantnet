@@ -1,3 +1,0 @@
-dataset,seed,variant,source_variant,graph_enabled,prob_graph_gain,ari,nmi,acc,q_total
-Pollen,42,safe_rdg_calibrated_logistic_explore,pca_kmeans,False,0.0,0.03339391415030334,0.11612458329724176,0.23255813953488372,0.7744577071822498
-Wang,42,safe_rdg_calibrated_logistic_explore,pca_kmeans,False,0.0,0.7858779620945557,0.6931907552992126,0.9472633680008404,0.7007474376409446

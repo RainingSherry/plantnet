@@ -68,7 +68,10 @@ def make_pseudo_batch(
     rng: np.random.Generator,
     random_neighbors: np.ndarray | None = None,
     far_neighbors: np.ndarray | None = None,
+    neighbor_estimator: str = "current",
 ) -> tuple[torch.Tensor, torch.Tensor, dict]:
+    if neighbor_estimator not in {"current", "uniform_sample", "full"}:
+        raise ValueError(f"Unknown neighbor_estimator: {neighbor_estimator!r}")
     if mix_mode == "none" or graph.indices.shape[1] == 0 or int(mix_neighbors) <= 0:
         zeros = torch.zeros(batch_x.shape[0], dtype=batch_x.dtype, device=batch_x.device)
         return batch_x.detach(), zeros, {"mean_node_gate": 0.0, "mean_perturb_norm": 0.0}
@@ -76,29 +79,51 @@ def make_pseudo_batch(
     bsz = int(batch_indices.shape[0])
     k = int(graph.indices.shape[1])
     m = max(1, min(int(mix_neighbors), k))
-    sampled = np.empty((bsz, m), dtype=np.int64)
-    weights = np.empty((bsz, m), dtype=np.float32)
-    for pos, cell in enumerate(batch_indices):
-        if mix_mode == "random" and random_neighbors is not None:
-            row = random_neighbors[cell]
-            probs = np.full(row.shape[0], 1.0 / row.shape[0], dtype=np.float32)
-        elif mix_mode == "far" and far_neighbors is not None:
-            row = far_neighbors[cell]
-            probs = np.full(row.shape[0], 1.0 / row.shape[0], dtype=np.float32)
-        elif mix_mode == "mutual":
-            mask = graph.mutual[cell]
-            row = graph.indices[cell][mask] if np.any(mask) else graph.indices[cell]
-            probs = np.full(row.shape[0], 1.0 / row.shape[0], dtype=np.float32)
-        else:
-            row = graph.indices[cell]
-            probs = edge_weights[cell] if mix_mode == "reliability" else graph.probs[cell]
-        choices = rng.choice(row.shape[0], size=m, replace=True, p=probs / np.clip(probs.sum(), 1e-12, None))
-        sampled[pos] = row[choices]
-        picked = probs[choices].astype(np.float32, copy=False)
-        weights[pos] = picked / max(float(picked.sum()), 1e-12)
+    if neighbor_estimator == "full":
+        neighbor_mean = np.empty((bsz, data_np.shape[1]), dtype=np.float32)
+        for pos, cell in enumerate(batch_indices):
+            if mix_mode == "random" and random_neighbors is not None:
+                row = random_neighbors[cell]
+                probs = np.full(row.shape[0], 1.0 / row.shape[0], dtype=np.float32)
+            elif mix_mode == "far" and far_neighbors is not None:
+                row = far_neighbors[cell]
+                probs = np.full(row.shape[0], 1.0 / row.shape[0], dtype=np.float32)
+            elif mix_mode == "mutual":
+                mask = graph.mutual[cell]
+                row = graph.indices[cell][mask] if np.any(mask) else graph.indices[cell]
+                probs = np.full(row.shape[0], 1.0 / row.shape[0], dtype=np.float32)
+            else:
+                row = graph.indices[cell]
+                probs = edge_weights[cell] if mix_mode == "reliability" else graph.probs[cell]
+            normalized = probs / np.clip(probs.sum(), 1e-12, None)
+            neighbor_mean[pos] = np.sum(data_np[row] * normalized[:, None], axis=0).astype(np.float32)
+    else:
+        sampled = np.empty((bsz, m), dtype=np.int64)
+        weights = np.empty((bsz, m), dtype=np.float32)
+        for pos, cell in enumerate(batch_indices):
+            if mix_mode == "random" and random_neighbors is not None:
+                row = random_neighbors[cell]
+                probs = np.full(row.shape[0], 1.0 / row.shape[0], dtype=np.float32)
+            elif mix_mode == "far" and far_neighbors is not None:
+                row = far_neighbors[cell]
+                probs = np.full(row.shape[0], 1.0 / row.shape[0], dtype=np.float32)
+            elif mix_mode == "mutual":
+                mask = graph.mutual[cell]
+                row = graph.indices[cell][mask] if np.any(mask) else graph.indices[cell]
+                probs = np.full(row.shape[0], 1.0 / row.shape[0], dtype=np.float32)
+            else:
+                row = graph.indices[cell]
+                probs = edge_weights[cell] if mix_mode == "reliability" else graph.probs[cell]
+            choices = rng.choice(row.shape[0], size=m, replace=True, p=probs / np.clip(probs.sum(), 1e-12, None))
+            sampled[pos] = row[choices]
+            picked = probs[choices].astype(np.float32, copy=False)
+            if neighbor_estimator == "current":
+                weights[pos] = picked / max(float(picked.sum()), 1e-12)
+            else:
+                weights[pos] = 1.0 / float(m)
 
-    neighbor_expr = data_np[sampled]
-    neighbor_mean = np.sum(neighbor_expr * weights[:, :, None], axis=1).astype(np.float32)
+        neighbor_expr = data_np[sampled]
+        neighbor_mean = np.sum(neighbor_expr * weights[:, :, None], axis=1).astype(np.float32)
     gate = np.asarray(node_gate[batch_indices], dtype=np.float32)
     if mix_mode in {"random", "far", "fixed"}:
         gate = np.maximum(gate, float(np.mean(node_gate)) if node_gate.size else 0.1).astype(np.float32)

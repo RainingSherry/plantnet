@@ -1,42 +1,59 @@
 \section{Discussion and Limitations}
 \label{sec:discussion}
 
-scVICAR treats local cell structure as a corruption distribution rather than a
-source of pseudo-labels.  The original anchor remains the target, and the graph
-is absent at clean inference.  This design makes the local perturbation easy to
-bound and gives a clear distinction between fixed vicinal regularization and
-topology-adaptive risk control.
+scVICAR uses intercellular structure to construct corrupted training examples.
+The decoder recovers the original cell, and the encoder processes clean
+expression profiles at inference. This design adds local information to scMAE
+with a single graph operation during training. The convex-hull and displacement
+bounds describe the resulting input change.
 
-Several limitations are fundamental.  First, a PCA cosine KNN graph remains an
-imperfect biological proxy.  Mutual and shared-neighbor evidence may correlate
-with edge purity, but the affinity is not calibrated and may fail around
-transitions, batches, or rare types.  Second, similarity and cosine distance are
-algebraically redundant in the current kernel; a future implementation should
-either combine their coefficient or introduce an independent distance signal.
-Third, the primary sampler draws by an affinity and reweights by that affinity,
-which sharpens the effective kernel.  We preserve this behavior for fidelity to
-the developed model and evaluate unbiased/full-neighborhood alternatives as
-ablations.
+The full scVICAR pipeline performed well across the evaluated datasets. Among
+16 primary configurations in the 15-dataset benchmark, scVICAR-T and scVICAR-F ranked
+first and second on all four mean metrics. In the six frozen datasets,
+scVICAR-T had the highest mean ARI, and scVICAR-F had the highest mean NMI and
+macro-F1. The matched-backbone comparisons showed smaller
+effects: $-0.002$ ARI for scVICAR-F and $+0.005$ for scVICAR-T relative to
+NoMix. The external rankings describe complete pipelines, whereas the matched
+effects estimate the incremental contribution of local mixing. That
+contribution varied by dataset.
 
-The theory describes the augmentation operator, not a universal clustering
-guarantee.  Its Lipschitz conclusion depends on an unspecified encoder constant,
-and the Taylor interpretation requires smoothness, small perturbations, and a
-small input-direction gradient or centered perturbation; parameter stationarity
-alone is insufficient.  The contamination bound becomes useful only if the
-topology mechanism empirically reduces erroneous weight mass, or contracts the
-overall perturbation through the gate, under the stated radius conditions.
+The ablations clarify the role of each component. RandomMix performed worse
+than local mixing, indicating that neighbor selection matters. The gate-only
+variant had the highest descriptive clean-graph ARI, whereas edge-only
+weighting remained below NoMix. Cell-specific control of mixing strength was
+the stronger adaptive component on the clean confirmatory graphs.
+The full model also provides edge weights that can be examined under graph
+corruption.
 
-The evaluation also has scope limits.  Known-$K$ KMeans measures embedding
-quality under a supplied cluster count; fixed-resolution Leiden is included to
-show a non-oracle view but does not solve resolution selection.  Six
-confirmatory datasets are stronger evidence than the development table, yet
-they do not cover all tissues, platforms, disease states, or batch structures.
-Low-label probes are transductive and cannot be interpreted as cross-study
-annotation.  Marker evaluation inherits limitations of Wilcoxon ranking and
-reference-label quality.
+The stress experiment measured that response directly. Topology-informed
+affinity separated retained same-class edges from injected cross-class edges
+with mean AUROC 0.918. The cell-specific mixing coefficient correlated with
+weighted neighborhood purity (mean Spearman 0.520). ARI degradation favored
+scVICAR-T on two datasets and scVICAR-F on one at complete edge replacement.
+Graph geometry and the encoder response therefore determine whether accurate
+edge scoring improves the final clustering.
 
-Finally, the historical 16-dataset experiments participated in method
-development.  We disclose that selection history in the supplement and keep it
-separate from confirmation.  scVICAR-T is not claimed to beat scVICAR-F on
-every dataset; its scientific question is whether topology adaptation provides
-measurable protection when local graphs are contaminated.
+The downstream tasks showed a similarly specific pattern. Frozen low-label
+probes improved by 0.13--0.34\% in relative macro-F1, with positive changes on
+most datasets. Marker recovery and marker-overlap annotation varied more
+widely, and scVICAR-T had negative mean changes on both marker endpoints.
+Local mixing changed linear class separation more consistently than
+cluster-level differential-expression programs. High baseline probe accuracy and
+dataset-specific marker quality may also limit the observed gains.
+
+Several design choices restrict the current method. The static PCA cosine KNN
+graph can connect different cell types near transitions, batch boundaries, and
+rare populations. The topology-informed affinity is an uncalibrated analytic
+weight. Cosine similarity and cosine distance are algebraically redundant in
+its current form. The sampler also uses the same affinity for sampling and
+reweighting, which sharpens the effective kernel. Alternative estimators in the
+ablation produced similar mean ARI at zero injected contamination.
+
+The evaluation covers six frozen datasets, three model seeds, known-$K$
+KMeans, and fixed-resolution Leiden. Other tissues, disease states, platforms,
+and batch structures may produce different graph errors. The complete-label
+sensitivity analysis suggests a possible benefit for rare or unresolved
+populations and motivates a dedicated rare-cell evaluation. The low-label
+probe measures within-dataset transductive annotation. Within this scope,
+scVICAR provides competitive masked representations and explicit measurements
+of how local graph quality affects neighbor mixing.

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + local Graphormer structural bias,42,rank28_graphormer_structural_bias_full,screen,scaled encoder + log-expression targets + local KNN Graphormer structural bias,0.6996440536013401,0.6080163671673877,0.47942160909558545,0.6225252784201291,0.7184294190262995,0.6080163671673876,0.8021306389712332,0.4895468491994677,5,,fixed,kmeans_known_k,True

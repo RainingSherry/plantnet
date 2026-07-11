@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,num_modules,mask_prob,module_mask_prob,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + MaskFeat gene-module semantic target,42,rank02_maskfeat_gene_module_semantic_full,screen,scaled encoder + log_expr module semantic targets,32,0.25,0.08,0.5428182579564489,0.5467175807773571,0.3108792442435611,0.4799091109116736,0.5912313860422683,0.5467175807773572,0.7767289620850848,0.421808246642574,5,,fixed,kmeans_known_k,True

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + CMT collaborative mask target,42,rank50_cmt_collaborative_mask_target_full,screen,scaled encoder + log-expression targets + collaborative mask and feature targets,0.9091289782244556,0.6641591099982079,0.7664607619277045,0.6903411665790555,0.8981860552264366,0.6641591099982079,0.6733377888175681,0.6552273062327513,5,,fixed,kmeans_known_k,True

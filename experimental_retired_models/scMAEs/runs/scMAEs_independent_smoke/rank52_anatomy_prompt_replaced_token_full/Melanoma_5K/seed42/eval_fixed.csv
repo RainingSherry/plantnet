@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + anatomy prompt replaced token,42,rank52_anatomy_prompt_replaced_token_full,smoke,scaled encoder + log-expression targets + module prompts/replaced-token objectives,0.44272102814092623,0.42466672798718835,0.3276849315214009,0.34880851740962365,0.44602951356947407,0.42466672798718835,0.4789956941510215,0.38140657894007507,9,,fixed,kmeans_known_k,True

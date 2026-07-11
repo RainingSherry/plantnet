@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + iBOT online tokenizer,42,rank33_ibot_online_tokenizer_full,screen,scaled encoder + log-expression targets + iBOT online tokenizer,0.5063150897407489,0.5450821656551883,0.3841249923955891,0.3914020236661744,0.4959087878439397,0.5450821656551883,0.604681096645669,0.4961776178387675,9,,fixed,kmeans_known_k,True

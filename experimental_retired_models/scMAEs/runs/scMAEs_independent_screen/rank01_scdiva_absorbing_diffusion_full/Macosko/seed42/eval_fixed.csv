@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,token_bins,t_min,t_max,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + ScDiVa absorbing token target,42,rank01_scdiva_absorbing_diffusion_full,screen,scaled encoder + log_expr targets,8,0.15,0.65,0.35663274415282986,0.43712318945053585,0.181467134561127,0.27605972384244803,0.4149689295040821,0.4371231894505358,0.6518723129391997,0.328803895875243,12,,fixed,kmeans_known_k,True

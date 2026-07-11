@@ -1,2 +1,0 @@
-dataset,method,seed,decoder_mode,mask_rank,variance_weight,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,decoder-bypass ablation,42,lowrank,16,0.02,0.7103922003102149,0.7149077035219688,0.6446081422175879,0.5213197859119848,0.7147475824711521,0.7149077035219686,0.7456408089167984,0.6866077653157795,9,,fixed,kmeans_known_k,True

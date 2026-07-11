@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + TS2Vec gene-module contextual consistency,42,rank39_ts2vec_gene_module_full,smoke,scaled encoder + log-expression SVD gene-module TS2Vec consistency,0.6911145579437181,0.6416219723133495,0.5496853717915292,0.5088410906572426,0.6371278440598036,0.6416219723133495,0.6786097124980432,0.6084578704572762,9,,fixed,kmeans_known_k,True

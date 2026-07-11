@@ -1,8 +1,0 @@
-{
-  "neighbor_k": 15,
-  "pca_dim": 50,
-  "tau": 0.2,
-  "mean_neighbor_similarity": 0.9128476977348328,
-  "mean_max_neighbor_prob": 0.07530739622776848,
-  "enabled": true
-}

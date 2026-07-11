@@ -49,6 +49,7 @@ VARIANTS = {
     "rdg_always_on",
     "safe_rdg_heuristic",
     "safe_rdg_pca_u",
+    "safe_rdg_pca_v31_u",
     "neg_random_cell_graph",
     "neg_degree_shuffle_graph",
     "neg_shuffled_gene_cell_graph",
@@ -65,6 +66,7 @@ STAGE_A_VARIANTS = [
     "rdg_always_on",
     "safe_rdg_heuristic",
     "safe_rdg_pca_u",
+    "safe_rdg_pca_v31_u",
 ]
 
 NEGATIVE_CONTROL_VARIANTS = [
@@ -107,6 +109,17 @@ class Config:
     cluster_entropy_min: float = 0.70
     largest_cluster_ratio_max: float = 0.80
     hubness_max: float = 10.0
+    v31_pca_margin: float = 0.03
+    v31_neighbor_min: float = 0.50
+    v31_general_largest_max: float = 0.45
+    v31_gene_largest_max: float = 0.35
+    v31_contrast_min: float = 0.05
+    v31_contrast_entropy_min: float = 0.78
+    v31_contrast_largest_max: float = 0.30
+    v31_rescue_neighbor_min: float = 0.85
+    v31_rescue_entropy_min: float = 0.85
+    v31_rescue_largest_max: float = 0.25
+    v31_rescue_hubness_max: float = 3.0
     spectral_failure_policy: str = "fail"
     eps: float = 1e-8
 
@@ -820,6 +833,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--cluster_entropy_min", type=float, default=0.70)
     parser.add_argument("--largest_cluster_ratio_max", type=float, default=0.80)
     parser.add_argument("--hubness_max", type=float, default=10.0)
+    parser.add_argument("--v31_pca_margin", type=float, default=0.03)
+    parser.add_argument("--v31_neighbor_min", type=float, default=0.50)
+    parser.add_argument("--v31_general_largest_max", type=float, default=0.45)
+    parser.add_argument("--v31_gene_largest_max", type=float, default=0.35)
+    parser.add_argument("--v31_contrast_min", type=float, default=0.05)
+    parser.add_argument("--v31_contrast_entropy_min", type=float, default=0.78)
+    parser.add_argument("--v31_contrast_largest_max", type=float, default=0.30)
+    parser.add_argument("--v31_rescue_neighbor_min", type=float, default=0.85)
+    parser.add_argument("--v31_rescue_entropy_min", type=float, default=0.85)
+    parser.add_argument("--v31_rescue_largest_max", type=float, default=0.25)
+    parser.add_argument("--v31_rescue_hubness_max", type=float, default=3.0)
     parser.add_argument("--spectral_failure_policy", default="fail", choices=["fail", "random_fallback"])
     parser.add_argument("--save_embedding_h5", type=family.str2bool, default=True)
     parser.add_argument("--include_negative_controls", type=family.str2bool, default=False)
@@ -851,6 +875,17 @@ def cfg_from_args(args: argparse.Namespace) -> Config:
         cluster_entropy_min=args.cluster_entropy_min,
         largest_cluster_ratio_max=args.largest_cluster_ratio_max,
         hubness_max=args.hubness_max,
+        v31_pca_margin=args.v31_pca_margin,
+        v31_neighbor_min=args.v31_neighbor_min,
+        v31_general_largest_max=args.v31_general_largest_max,
+        v31_gene_largest_max=args.v31_gene_largest_max,
+        v31_contrast_min=args.v31_contrast_min,
+        v31_contrast_entropy_min=args.v31_contrast_entropy_min,
+        v31_contrast_largest_max=args.v31_contrast_largest_max,
+        v31_rescue_neighbor_min=args.v31_rescue_neighbor_min,
+        v31_rescue_entropy_min=args.v31_rescue_entropy_min,
+        v31_rescue_largest_max=args.v31_rescue_largest_max,
+        v31_rescue_hubness_max=args.v31_rescue_hubness_max,
         spectral_failure_policy=args.spectral_failure_policy,
     )
 
@@ -1146,6 +1181,144 @@ def main() -> int:
         selector_cache["safe_rdg_pca_u"] = {"chosen_branch": chosen, "embedding": emb, "gate": selected_gate, "stability": stability, "scores": scores}
         return chosen, emb, selected_gate, stability, scores
 
+    def safe_rdg_pca_v31_u_selection() -> tuple[str, np.ndarray, dict, dict, dict]:
+        if "safe_rdg_pca_v31_u" in selector_cache:
+            cached = selector_cache["safe_rdg_pca_v31_u"]
+            return cached["chosen_branch"], cached["embedding"], cached["gate"], cached["stability"], cached["scores"]
+
+        neg_specs = negative_branch_specs()
+        neg_scores = {name: reliability_for_branch(name, spec, None) for name, spec in neg_specs.items()}
+        neg_values = np.asarray([score["base_score"] for score in neg_scores.values()], dtype=np.float64)
+        negative_p95 = float(np.percentile(neg_values, 95)) if neg_values.size else 1.0
+
+        pca_spec = {
+            "embedding": z_raw,
+            "affinity": None,
+            "graph_diag": final_pca_diag,
+            "uses_graph_clustering": False,
+            "uses_rdg_graph": False,
+            "uses_rdg_features": False,
+        }
+        pca_score = reliability_for_branch("pca_kmeans", pca_spec, None)
+        candidates = branch_specs()
+        cand_scores = {name: reliability_for_branch(name, spec, negative_p95) for name, spec in candidates.items()}
+
+        def rescue_profile(score: dict) -> bool:
+            return bool(
+                score["neighbor_stability"] >= cfg.v31_rescue_neighbor_min
+                and score["cluster_size_entropy"] >= cfg.v31_rescue_entropy_min
+                and score["largest_cluster_ratio"] <= cfg.v31_rescue_largest_max
+                and score["hubness_ratio"] <= cfg.v31_rescue_hubness_max
+            )
+
+        def eligible_graph_branch(name: str, score: dict) -> bool:
+            rescue_ok = rescue_profile(score)
+            contrast_ok = score["negative_control_contrast"] >= cfg.v31_contrast_min
+            contrast_shape_ok = bool(
+                score["cluster_size_entropy"] >= cfg.v31_contrast_entropy_min
+                and score["largest_cluster_ratio"] <= cfg.v31_contrast_largest_max
+            )
+            competitive_ok = rescue_ok or (score["utility"] >= pca_score["utility"] + cfg.v31_pca_margin)
+            largest_limit = cfg.v31_gene_largest_max if name == "rdg_gene_only" else cfg.v31_general_largest_max
+            return bool(
+                score["passes_unsupervised_gate"]
+                and competitive_ok
+                and score["neighbor_stability"] >= cfg.v31_neighbor_min
+                and score["largest_cluster_ratio"] <= largest_limit
+                and ((contrast_ok and contrast_shape_ok) or rescue_ok)
+            )
+
+        eligible = [name for name, score in cand_scores.items() if eligible_graph_branch(name, score)]
+        if eligible:
+            chosen = max(eligible, key=lambda name: cand_scores[name]["utility"])
+            emb = np.asarray(candidates[chosen]["embedding"], dtype=np.float32)
+            chosen_spec = candidates[chosen]
+            selected_gate = {
+                **gate,
+                "variant": "safe_rdg_pca_v31_u",
+                "graph_enabled": True,
+                "fallback_to_pca": False,
+                "chosen_branch": chosen,
+                "uses_graph_clustering": bool(chosen_spec.get("uses_graph_clustering", False)),
+                "uses_rdg_graph": bool(chosen_spec.get("uses_rdg_graph", False)),
+                "uses_rdg_features": bool(chosen_spec.get("uses_rdg_features", False)),
+                "selector_type": "strict_unsupervised_pca_competitive_stability_negative_control_v31",
+            }
+        else:
+            chosen = "pca_kmeans"
+            emb = z_raw
+            selected_gate = {
+                **gate,
+                "variant": "safe_rdg_pca_v31_u",
+                "graph_enabled": False,
+                "fallback_to_pca": True,
+                "chosen_branch": "pca_kmeans",
+                "uses_graph_clustering": False,
+                "uses_rdg_graph": False,
+                "uses_rdg_features": False,
+                "selector_type": "strict_unsupervised_pca_competitive_stability_negative_control_v31",
+            }
+        eligibility = {
+            name: {
+                "eligible_v31": bool(name in eligible),
+                "rescue_profile": rescue_profile(score),
+                "contrast_ok": bool(score["negative_control_contrast"] >= cfg.v31_contrast_min),
+                "contrast_shape_ok": bool(
+                    score["cluster_size_entropy"] >= cfg.v31_contrast_entropy_min
+                    and score["largest_cluster_ratio"] <= cfg.v31_contrast_largest_max
+                ),
+                "competitive_vs_pca": bool(score["utility"] >= pca_score["utility"] + cfg.v31_pca_margin),
+                "pca_utility_margin": float(score["utility"] - pca_score["utility"]),
+            }
+            for name, score in cand_scores.items()
+        }
+        stability = {
+            "negative_control_p95": negative_p95,
+            "negative_controls": neg_scores,
+            "pca_candidate": pca_score,
+            "candidates": cand_scores,
+            "eligibility": eligibility,
+            "eligible_branches": eligible,
+            "chosen_branch": chosen,
+            "thresholds": {
+                "assignment_stability_min": cfg.assignment_stability_min,
+                "graph_stability_min": cfg.graph_stability_min,
+                "cluster_entropy_min": cfg.cluster_entropy_min,
+                "largest_cluster_ratio_max": cfg.largest_cluster_ratio_max,
+                "hubness_max": cfg.hubness_max,
+                "stability_margin": cfg.stability_margin,
+                "stability_max_cells": cfg.stability_max_cells,
+                "v31_pca_margin": cfg.v31_pca_margin,
+                "v31_neighbor_min": cfg.v31_neighbor_min,
+                "v31_general_largest_max": cfg.v31_general_largest_max,
+                "v31_gene_largest_max": cfg.v31_gene_largest_max,
+                "v31_contrast_min": cfg.v31_contrast_min,
+                "v31_contrast_entropy_min": cfg.v31_contrast_entropy_min,
+                "v31_contrast_largest_max": cfg.v31_contrast_largest_max,
+                "v31_rescue_neighbor_min": cfg.v31_rescue_neighbor_min,
+                "v31_rescue_entropy_min": cfg.v31_rescue_entropy_min,
+                "v31_rescue_largest_max": cfg.v31_rescue_largest_max,
+                "v31_rescue_hubness_max": cfg.v31_rescue_hubness_max,
+            },
+            "label_free": True,
+        }
+        scores = {
+            "selector": "safe_rdg_pca_v31_u",
+            "chosen_branch": chosen,
+            "pca_candidate": pca_score,
+            "candidate_scores": cand_scores,
+            "negative_control_scores": neg_scores,
+            "eligibility": eligibility,
+        }
+        selector_cache["safe_rdg_pca_v31_u"] = {
+            "chosen_branch": chosen,
+            "embedding": emb,
+            "gate": selected_gate,
+            "stability": stability,
+            "scores": scores,
+        }
+        return chosen, emb, selected_gate, stability, scores
+
     def select_variant(v: str) -> tuple[np.ndarray, np.ndarray, dict]:
         local_gate = {
             **gate,
@@ -1186,6 +1359,9 @@ def main() -> int:
                 emb = z_raw
         elif v == "safe_rdg_pca_u":
             _, emb, selected_gate, _, _ = safe_rdg_pca_u_selection()
+            local_gate = selected_gate
+        elif v == "safe_rdg_pca_v31_u":
+            _, emb, selected_gate, _, _ = safe_rdg_pca_v31_u_selection()
             local_gate = selected_gate
         elif v == "neg_random_cell_graph":
             local_gate.update({"graph_enabled": True, "uses_graph_clustering": True, "uses_rdg_graph": False, "negative_control": "random_cell_graph"})
@@ -1251,8 +1427,8 @@ def main() -> int:
             "clusters": cluster_diagnostics(pred),
             "gate": local_gate,
         }
-        if out_variant == "safe_rdg_pca_u":
-            cached = selector_cache.get("safe_rdg_pca_u", {})
+        if out_variant in {"safe_rdg_pca_u", "safe_rdg_pca_v31_u"}:
+            cached = selector_cache.get(out_variant, {})
             local_diag["stability_diagnostics"] = cached.get("stability", {})
             local_diag["selector_scores"] = cached.get("scores", {})
         if out_variant in NEGATIVE_CONTROL_VARIANTS:

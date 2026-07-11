@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + AudioMAE module patch,42,rank21_audiomae_module_patch_full,screen,scaled encoder + log_expr ordered module-patch targets,0.7696817420435511,0.6409930046056862,0.5809151323433339,0.6139189543839402,0.7843686589908144,0.6409930046056862,0.8156664612988698,0.5279364047489052,5,,fixed,kmeans_known_k,True

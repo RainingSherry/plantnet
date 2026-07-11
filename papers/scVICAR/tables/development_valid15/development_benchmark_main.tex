@@ -1,0 +1,30 @@
+% Requires booktabs.
+\begin{table*}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\caption{Primary development comparison on 15 datasets and 16 method configurations. Each row summarizes 45 runs (three seeds per dataset). Bold and underlined values denote the best and second-best mean, respectively. The exploratory contrastive extension is reported in the supplement.}
+\label{tab:development-benchmark}
+\begin{tabular}{rlrrrr}
+\toprule
+Rank & Method & ACC & NMI & ARI & Macro-F1 \\
+\midrule
+1 & scVICAR-T & \textbf{0.8401 $\pm$ 0.1111} & \textbf{0.8374 $\pm$ 0.0951} & \textbf{0.7955 $\pm$ 0.1713} & \textbf{0.7541 $\pm$ 0.1253} \\
+2 & scVICAR-F & \underline{0.8353 $\pm$ 0.1309} & \underline{0.8346 $\pm$ 0.1005} & \underline{0.7868 $\pm$ 0.1791} & \underline{0.7537 $\pm$ 0.1321} \\
+3 & scMAE & 0.8134 $\pm$ 0.1259 & 0.8224 $\pm$ 0.1000 & 0.7570 $\pm$ 0.1754 & 0.7437 $\pm$ 0.1193 \\
+4 & scNAME & 0.7935 $\pm$ 0.1101 & 0.7878 $\pm$ 0.1075 & 0.7326 $\pm$ 0.1584 & 0.6441 $\pm$ 0.1430 \\
+5 & PCA + KMeans (known K) & 0.7875 $\pm$ 0.1567 & 0.7773 $\pm$ 0.1446 & 0.7093 $\pm$ 0.2304 & 0.6553 $\pm$ 0.1828 \\
+6 & scziDesk & 0.7765 $\pm$ 0.1373 & 0.7488 $\pm$ 0.1857 & 0.6793 $\pm$ 0.2464 & 0.6231 $\pm$ 0.2022 \\
+7 & scDCC & 0.7504 $\pm$ 0.1469 & 0.7662 $\pm$ 0.1217 & 0.6647 $\pm$ 0.1805 & 0.6714 $\pm$ 0.1737 \\
+8 & SC3 & 0.7274 $\pm$ 0.1591 & 0.7663 $\pm$ 0.1276 & 0.6433 $\pm$ 0.2261 & 0.6747 $\pm$ 0.1485 \\
+9 & scDeepCluster & 0.7231 $\pm$ 0.1488 & 0.7665 $\pm$ 0.1088 & 0.6419 $\pm$ 0.1932 & 0.6460 $\pm$ 0.1739 \\
+10 & scVI & 0.6593 $\pm$ 0.1690 & 0.7045 $\pm$ 0.1270 & 0.5308 $\pm$ 0.1991 & 0.6036 $\pm$ 0.2047 \\
+11 & scCDCG & 0.6300 $\pm$ 0.1490 & 0.6384 $\pm$ 0.1971 & 0.5197 $\pm$ 0.2626 & 0.4993 $\pm$ 0.1468 \\
+12 & scRCL & 0.6041 $\pm$ 0.1559 & 0.6444 $\pm$ 0.1902 & 0.4840 $\pm$ 0.2261 & 0.4758 $\pm$ 0.1545 \\
+13 & Leiden & 0.6485 $\pm$ 0.1590 & 0.5443 $\pm$ 0.2189 & 0.4456 $\pm$ 0.2533 & 0.4854 $\pm$ 0.1588 \\
+14 & DEC & 0.6573 $\pm$ 0.1518 & 0.5167 $\pm$ 0.2701 & 0.4366 $\pm$ 0.2827 & 0.4453 $\pm$ 0.1678 \\
+15 & Louvain & 0.6105 $\pm$ 0.2295 & 0.4693 $\pm$ 0.2855 & 0.3906 $\pm$ 0.2885 & 0.4108 $\pm$ 0.1933 \\
+16 & PhytoCluster & 0.4846 $\pm$ 0.2248 & 0.4242 $\pm$ 0.2624 & 0.3297 $\pm$ 0.2555 & 0.3759 $\pm$ 0.2222 \\
+\bottomrule
+\end{tabular}
+\end{table*}

@@ -1,8 +1,15 @@
 \documentclass[11pt]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb,booktabs,longtable,graphicx,url,hyperref}
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{14pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\floatpagefraction}{0.80}
 \title{Supplementary Information for\\
-\emph{scVICAR: Topology-Adaptive Graph-Vicinal Anchor Recovery for Masked Single-Cell Representation Learning}}
+\emph{scVICAR: Bounded Graph-Vicinal Anchor Recovery for Masked Single-Cell Representation Learning}}
 \author{Anonymous Authors}
 \date{}
 
@@ -13,17 +20,39 @@
 
 This supplement records the complete protocol, model-development boundary, and
 reproducibility checks.  NeighborMix-scMAE and RG-NeighborMix-scMAE were
-developed through broad experiments on 16 datasets.  Those runs motivated the
-fixed and topology-adaptive formulations and therefore are not statistically
-independent confirmation.  Their complete selection history is archived as
-development evidence; only the six frozen datasets in the main paper enter
-confirmatory inference.  The invalid \texttt{hrvatin\_geo} label variant is
-excluded and is not counted as an independent dataset.
+developed through broad experiments on 16 datasets. Those runs motivated the
+fixed and topology-adaptive formulations and are analyzed as development
+evidence. The six frozen datasets in the main paper provide the confirmatory
+analysis. The invalid \texttt{hrvatin\_geo} label variant is excluded because
+it overlaps with \texttt{hrvatin} and has unsuitable label semantics.
 
-The development table suggested mean improvements over scMAE for both earlier
-variants, but their relative ordering was dataset-dependent.  We do not convert
-this observation into a significance or universal-superiority claim.  The
-confirmatory study was frozen before inspecting its scVICAR outputs.
+After excluding the invalid \texttt{hrvatin\_geo} label variant, the development
+table retained 15 datasets, three seeds, and 45/45 successful non-fallback runs
+per ranked configuration. scVICAR-T (RG-NeighborMix-scMAE) achieved mean ARI
+0.7955, compared with 0.7868 for scVICAR-F (NeighborMix-scMAE) and 0.7570 for
+scMAE. The scVICAR-T difference from scMAE was 0.0385 in absolute ARI, or
+5.08\% relative to the scMAE mean. The final F and T parameter signatures were selected using the same
+development archive. These values describe development-stage competitiveness.
+The confirmatory study was frozen before inspecting its scVICAR outputs and
+provides the generalization estimate.
+
+\input{../tables/development_valid15/paper_table_overall}
+
+The ranked table contains 17 method configurations with complete coverage on
+the 15 valid datasets. scVICAR-T ranked first on all four mean metrics, and
+scVICAR-F ranked second. Dataset-level ARI values and paired changes relative
+to scMAE are listed below.
+
+\input{../tables/development_valid15/development_principal_dataset_ari}
+
+The lightweight development archive records the wider implementation effort.
+It contains 1,055 run records across 22 external or backbone models: 749
+successful, 168 failed, 97 fallback, and 41 pending records. The ranked table
+uses complete, non-fallback coverage after removing the invalid
+\texttt{hrvatin\_geo} label variant. Eight additional implementations had
+incomplete coverage or fallback outputs and are reported for auditability.
+
+\input{../tables/development_valid15/attempted_incomplete_methods}
 
 \section{Frozen Dataset Manifest}
 
@@ -82,8 +111,10 @@ Tabula Sapiens Pancreas & 14,140 & 23 & \texttt{8af6f4eeaca1}\\
 
 The sensitivity matrix contains only the three principal variants (NoMix,
 scVICAR-F, and scVICAR-T) at all three model seeds, for 54 runs.  It uses the
-same backbone and optimization budget.  Full $K$ is exposed only to post-hoc
-KMeans; full labels do not enter training or clean graph construction.
+same backbone and optimization budget. Full $K$ is exposed during post-hoc
+KMeans. Training and clean graph construction use expression data.
+
+\input{generated/full_label_sensitivity_results}
 
 \section{Matched Variant Registry}
 
@@ -105,26 +136,37 @@ scVICAR-T & local & topology & topology-informed\\
 
 All variants use 1,000 selected genes, a 128-dimensional embedding, 80 epochs,
 batch size 256, Adam with learning rate $10^{-3}$, mask ratio 0.4, $k=5$, four
-sampled neighbors, temperature 0.2, and maximum gate 0.1.  If Seurat-style HVG
-selection cannot return exactly 1,000 genes, deterministic empirical variance
-is used as the frozen fallback.  The run fails if more than the requested genes
-remain.
+sampled neighbors, temperature 0.2, and maximum coefficient 0.1. When
+Seurat-style HVG selection returns fewer than 1,000 genes, deterministic
+empirical variance supplies the frozen fallback. The run requires exactly the
+requested number of genes.
 
 External baselines are separately frozen across six interpreters/environments.
-PCA, original scMAE, and scVI learn their representations without $K$ and use
-it only for post-hoc clustering.  scDCC, scDeepCluster, and scRCL require $K$
+PCA, original scMAE, and scVI use $K$ during post-hoc clustering. scDCC,
+scDeepCluster, and scRCL require $K$
 in their published clustering-oriented architecture and are therefore labeled
 known-$K$ training baselines.  Their per-cell labels are withheld from gradient
 updates and checkpoint selection.  Every baseline emits cell identifiers; any
 row-order or cell-set mismatch with the canonical H5AD is a hard failure.
 
+During baseline execution, the initial scDeepCluster adapter was found to pass
+Z-scored values as a ZINB count target when a legacy Scanpy HVG call retained
+all 61,497 genes, producing non-finite loss. Aggregation excluded these runs.
+The separately frozen \texttt{scdeepcluster\_repair\_v2} aligns non-negative raw
+counts to the selected genes, derives size factors from raw library sizes, and
+enforces the prespecified 2,000-gene input with a deterministic variance
+fallback.  The architecture, training epochs, seeds, and known-$K$ contract are
+otherwise unchanged.  Repaired runs must match their full interpreter,
+package, parameter, and source identity hash; the other baselines remain bound
+to the original baseline freeze.
+
 \section{Downstream Leakage Controls}
 
 For every split, reference and evaluation indices are archived and verified to
 form a disjoint complete partition.  Reference labels are used to derive
-reference markers only.  Evaluation labels are not visible during evaluation
-cluster differential expression or marker-overlap assignment.  They are opened
-only for final scoring.  The linear-probe scaler and classifier are fitted in a
+reference markers. Evaluation labels are opened after cluster differential
+expression and marker-overlap assignment for final scoring. The linear-probe
+scaler and classifier are fitted in a
 single pipeline on the labeled training subset; the remaining cells are
 transformed only after fitting.  Every model seed and all five split seeds are
 retained.
@@ -137,8 +179,8 @@ versus NoMix, scVICAR-T versus NoMix, and scVICAR-T versus scVICAR-F.  We report
 paired mean and median effects, win/tie/loss counts, a 10,000-replicate
 hierarchical bootstrap interval, and a paired sign-flip permutation test.
 Holm adjustment is applied across the three contrasts separately for each
-endpoint.  Cells, seeds, and splits are not treated as independent biological
-replicates.
+endpoint. The dataset is the independent unit; cells, seeds, and splits are
+nested computational observations.
 
 \section{Traceability and Failure Recovery}
 
@@ -157,11 +199,13 @@ space falls below 5 GiB.
 
 \section{Negative or Null Results}
 
-All confirmatory and downstream endpoints will be populated from frozen
-aggregates after completeness checks.  If either variant fails to improve over
-NoMix, or if marker/probe endpoints are null, the full result remains in the
-tables and the corresponding claim is narrowed.  scVICAR-T is principally a
-graph-contamination robustness hypothesis; a clean-graph loss to scVICAR-F does
-not justify suppressing the result or changing the frozen protocol.
+All 108 confirmatory and 108 downstream run identifiers passed completeness
+and checksum checks before aggregation. scVICAR-F changed mean confirmatory
+ARI by $-0.002$ relative to NoMix, and scVICAR-T changed it by $+0.005$ with a
+3/0/3 dataset split. Under complete edge replacement, ARI degradation favored
+scVICAR-T on two datasets and scVICAR-F on one. Low-label probe changes were
+small, with Holm-adjusted $p$-values above 0.05. Marker recovery and
+marker-overlap annotation were heterogeneous and had negative mean changes for
+scVICAR-T. The main text reports each result at its observed scale.
 
 \end{document}

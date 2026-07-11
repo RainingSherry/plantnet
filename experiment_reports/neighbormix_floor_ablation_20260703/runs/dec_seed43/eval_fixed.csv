@@ -1,2 +1,0 @@
-dataset,method,seed,mix_mode,variance_weight,var_mode,denoise_weight,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,NeighborMix x std-floor ablation,43,none,0.0,hinge,1.0,0.43757811105159794,0.5928501155744972,0.32373796224271445,0.4194348353446338,0.5546287408340207,0.5928501155744971,0.8216483268236331,0.4637211774838926,12,,fixed,kmeans_known_k,True

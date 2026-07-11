@@ -1,6 +1,0 @@
-run,device,n_cells,load,neighbor,kmeans_init,train_per_ep,eval_km,classic_frac,gpu_util,peak_mem_mb
-Macosko_cuda,cuda,44808,7.1,46.2,4.7,2.832,3.9,0.42,5.4,6419.0
-Melanoma_cpu,cpu,4513,3.1,0.7,0.4,0.287,0.3,0.34,,
-Melanoma_cuda,cuda,4513,3.1,0.7,0.5,0.271,0.4,0.36,5.9,6419.0
-Quake_cpu,cpu,9552,2.7,2.7,0.5,0.64,0.3,0.25,,
-Quake_cuda,cuda,9552,3.6,2.7,0.5,0.589,0.4,0.29,6.0,6419.0

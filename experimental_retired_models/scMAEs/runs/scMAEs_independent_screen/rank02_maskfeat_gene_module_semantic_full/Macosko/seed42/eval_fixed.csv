@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,num_modules,mask_prob,module_mask_prob,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + MaskFeat gene-module semantic target,42,rank02_maskfeat_gene_module_semantic_full,screen,scaled encoder + log_expr module semantic targets,32,0.25,0.08,0.3812935190144617,0.4583942310459079,0.17465562369997045,0.31713097003224544,0.40633040317394126,0.4583942310459079,0.6930310877450452,0.3424516870076175,12,,fixed,kmeans_known_k,True

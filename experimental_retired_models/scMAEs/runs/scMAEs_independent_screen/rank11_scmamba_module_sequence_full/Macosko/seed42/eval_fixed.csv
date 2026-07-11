@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + scMamba module sequence,42,rank11_scmamba_module_sequence_full,screen,coexpression ordered module sequence,0.3620558828780575,0.4769835309231725,0.20976107108376332,0.3083189605755004,0.4455070422142405,0.4769835309231726,0.7002803672742872,0.36166137590609404,12,,fixed,kmeans_known_k,True

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + iBOT online tokenizer,42,rank33_ibot_online_tokenizer_full,screen,scaled encoder + log-expression targets + iBOT online tokenizer,0.3506516693447599,0.43826221269919846,0.18629573610872258,0.25609987975146126,0.4192792860182285,0.43826221269919846,0.6609779389511462,0.327807774884874,12,,fixed,kmeans_known_k,True

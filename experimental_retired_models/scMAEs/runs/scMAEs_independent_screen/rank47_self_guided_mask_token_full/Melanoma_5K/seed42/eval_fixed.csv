@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + self-guided adaptive mask tokens,42,rank47_self_guided_mask_token_full,screen,scaled encoder + log-expression targets + self-guided adaptive mask rank tokens,0.6399290937292267,0.681607758241799,0.5628031938112878,0.5169847019466095,0.6485832716332105,0.6816077582417991,0.7451343797760448,0.6280621587600976,9,,fixed,kmeans_known_k,True

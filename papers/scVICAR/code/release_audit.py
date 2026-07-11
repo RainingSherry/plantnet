@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import shlex
 from pathlib import Path
 
 import pandas as pd
 
 from .config import (
-    DATASETS, PAPER_ROOT, PROTOCOL_VERSION, REMOTE_DATA_ROOT, REMOTE_RESULT_ROOT, SEEDS, VARIANTS,
+    DATASETS, PAPER_ROOT, PROJECT_ROOT, PROTOCOL_VERSION, REMOTE_DATA_ROOT, REMOTE_RESULT_ROOT,
+    SEEDS, VARIANTS, sha256_payload,
 )
 from .io_utils import sha256_file, utc_now, write_json
 from .run_baseline import BASELINES
@@ -40,6 +42,22 @@ def main() -> int:
         baseline_freeze["primary_freeze_hash"] == primary_freeze["freeze_hash"],
         baseline_freeze["freeze_hash"],
     )
+    repair_path = PAPER_ROOT / "experiments/baselines_v1/source_freeze_scdeepcluster_repair_v2.json"
+    if repair_path.is_file():
+        repair = json.loads(repair_path.read_text(encoding="utf-8"))
+        payload = {key: value for key, value in repair.items() if key != "freeze_hash"}
+        method_source = PROJECT_ROOT / "methods/DeepLearning/scDeepCluster/run.py"
+        adapter_source = PAPER_ROOT / "code/run_baseline.py"
+        record(
+            "scdeepcluster_repair_freeze",
+            repair["primary_freeze_hash"] == primary_freeze["freeze_hash"]
+            and sha256_payload(payload) == repair["freeze_hash"]
+            and sha256_file(method_source) == repair["method_source_sha256"]
+            and sha256_file(adapter_source) == repair["adapter_sha256"],
+            repair["freeze_hash"],
+        )
+    else:
+        record("scdeepcluster_repair_freeze", False, f"missing {repair_path}")
     secondary_freeze_path = PAPER_ROOT / "experiments/leiden_fixed_v1/source_freeze.json"
     secondary_freeze = json.loads(secondary_freeze_path.read_text(encoding="utf-8"))
     record(
@@ -161,11 +179,19 @@ def main() -> int:
 
     if args.remote:
         store = RemoteStore()
-        data_ok = all(
-            store.exists(f"{REMOTE_DATA_ROOT}/datasets/confirmatory_v1/{name}.h5ad")
-            for name in DATASETS
+        data_mismatches = []
+        for name in DATASETS:
+            remote_path = f"{REMOTE_DATA_ROOT}/datasets/confirmatory_v1/{name}.h5ad"
+            result = store.run(f"sha256sum {shlex.quote(remote_path)}", check=False)
+            observed = result.stdout.split()[0] if result.returncode == 0 and result.stdout.split() else None
+            expected = primary_freeze["dataset_sha256"][name]
+            if observed != expected:
+                data_mismatches.append(name)
+        record(
+            "remote_dataset_sha256",
+            not data_mismatches,
+            f"verified={len(DATASETS)-len(data_mismatches)}/{len(DATASETS)}; mismatches={','.join(data_mismatches)}",
         )
-        record("remote_datasets_present", data_ok, f"root={REMOTE_DATA_ROOT}")
         counts = {}
         for version, expected in (("protocol_v1", 108), ("baselines_v1", 108), ("stress_v1", 126)):
             result = store.run(
@@ -182,6 +208,34 @@ def main() -> int:
         )
         count = len([line for line in result.stdout.splitlines() if line.strip()])
         record("remote_fixed_leiden_v1", count >= 108, f"completed_markers={count}, expected_at_least=108")
+        for name, root, expected in (
+            (
+                "remote_downstream_v1",
+                f"{REMOTE_RESULT_ROOT}/downstream/{PROTOCOL_VERSION}",
+                108,
+            ),
+            (
+                "remote_full_label_sensitivity_v1",
+                f"{REMOTE_RESULT_ROOT}/runs/sensitivity_full_labels_v1",
+                54,
+            ),
+        ):
+            result = store.run(
+                f"find {root} -type f -name COMPLETED -print", check=False
+            )
+            count = len([line for line in result.stdout.splitlines() if line.strip()])
+            record(name, count >= expected, f"completed_markers={count}, expected_at_least={expected}")
+        result = store.run(
+            f"find {REMOTE_RESULT_ROOT}/paper_snapshots -mindepth 2 -maxdepth 2 "
+            "-type f -name COMPLETED -print",
+            check=False,
+        )
+        snapshots = [line for line in result.stdout.splitlines() if line.strip()]
+        record(
+            "remote_paper_snapshot",
+            bool(snapshots),
+            f"completed_snapshots={len(snapshots)}",
+        )
 
     payload = {
         "created_utc": utc_now(),

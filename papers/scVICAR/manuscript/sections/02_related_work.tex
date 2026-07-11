@@ -7,7 +7,7 @@ Standard single-cell workflows project expression, construct a cell graph, and
 apply community detection such as Leiden~\cite{wolf2018scanpy,traag2019leiden}.
 They are scalable and interpretable, but their output depends on preprocessing,
 neighborhood size, resolution, and initial geometry~\cite{kiselev2019challenges}.
-Deep models instead learn this geometry.  scVI uses a probabilistic latent
+Deep models learn this geometry. scVI uses a probabilistic latent
 variable model~\cite{lopez2018scvi}; scDeepCluster and scDCC couple nonlinear
 representation learning to clustering structure~\cite{tian2019scdeepcluster,tian2021scdcc}.
 Graph-aware methods such as scGNN and scDSC propagate structural information
@@ -24,6 +24,16 @@ expression vector~\cite{fang2024scmae}.  scVICAR retains this backbone and its
 clean-cell objective, but uses the cell graph to define an auxiliary corruption
 distribution from which the original anchor is recovered.
 
+Contrastive single-cell methods provide a complementary route to structured
+representations. CLEAR perturbs expression profiles to define positive views,
+whereas scNAME combines mask estimation with neighborhood contrast and a memory
+bank~\cite{wan2022scname}. More recent scRCL models heterogeneous cell views and
+cell--gene associations through several contrastive objectives
+~\cite{peng2024scrcl}. These methods optimize embedding agreement or separation.
+scVICAR instead reconstructs the unmodified anchor and uses no contrastive loss
+in its final configuration, allowing the effect of local corruption to be
+tested without an additional representation-separation objective.
+
 \subsection{Neighborhood Learning and Graph Risk}
 
 Cell graphs are useful because nearby cells often share aspects of type, state,
@@ -34,31 +44,27 @@ blurring boundaries in a manner related to oversmoothing~\cite{li2018laplacian}.
 Rare cells are particularly exposed because they have fewer same-population
 neighbors.
 
-scVICAR differs from conventional graph representation learning in two ways.
-First, the graph constructs a training-time corruption direction rather than a
-mandatory inference-time message-passing backbone; final embeddings are
-extracted from clean profiles.  Second, edge affinity and perturbation
-magnitude are separated.  Affinity determines neighbor contribution, while a
-cell-wise budget bounds how far the anchor moves.  This makes edge weighting,
-node gating, and graph contamination separately testable.  Because the analytic
-score is uncalibrated, we call it topology-informed affinity rather than an edge
-correctness probability.
+scVICAR uses the graph to construct training examples and extracts final
+embeddings directly from clean profiles. Edge affinity determines each
+neighbor's contribution, and a cell-specific coefficient controls the amount
+of mixing. This separation supports direct tests of edge weighting, cell-level
+mixing, and graph contamination. We use the term topology-informed affinity
+for this uncalibrated analytic score.
 
 \subsection{Vicinal Learning and Anchor Recovery}
 
 Mixup regularizes a predictor using convex combinations of observations and
 targets~\cite{zhang2018mixup}; graph variants extend interpolation to structured
-data~\cite{wang2021graphmixup}.  Interpolating expression and reconstructing the
-interpolation is not necessarily appropriate when adjacent cells occupy distinct
-biological states.  scVICAR instead uses a local convex mixture only as a
-corrupted input and retains the anchor as target.  It asks which features remain
-sufficient to identify that anchor after a controlled displacement.
+data~\cite{wang2021graphmixup}. Adjacent cells may still occupy distinct
+biological states. scVICAR uses their local convex mixture as a corrupted input
+and retains the anchor as target. The model learns to recover the anchor after
+a controlled displacement.
 
 The graph-vicinal displacement is aligned with observed cell--cell variation
 and bounded by local geometry.  Under additional smoothness and small-residual
 conditions, its auxiliary risk admits a directional-curvature interpretation.
-This does not imply that every graph direction is valid; it motivates random
-mixing, alternative aggregation estimators, and controlled bad-edge tests.
+Random mixing, alternative aggregation estimators, and controlled bad-edge
+tests measure the consequences of inaccurate graph directions.
 
 \subsection{Evaluation Beyond a Single Clustering Score}
 
@@ -69,10 +75,16 @@ clustering oracles differ.  We therefore use a matched backbone, disclose
 known-$K$ KMeans, retain fixed-resolution Leiden as secondary, and prohibit a
 label-guided resolution sweep.
 
-Multiple seeds quantify algorithmic variability but do not create independent
-biological datasets.  We average seeds within dataset before confirmatory
-inference.  Finally, external clustering agreement does not directly measure
-whether marker programs or annotation signal are retained.  Our evaluation
-therefore adds marker recovery, marker-overlap annotation, rare-class recall,
-and low-label probing on frozen embeddings.  Together these tasks provide
-complementary evidence rather than a single composite ranking.
+We use multiple seeds to quantify algorithmic variability and average them
+within each dataset before confirmatory inference. Marker recovery,
+marker-overlap annotation, rare-class recall, and low-label probing evaluate
+properties that clustering agreement alone leaves unresolved. Each task is
+reported separately.
+
+Biological validation in single-cell clustering commonly combines marker-gene
+specificity, differential-expression patterns, enrichment analysis, rare-cell
+recovery, and trajectory or spatial-coherence analyses. The appropriate task
+depends on the biological structure represented in each dataset. We therefore
+separate marker coherence from predictive separability and avoid treating a
+high clustering score as evidence that every downstream biological property
+has improved.

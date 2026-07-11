@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + BGRL graph bootstrap,42,rank26_bgrl_graph_bootstrap_full,screen,scaled encoder + log-expression targets + shallow KNN graph bootstrap,0.6051407046310658,0.6515939632917652,0.5188849163980661,0.49698091213511053,0.6115614972989164,0.6515939632917652,0.7168553034734609,0.597223690463928,9,,fixed,kmeans_known_k,True

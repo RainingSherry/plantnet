@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + MAE asymmetric decoder,42,rank48_mae_asymmetric_decoder_full,screen,scaled encoder + log-expression targets + MAE asymmetric decoder,0.6834170854271356,0.6122454347084038,0.4681820391943341,0.6109592392730577,0.7102353638667502,0.6122454347084038,0.8155845364018113,0.4900641131108155,5,,fixed,kmeans_known_k,True

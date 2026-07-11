@@ -1,17 +1,20 @@
-\section{Downstream Biological Utility}
+\section{Downstream Predictive Utility and Marker Coherence}
 \label{sec:downstream}
+
+Clustering agreement measures partition quality. We additionally evaluate
+low-label linear separability with frozen probes and cluster-level gene programs
+with marker tasks. Evaluation labels are reserved for final scoring.
 
 \subsection{Marker Recovery}
 
 For each dataset and split seed $s\in\{11,23,37,53,71\}$, we stratify cells into
 50\% reference and 50\% evaluation subsets.  Reference markers are the top 100
 Wilcoxon-ranked genes for each true type using reference cells only.  Evaluation
-markers are independently ranked for each predicted cluster; true evaluation
-labels do not enter differential expression.  Type--cluster overlap matrices
+markers are independently ranked for each predicted cluster. True evaluation
+labels are opened after differential expression. Type--cluster overlap matrices
 yield Recovery@20, @50, and @100, Jaccard similarity, overlap coefficient, and
-the fraction of evaluation clusters without at least three valid markers.
-Unmatched reference types contribute zero to recovery rather than disappearing
-from the mean.
+the fraction of evaluation clusters with fewer than three valid markers.
+Unmatched reference types receive zero recovery and remain in the mean.
 
 \subsection{Marker-Overlap Annotation}
 
@@ -30,43 +33,75 @@ At 10\% and 30\% label fractions, a stratified subset trains
 ($C=1$, balanced class weights, 2,000 maximum iterations).  The scaler and
 classifier are fit only on the training subset; the encoder remains frozen.
 We report accuracy, balanced accuracy, macro-F1, and per-class recall over the
-five fixed split seeds.  This is within-dataset transductive annotation and does
-not establish cross-dataset transfer.
+five fixed split seeds. The task measures within-dataset transductive
+annotation.
 
-\subsection{Human Pancreas 3 Case Study}
+\subsection{Low-Label Signal Is Consistent but Small}
+
+\input{generated/downstream_results}
+
+The most consistent downstream signal occurred in frozen low-label probes. At
+10\% labels, scVICAR-F improved on NoMix in all six datasets and scVICAR-T in
+five. Their relative macro-F1 gains were 0.29\% and 0.34\%, respectively. At
+30\% labels, the corresponding gains were 0.13\% and 0.22\%. These effects are
+directionally consistent but small, and none remained significant after Holm
+correction. Marker-based endpoints provided a different result. scVICAR-T had
+negative mean changes in Recovery@100 and marker-annotation macro-F1, with both
+intervals spanning zero. Modest changes in linear separability therefore
+coexisted with heterogeneous cluster-level marker coherence.
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{../figures/final/fig5_downstream.pdf}
+  \caption{Downstream biological utility across all six confirmatory datasets.
+  (a) Recovery@100 and (b) marker-overlap annotation macro-F1 after averaging
+  the five downstream splits within each model seed and the three model seeds
+  within each dataset. Each point is one dataset. (c) Frozen-embedding linear
+  probe macro-F1 at 10\% and 30\% labeled cells. Pale points are dataset-level
+  values and large connected symbols are cross-dataset means. Absolute values
+  display the scale of the small between-method effects;
+  paired intervals and Holm-adjusted tests are reported in the text and source
+  data.}
+  \label{fig:downstream}
+\end{figure*}
+\FloatBarrier
+
+\subsection{Human Pancreas 3 Biological Case Study}
 
 The case study fixes scMAE/NoMix, scVICAR-F, and scVICAR-T before inspecting
 markers.  It combines a marker dot or track plot, type--cluster overlap heatmap,
 and a reference-type $\rightarrow$ predicted-cluster $\rightarrow$ marker
 annotation $\rightarrow$ gold-type Sankey diagram.  A literature-verified
-pancreatic marker panel is used only for interpretation.  It is neither a
-training input nor a model-selection criterion.  The panel is frozen from the
+pancreatic marker panel is used only for interpretation. The panel is frozen from the
 primary human-pancreas atlas literature, principally Baron et
-al.~cite{baron2016pancreas,segerstolpe2016pancreas}.  We distinguish the 8,629
+al.~\cite{baron2016pancreas,segerstolpe2016pancreas}.  We distinguish the 8,629
 human cells reported after quality control in the primary Baron article, the
 8,569-cell benchmark input, and the 8,562 cells retained by our prespecified
-filter; these numbers describe different processing stages rather than a
-discrepancy in the confirmatory analysis.  Figure~\ref{fig:pancreas-case}
-reports the fixed case without selecting a favorable seed or split.
+filter. These values correspond to three processing stages.
+Figure~\ref{fig:pancreas-case} reports the prespecified seed and split.
+All downstream computations reuse the frozen embeddings. Split-level outputs
+remain linked to their originating run identifiers, which prevents favorable
+seed or split selection.
+
+Across all model and split seeds for Human Pancreas 3, scVICAR-T increased
+Recovery@100 from 0.616 for NoMix to 0.623. Marker-overlap annotation macro-F1
+remained essentially unchanged (0.719 for NoMix and 0.718 for scVICAR-T).
+The 10\% and 30\% probes increased from 0.945 to 0.949 and from 0.954 to
+0.956, respectively. The case therefore illustrates the broader result:
+neighbor mixing produced a small improvement in label-efficient linear
+separation without a corresponding uniform gain in marker-based annotation.
 
 \begin{figure*}[t]
   \centering
   \includegraphics[width=\textwidth]{../figures/final/fig6_pancreas_case.pdf}
-  \caption{Preregistered Human Pancreas 3 case study (model seed 42, downstream
+  \caption{Prespecified Human Pancreas 3 case study (model seed 42, downstream
   split seed 11). (a--c) Reference-marker overlap by predicted cluster for
   NoMix, scVICAR-F, and scVICAR-T. (d) Expression prevalence and mean normalized
   expression of a literature-verified pancreas marker panel, shown for
   interpretation only. (e--g) Reference type $\rightarrow$ cluster
   $\rightarrow$ marker-overlap annotation $\rightarrow$ held-out gold type.
-  Line width represents cell count; the marker panel is not used for training,
-  graph construction, or model selection.}
+  Line width represents cell count; the marker panel is used only for
+  interpretation.}
   \label{fig:pancreas-case}
 \end{figure*}
 \clearpage
-
-All downstream computations reuse remotely archived embeddings and write their
-split-level outputs under the originating run identifier.  Results are reported
-completely even when they do not support an advantage, in which case the claim
-is narrowed to representation geometry or clustering as appropriate.
-
-\input{generated/downstream_results}

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + fuzzy rough quantification,42,rank30_fuzzy_rough_quantification_full,smoke,scaled encoder + log-expression targets + fuzzy rough quantification,0.6031464657655662,0.6458572741454902,0.5091811321824548,0.48108187131115165,0.6028724915334189,0.6458572741454902,0.7070086468056108,0.5944421290511256,9,,fixed,kmeans_known_k,True

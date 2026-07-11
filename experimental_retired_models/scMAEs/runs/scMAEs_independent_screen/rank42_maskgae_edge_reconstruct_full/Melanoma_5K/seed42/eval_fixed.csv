@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + MaskGAE masked edge reconstruction,42,rank42_maskgae_edge_reconstruct_full,screen,scaled encoder + log-expression targets + MaskGAE masked KNN edge reconstruction,0.570352315532905,0.6254481542561813,0.4921276147698327,0.4227225040992415,0.590187496837571,0.6254481542561813,0.698703769520676,0.5660958226968859,9,,fixed,kmeans_known_k,True

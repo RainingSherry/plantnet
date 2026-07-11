@@ -1,2 +1,0 @@
-dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,suture06_cluster_centric_prototype_graph_full,42,screen,0.6480318257956449,0.5639985032847696,0.4964990544672108,0.4080788188848909,0.7307237665880872,0.5639985032847697,0.7473185287401595,0.4529003551231145,5,,fixed,kmeans_known_k,True

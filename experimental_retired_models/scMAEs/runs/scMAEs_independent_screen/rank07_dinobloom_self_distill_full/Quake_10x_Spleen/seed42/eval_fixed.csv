@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + DinoBloom self-distillation,42,rank07_dinobloom_self_distill_full,screen,scaled encoder + DINO-style self-distillation,0.7113693467336684,0.6529763729756909,0.5013013501303234,0.643229975247945,0.7327667593814247,0.6529763729756909,0.8551385042593815,0.5281234306799969,5,,fixed,kmeans_known_k,True

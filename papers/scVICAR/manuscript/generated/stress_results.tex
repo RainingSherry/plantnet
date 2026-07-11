@@ -1,1 +1,7 @@
-% Replaced only after all 126 stress run IDs pass checksum, CUDA, and completeness QA.
+\input{../tables/generated/stress_overall}
+
+At 100\% injected cross-class edges, mean ARI degradation was -0.010 for scVICAR-F and -0.005 for scVICAR-T; the descriptive T--F degradation difference was 0.005 (positive values indicate slower degradation for T). At the dataset level, this contrast favored T in 2/3 datasets and F in 1/3 (range -0.075 to 0.065), showing dataset-dependent robustness.
+
+Across nonzero contamination levels, the topology-informed affinity had mean same-edge AUROC 0.918, and the mean gate--purity Spearman association was 0.520. Both statistics are post-hoc summaries.
+
+At zero injected contamination, descriptive ARI means for the implemented, uniform-sample, and full-neighborhood estimators were 0.480, 0.486, and 0.483, respectively.

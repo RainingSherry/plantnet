@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + AMP-DRL adaptive mask policy,42,rank49_amp_drl_mask_policy_full,screen,scaled encoder + log-expression targets + AMP-DRL adaptive mask policy,0.8159547738693468,0.579292913909974,0.6703489768885454,0.6580853105166451,0.8424119422877253,0.579292913909974,0.6643511442213551,0.5135429623300004,5,,fixed,kmeans_known_k,True

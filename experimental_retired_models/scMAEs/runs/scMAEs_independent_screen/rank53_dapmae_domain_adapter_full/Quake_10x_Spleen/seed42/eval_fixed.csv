@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + DAP-MAE domain adapter,42,rank53_dapmae_domain_adapter_full,screen,scaled encoder + log-expression targets + pseudo-domain adapter/DFG,0.926926298157454,0.7656326904643799,0.8994363947939258,0.6356141027757719,0.9551972000318367,0.7656326904643799,0.7985307621202364,0.7353380481694187,5,,fixed,kmeans_known_k,True

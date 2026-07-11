@@ -112,6 +112,7 @@ def main() -> int:
 
     np.save(save_dir / "embedding_final.npy", embedding)
     np.save(save_dir / "labels.npy", labels)
+    np.save(save_dir / "cell_ids.npy", np.asarray(bundle.adata.obs_names, dtype=str))
     family.save_embedding_h5(save_dir / "embedding.h5", embedding, labels)
     save_json(bundle.profile, str(save_dir / "dataset_profile.json"))
     save_json(bundle.preprocess_config, str(save_dir / "preprocess_config.json"))

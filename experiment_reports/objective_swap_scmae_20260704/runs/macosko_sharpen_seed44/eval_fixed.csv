@@ -1,2 +1,0 @@
-dataset,method,seed,assignment_mode,variance_weight,latent_dim,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,cluster_first_prototype,44,sharpen,0.02,128,0.3520130333868952,0.37540012138228457,0.13226701486040005,0.2507610059387203,0.357330147891699,0.3754001213822846,0.5742351491536957,0.278846540881573,12,,fixed,kmeans_known_k,True

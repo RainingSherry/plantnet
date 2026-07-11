@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + trajectory-guided token selection,42,rank51_trajectory_guided_token_selection_full,screen,scaled encoder + log-expression targets + trajectory-guided mask token selection,0.4835636515912898,0.3722548554129303,0.18931606605847942,0.3187210016042941,0.5042911678105125,0.3722548554129303,0.5300850548825842,0.2868474484515981,5,,fixed,kmeans_known_k,True

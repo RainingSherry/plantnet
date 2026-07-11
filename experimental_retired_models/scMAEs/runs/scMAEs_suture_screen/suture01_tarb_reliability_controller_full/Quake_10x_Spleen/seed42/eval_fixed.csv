@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + suture TARB reliability controller,42,suture01_tarb_reliability_controller_full,screen,scaled encoder + log target + TARB latent controller,0.9417922948073701,0.8041048414958674,0.8898549686908472,0.7002630064803368,0.9502681480738697,0.8041048414958673,0.8520312589151707,0.7612829785396245,5,,fixed,kmeans_known_k,True

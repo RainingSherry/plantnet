@@ -5,6 +5,7 @@ import pandas as pd
 
 from methods.DeepLearning import scMAE_family as family
 from papers.scVICAR.code.config import DATASETS, SEEDS, VARIANTS
+from papers.scVICAR.code.generate_manuscript_assets import write_full_label_sensitivity
 from papers.scVICAR.code.secondary_aggregate import (
     CONFIRMATORY_METRICS,
     contrast_table,
@@ -53,3 +54,31 @@ def test_secondary_summaries_use_dataset_as_independent_unit() -> None:
     assert len(contrasts) == len(CONFIRMATORY_METRICS) * 3
     assert set(contrasts["n_datasets"]) == {6}
     assert (contrasts[["wins", "ties", "losses"]].sum(axis=1) == 6).all()
+
+
+def test_full_label_sensitivity_asset_requires_complete_three_variant_summary(tmp_path) -> None:
+    variants = ["nomix", "fixed", "topology_full"]
+    overall = pd.DataFrame([
+        {
+            "variant": variant, "n_datasets": 6,
+            "ari_mean": 0.5 + index * 0.01, "ari_sd": 0.1,
+            "nmi_mean": 0.6 + index * 0.01, "nmi_sd": 0.1,
+            "f1_macro_mean": 0.4 + index * 0.01, "f1_macro_sd": 0.1,
+        }
+        for index, variant in enumerate(variants)
+    ])
+    contrasts = pd.DataFrame([
+        {
+            "metric": "ari", "contrast": contrast, "mean_delta": 0.01,
+            "ci95_low": -0.01, "ci95_high": 0.03,
+            "wins": 4, "ties": 0, "losses": 2, "holm_p": 0.5,
+        }
+        for contrast in ("F_vs_NoMix", "T_vs_NoMix", "T_vs_F")
+    ])
+    manuscript = tmp_path / "manuscript"; tables = tmp_path / "tables"
+    manuscript.mkdir(); (manuscript / "generated").mkdir(); tables.mkdir()
+    write_full_label_sensitivity(overall, contrasts, manuscript, tables)
+    table = (tables / "full_label_sensitivity.tex").read_text()
+    prose = (manuscript / "generated/full_label_sensitivity_results.tex").read_text()
+    assert table.count("scVICAR-") == 2
+    assert "wins/ties/losses 4/0/2" in prose

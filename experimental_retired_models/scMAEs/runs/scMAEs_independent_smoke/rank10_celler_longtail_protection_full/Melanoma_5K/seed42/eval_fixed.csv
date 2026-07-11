@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + Celler long-tail protection,42,rank10_celler_longtail_protection_full,smoke,scaled encoder + Celler long-tail protection,0.5504099268779082,0.47304765011986244,0.35201806421844195,0.38265048602279395,0.49770396098949354,0.47304765011986244,0.4703234925213672,0.475803548715691,9,,fixed,kmeans_known_k,True

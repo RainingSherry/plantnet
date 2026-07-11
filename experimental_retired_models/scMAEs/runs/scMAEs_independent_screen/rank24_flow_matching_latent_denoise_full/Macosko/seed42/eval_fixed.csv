@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + latent flow matching denoise,42,rank24_flow_matching_latent_denoise_full,screen,scaled encoder + latent flow matching regularizer,0.39852258525263345,0.5210628141767035,0.222663322492027,0.3961283595460933,0.4584035153729459,0.5210628141767035,0.763149563650649,0.39557749166214584,12,,fixed,kmeans_known_k,True

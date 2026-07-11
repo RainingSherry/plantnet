@@ -1,9 +1,0 @@
-{
-  "dataset_name": "hrvatin_geo",
-  "source_path": "/data/luolie/biopipeline/scCluBench/data/scMAE/hrvatin_geo",
-  "output_path": "/home/luolie/biopipeline/dimension-reduction/plantnet/experiment_reports/safe_rdg_pca_20260709_v3_branch_stability/converted_data/hrvatin_geo.h5ad",
-  "label_key": "maintype",
-  "n_cells": 65539,
-  "n_genes": 25187,
-  "n_clusters": 9
-}

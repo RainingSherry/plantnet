@@ -1,2 +1,0 @@
-dataset,method,seed,corruption,donor_pool_mean,n_bins,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,conditional-shuffle ablation,42,swap_ndet,955.2,10,0.957391122278057,0.8458790428617485,0.9234792940696815,0.7739641105775341,0.9658641023600647,0.8458790428617484,0.8792918404773306,0.814912633700667,5,,fixed,kmeans_known_k,True

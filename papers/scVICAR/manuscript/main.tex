@@ -8,6 +8,7 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage[capitalise,noabbrev]{cleveref}
 \usepackage{microtype}
+\usepackage{placeins}
 
 \newtheorem{proposition}{Proposition}
 \newtheorem{corollary}{Corollary}
@@ -16,9 +17,23 @@
 \newcommand{\methodT}{\textsc{scVICAR-T}}
 \graphicspath{{../figures/final/}}
 
+% Keep dedicated float pages top-aligned; otherwise IEEEtran's stretchable
+% float glue vertically centers a wide figure and leaves a misleading blank
+% band above it.
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{12pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\setlength{\@dblfptop}{0pt}
+\setlength{\@dblfpsep}{12pt}
+\setlength{\@dblfpbot}{0pt plus 1fil}
+\makeatother
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\floatpagefraction}{0.80}
+
 \input{results_macros}
 
-\title{scVICAR: Topology-Adaptive Graph-Vicinal Anchor Recovery for Masked Single-Cell Representation Learning}
+\title{scVICAR: Bounded Graph-Vicinal Anchor Recovery for Masked Single-Cell Representation Learning}
 
 \author{Anonymous Authors%
 \thanks{Manuscript prepared for double-anonymous review.  Author and funding information will be restored after acceptance.}}

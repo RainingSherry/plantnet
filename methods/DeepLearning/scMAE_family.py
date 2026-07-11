@@ -310,6 +310,55 @@ def normalize_total_log1p(matrix, target_sum: float) -> sp.csr_matrix:
     return x
 
 
+def strict_hvg_subset(work: sc.AnnData, n_top_genes: int) -> tuple[sc.AnnData, dict]:
+    """Return exactly ``min(n_top_genes, n_vars)`` genes deterministically.
+
+    Scanpy's Seurat implementation can mark every gene as highly variable when
+    fewer finite normalized dispersions are available than requested.  That
+    behavior is dangerous for scMAE because the decoder width is quadratic in
+    the selected gene count.  We keep the standard selection when it returns
+    the requested size and otherwise fall back to finite empirical variance,
+    with original gene order as a deterministic tie break.
+    """
+    requested = max(0, int(n_top_genes))
+    target = min(requested, int(work.n_vars))
+    if target <= 0 or work.n_vars <= target:
+        return work, {
+            "requested": requested,
+            "selected": int(work.n_vars),
+            "strategy": "all_genes_within_limit",
+        }
+
+    strategy = "seurat"
+    try:
+        sc.pp.highly_variable_genes(work, flavor="seurat", n_top_genes=target, subset=False)
+        mask = np.asarray(work.var["highly_variable"], dtype=bool)
+    except Exception:
+        mask = np.zeros(work.n_vars, dtype=bool)
+    if int(mask.sum()) == target:
+        selected = np.flatnonzero(mask)
+    else:
+        strategy = "variance_fallback"
+        matrix = work.X
+        if sp.issparse(matrix):
+            mean = np.asarray(matrix.mean(axis=0)).ravel().astype(np.float64)
+            mean_sq = np.asarray(matrix.multiply(matrix).mean(axis=0)).ravel().astype(np.float64)
+        else:
+            values = np.asarray(matrix, dtype=np.float64)
+            mean = np.mean(values, axis=0)
+            mean_sq = np.mean(values * values, axis=0)
+        variance = np.nan_to_num(mean_sq - mean * mean, nan=-np.inf, posinf=-np.inf, neginf=-np.inf)
+        order = np.lexsort((np.arange(work.n_vars, dtype=np.int64), -variance))
+        selected = np.sort(order[:target])
+    subset = work[:, selected].copy()
+    return subset, {
+        "requested": requested,
+        "selected": int(subset.n_vars),
+        "strategy": strategy,
+        "scanpy_selected_before_fallback": int(mask.sum()),
+    }
+
+
 def load_scmae_dataset(
     file_path: str,
     input_mode: str,
@@ -342,8 +391,15 @@ def load_scmae_dataset(
     elif sample_values(work.X).size and float(np.nanmax(sample_values(work.X))) > 30.0:
         work.X = normalize_total_log1p(work.X, target_sum=target_sum)
 
-    if n_top_genes and n_top_genes > 0 and work.n_vars > n_top_genes:
-        sc.pp.highly_variable_genes(work, flavor="seurat", n_top_genes=n_top_genes, subset=True)
+    hvg_summary = {
+        "requested": int(n_top_genes),
+        "selected": int(work.n_vars),
+        "strategy": "disabled",
+    }
+    if n_top_genes and n_top_genes > 0:
+        work, hvg_summary = strict_hvg_subset(work, n_top_genes)
+    if int(work.n_vars) > int(n_top_genes) > 0:
+        raise AssertionError(f"HVG contract failed: selected {work.n_vars} > requested {n_top_genes}")
 
     if scale_input:
         sc.pp.scale(work)
@@ -375,7 +431,7 @@ def load_scmae_dataset(
         "counts_source": counts_source,
         "input_mode": inferred_mode,
         "normalization": f"normalize_total(target_sum={target_sum}) + log1p when raw",
-        "hvg": {"n_top_genes": int(n_top_genes), "flavor": "seurat"},
+        "hvg": {"n_top_genes": int(n_top_genes), "flavor": "seurat", **hvg_summary},
         "scale_input": bool(scale_input),
         "selected_n_genes": int(work.n_vars),
         "seed": int(seed),

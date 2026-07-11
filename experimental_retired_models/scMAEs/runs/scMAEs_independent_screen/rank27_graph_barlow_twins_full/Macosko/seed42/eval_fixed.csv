@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + Graph Barlow Twins,42,rank27_graph_barlow_twins_full,screen,scaled encoder + log-expression targets + shallow KNN Graph Barlow Twins,0.3436886270308873,0.4372897585161553,0.19582459113838055,0.2565157689656164,0.429828553364624,0.4372897585161553,0.6557428184961606,0.3280152947514807,12,,fixed,kmeans_known_k,True

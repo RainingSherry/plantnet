@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + soft graph clustering,42,rank59_soft_graph_clustering_full,screen,scaled encoder + log-expression targets + soft graph regularization,0.9611599664991625,0.8664377487531526,0.9344713662585298,0.729354713361158,0.9710702794505088,0.8664377487531526,0.8806649749872391,0.8526628987182098,5,,fixed,kmeans_known_k,True

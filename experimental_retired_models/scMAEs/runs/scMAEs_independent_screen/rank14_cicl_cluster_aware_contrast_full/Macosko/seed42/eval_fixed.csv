@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + CICL cluster-aware contrast,42,rank14_cicl_cluster_aware_contrast_full,screen,scaled encoder + CICL cluster-aware contrast,0.40390108909123373,0.5069379963848146,0.2187559379322795,0.3996761192971348,0.4546267662548379,0.5069379963848146,0.7406544200541212,0.3853418543200662,12,,fixed,kmeans_known_k,True

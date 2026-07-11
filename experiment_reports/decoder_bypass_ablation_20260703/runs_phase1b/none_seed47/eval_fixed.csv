@@ -1,2 +1,0 @@
-dataset,method,seed,decoder_mode,mask_rank,variance_weight,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,decoder-bypass ablation,47,none,16,0.02,0.5091724692019283,0.5898960760478705,0.35726228547008493,0.36453699040211873,0.5834270211555307,0.5898960760478705,0.8171197007468339,0.46154908389557636,12,,fixed,kmeans_known_k,True

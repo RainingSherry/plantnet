@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + fuzzy rough quantification,42,rank30_fuzzy_rough_quantification_full,screen,scaled encoder + log-expression targets + fuzzy rough quantification,0.4635678391959799,0.46604178587954004,0.2482956399598184,0.3984172361432326,0.5420782753916841,0.46604178587954,0.6724332614260178,0.3565921450042124,5,,fixed,kmeans_known_k,True

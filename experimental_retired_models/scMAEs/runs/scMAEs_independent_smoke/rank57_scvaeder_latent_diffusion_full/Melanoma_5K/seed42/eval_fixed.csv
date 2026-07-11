@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + scVAEDer latent diffusion,42,rank57_scvaeder_latent_diffusion_full,smoke,scaled encoder + log-expression targets + optional aligned raw-count ZINB + latent diffusion denoising,0.6100155107467317,0.6059604895918441,0.4801979703408532,0.4865390116904939,0.5782192012872032,0.6059604895918441,0.6583662021044547,0.5612825970661389,9,,fixed,kmeans_known_k,True

@@ -1,9 +1,0 @@
-
-
-===== LAUNCH 2026-06-28 10:10:08 =====
-CUDA_VISIBLE_DEVICES=4 /data/luolie/conda/base/bin/python /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/APA_scMAE/run.py --data_path benchmark_outputs/APA_scMAE_full_benchmark/CRA007122/apa_scmae/seed_3/canonical_hvg.h5ad --save_dir benchmark_outputs/APA_scMAE_full_benchmark/CRA007122/apa_scmae/seed_3 --dataset_name CRA007122 --method_name apa_scmae --n_clusters 7 --seed 3 --label_key Celltype --input_mode log1p --n_top_genes 0 --epochs 80 --batch_size 16 --gpu 4
-/home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/CAAM_scMAE/evaluation/local_metrics.py:77: FutureWarning: The `igraph` implementation of leiden clustering is *orders of magnitude faster*. Set the flavor argument to (and install if needed) 'igraph' to use it.
-In the future, the default backend for leiden will be igraph instead of leidenalg. To achieve the future defaults please pass: `flavor='igraph'` and `n_iterations=2`. `directed` must also be `False` to work with igraph’s implementation.
-  sc.tl.leiden(adata, resolution=float(resolution), random_state=int(seed), key_added="leiden_fixed")
-
-===== EXIT 0 2026-06-28 12:06:23 =====

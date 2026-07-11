@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + Mole-BERT context token modeling,42,rank44_molebert_context_token_full,screen,scaled encoder + log-expression targets + Mole-BERT context tokens,0.4695324617770884,0.5396243176154097,0.36498656202327584,0.34186165867811447,0.47908796975691875,0.5396243176154097,0.6056190925171374,0.4865992281999808,9,,fixed,kmeans_known_k,True

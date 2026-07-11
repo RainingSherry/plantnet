@@ -176,7 +176,9 @@ def main():
         X=X,
         X_raw=raw_counts,
         sf=sf,
-        y=Y,
+        # Ground-truth cell labels are withheld from the optimization loop;
+        # the upstream ``y`` argument is used only for epoch-wise monitoring.
+        y=None,
         lr=args.lr,
         batch_size=args.batch_size,
         num_epochs=args.epochs,
@@ -190,6 +192,7 @@ def main():
     embedding = model.encodeBatch(X_tensor, device=device).cpu().numpy()
 
     save(args.save_dir, Y, y_pred, args.epochs, embedding, args=vars(args))
+    np.save(os.path.join(args.save_dir, 'cell_ids.npy'), np.asarray(adata.obs_names, dtype=str))
 
     print(f'Training completed.')
     print(f'Results saved to: {args.save_dir}')

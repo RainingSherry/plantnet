@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + scLDM MCAB flow,42,rank62_scldm_mcab_flow_full,screen,scaled encoder + log-expression targets + MCAB flow,0.47426798785931085,0.5097231767483135,0.3081994678089787,0.32488054633408237,0.54084038121156,0.5097231767483136,0.7270822407663942,0.3924126016547989,12,,fixed,kmeans_known_k,True

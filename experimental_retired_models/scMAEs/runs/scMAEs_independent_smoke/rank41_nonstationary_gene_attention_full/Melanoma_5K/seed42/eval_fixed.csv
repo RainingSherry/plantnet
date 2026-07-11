@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + non-stationary gene-module attention,42,rank41_nonstationary_gene_attention_full,smoke,scaled encoder + log-expression SVD gene-module non-stationary attention,0.6518945269222247,0.6238991595310522,0.5023675692797632,0.5022741645569804,0.5974890638402877,0.6238991595310523,0.6690864331058518,0.5844292732099787,9,,fixed,kmeans_known_k,True

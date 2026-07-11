@@ -108,13 +108,14 @@ def infer_label_column(adata: Any, explicit: str = "auto") -> str:
     raise KeyError(f"No label column found; obs columns={list(adata.obs.columns)}")
 
 
-def build_scrcl_input(data_path: Path, tmp_dir: Path, label_key: str) -> tuple[Path, np.ndarray, dict[str, Any]]:
+def build_scrcl_input(data_path: Path, tmp_dir: Path, label_key: str) -> tuple[Path, np.ndarray, np.ndarray, dict[str, Any]]:
     import scanpy as sc
 
     register_null_h5ad_reader()
     adata = sc.read_h5ad(data_path)
     resolved_label = infer_label_column(adata, label_key)
     raw_labels = adata.obs[resolved_label].astype(str).to_numpy()
+    cell_ids = np.asarray(adata.obs_names, dtype=str)
 
     work = adata.copy()
     # Upstream load_h5_data uses cell_type1.values.codes and densifies feature
@@ -129,7 +130,7 @@ def build_scrcl_input(data_path: Path, tmp_dir: Path, label_key: str) -> tuple[P
         "n_cells": int(work.n_obs),
         "n_genes": int(work.n_vars),
     }
-    return out_path, raw_labels, meta
+    return out_path, raw_labels, cell_ids, meta
 
 
 def make_config(args: argparse.Namespace, n_clusters: int) -> dict[str, Any]:
@@ -280,7 +281,7 @@ def main() -> int:
     config = make_config(args, args.n_clusters)
     with tempfile.TemporaryDirectory(prefix="plantnet_scrcl_") as tmp:
         tmp_dir = Path(tmp)
-        scrcl_input, raw_labels, input_meta = build_scrcl_input(Path(args.data_path), tmp_dir, args.label_key)
+        scrcl_input, raw_labels, cell_ids, input_meta = build_scrcl_input(Path(args.data_path), tmp_dir, args.label_key)
         config["hvg"] = max(1, min(int(config["hvg"]), int(input_meta["n_genes"])))
         config["k"] = max(1, min(int(config["k"]), int(input_meta["n_cells"]) - 1))
 
@@ -311,6 +312,7 @@ def main() -> int:
             "checkpoint_policy": "final_epoch_no_label_selection",
         },
     )
+    np.save(save_dir / "cell_ids.npy", cell_ids)
     with (save_dir / "training_history.json").open("w", encoding="utf-8") as handle:
         json.dump(history, handle, indent=2)
     print(f"scRCL completed. Results saved to: {save_dir}")

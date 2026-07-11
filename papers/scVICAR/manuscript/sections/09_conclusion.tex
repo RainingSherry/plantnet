@@ -1,14 +1,15 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented scVICAR, a graph-vicinal anchor-recovery framework for masked
-single-cell representation learning.  A fixed variant introduces bounded local
-corruption, while a topology-adaptive variant modulates neighbor affinity and
-cell-wise perturbation strength.  The unified formulation exposes convex-hull,
-diffusion, and contamination properties and separates strict derivations from a
-conditional local-risk interpretation.  The accompanying protocol combines
-matched-backbone confirmation, controlled graph stress, and leakage-resistant
-downstream evaluation.  The final conclusion about empirical benefit will
-follow the complete frozen evidence: fixed recovery is judged against NoMix,
-and topology adaptation is judged primarily by robustness rather than presumed
-universal superiority.
+We introduced scVICAR, which trains a masked autoencoder to recover cells from
+locally mixed inputs. scVICAR-F uses a fixed mixing coefficient, and scVICAR-T
+adapts edge weights and mixing strength to local graph structure. scVICAR-T
+and scVICAR-F ranked first and second across four mean metrics in the
+15-dataset development benchmark. scVICAR-T also achieved the highest mean ARI in the
+frozen external comparison. Matched controls found smaller,
+dataset-dependent effects from corruption design. Under controlled edge
+replacement, the adaptive scores identified inaccurate neighbors, while the
+resulting ARI changes varied by dataset. Low-label probes showed small positive
+changes, and marker-based endpoints were heterogeneous. These results define
+the empirical scope of neighbor-mixed anchor recovery for single-cell
+representation learning.

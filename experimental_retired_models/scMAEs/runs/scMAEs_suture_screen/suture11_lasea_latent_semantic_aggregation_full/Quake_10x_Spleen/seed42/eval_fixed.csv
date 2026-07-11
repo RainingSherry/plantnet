@@ -1,2 +1,0 @@
-dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,suture11_lasea_latent_semantic_aggregation_full,42,screen,0.5788316582914573,0.500866295870688,0.32341003457716017,0.4184181032604292,0.6009756809601473,0.5008662958706879,0.7187932042836352,0.3843403006370406,5,,fixed,kmeans_known_k,True

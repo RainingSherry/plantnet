@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + fuzzy-rough core boundary,42,rank58_fuzzy_rough_core_boundary_full,smoke,scaled encoder + log-expression targets + fuzzy-rough core-boundary,0.661865721249723,0.6639449322081967,0.5686320920380057,0.5178231596674799,0.6522525595761424,0.6639449322081968,0.717395001606437,0.6179072729715812,9,,fixed,kmeans_known_k,True

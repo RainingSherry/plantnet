@@ -20,6 +20,7 @@ from .config import (
     DATASETS,
     PAPER_ROOT,
     PROTOCOL_VERSION,
+    REMOTE_DATA_ROOT,
     REMOTE_RESULT_ROOT,
     SEEDS,
     SPLIT_SEEDS,
@@ -73,12 +74,16 @@ class FormalRun:
             raise ValueError(f"Unknown formal variant {variant!r}")
         if seed not in SEEDS:
             raise ValueError(f"Seed {seed} is outside the preregistered set {SEEDS}")
+        remote_dir = str(row["remote_dir"]).rstrip("/")
+        public_root = "<SCVICAR_RESULT_ROOT>"
+        if remote_dir == public_root or remote_dir.startswith(public_root + "/"):
+            remote_dir = REMOTE_RESULT_ROOT + remote_dir[len(public_root):]
         return cls(
             run_id=run_id,
             dataset=dataset,
             variant=variant,
             seed=seed,
-            remote_dir=str(row["remote_dir"]).rstrip("/"),
+            remote_dir=remote_dir,
             data_sha256=str(row["data_sha256"]) if row.get("data_sha256") else None,
         )
 
@@ -170,6 +175,9 @@ def ensure_cached_dataset(
     expected = str(record["sha256"])
     filename = str(record.get("canonical_filename") or f"{dataset}.h5ad")
     remote_path = str(record["remote_path"])
+    public_root = "<SCVICAR_DATA_ROOT>"
+    if remote_path == public_root or remote_path.startswith(public_root + "/"):
+        remote_path = REMOTE_DATA_ROOT + remote_path[len(public_root):]
     target = cache_dir / filename
     _download_verified(store, remote_path, target, expected)
     if sha256_file(target) != expected:

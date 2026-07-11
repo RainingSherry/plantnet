@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + latent flow matching denoise,42,rank24_flow_matching_latent_denoise_full,screen,scaled encoder + latent flow matching regularizer,0.5375837520938024,0.4967330021584165,0.28760234922440564,0.43064703411333766,0.5712931341798418,0.49673300215841637,0.718315494009085,0.37962738212451086,5,,fixed,kmeans_known_k,True

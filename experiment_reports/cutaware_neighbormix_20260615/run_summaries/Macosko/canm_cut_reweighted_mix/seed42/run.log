@@ -1,8 +1,0 @@
-Command: /data/luolie/conda/base/bin/python /home/luolie/biopipeline/dimension-reduction/plantnet/methods/DeepLearning/CutAware_NeighborMix_scMAE/run.py --data_path /home/luolie/biopipeline/dimension-reduction/plantnet/data/processed_scmae/Macosko.h5ad --save_dir /home/luolie/biopipeline/dimension-reduction/plantnet/results/experimental/cutaware_neighbormix_20260615/Macosko/canm_cut_reweighted_mix/seed42 --dataset_name Macosko --variant_name canm_cut_reweighted_mix --seed 42 --n_clusters 12 --epochs 80 --batch_size 256 --n_top_genes 1000 --gpu 4 --no_save_h5ad
-
-Using device: cuda:0
-/data/luolie/conda/base/lib/python3.13/functools.py:934: UserWarning: zero-centering a sparse array/matrix densifies it.
-  return dispatch(args[0].__class__)(*args, **kw)
-OpenBLAS warning: precompiled NUM_THREADS exceeded, adding auxiliary array for thread metadata.
-To avoid this warning, please rebuild your copy of OpenBLAS with a larger NUM_THREADS setting
-or set the environment variable OPENBLAS_NUM_THREADS to 64 or lower

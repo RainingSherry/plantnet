@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + multi-facet VAE uncertainty,42,rank55_multifacet_vae_uncertainty_full,screen,scaled encoder + log-expression targets + optional aligned raw-count NB + multi-facet VAE,0.838463149078727,0.636717704166282,0.7270279781084297,0.5831964741016752,0.868896594951229,0.6367177041662822,0.7541614650048333,0.5509236777509186,5,,fixed,kmeans_known_k,True

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + soft graph clustering,42,rank59_soft_graph_clustering_full,screen,scaled encoder + log-expression targets + soft graph regularization,0.5070523120871273,0.5975932819886148,0.36772557552362584,0.3697865762671663,0.5921272253073198,0.5975932819886149,0.805939854051332,0.4748404691889327,12,,fixed,kmeans_known_k,True

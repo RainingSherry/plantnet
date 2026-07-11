@@ -1,2 +1,0 @@
-dataset,method,seed,corruption,donor_pool_mean,n_bins,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,conditional-shuffle ablation,42,swap_lib,4480.8,10,0.8263702910194608,0.731379860657753,0.8703331180948335,0.39462294777506374,0.9286563611083724,0.731379860657753,0.8116082984560807,0.6655859083877811,12,,fixed,kmeans_known_k,True

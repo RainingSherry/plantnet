@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + I-JEPA context-target,42,rank22_ijepa_context_target_full,screen,scaled encoder + log_expr ordered JEPA target encoder,0.719535175879397,0.6251995456405793,0.515591314055779,0.6046197294103888,0.7426050774570642,0.6251995456405792,0.8170823632892644,0.5063004471616103,5,,fixed,kmeans_known_k,True

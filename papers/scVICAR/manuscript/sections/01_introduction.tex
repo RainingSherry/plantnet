@@ -1,100 +1,80 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Single-cell RNA sequencing (scRNA-seq) enables transcriptome-wide measurements
-at cellular resolution, but converting them into biologically meaningful cell
-populations remains difficult.  Expression matrices are high-dimensional,
-sparse, and affected by sequencing depth, technical noise, transient states,
-and class imbalance.  Unsupervised clustering therefore depends critically on
-a representation that suppresses nuisance variation without erasing signals of
-rare types or continuous transitions~\cite{kiselev2019challenges}.  Deep
-generative and autoencoding models learn nonlinear structure from expression
-profiles~\cite{lopez2018scvi,tian2019scdeepcluster,tian2021scdcc}, yet their
-objectives must still determine which variations should be reconstructed,
-ignored, or treated as local biological organization.
+Single-cell RNA sequencing (scRNA-seq) resolves transcriptomes at cellular
+resolution, but its analytical value depends on representations that preserve
+biological identity while suppressing technical variation. This balance is
+difficult because expression matrices are sparse, high-dimensional, and
+strongly affected by sequencing depth, transient state, and class imbalance.
+Errors in the learned geometry can merge rare populations or fragment
+continuous biological programs~\cite{kiselev2019challenges}. Reliable
+representation learning is therefore central to both cell clustering and
+subsequent annotation.
 
-Masked representation learning offers a direct self-supervised objective.  A
-masked autoencoder corrupts part of an input and infers the replaced content
-from its context, a principle successful in other modalities~\cite{he2022mae}.
-scMAE adapted it to scRNA-seq by jointly reconstructing gene expression and
-predicting the corruption mask~\cite{fang2024scmae}.  Its replacement noise
-uses within-cell gene context effectively, but it does not explicitly exploit
-relationships among cells.  Local expression variation could provide a more
-structured perturbation, asking the encoder which anchor-cell features remain
-stable among phenotypically related cells.
+Deep generative and autoencoding models learn nonlinear structure directly
+from expression profiles~\cite{lopez2018scvi,tian2019scdeepcluster,tian2021scdcc}.
+Masked autoencoding provides an especially direct self-supervised objective:
+the model corrupts part of an observation and reconstructs its original
+content~\cite{he2022mae}. scMAE adapts this principle to scRNA-seq through
+gene-value replacement, mask prediction, and expression reconstruction
+~\cite{fang2024scmae}. Its corruption process exploits within-cell gene
+context. Local relationships among cells remain unused.
 
-This opportunity is also a hazard.  A nearest-neighbor graph estimated from
-sparse expression can cross cell types, transitional states, technical batches,
-or rare-population boundaries.  Uniform neighborhood mixing can therefore move
-an anchor away from its biological support and encourage excessive smoothing.
-The central question is not merely whether neighbors should be used, but how a
-local perturbation should be constructed, bounded, and weighted when the graph
-itself is uncertain.
+Intercellular context could provide a biologically structured training signal,
+yet using it safely is the central technical challenge. Expression-derived
+nearest-neighbor graphs can cross cell types, technical batches, transitional
+states, and rare-population boundaries. Uniform neighborhood propagation may
+then move a cell outside its local biological support and erase informative
+variation. A useful local corruption must therefore limit how far each cell
+moves and expose the effects of unreliable neighbors.
 
-We introduce \emph{single-cell Vicinal Corruption with Anchor Recovery}
-(scVICAR), a graph-vicinal extension of masked single-cell representation
-learning.  Given a row-stochastic sampled neighborhood operator $\widehat P$
-and a diagonal matrix $G$ of cell-wise perturbation budgets, scVICAR constructs
+We address this problem with \emph{single-cell Vicinal Corruption with Anchor
+Recovery} (scVICAR). The key idea is to use local cell geometry as a
+training-time corruption distribution, while retaining the original cell as
+the reconstruction target. Given a row-stochastic sampled neighborhood
+operator $\widehat P$ and diagonal matrix $G$ of mixing coefficients, scVICAR constructs
 \begin{equation}
  X^v=(I-G)X+G\widehat PX=X-G(I-\widehat P)X.
  \label{eq:intro-view}
 \end{equation}
-The view is then subjected to the original gene-replacement corruption, while
-the reconstruction target remains the unmodified anchor cell.  This
-\emph{anchor-recovery} objective differs from conventional mixup, which
-interpolates inputs and prediction targets together~\cite{zhang2018mixup}.  The
-clean scMAE branch is retained, so vicinal recovery is an auxiliary regularizer
-rather than a replacement objective.
+The resulting view is subjected to the original gene-replacement corruption.
+The clean scMAE branch remains active. Final embeddings are extracted directly
+from clean profiles. Mixup, by comparison, interpolates inputs and prediction targets together
+~\cite{zhang2018mixup}.
 
-scVICAR has two matched variants.  scVICAR-F uses a fixed perturbation budget.
-scVICAR-T derives topology-informed affinity from cosine similarity,
-mutual-KNN relations, and shared-nearest-neighbor overlap, and assigns each cell
-an analytic perturbation budget from local graph coherence.  The topology score
-is not a calibrated probability of biological correctness.  It defines a
-bounded trust region in which neighborhood information can influence the
-corrupted view.  We therefore frame scVICAR-T as a robustness extension of
-scVICAR-F under graph contamination, not as a method expected to dominate the
-fixed variant on every clean dataset.
+scVICAR separates local mixing from topology weighting. scVICAR-F uses
+a fixed mixing coefficient and provides the simplest test of graph-vicinal
+anchor recovery. scVICAR-T adds topology-informed affinity based on cosine
+similarity, mutual-KNN relations, and shared-neighbor overlap. It also assigns
+an analytic cell-specific mixing coefficient from local graph coherence. The
+affinity is an uncalibrated edge weight. scVICAR-T reduces mixing when local
+graph coherence is weak.
 
-The formulation admits several precise interpretations.  Every vicinal view
-lies in the convex hull of its anchor and sampled neighbors, and its displacement
-is bounded by the cell-wise gate and neighborhood radius.  Equation
-\eqref{eq:intro-view} is one step of nonuniform graph diffusion.  A conditional
-local expansion of the anchor-recovery loss further gives a directional
-curvature-regularization interpretation.  These properties connect local
-corruption to bounded denoising without assuming that every graph edge joins
-cells of the same type.
+This formulation connects method design to testable properties. Each vicinal
+view remains inside the convex hull of its anchor and sampled neighbors. Its
+displacement is bounded by the local radius and cell-specific coefficient. The same
+operator is one step of nonuniform graph diffusion, while a contamination bound
+links perturbation size to cross-class neighbor mass. The stress experiments
+measure these quantities under deliberate graph corruption.
 
-We evaluate scVICAR with a frozen, matched-backbone protocol.  NoMix,
-scVICAR-F, edge-only, gate-only, topology-adaptive, and random-mixing controls
-share preprocessing, encoder, optimizer, training duration, and seed schedule.
-Six confirmatory datasets were excluded from the historical NeighborMix and RG
-parameter-development stage.  Dataset, rather than seed run or cell, is the
-independent statistical unit.  Controlled bad-edge injection tests whether
-topology adaptation degrades more gracefully as graph quality falls.  In the
-clean primary protocol, labels are used only for predefined filtering,
-evaluation, and post-hoc diagnostics; they never enter training, graph
-construction, or parameter selection.  The controlled stress intervention uses
-labels solely to inject prespecified cross-class edges and is never used to fit
-or select a clean model.
+We evaluate scVICAR in a broad development benchmark and a separately frozen
+six-dataset study. The frozen study includes external baselines,
+matched-backbone controls, bad-edge interventions, component ablations, marker
+tasks, and low-label probes. Dataset is the independent statistical unit, and
+every seed is retained. Labels are reserved for evaluation and the isolated
+stress intervention.
 
-Clustering agreement alone does not establish biological utility.  We therefore
-complement clustering scores with marker recovery, marker-overlap annotation,
-rare-class diagnostics, and frozen-embedding low-label probes, following the
-task-diverse evaluation motivation of scCluBench~\cite{xu2026scclubench}.  The
-low-label analyses are explicitly within-dataset and transductive, not claims of
-cross-dataset transfer.
-
-Our contributions are fourfold:
+The study makes three contributions:
 \begin{itemize}
- \item We formulate graph-vicinal anchor recovery, which uses a bounded local
- view while preserving the original cell as the self-supervised target.
- \item We separate topology-informed edge affinity from a cell-wise perturbation
- budget, with robustness to graph contamination as the adaptive variant's
- primary hypothesis.
- \item We derive convex-hull, perturbation-radius, nonuniform-diffusion, and
- contamination bounds together with a conditional local-risk interpretation.
- \item We establish a matched, confirmatory evaluation spanning clustering,
- controlled graph corruption, and downstream biological utility without
- claiming universal superiority of scVICAR-T over scVICAR-F.
+ \item We introduce graph-vicinal anchor recovery, which uses local cell
+ geometry as bounded input corruption while preserving the original cell as
+ the self-supervised target. The formulation covers fixed and topology-adaptive
+ mixing without changing clean-profile inference.
+ \item We derive convex-hull, perturbation, diffusion, and contamination
+ properties. The adaptive design separates topology-informed affinity from a
+ cell-specific mixing coefficient, enabling direct component and bad-edge tests.
+ \item We evaluate 16 primary method configurations on 15 development datasets
+ and test the frozen final variants on six additional datasets. Matched
+ ablations, graph stress, marker tasks, and low-label probes distinguish
+ competitiveness, attribution, graph-risk response, and downstream utility.
 \end{itemize}

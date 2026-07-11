@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + non-stationary gene-module attention,42,rank41_nonstationary_gene_attention_full,screen,scaled encoder + log-expression SVD gene-module non-stationary attention,0.3887029101946081,0.5262669232785995,0.24100887377953106,0.40078223484967473,0.4770700868227837,0.5262669232785995,0.7680048216766129,0.4002757598856563,12,,fixed,kmeans_known_k,True

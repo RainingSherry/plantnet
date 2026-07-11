@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + DAP-MAE domain adapter,42,rank53_dapmae_domain_adapter_full,screen,scaled encoder + log-expression targets + pseudo-domain adapter/DFG,0.588300465322402,0.6004242317140854,0.47412132138967394,0.43859024502475846,0.5739202887822927,0.6004242317140854,0.6416475332436935,0.5641780371349158,9,,fixed,kmeans_known_k,True

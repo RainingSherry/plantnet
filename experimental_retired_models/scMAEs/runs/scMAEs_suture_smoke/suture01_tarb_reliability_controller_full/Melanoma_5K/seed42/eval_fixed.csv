@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + suture TARB reliability controller,42,suture01_tarb_reliability_controller_full,smoke,scaled encoder + log target + TARB latent controller,0.7050742300022158,0.6901146577303222,0.5906534589772381,0.6281914348726816,0.6709775309139672,0.6901146577303223,0.7220056815011517,0.6609217155137415,9,,fixed,kmeans_known_k,True

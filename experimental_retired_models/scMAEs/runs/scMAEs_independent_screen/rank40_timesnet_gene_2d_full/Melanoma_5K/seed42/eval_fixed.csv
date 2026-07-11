@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + TimesNet gene-module 2D variation,42,rank40_timesnet_gene_2d_full,screen,scaled encoder + log-expression SVD gene-module TimesNet 2D variation,0.6751606470197208,0.6854912590439673,0.5913658367746123,0.5049236202668774,0.6712785193402687,0.6854912590439673,0.7234700557759697,0.6513010004296862,9,,fixed,kmeans_known_k,True

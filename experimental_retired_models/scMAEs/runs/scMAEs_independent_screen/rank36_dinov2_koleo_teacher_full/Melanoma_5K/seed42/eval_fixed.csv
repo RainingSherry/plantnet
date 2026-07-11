@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + DINOv2 KoLeo teacher,42,rank36_dinov2_koleo_teacher_full,screen,scaled encoder + log-expression targets + DINOv2 KoLeo teacher,0.5548415688012409,0.5543615475338325,0.4103089639222366,0.44929409423390293,0.5185995243533972,0.5543615475338325,0.6106102091110344,0.5076018860083544,9,,fixed,kmeans_known_k,True

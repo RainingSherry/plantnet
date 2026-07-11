@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + MultiMAE gene multitask,42,rank20_multimae_multitask_gene_full,screen,scaled encoder + MultiMAE expression/token/module targets,0.6946189279731994,0.6469539252192261,0.48791889051145626,0.6392646737956345,0.7236859841592191,0.6469539252192261,0.8515031747241818,0.5216439151934694,5,,fixed,kmeans_known_k,True

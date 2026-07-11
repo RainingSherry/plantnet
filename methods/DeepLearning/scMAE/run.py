@@ -413,6 +413,7 @@ def main():
     np.save(save_dir / "embedding_final.npy", embedding.astype(np.float32))
     np.save(save_dir / "embeddings_base.npy", embedding.astype(np.float32))
     np.save(save_dir / "labels.npy", labels_out.astype(np.int64))
+    np.save(save_dir / "cell_ids.npy", np.asarray(bundle.adata.obs_names, dtype=str))
     np.save(save_dir / "gene_names.npy", bundle.gene_names.astype(str))
     family.save_embedding_h5(save_dir / "embedding.h5", embedding, labels_out)
     save_json(history, str(save_dir / "training_history.json"))

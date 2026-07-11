@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + adaptive sharp/soft switch,42,AdaptiveSwitch_scMAE,screen,0.9534128978224455,0.8362241379512102,0.9216818654209163,0.7041422255183478,0.9650541140858243,0.8362241379512103,0.8689436511294711,0.805879273278069,5,,fixed,kmeans_known_k,True

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + anomaly association boundary,42,rank25_anomaly_association_boundary_full,screen,scaled encoder + log-expression targets + covariance ordered gene modules,0.7037269681742043,0.5513867757388824,0.5038248506225292,0.44334692936978454,0.7361558521695412,0.5513867757388823,0.720060902928453,0.4467383934991539,5,,fixed,kmeans_known_k,True

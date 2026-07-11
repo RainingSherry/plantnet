@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + scDiffusion pseudo-condition DDPM,42,rank61_scdiffusion_pseudocond_ddpm_full,screen,scaled encoder + log-expression targets + pseudo-condition DDPM latent denoising,0.5469559007320122,0.6026297738393426,0.40157165246868626,0.42138401695162925,0.6196574328302938,0.6026297738393426,0.8022213071774644,0.4825676267681415,12,,fixed,kmeans_known_k,True

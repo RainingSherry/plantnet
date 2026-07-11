@@ -1,17 +1,29 @@
 \section{Experimental Protocol}
 \label{sec:experiments}
 
-\subsection{Evidence Boundary and Datasets}
+\subsection{Evidence Design and Datasets}
 
-The earlier NeighborMix and RG experiments on 16 datasets informed method
-development and are reported only in the supplement.  They are not combined
-with confirmatory inference.  The confirmatory cohort contains six datasets not
-used to choose the fixed or topology-adaptive settings (Table~\ref{tab:data}).
+The development archive contains 15 valid datasets, 17 complete configurations,
+and three seeds. The main comparison reports 16 primary configurations and
+excludes the exploratory scVICAR-T contrastive extension, which is retained in
+the supplement. Each reported configuration completed 45 runs using its
+method-specific protocol. The final scVICAR-F
+and scVICAR-T configurations were selected during this development stage. The
+benchmark measures performance across the broad scMAE dataset collection. The
+confirmatory cohort contains six additional datasets selected before the fixed
+and topology-adaptive models were evaluated (Table~\ref{tab:data}).
 We remove labels whose normalized value is \texttt{unknown}, \texttt{nan}, or
 \texttt{unassigned}, followed by classes with fewer than ten cells.  The
 unfiltered-label analysis is retained as sensitivity analysis.  The
-\texttt{hrvatin\_geo} artifact is excluded because its label semantics are
-invalid for formal aggregation and it is not independent of \texttt{hrvatin}.
+\texttt{hrvatin\_geo} artifact is excluded because its labels are invalid for
+formal aggregation and its cells overlap with \texttt{hrvatin}.
+
+The 15 development datasets are Bach, Baron, Guo, Limb Muscle, Macosko,
+Melanoma 5K, Pollen, Quake 10x Spleen, Quake Smart-seq2 Lung, Shekhar,
+Tosches, Wang, Young, Hrvatin, and worm neuron cell. They span pancreas,
+retina, melanoma, lung, spleen, muscle, embryonic, and neuronal systems and
+include plate-based and droplet sequencing protocols. Dataset provenance,
+dimensions, label fields, and preprocessing are listed in the supplement.
 
 \begin{table}[t]
 \centering
@@ -32,18 +44,18 @@ Tabula Sapiens Pancreas & 14,116 & 61,497 & 16\\
 \end{tabular}
 \end{table}
 
-Each canonical H5AD is immutable and identified by SHA-256.  The manifest
-records source path, label field, filtering, dimensions, size, creation time,
-and remote location.  Blood--Bone Marrow derives from the hematopoietic
+The dataset manifest records source identifiers, label fields, filtering rules,
+dimensions, and input checksums. Blood--Bone Marrow derives from the hematopoietic
 reference map~\cite{triana2021hematopoietic}; Human Pancreas 1 is from Enge et
 al.~\cite{enge2017pancreas}; PRJNA895163 is the cassava tuberous-root atlas of
 Song et al.~\cite{song2022cassava}; and the Tabula Sapiens subset derives from
 the multi-organ atlas~\cite{tabulasapiens2022atlas}.  Baron human/mouse pancreas
 citations and processing-stage counts are detailed in
 Section~\ref{sec:downstream} and the supplement.
-Per-cell labels do not enter clean-view optimization,
-graph construction, checkpoint selection, or run scheduling.  They are exposed
-only to post-training evaluation and prespecified diagnostic interventions.
+Per-cell labels are reserved for post-training evaluation and prespecified
+diagnostic interventions. Clean-view optimization, graph construction,
+checkpoint selection, and run scheduling use expression data and frozen
+configuration fields.
 
 \subsection{Matched Variants and Baselines}
 
@@ -51,16 +63,17 @@ We compare six variants under the common backbone in Section~\ref{sec:method}:
 NoMix, random mixing, scVICAR-F, topology edge-only, topology gate-only, and
 full scVICAR-T.  NoMix is the matched scMAE objective; random mixing tests
 whether arbitrary convex corruption explains any gain.  Component variants
-separate neighbor affinity from cell-wise perturbation strength.
+separate neighbor affinity from the cell-specific mixing coefficient.
 
 External references comprise PCA+KMeans, the original scMAE implementation,
 scVI, scDeepCluster, scDCC, scRCL, and graph/deep-clustering methods supported by
 the benchmark adapters~\cite{lopez2018scvi,tian2019scdeepcluster,tian2021scdcc,peng2024scrcl}.
-Historical values are reused only when input SHA-256 and every evaluation field
-match protocol v1; otherwise the baseline is rerun.  Method-family conclusions
-are based on the matched variants, avoiding attribution of backbone changes to
-vicinal recovery.  Every rerun baseline must emit cell identifiers that match
-the frozen H5AD row-for-row before it can receive a completion marker.  The
+The 15-dataset development table additionally includes Louvain, Leiden, SC3,
+DEC, scNAME, scziDesk, scCDCG, and PhytoCluster
+~\cite{blondel2008louvain,traag2019leiden,kiselev2017sc3,xie2016dec,wan2022scname,chen2020sczidesk,xu2024sccdcg,wang2025phytocluster}.
+Historical values are reused only when the input and evaluation protocol match;
+otherwise the baseline is rerun. Method-family conclusions are based on the
+matched variants, avoiding attribution of backbone changes to vicinal recovery. The
 published architectures of scDCC, scDeepCluster, and scRCL require $K$ during
 clustering-oriented training; we therefore mark them explicitly as known-$K$
 training baselines.  Per-cell reference labels are withheld from their gradient
@@ -72,51 +85,45 @@ Model seeds are 42, 2024, and 3407.  The six datasets, six matched variants,
 and three seeds give \FormalRunCount{} primary runs.  The primary endpoint is
 ARI from known-$K$ KMeans with \texttt{n\_init=20}.  NMI, assignment accuracy,
 macro-F1, silhouette, runtime, and peak GPU memory are secondary.  Fixed
-resolution 1.0 Leiden is reported separately; label-guided resolution sweeps
-are prohibited.  Known $K$ is an evaluation assumption and is never used by the
-encoder objective of the six matched scVICAR variants.  This statement does not
-apply to the three external known-$K$ training baselines identified above.
+resolution 1.0 Leiden is reported separately with a fixed neighborhood graph.
+The six matched scVICAR variants use known $K$ only during post-hoc evaluation.
+The three external known-$K$ baselines use it during their published
+clustering-oriented training procedure.
 
 The graph uses $k=5$, four sampled neighbors, $\tau=0.2$, and a maximum gate of
 0.1.  All models train for 80 epochs with batch size 256, learning rate
-$10^{-3}$, mask ratio 0.4, and vicinal weight 0.3 where applicable.  No
-per-dataset tuning is performed.  Contrastive weight is zero, uncertainty is
-disabled, and no dynamic graph, learned gate, or explicit consistency loss is
-part of the primary model.
+$10^{-3}$, mask ratio 0.4, and vicinal weight 0.3 where applicable. One
+configuration is used for all six datasets. The primary model sets the
+contrastive weight to zero and contains a static graph, analytic coefficient,
+and the losses defined in Eq.~\eqref{eq:objective}.
 
 \subsection{Graph-Contamination and Estimator Tests}
 
 On Blood--Bone Marrow, Human Pancreas 3, and PRJNA895163, we replace 0, 25, 50,
-75, or 100\% of each graph row with deliberately cross-label neighbors.  Labels
-are used only to construct this controlled stress intervention, never in the
-clean experiment.  We compare scVICAR-F with scVICAR-T by absolute performance
+75, or 100\% of each graph row with deliberately cross-label neighbors. Labels
+construct this isolated stress intervention. We compare scVICAR-F with scVICAR-T by absolute performance
 and degradation from 0\% contamination.  A separate aggregation ablation
 compares the implemented sampling-then-reweighting estimator in
 Eq.~\eqref{eq:realized-kernel}, an unbiased uniform average of sampled
 neighbors, and full-neighborhood aggregation.
 
-For post-hoc diagnosis, we compute Spearman association and AUROC between
-affinity/gate scores and same-type edge purity.  We also relate gate magnitude
-to class frequency and per-class recall.  These diagnostic labels do not alter
-the graph, model, or chosen checkpoint.
+After training, we compute Spearman association and AUROC between affinity or
+mixing scores and same-type edge purity. We also relate the coefficient to
+class frequency and per-class recall. These calculations use the frozen graph,
+model, and checkpoint.
 
 \subsection{Statistical Analysis}
 
-Dataset is the independent unit.  For downstream tasks, split seeds are first
+The dataset is the independent unit. For downstream tasks, split seeds are first
 averaged within model run; model seeds are then averaged within dataset.  The
 three prespecified contrasts are F--NoMix, T--NoMix, and T--F.  We report paired
 dataset-level mean and median effects, win/tie/loss counts, hierarchical
 bootstrap 95\% confidence intervals, paired sign-flip permutation tests, and
-Holm-adjusted $p$-values.  Cells, splits, and seeds are not treated as
-independent biological replicates, and no best seed is selected.
+Holm-adjusted $p$-values. Cells, splits, and seeds are nested computational
+observations. Every seed is retained.
 
 \subsection{Reproducibility and Traceability}
 
-Every run directory is keyed by dataset, variant, seed, and a hash of the fully
-resolved configuration.  It contains data and code digests, frozen parameters,
-metrics, compressed float32 embeddings, clusters, topology diagnostics,
-resource logs, a file-level checksum manifest, and a completion marker.  Upload
-is staged in a partial remote directory, verified, and atomically promoted.
-Complete hashes are skipped; no synchronization uses destructive deletion.
-Every number and figure source in the manuscript resolves to one or more unique
-run identifiers.
+Every reported number and figure resolves to a frozen run and configuration.
+The supplement describes checksums, run identifiers, completion criteria,
+software identities, and storage provenance.

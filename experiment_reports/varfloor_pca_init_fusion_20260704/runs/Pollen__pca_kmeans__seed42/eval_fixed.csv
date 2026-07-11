@@ -1,2 +1,0 @@
-dataset,method,seed,variant,std_floor_weight,cluster_method_train,mask_strategy,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Pollen,VarFloor-scMAE,42,varfloor_scmae,0.02,DEC_sharpened_target,zero,0.5149501661129569,0.7090498359980528,0.42605744508553317,0.39264870726079676,0.5785979427771115,0.7090498359980527,0.5960562890904885,0.8749041834925405,11,,fixed,kmeans_known_k,True

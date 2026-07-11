@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,count_source,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + scVGAE ZINB variational decoder,42,rank06_scvgae_zinb_variational_full,screen,scaled encoder + log_expr rec + count ZINB,raw_count_source,0.3619889305481164,0.5327110029811468,0.2185228416129253,0.3554976025810544,0.45397523680559965,0.5327110029811469,0.786325954874094,0.40279643330245657,12,,fixed,kmeans_known_k,True

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + CICL cluster-aware contrast,42,rank14_cicl_cluster_aware_contrast_full,screen,scaled encoder + CICL cluster-aware contrast,0.5672501661865721,0.6203705589566956,0.46064425578878687,0.48569230755111054,0.5616426322764253,0.6203705589566956,0.6809343404128609,0.5697001852276452,9,,fixed,kmeans_known_k,True

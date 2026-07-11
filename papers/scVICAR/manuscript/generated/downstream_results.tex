@@ -1,1 +1,13 @@
-% Replaced only after all downstream run IDs pass checksum and completeness QA.
+\input{../tables/generated/downstream_overall}
+
+Table~\ref{tab:downstream_overall} reports all prespecified downstream endpoints after split-level and model-seed aggregation, retaining every seed and split.
+
+At 10\% labels, scVICAR-F changed macro-F1 versus NoMix by +0.0025 (+0.29\% relative; dataset bootstrap 95\% CI +0.0015 to +0.0037; wins/ties/losses 6/0/0; Holm-adjusted $p=0.1385$).
+
+At 10\% labels, scVICAR-T changed macro-F1 versus NoMix by +0.0029 (+0.34\% relative; dataset bootstrap 95\% CI +0.0002 to +0.0057; wins/ties/losses 5/0/1; Holm-adjusted $p=0.1538$).
+
+At 30\% labels, scVICAR-F changed macro-F1 versus NoMix by +0.0011 (+0.13\% relative; dataset bootstrap 95\% CI -0.0001 to +0.0025; wins/ties/losses 4/0/2; Holm-adjusted $p=0.6462$).
+
+At 30\% labels, scVICAR-T changed macro-F1 versus NoMix by +0.0019 (+0.22\% relative; dataset bootstrap 95\% CI -0.0001 to +0.0035; wins/ties/losses 5/0/1; Holm-adjusted $p=0.4154$).
+
+Marker-based endpoints were heterogeneous: scVICAR-T changed Recovery@100 by -0.0168 and marker-annotation macro-F1 by -0.0162 versus NoMix, with both 95\% intervals spanning zero.

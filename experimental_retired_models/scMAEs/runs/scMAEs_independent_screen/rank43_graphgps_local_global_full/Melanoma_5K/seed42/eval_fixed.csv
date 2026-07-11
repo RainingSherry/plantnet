@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + GraphGPS local-global adapter,42,rank43_graphgps_local_global_full,screen,scaled encoder + log-expression targets + GraphGPS local-global adapter,0.6310658098825614,0.665226491755446,0.5368817085007511,0.49608503868718046,0.6257554181490242,0.665226491755446,0.718228038248751,0.6195098419680202,9,,fixed,kmeans_known_k,True

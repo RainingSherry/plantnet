@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + scAGC adaptive graph,42,rank15_scagc_adaptive_graph_full,smoke,scaled encoder + adaptive graph reliability,0.6545535120762243,0.6372308171573636,0.5384509136201059,0.5196455844540245,0.6270920893415474,0.6372308171573636,0.6833617150877098,0.5969342750680062,9,,fixed,kmeans_known_k,True

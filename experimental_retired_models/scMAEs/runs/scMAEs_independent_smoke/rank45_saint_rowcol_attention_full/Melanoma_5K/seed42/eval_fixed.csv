@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + SAINT row-column attention,42,rank45_saint_rowcol_attention_full,smoke,scaled encoder + log-expression targets + SAINT row-column attention,0.6113450033237314,0.6231112141211975,0.4920090154926913,0.48103145703007866,0.5882750794722972,0.6231112141211976,0.6744751376155865,0.5790168157270504,9,,fixed,kmeans_known_k,True

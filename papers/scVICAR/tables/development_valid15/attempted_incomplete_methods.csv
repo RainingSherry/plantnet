@@ -1,0 +1,9 @@
+model,records,success,failed,fallback,pending
+AttentionAE-sc,48,32,16,0,0
+DESC,48,39,9,0,0
+GeneCompass,48,0,0,48,0
+Geneformer,48,0,2,46,0
+scDSC,48,9,39,0,0
+scDSC-GSE70256,48,0,48,0,0
+scGNN,47,0,6,0,41
+scGPT,48,0,45,3,0

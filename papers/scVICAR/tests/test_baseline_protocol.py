@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import anndata as ad
 import numpy as np
 import pytest
 
+from papers.scVICAR.code.config import sha256_payload
+from papers.scVICAR.code.io_utils import sha256_file
 from papers.scVICAR.code.run_baseline import BASELINES, canonicalize_baseline
 
 
@@ -16,6 +19,18 @@ def test_baseline_matrix_has_all_dataset_method_seed_keys():
     assert len(matrix) == 108
     assert len({(row["dataset"], row["method"], row["seed"]) for row in matrix}) == 108
     assert {row["method"] for row in matrix} == set(BASELINES)
+
+
+def test_scdeepcluster_repair_is_frozen_and_hvg_bounded():
+    spec = BASELINES["scdeepcluster"]
+    args = list(spec.args)
+    assert args[args.index("--n_top_genes") + 1] == "2000"
+    path = "papers/scVICAR/experiments/baselines_v1/source_freeze_scdeepcluster_repair_v2.json"
+    repair = json.loads(open(path, encoding="utf-8").read())
+    payload = {key: value for key, value in repair.items() if key != "freeze_hash"}
+    assert sha256_payload(payload) == repair["freeze_hash"]
+    assert sha256_file(Path("methods/DeepLearning/scDeepCluster/run.py")) == repair["method_source_sha256"]
+    assert sha256_file(Path("papers/scVICAR/code/run_baseline.py")) == repair["adapter_sha256"]
 
 
 def test_canonicalize_uses_frozen_labels_and_checks_order(tmp_path):

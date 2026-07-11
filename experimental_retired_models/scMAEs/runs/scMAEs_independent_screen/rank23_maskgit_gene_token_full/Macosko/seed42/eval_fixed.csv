@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + MaskGIT gene-token curriculum,42,rank23_maskgit_gene_token_full,screen,scaled encoder + MaskGIT gene token curriculum target,0.2572754865202642,0.22076682549325669,0.12345201409810824,0.17209910220057636,0.36008090418542904,0.22076682549325669,0.3202921723071779,0.16843005089122573,12,,fixed,kmeans_known_k,True

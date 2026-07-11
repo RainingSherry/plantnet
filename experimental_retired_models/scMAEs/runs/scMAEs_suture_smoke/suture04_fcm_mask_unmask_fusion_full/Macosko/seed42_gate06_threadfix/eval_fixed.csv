@@ -1,2 +1,0 @@
-dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,suture04_fcm_mask_unmask_fusion_full,42,smoke,0.5761024816996965,0.6013246794354166,0.39790476726111307,0.3888344614458661,0.616648504367199,0.6013246794354166,0.8136201134697131,0.47689096349567733,12,,fixed,kmeans_known_k,True

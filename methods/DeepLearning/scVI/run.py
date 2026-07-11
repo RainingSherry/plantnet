@@ -301,6 +301,10 @@ def main():
     sc.pp.filter_genes(adata, min_counts=3)
     sc.pp.filter_cells(adata, min_counts=3)
 
+    # Keep all post-hoc runner diagnostics aligned with the filtered cell set.
+    # Canonical scVICAR baselines additionally verify exact cell IDs upstream.
+    Y_encoded = LabelEncoder().fit_transform(np.asarray(adata.obs[label_col]))
+
     if adata.n_vars > args.n_top_genes:
         sc.pp.highly_variable_genes(adata, flavor='seurat_v3', n_top_genes=args.n_top_genes, subset=True)
 
@@ -436,6 +440,9 @@ def main():
     if _save_fn is not None:
         _save_fn(args.save_dir, Y_encoded, pred_labels, args.epochs, embedding)
     np.save(os.path.join(args.save_dir, 'embedding_final.npy'), embedding)
+    filtered_labels = LabelEncoder().fit_transform(np.asarray(adata.obs[label_col])).astype(np.int64)
+    np.save(os.path.join(args.save_dir, 'labels.npy'), filtered_labels)
+    np.save(os.path.join(args.save_dir, 'cell_ids.npy'), np.asarray(adata.obs_names, dtype=str))
 
     import json
     metrics = {

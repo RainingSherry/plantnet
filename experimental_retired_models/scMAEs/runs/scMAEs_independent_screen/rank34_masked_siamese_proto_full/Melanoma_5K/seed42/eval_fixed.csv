@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + Masked Siamese prototypes,42,rank34_masked_siamese_proto_full,screen,scaled encoder + log-expression targets + MSN prototype target,0.5758918679370707,0.4709436854890045,0.40162964267597934,0.4347594722646057,0.511766297599801,0.4709436854890045,0.5154193365496914,0.4335339435042834,9,,fixed,kmeans_known_k,True

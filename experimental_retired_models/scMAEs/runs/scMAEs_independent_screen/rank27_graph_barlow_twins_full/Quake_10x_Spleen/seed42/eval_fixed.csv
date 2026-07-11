@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + Graph Barlow Twins,42,rank27_graph_barlow_twins_full,screen,scaled encoder + log-expression targets + shallow KNN Graph Barlow Twins,0.6538944723618091,0.4541782838403179,0.3411336176904915,0.4259057229211981,0.6440491475097239,0.4541782838403179,0.5367100564168822,0.39364597307563265,5,,fixed,kmeans_known_k,True

@@ -1,9 +1,0 @@
-{
-  "enabled": true,
-  "mode": "shuffled",
-  "program_dim": 32,
-  "nmf_reconstruction_err": 2287.5943022037964,
-  "nmf_n_iter": 84,
-  "mean_abs_activity": 0.027183901753719323,
-  "shuffled": true
-}

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + mask-sc cluster target,42,rank13_masked_sc_cluster_target_full,screen,scaled encoder + warmup cluster target,0.5057355829316194,0.5970594168112139,0.3434417219422049,0.4340177471091955,0.5716963538605709,0.5970594168112139,0.8215582036642585,0.4689219291137053,12,,fixed,kmeans_known_k,True

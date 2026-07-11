@@ -1,2 +1,0 @@
-dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,suture11_lasea_latent_semantic_aggregation_full,42,screen,0.6913361400398848,0.6692864082421071,0.6078503384270971,0.49692038188097304,0.6845484265501308,0.669286408242107,0.7112605689471002,0.6319902850665367,9,,fixed,kmeans_known_k,True

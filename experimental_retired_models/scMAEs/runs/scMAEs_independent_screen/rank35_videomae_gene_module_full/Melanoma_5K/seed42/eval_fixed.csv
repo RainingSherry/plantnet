@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + VideoMAE gene-module tube mask,42,rank35_videomae_gene_module_full,screen,scaled encoder + ordered log-expression targets + VideoMAE tube mask,0.6015953910923998,0.5284672058611246,0.4296078107897827,0.46127265546500834,0.5358501470824542,0.5284672058611245,0.57311250006411,0.4902749335802207,9,,fixed,kmeans_known_k,True

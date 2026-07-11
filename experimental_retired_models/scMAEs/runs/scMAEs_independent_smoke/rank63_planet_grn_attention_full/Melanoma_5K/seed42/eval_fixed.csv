@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + Planet GRN attention,42,rank63_planet_grn_attention_full,smoke,scaled encoder + log-expression targets + GRN edge attention,0.5829824950144028,0.5699622814458016,0.4379164181717787,0.48285724963732,0.5424831053946348,0.5699622814458017,0.620910657979683,0.5267409337620049,9,,fixed,kmeans_known_k,True

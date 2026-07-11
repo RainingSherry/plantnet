@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + MaskGAE masked edge reconstruction,42,rank42_maskgae_edge_reconstruct_full,screen,scaled encoder + log-expression targets + MaskGAE masked KNN edge reconstruction,0.6901172529313233,0.5812811626062739,0.46177257509400865,0.5607381010155936,0.7062566839791973,0.581281162606274,0.7824046891534308,0.4624138891793208,5,,fixed,kmeans_known_k,True

@@ -1,5 +1,3 @@
-import os
-
 from __future__ import annotations
 
 import hashlib
@@ -14,11 +12,11 @@ PAPER_ROOT = Path(__file__).resolve().parents[1]
 PYTHON_BIN = Path("/data/luolie/conda/envs/scclubench-sccdcg-h100/bin/python")
 MODEL_RUNNER = PROJECT_ROOT / "experimental_retired_models/RG_NeighborMix_scMAE/run.py"
 
-REMOTE_DATA_ROOT = "<SCVICAR_DATA_ROOT>"
-REMOTE_RESULT_ROOT = "<SCVICAR_RESULT_ROOT>"
-REMOTE_HOST = os.getenv("SCVICAR_REMOTE_HOST", "<SCVICAR_REMOTE_HOST>")
+REMOTE_DATA_ROOT = "/share/org/bd/bd_luolie/data/scVICAR"
+REMOTE_RESULT_ROOT = "/share/org/bd/bd_luolie/plantnet/scVICAR"
+REMOTE_HOST = "172.17.1.52"
 REMOTE_PORT = 16335
-REMOTE_USER = os.getenv("SCVICAR_REMOTE_USER", "<SCVICAR_REMOTE_USER>")
+REMOTE_USER = "bd_luolie"
 PROTOCOL_VERSION = "protocol_v1"
 
 SEEDS = (42, 2024, 3407)

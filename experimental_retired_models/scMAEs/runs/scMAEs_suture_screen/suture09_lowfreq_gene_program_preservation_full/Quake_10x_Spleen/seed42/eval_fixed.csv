@@ -1,2 +1,0 @@
-dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,suture09_lowfreq_gene_program_preservation_full,42,screen,0.9117462311557789,0.6702340858141859,0.867407845995014,0.5670136347262666,0.9402585176161976,0.6702340858141858,0.7041066699584211,0.6394709439753536,5,,fixed,kmeans_known_k,True

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + BGRL graph bootstrap,42,rank26_bgrl_graph_bootstrap_full,screen,scaled encoder + log-expression targets + shallow KNN graph bootstrap,0.6910594639865997,0.5897455252746178,0.4702301490181327,0.5672077382814461,0.7120217087517552,0.5897455252746178,0.790789856011643,0.4702043801738839,5,,fixed,kmeans_known_k,True

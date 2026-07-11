@@ -1,0 +1,17 @@
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\caption{Downstream utility after averaging split seeds and then model seeds within each dataset.}
+\label{tab:downstream_overall}
+\begin{tabular}{lccc}
+\toprule
+Endpoint & NoMix & scVICAR-F & scVICAR-T \\
+\midrule
+Recovery@100 & 0.603 & 0.603 & 0.586 \\
+Marker annotation macro-F1 & 0.636 & 0.637 & 0.620 \\
+10\% probe macro-F1 & 0.853 & 0.856 & 0.856 \\
+30\% probe macro-F1 & 0.869 & 0.870 & 0.870 \\
+\bottomrule
+\end{tabular}
+\end{table}

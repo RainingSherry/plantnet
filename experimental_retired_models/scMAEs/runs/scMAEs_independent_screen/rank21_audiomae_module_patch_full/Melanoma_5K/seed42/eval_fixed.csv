@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + AudioMAE module patch,42,rank21_audiomae_module_patch_full,screen,scaled encoder + log_expr ordered module-patch targets,0.6341679592288944,0.6166709051093304,0.5126935000393715,0.48639864312999326,0.6058091655809694,0.6166709051093304,0.6619638247817136,0.5771791279174828,9,,fixed,kmeans_known_k,True

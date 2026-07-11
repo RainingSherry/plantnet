@@ -1,3 +1,0 @@
-dataset,seed,variant,source_variant,graph_enabled,tau,ari,nmi,acc,q_total
-Pollen,42,safe_rdg_calibrated_threshold,rdg_always_on,True,0.0,0.8575113158003691,0.8847025211321745,0.8538205980066446,0.7745765854592208
-worm_neuron_cell,42,safe_rdg_calibrated_threshold,rdg_always_on,True,0.0,0.19074188772795064,0.49204127892383653,0.5513616817964644,0.7756898574299169

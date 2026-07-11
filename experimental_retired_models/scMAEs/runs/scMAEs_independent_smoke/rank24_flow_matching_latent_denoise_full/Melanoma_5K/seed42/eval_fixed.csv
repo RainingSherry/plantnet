@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + latent flow matching denoise,42,rank24_flow_matching_latent_denoise_full,smoke,scaled encoder + latent flow matching regularizer,0.68047861732772,0.6386628655125769,0.5455869276772665,0.5221756399065179,0.633388069363918,0.6386628655125769,0.6802101818074319,0.6018988164393118,9,,fixed,kmeans_known_k,True

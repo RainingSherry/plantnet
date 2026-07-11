@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from .config import DATASETS, PAPER_ROOT, REMOTE_RESULT_ROOT, SEEDS
+from .config import DATASETS, PAPER_ROOT, REMOTE_RESULT_ROOT, SEEDS, sha256_payload
 from .downstream_orchestrate import _parse_sha256sums
 from .io_utils import sha256_file
 from .remote_store import RemoteStore
@@ -47,6 +47,7 @@ def collect(
     local_root: Path,
     freeze: dict,
     primary_freeze: dict,
+    scdeepcluster_repair: dict,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     accepted: list[dict] = []
     rejected: list[dict] = []
@@ -68,9 +69,20 @@ def collect(
             "per_cell_labels_in_optimization": metadata.get("protocol", {}).get("per_cell_labels_in_optimization"),
         }
         reason = None
+        method = metadata.get("method")
+        protocol = metadata.get("protocol", {})
+        repaired_scdeepcluster = method == "scdeepcluster"
+        expected_baseline_freeze = (
+            scdeepcluster_repair["freeze_hash"] if repaired_scdeepcluster else freeze["freeze_hash"]
+        )
+        identity_keys = (
+            "python", "python_sha256", "distribution_lock", "distribution_lock_hash",
+            "script", "gpu", "runner_args", "code_sha256",
+        )
+        protocol_identity = {key: protocol.get(key) for key in identity_keys}
         if not (run_dir / "COMPLETED").is_file():
             reason = "missing_completed"
-        elif metadata.get("baseline_freeze_hash") != freeze["freeze_hash"]:
+        elif metadata.get("baseline_freeze_hash") != expected_baseline_freeze:
             reason = "baseline_freeze_mismatch"
         elif metadata.get("source_freeze_hash") != primary_freeze["freeze_hash"]:
             reason = "primary_freeze_mismatch"
@@ -82,7 +94,9 @@ def collect(
             reason = "method_protocol_mismatch"
         elif metadata.get("protocol", {}).get("seed") != metadata.get("seed"):
             reason = "seed_protocol_mismatch"
-        elif metadata.get("protocol", {}).get("code_sha256") != freeze["methods"].get(metadata.get("method"), {}).get("code_sha256"):
+        elif repaired_scdeepcluster and sha256_payload(protocol_identity) != scdeepcluster_repair["identity_hash"]:
+            reason = "scdeepcluster_repair_identity_mismatch"
+        elif not repaired_scdeepcluster and protocol.get("code_sha256") != freeze["methods"].get(method, {}).get("code_sha256"):
             reason = "method_code_mismatch"
         elif not metadata.get("validation", {}).get("cell_set_complete"):
             reason = "cell_set_incomplete"
@@ -119,12 +133,20 @@ def main() -> None:
     if not args.no_sync:
         sync_metadata(args.index_root)
     baseline_freeze = json.loads((args.output_dir / "source_freeze.json").read_text(encoding="utf-8"))
+    scdeepcluster_repair = json.loads(
+        (args.output_dir / "source_freeze_scdeepcluster_repair_v2.json").read_text(encoding="utf-8")
+    )
     primary_freeze = json.loads(
         (PAPER_ROOT / "experiments/protocol_v1/source_freeze.json").read_text(encoding="utf-8")
     )
     if baseline_freeze["primary_freeze_hash"] != primary_freeze["freeze_hash"]:
         raise ValueError("Baseline freeze does not bind the active primary freeze")
-    frame, rejected = collect(args.index_root, baseline_freeze, primary_freeze)
+    repair_payload = {key: value for key, value in scdeepcluster_repair.items() if key != "freeze_hash"}
+    if sha256_payload(repair_payload) != scdeepcluster_repair["freeze_hash"]:
+        raise ValueError("scDeepCluster repair freeze hash is invalid")
+    frame, rejected = collect(
+        args.index_root, baseline_freeze, primary_freeze, scdeepcluster_repair
+    )
     args.output_dir.mkdir(parents=True, exist_ok=True)
     frame.to_csv(args.output_dir / "run_master.csv", index=False)
     rejected.to_csv(args.output_dir / "superseded_or_invalid_runs.csv", index=False)

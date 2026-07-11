@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + ScInfoVAE MI-ZINB,42,rank56_scinfovae_mi_zinb_full,screen,scaled encoder + log-expression targets + optional aligned raw-count ZINB + InfoVAE MMD,0.7568048576214406,0.6568539901626415,0.5478307992313857,0.6450134256301376,0.7636863342307739,0.6568539901626415,0.8420447292722318,0.5384358867487039,5,,fixed,kmeans_known_k,True

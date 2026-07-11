@@ -1,2 +1,0 @@
-dataset,method,seed,variant,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k,method_raw,runtime_seconds
-Guo,Safe-RDG-PCA,3407,rdg_gene_only,0.6870570107858244,0.7259863170665457,0.5924736269841702,0.4987361206494274,0.6783332264978532,0.7259863170665457,0.6779298916965284,0.7813757073662111,12,,fixed,kmeans_known_k,True,rdg_gene_only,9.014998435974121

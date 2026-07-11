@@ -1,8 +1,0 @@
-{
-  "corruption_type": "scmae_shuffle",
-  "selected_positions": 208324869.0,
-  "effective_corruption_rate": 1.0,
-  "zero_to_zero_rate": 0.0,
-  "mean_abs_delta": 0.09412357592185365,
-  "budget_deficit_rate": 0.3025999963283539
-}

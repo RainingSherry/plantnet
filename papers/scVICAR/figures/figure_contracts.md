@@ -26,11 +26,20 @@
 
 ## Figure 4 — Graph contamination
 
-- **Core conclusion:** topology adaptation is tested for graceful degradation as cross-class edges are injected.
-- **Archetype:** asymmetric mixed-modality.
-- **Hero evidence:** ARI versus contamination rate for F and T.
-- **Supporting evidence:** affinity AUROC/Spearman, gate distribution and rare-class recall.
-- **Reviewer risk:** labels are used only to inject/measure the stress test, not for training.
+- **Core conclusion:** topology affinity detects injected cross-class edges and
+  the gate tracks neighborhood purity, whereas the relative ARI response of T
+  versus F remains dataset-dependent.
+- **Archetype:** quantitative grid with one hero panel.
+- **Hero evidence:** complete ARI response curves versus contamination rate for
+  F and T, with individual datasets shown behind dataset means.
+- **Supporting evidence:** clean-referenced T-minus-F response, affinity AUROC,
+  and gate--purity Spearman association.
+- **Statistics:** three model seeds are averaged within each of three fixed
+  stress datasets; diagnostics are mechanism measurements, not independent
+  biological replicates.
+- **Reviewer risk:** labels are used only to inject/measure the stress test, not
+  for training. Affinity AUROC and gate--purity correlation are undefined at
+  100% cross-class replacement and must not be displayed as zero.
 
 ## Figure 5 — Downstream utility
 

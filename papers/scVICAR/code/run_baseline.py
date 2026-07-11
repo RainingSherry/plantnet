@@ -72,7 +72,7 @@ BASELINES = {
     "scdeepcluster": BaselineSpec(
         "/data/luolie/conda/envs/scclubench-tf212-cpu/bin/python",
         "methods/DeepLearning/scDeepCluster/run.py", False,
-        ("--pretrain_epochs", "400", "--maxiter", "20000", "--no_cuda"),
+        ("--n_top_genes", "2000", "--pretrain_epochs", "400", "--maxiter", "20000", "--no_cuda"),
     ),
     "scrcl": BaselineSpec(
         "/data/luolie/conda/envs/plantnet-scrcl/bin/python", "methods/DeepLearning/scRCL/run.py", True,
@@ -197,7 +197,7 @@ def main() -> int:
     data_digest = sha256_file(args.data_path)
     if freeze["dataset_sha256"][args.dataset] != data_digest:
         raise RuntimeError("Baseline data does not match frozen canonical dataset")
-    identity = baseline_identity(args.method)
+    live_identity = baseline_identity(args.method)
     frozen_dataset = freeze["protocol"]["datasets"][args.dataset]
     known_k = int(frozen_dataset["expected_clusters"])
     if known_k != DATASETS[args.dataset].expected_clusters:
@@ -205,6 +205,37 @@ def main() -> int:
     if args.seed not in freeze["protocol"]["seeds"]:
         raise RuntimeError("Seed is absent from the primary protocol freeze")
     known_k_training = args.method in {"scdcc", "scdeepcluster", "scrcl"}
+    baseline_freeze_path = PAPER_ROOT / "experiments/baselines_v1/source_freeze.json"
+    if not baseline_freeze_path.is_file():
+        raise FileNotFoundError(f"Freeze external baselines before execution: {baseline_freeze_path}")
+    baseline_freeze = json.loads(baseline_freeze_path.read_text(encoding="utf-8"))
+    if baseline_freeze["primary_freeze_hash"] != freeze["freeze_hash"]:
+        raise RuntimeError("Baseline freeze does not reference the active primary freeze")
+    frozen_identity = baseline_freeze["methods"][args.method]
+    active_freeze_hash = baseline_freeze["freeze_hash"]
+    if args.method == "scdeepcluster":
+        repair_path = PAPER_ROOT / "experiments/baselines_v1/source_freeze_scdeepcluster_repair_v2.json"
+        if not repair_path.is_file():
+            raise FileNotFoundError(f"Freeze the scDeepCluster numerical repair before execution: {repair_path}")
+        repair = json.loads(repair_path.read_text(encoding="utf-8"))
+        if repair["primary_freeze_hash"] != freeze["freeze_hash"]:
+            raise RuntimeError("scDeepCluster repair freeze does not reference the active primary freeze")
+        if repair["identity_hash"] != sha256_payload(live_identity):
+            raise RuntimeError("scDeepCluster source changed after repair_v2 freeze")
+        identity = live_identity
+        active_freeze_hash = repair["freeze_hash"]
+    else:
+        # The adapter contains the registry for every method.  A method-local
+        # repair therefore changes its file hash even when another baseline's
+        # executable, environment, arguments, and method code are untouched.
+        # Compare after restoring only that shared adapter digest, and retain
+        # the original frozen identity so completed run hashes remain stable.
+        comparable = json.loads(json.dumps(live_identity))
+        adapter = "papers/scVICAR/code/run_baseline.py"
+        comparable["code_sha256"][adapter] = frozen_identity["code_sha256"][adapter]
+        if comparable != frozen_identity:
+            raise RuntimeError(f"Baseline source changed after freeze: {args.method}")
+        identity = frozen_identity
     protocol = {
         "baseline_version": BASELINE_VERSION, "dataset": args.dataset, "method": args.method,
         "seed": args.seed, "known_k": known_k,
@@ -212,17 +243,9 @@ def main() -> int:
         "per_cell_labels_in_optimization": False,
         **identity,
     }
-    baseline_freeze_path = PAPER_ROOT / "experiments/baselines_v1/source_freeze.json"
-    if not baseline_freeze_path.is_file():
-        raise FileNotFoundError(f"Freeze external baselines before execution: {baseline_freeze_path}")
-    baseline_freeze = json.loads(baseline_freeze_path.read_text(encoding="utf-8"))
-    if baseline_freeze["primary_freeze_hash"] != freeze["freeze_hash"]:
-        raise RuntimeError("Baseline freeze does not reference the active primary freeze")
-    if baseline_freeze["methods"][args.method] != identity:
-        raise RuntimeError(f"Baseline source changed after freeze: {args.method}")
     config_hash = sha256_payload({
         "protocol": protocol, "data_sha256": data_digest,
-        "baseline_freeze_hash": baseline_freeze["freeze_hash"],
+        "baseline_freeze_hash": active_freeze_hash,
     })
     run_id = f"{args.dataset}--{args.method}--seed{args.seed}--{config_hash}"
     run_dir = args.staging_root / run_id; raw = run_dir / "raw"
@@ -274,7 +297,7 @@ def main() -> int:
         "run_id": run_id, "dataset": args.dataset, "method": args.method, "seed": args.seed,
         "variant": args.method, "execution_mode": "formal",
         "config_hash": config_hash, "protocol": protocol, "source_freeze_hash": freeze["freeze_hash"],
-        "baseline_freeze_hash": baseline_freeze["freeze_hash"],
+        "baseline_freeze_hash": active_freeze_hash,
         "code_sha256": identity["code_sha256"],
         "known_k_training": known_k_training,
         "per_cell_labels_in_optimization": False,

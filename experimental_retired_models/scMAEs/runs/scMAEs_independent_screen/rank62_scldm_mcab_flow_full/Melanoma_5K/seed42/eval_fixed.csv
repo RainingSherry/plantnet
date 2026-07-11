@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + scLDM MCAB flow,42,rank62_scldm_mcab_flow_full,screen,scaled encoder + log-expression targets + MCAB flow,0.6598714823842233,0.6531328013238159,0.5429400582300411,0.5391242720658709,0.6316677331310813,0.653132801323816,0.6919940351113641,0.6184042475777367,9,,fixed,kmeans_known_k,True

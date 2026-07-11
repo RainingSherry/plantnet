@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + adaptive sharp/soft switch,3407,AdaptiveSwitch_scMAE,screen,0.6547268344938404,0.5999046488131966,0.4920776438998437,0.42166659499823206,0.6883907457359006,0.5999046488131965,0.770273076961442,0.4912502767682255,12,,fixed,kmeans_known_k,True

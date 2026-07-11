@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + scMamba module sequence,42,rank11_scmamba_module_sequence_full,screen,coexpression ordered module sequence,0.7325167504187605,0.6784389102887028,0.5149975354093287,0.7057179576106047,0.7419652378189322,0.6784389102887028,0.8724354098841297,0.5550228978687676,5,,fixed,kmeans_known_k,True

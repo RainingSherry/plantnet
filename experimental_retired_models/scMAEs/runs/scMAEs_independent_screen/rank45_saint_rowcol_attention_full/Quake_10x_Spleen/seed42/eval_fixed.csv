@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + SAINT row-column attention,42,rank45_saint_rowcol_attention_full,screen,scaled encoder + log-expression targets + SAINT row-column attention,0.701214405360134,0.6170028493417016,0.4921389043585297,0.5952467977962101,0.7269225564419393,0.6170028493417016,0.815881336175125,0.4960790698751641,5,,fixed,kmeans_known_k,True

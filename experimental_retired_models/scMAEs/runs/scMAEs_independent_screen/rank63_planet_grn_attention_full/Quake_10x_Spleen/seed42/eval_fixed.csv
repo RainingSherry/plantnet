@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + Planet GRN attention,42,rank63_planet_grn_attention_full,screen,scaled encoder + log-expression targets + GRN edge attention,0.9671273031825796,0.8635529676552125,0.9282134785673567,0.7495961876074071,0.9685832182275594,0.8635529676552125,0.8666767538996514,0.8604516188318848,5,,fixed,kmeans_known_k,True

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,policy_probs,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + JOAO mask policy,42,rank04_joao_mask_policy_full,screen,scaled encoder + JOAO mask policy,swap:0.1354;absorbing:0.5209;module:0.1230;dropout:0.2206,0.5271826459560792,0.6139235958433239,0.34754998839883916,0.5619219674765901,0.5752048149039964,0.6139235958433239,0.8226351710676179,0.48968510746246635,12,,fixed,kmeans_known_k,True

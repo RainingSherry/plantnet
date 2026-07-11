@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + scVAEDer latent diffusion,42,rank57_scvaeder_latent_diffusion_full,screen,scaled encoder + log-expression targets + optional aligned raw-count ZINB + latent diffusion denoising,0.7867462311557789,0.7033830123897673,0.5664237399622112,0.7367291667621195,0.7755117209943005,0.7033830123897674,0.8792922666721513,0.586124290972788,5,,fixed,kmeans_known_k,True

@@ -1,6 +1,0 @@
-dataset,ari,acc,nmi,used_scgpt_transformer,matched_gene_fraction,fallback_reason
-Macosko,0.22565919140737453,0.38468577039814317,0.5347891642857675,False,0.0,scgpt package unavailable: No module named 'scgpt'
-Melanoma_5K,0.552736518267948,0.66009306448039,0.6428684271025294,False,0.0,scgpt package unavailable: No module named 'scgpt'
-SRP182008,0.5129633726110361,0.6792215480242711,0.6600835520700159,False,0.0,scgpt package unavailable: No module named 'scgpt'
-Tosches,0.5223780950951161,0.636894556365195,0.7275558619687671,False,0.0,scgpt package unavailable: No module named 'scgpt'
-Wang,0.9382953239988724,0.9858178380081941,0.868187253255384,False,0.0,scgpt package unavailable: No module named 'scgpt'

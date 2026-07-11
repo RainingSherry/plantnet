@@ -1,2 +1,0 @@
-dataset,method,seed,program_mode,split_mode,program_weight,type_dim,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,program-bottleneck ablation,43,nmf,fixed,0.1,96,0.4546955900732012,0.4907898243562008,0.25358998152090056,0.3398500473059538,0.4907004442617111,0.4907898243562008,0.6934941969900729,0.3797817879531109,12,,fixed,kmeans_known_k,True

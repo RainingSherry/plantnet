@@ -1,2 +1,0 @@
-dataset,method,seed,stage,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,suture06_cluster_centric_prototype_graph_full,42,screen,0.4234734868773433,0.5194577825652091,0.2564669003819761,0.3163364977846292,0.49237114211916916,0.5194577825652091,0.7599346973646998,0.39459157409564544,12,,fixed,kmeans_known_k,True

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + TimesNet gene-module 2D variation,42,rank40_timesnet_gene_2d_full,screen,scaled encoder + log-expression SVD gene-module TimesNet 2D variation,0.43235582931619354,0.5271683198867861,0.23305981737135908,0.377288293461568,0.4690368254088381,0.5271683198867861,0.7722954439438853,0.40015791318649385,12,,fixed,kmeans_known_k,True

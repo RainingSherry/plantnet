@@ -13,6 +13,7 @@ import pandas as pd
 import seaborn as sns
 
 from .config import DATASETS, PAPER_ROOT, SEEDS, VARIANTS
+from .io_utils import write_checksum_manifest
 
 
 COLORS = {
@@ -271,6 +272,10 @@ def plot_stress(stress_runs: Path, target: Path) -> None:
     if len(current[["dataset", "variant", "seed", "contamination"]].drop_duplicates()) != expected:
         raise RuntimeError("Stress contamination grid is incomplete")
     summary = current.groupby(["dataset", "variant", "contamination"], as_index=False).mean(numeric_only=True)
+    source_dir = PAPER_ROOT / "figures" / "source_data" / "fig4_graph_stress"
+    source_dir.mkdir(parents=True, exist_ok=True)
+    frame.to_csv(source_dir / "stress_runs_126.csv", index=False)
+    summary.to_csv(source_dir / "dataset_variant_contamination_means.csv", index=False)
     fig = plt.figure(figsize=(7.2, 4.3))
     gs = fig.add_gridspec(2, 3, width_ratios=[1.35, 1.0, 1.0], hspace=0.42, wspace=0.42)
     ax_a = fig.add_subplot(gs[:, 0])
@@ -293,23 +298,37 @@ def plot_stress(stress_runs: Path, target: Path) -> None:
     )
     ax_b.axhline(0, color="#777777", linestyle="--", linewidth=0.8)
     ax_b.set(xlabel="Contamination fraction", ylabel="T−F degradation (higher is safer)")
-    ax_b.legend(fontsize=5, ncol=3, title=None)
+    handles, _ = ax_b.get_legend_handles_labels()
+    ax_b.legend(
+        handles, ["Blood--bone marrow", "Human pancreas 3", "PRJNA895163"],
+        fontsize=5, ncol=3, title=None,
+    )
     ax_b.text(-0.10, 1.05, "b", transform=ax_b.transAxes, fontweight="bold")
 
     ax_c = fig.add_subplot(gs[1, 1])
     diag = current[current["variant"] == "topology_full"]
-    sns.boxplot(data=diag, x="contamination", y="affinity_same_edge_auroc", color=COLORS["topology_full"], ax=ax_c)
-    ax_c.set(xlabel="Contamination", ylabel="Affinity AUROC")
+    diag_auroc = diag.dropna(subset=["affinity_same_edge_auroc"])
+    sns.boxplot(data=diag_auroc, x="contamination", y="affinity_same_edge_auroc", color=COLORS["topology_full"], ax=ax_c)
+    ax_c.set_xticks(range(4), ["0", "25", "50", "75"])
+    ax_c.set(xlabel="Injected edges (%)", ylabel="Affinity AUROC")
     ax_c.text(-0.24, 1.05, "c", transform=ax_c.transAxes, fontweight="bold")
 
     ax_d = fig.add_subplot(gs[1, 2])
+    diag_gate = diag.dropna(subset=["weighted_same_edge_purity", "gate_purity_spearman"])
+    contamination_order = [0.0, 0.25, 0.5, 0.75]
     sns.scatterplot(
-        data=diag, x="weighted_same_edge_purity", y="gate_purity_spearman",
-        hue="contamination", palette="viridis", s=20, ax=ax_d,
+        data=diag_gate, x="weighted_same_edge_purity", y="gate_purity_spearman",
+        hue="contamination", hue_order=contamination_order,
+        palette=sns.color_palette("viridis", len(contamination_order)), s=20, ax=ax_d,
     )
     ax_d.set(xlabel="Weighted same-edge purity", ylabel="Gate–purity Spearman")
-    ax_d.legend(fontsize=5, title="contam.")
+    handles, _ = ax_d.get_legend_handles_labels()
+    ax_d.legend(
+        handles, ["0%", "25%", "50%", "75%"], fontsize=5,
+        title="Injected edges", loc="lower left",
+    )
     ax_d.text(-0.22, 1.05, "d", transform=ax_d.transAxes, fontweight="bold")
+    write_checksum_manifest(source_dir)
     export(fig, target)
 
 
@@ -319,13 +338,19 @@ def plot_downstream(dataset_metrics: Path, target: Path) -> None:
     expected = len(DATASETS) * len(VARIANTS) * 3
     if len(frame) != expected:
         raise RuntimeError(f"Refusing partial downstream figure: {len(frame)}/{expected} rows")
+    source_dir = PAPER_ROOT / "figures" / "source_data" / "fig5_downstream"
+    source_dir.mkdir(parents=True, exist_ok=True)
+    frame.to_csv(source_dir / "dataset_variant_metrics.csv", index=False)
+    contrasts = dataset_metrics.with_name("downstream_contrasts.csv")
+    if contrasts.is_file():
+        pd.read_csv(contrasts).to_csv(source_dir / "downstream_contrasts.csv", index=False)
     variants = ["nomix", "fixed", "topology_full"]
     marker = frame[(frame["task"] == "marker") & frame["variant"].isin(variants)]
     probe = frame[(frame["task"] == "linear_probe") & frame["variant"].isin(variants)]
     fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.6))
     for ax, metric, label, panel in [
         (axes[0], "recovery_recovery_at_100", "Recovery@100", "a"),
-        (axes[1], "annotation_f1_macro", "Marker annotation macro-F1", "b"),
+        (axes[1], "annotation_macro_f1", "Marker annotation macro-F1", "b"),
     ]:
         sns.boxplot(data=marker, x="variant", y=metric, order=variants, color="white", fliersize=0, ax=ax)
         sns.stripplot(
@@ -335,15 +360,22 @@ def plot_downstream(dataset_metrics: Path, target: Path) -> None:
         ax.set_xticks(range(len(variants)), [DISPLAY[v] for v in variants], rotation=20, ha="right")
         ax.set(xlabel="", ylabel=label)
         ax.text(-0.18, 1.04, panel, transform=ax.transAxes, fontweight="bold")
-    sns.pointplot(
-        data=probe, x="label_fraction", y="probe_f1_macro", hue="variant",
+    sns.stripplot(
+        data=probe, x="label_fraction", y="probe_macro_f1", hue="variant",
         hue_order=variants, palette=[COLORS[v] for v in variants],
-        errorbar=None, dodge=0.16, markers=["o", "s", "D"], ax=axes[2],
+        dodge=True, jitter=0.08, alpha=0.42, size=3.0, legend=False, ax=axes[2],
+    )
+    sns.pointplot(
+        data=probe, x="label_fraction", y="probe_macro_f1", hue="variant",
+        hue_order=variants, palette=[COLORS[v] for v in variants],
+        errorbar=None, dodge=0.16, markers=["o", "s", "D"],
+        markersize=5, linewidth=1.2, ax=axes[2],
     )
     axes[2].set(xlabel="Labeled-cell fraction", ylabel="Frozen-probe macro-F1")
     axes[2].legend(labels=[DISPLAY[v] for v in variants], fontsize=6, title=None)
     axes[2].text(-0.18, 1.04, "c", transform=axes[2].transAxes, fontweight="bold")
     fig.tight_layout(w_pad=1.2)
+    write_checksum_manifest(source_dir)
     export(fig, target)
 
 

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + scDiffusion pseudo-condition DDPM,42,rank61_scdiffusion_pseudocond_ddpm_full,smoke,scaled encoder + log-expression targets + pseudo-condition DDPM latent denoising,0.5823177487259029,0.5549535709487129,0.4308999809910636,0.48173029523766986,0.5366621907936124,0.5549535709487129,0.6035851539947085,0.5135742730258818,9,,fixed,kmeans_known_k,True

@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + GraphGPS local-global adapter,42,rank43_graphgps_local_global_full,screen,scaled encoder + log-expression targets + GraphGPS local-global adapter,0.6788107202680067,0.6301579542644397,0.47234925377086495,0.6198792996002103,0.712944496190832,0.6301579542644397,0.8373173692093249,0.5051736988853243,5,,fixed,kmeans_known_k,True

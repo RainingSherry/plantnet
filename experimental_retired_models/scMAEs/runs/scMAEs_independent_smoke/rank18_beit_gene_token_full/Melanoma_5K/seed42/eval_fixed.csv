@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + BEiT gene-token target,42,rank18_beit_gene_token_full,smoke,scaled encoder + BEiT gene token target,0.6385996011522269,0.6256734136639087,0.512706850218477,0.5061840040916451,0.6055870675959054,0.6256734136639087,0.6757596795257955,0.5824994521110244,9,,fixed,kmeans_known_k,True

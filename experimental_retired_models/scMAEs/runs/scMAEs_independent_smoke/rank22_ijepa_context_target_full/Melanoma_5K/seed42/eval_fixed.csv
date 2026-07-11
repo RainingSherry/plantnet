@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,scMAE + I-JEPA context-target,42,rank22_ijepa_context_target_full,smoke,scaled encoder + log_expr ordered JEPA target encoder,0.20363394637713272,0.06327632147027083,0.03531980134941057,0.15808028156027615,0.1870644134367886,0.06327632147027082,0.07118841015733522,0.056947058386243816,9,,fixed,kmeans_known_k,True

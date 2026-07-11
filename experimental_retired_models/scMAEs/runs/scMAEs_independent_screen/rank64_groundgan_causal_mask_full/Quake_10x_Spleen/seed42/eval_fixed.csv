@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + GRouNdGAN causal mask,42,rank64_groundgan_causal_mask_full,screen,scaled encoder + log-expression targets + causal mask consistency,0.9626256281407035,0.8727618042826266,0.9391239412208239,0.7298260808086585,0.9731569428063372,0.8727618042826266,0.8863647167910855,0.8595701048504798,5,,fixed,kmeans_known_k,True

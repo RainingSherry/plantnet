@@ -1,2 +1,0 @@
-dataset,method,seed,corruption,donor_pool_mean,n_bins,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Melanoma_5K,conditional-shuffle ablation,42,swap_global,4513.0,1,0.7157101706182141,0.7224328257984157,0.652728824371817,0.519974524759818,0.7213947228153028,0.7224328257984157,0.7511582540520254,0.6958234829228558,9,,fixed,kmeans_known_k,True

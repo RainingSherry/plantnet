@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + data2vec latent teacher,42,rank19_data2vec_latent_teacher_full,screen,scaled encoder + data2vec EMA latent target,0.3533967148723442,0.5246963208058155,0.18771941163464867,0.3167771358999604,0.4201136711319467,0.5246963208058155,0.8025816855517246,0.3897496526517095,12,,fixed,kmeans_known_k,True

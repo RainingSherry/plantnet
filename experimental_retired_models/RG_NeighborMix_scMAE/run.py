@@ -66,6 +66,8 @@ def parse_args():
     parser.add_argument("--edge_reliability_mode", default="sim_mutual_snn_distance")
     parser.add_argument("--neighbor_k", type=int, default=10)
     parser.add_argument("--mix_neighbors", type=int, default=4)
+    parser.add_argument("--neighbor_estimator", default="current", choices=["current", "uniform_sample", "full"])
+    parser.add_argument("--stress_bad_edge_ratio", type=float, default=0.0)
     parser.add_argument("--tau", type=float, default=0.2)
     parser.add_argument("--knn_pca_dim", type=int, default=50)
     parser.add_argument("--pseudo_weight", type=float, default=0.3)
@@ -247,6 +249,8 @@ def safe_contrastive_loss(
 
 def main():
     args = parse_args()
+    if not 0.0 <= float(args.stress_bad_edge_ratio) <= 1.0:
+        raise ValueError("--stress_bad_edge_ratio must be between 0 and 1")
     contrast_variant = args.variant_name in {
         "rg_neighbormix_scmae_contrast_safe",
         "rg_nm_v1_reliability_contrast_safe",
@@ -302,7 +306,16 @@ def main():
     if not args.lightweight_outputs:
         np.save(save_dir / "gene_names.npy", bundle.gene_names.astype(str))
 
-    graph = build_pca_knn_graph(data_np, k=args.neighbor_k, pca_dim=args.knn_pca_dim, tau=args.tau, seed=args.seed)
+    graph = build_pca_knn_graph(
+        data_np,
+        k=args.neighbor_k,
+        pca_dim=args.knn_pca_dim,
+        tau=args.tau,
+        seed=args.seed,
+        labels=labels if args.stress_bad_edge_ratio > 0.0 else None,
+        stress_bad_edge_ratio=args.stress_bad_edge_ratio,
+    )
+    graph.profile["neighbor_estimator"] = args.neighbor_estimator
     edge_reliability, edge_weights, edge_summary = compute_edge_reliability(
         graph,
         mode=args.edge_reliability_mode,
@@ -434,6 +447,7 @@ def main():
                     rng=rng,
                     random_neighbors=random_neighbors,
                     far_neighbors=far_neighbors,
+                    neighbor_estimator=args.neighbor_estimator,
                 )
                 xp_corrupt, pseudo_mask = family.apply_scmae_noise(x_prime, args.mask_ratio)
                 _, pseudo_loss, pseudo_parts = model.loss_mask_weighted(
@@ -560,6 +574,9 @@ def main():
                 "mix_mode": args.mix_mode,
                 "gate_mode": args.gate_mode,
                 "edge_reliability_mode": args.edge_reliability_mode,
+                "neighbor_estimator": args.neighbor_estimator,
+                "stress_bad_edge_ratio": float(args.stress_bad_edge_ratio),
+                "label_leakage_diagnostic": bool(args.stress_bad_edge_ratio > 0.0),
                 "gate_max": float(args.gate_max),
                 "pseudo_weight": float(args.pseudo_weight),
                 "contrast_enabled": bool(contrast_enabled),
@@ -593,6 +610,8 @@ def main():
         "n_genes": int(data_np.shape[1]),
         "n_clusters": int(n_clusters),
         "mix_mode": args.mix_mode,
+        "neighbor_estimator": args.neighbor_estimator,
+        "stress_bad_edge_ratio": float(args.stress_bad_edge_ratio),
         "pseudo_enabled": bool(pseudo_enabled),
         "edge_weight_summary": edge_summary,
         "gate_summary": gate_summary,
@@ -600,7 +619,8 @@ def main():
         "contrast_diagnostics": contrast_diag,
         "lightweight_outputs": bool(args.lightweight_outputs),
         "fixed_metrics": result["fixed"] if result is not None else {},
-        "label_leakage": False,
+        "label_leakage": bool(args.stress_bad_edge_ratio > 0.0),
+        "label_leakage_diagnostic": bool(args.stress_bad_edge_ratio > 0.0),
     }
     save_json(summary, str(save_dir / "summary.json"))
 

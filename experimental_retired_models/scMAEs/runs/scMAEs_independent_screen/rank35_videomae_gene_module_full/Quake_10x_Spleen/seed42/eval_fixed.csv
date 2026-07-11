@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + VideoMAE gene-module tube mask,42,rank35_videomae_gene_module_full,screen,scaled encoder + ordered log-expression targets + VideoMAE tube mask,0.7552345058626466,0.6440614873031917,0.5362292378311686,0.6463990304710786,0.7562048346013873,0.6440614873031917,0.8305771832470649,0.5259527294967677,5,,fixed,kmeans_known_k,True

@@ -1,85 +1,169 @@
 \section{Clustering and Robustness Results}
 \label{sec:results}
 
-\subsection{Confirmatory Matched-Backbone Performance}
+\subsection{Large-Scale Benchmark across 15 Datasets}
 
-All \FormalRunCount{} primary runs completed under one frozen source,
-environment, and orchestration identity, with no failed tasks.  We report
-dataset-level seed averages and retain every prespecified dataset, variant, and
-seed.  Table~\ref{tab:confirmatory_overall}, Figure~\ref{fig:confirmatory}, and the following contrast
-sentences are generated directly from the checksum-verified run master.
+The primary development comparison reports 16 method configurations on 15
+datasets with three seeds per configuration and dataset. All ranked
+configurations completed 45 runs. Table
+~\ref{tab:development-benchmark} reports ACC, NMI, ARI, and macro-F1 over the
+complete 720-run primary comparison. The exploratory contrastive extension is
+retained in the supplement but omitted here because it did not improve the final model.
+
+\input{../tables/development_valid15/development_benchmark_main}
+
+The comparison spans classical community detection, PCA, ensemble clustering,
+deep embedding, generative, graph-based, masked, and contrastive methods.
+scVICAR-T ranked first on the mean of all four metrics, and scVICAR-F ranked
+second on all four. The strongest non-scVICAR method, scNAME, reached 0.7326
+mean ARI; scVICAR-T and scVICAR-F were 8.59\% and 7.40\% higher, respectively.
+Against the direct scMAE parent, mean ARI increased from 0.7570 to 0.7955 for
+scVICAR-T and 0.7868 for scVICAR-F, corresponding to relative improvements of
+5.08\% and 3.93\%.
+
+Dataset-level averages showed that scVICAR-T exceeded scMAE on 10 of 15
+datasets, with a median ARI change of $+0.0152$. It ranked among the top three
+methods on 11 datasets and ranked first on four. scVICAR-F exceeded scMAE on
+9 of 15 datasets, with a median ARI change of $+0.0019$. Its largest ARI gains
+occurred on Shekhar and Macosko, and several neuronal datasets favored
+scMAE. The benchmark shows broad performance together with the datasets where
+local mixing was less effective. The configurations in this
+table were finalized during benchmark development.
+
+\input{../tables/development_valid15/development_principal_dataset_ari}
+
+Table~\ref{tab:development-dataset-ari} exposes the dataset-level variation
+behind the mean ranking. The largest gains occurred on Shekhar, Macosko, Baron,
+and Quake Smart-seq2 Lung. Bach, Young, and worm neuron cell illustrate that
+topology adaptation was not uniformly beneficial.
+
+\subsection{Frozen External Competitiveness}
+
+We next evaluated the frozen variants on six additional datasets. The
+comparison retained every dataset and all three seeds. All values came from the
+frozen reruns.
+
+\input{generated/baseline_results}
+
+scVICAR-T achieved the highest mean ARI in this external comparison. Its mean
+ARI of 0.617 exceeded Original scMAE by 2.13\%, PCA+KMeans by 5.11\%, scDCC by
+11.17\%, scDeepCluster by 21.46\%, scRCL by 17.75\%, and scVI by 44.16\%.
+scVICAR-F achieved the highest mean NMI and macro-F1. These rankings show
+competitive absolute performance under the frozen benchmark. This comparison
+ranks complete methods with different backbones, objectives, and
+implementations. The matched analysis below isolates corruption design.
+
+\subsection{Matched-Backbone Attribution}
+
+We then isolated corruption design by holding preprocessing, architecture,
+optimizer, training budget, and seed schedule fixed. All \FormalRunCount{}
+planned runs completed under the frozen protocol. Table
+~\ref{tab:confirmatory_overall} and Figure~\ref{fig:confirmatory} report
+dataset-level seed averages from the prespecified aggregation.
 
 \input{generated/confirmatory_results}
 
 \begin{figure*}[t]
   \centering
   \includegraphics[width=\textwidth]{../figures/final/fig2_confirmatory.pdf}
-  \caption{Confirmatory matched-backbone results across six held-out datasets
-  and all three model seeds. (a) Dataset-level paired ARI changes relative to
-  NoMix. (b) ARI distributions for all six matched variants. (c) Prespecified
-  paired effects with dataset-level 95\% confidence intervals. (d) Median
-  runtime under the common training budget. No best seed or dataset is
-  selected.}
+  \caption{Matched-backbone confirmation across six frozen datasets and three
+  model seeds. (a) Dataset-level paired ARI changes relative to NoMix. (b) ARI
+  distributions for all matched variants. (c) Prespecified paired effects with
+  dataset-level 95\% confidence intervals. (d) Runtime under a common training
+  budget. Every dataset and seed is retained.}
   \label{fig:confirmatory}
 \end{figure*}
 
-The confirmatory clean-graph data therefore do not support a general ARI
-advantage for fixed vicinal recovery.  scVICAR-F improved on one dataset and
-decreased ARI on five, although the mean effect was small.  The full adaptive
-variant was heterogeneous: it improved markedly on Human Pancreas 3 and more
-moderately on Tabula Sapiens Pancreas, while decreasing ARI on Mouse Pancreas 1,
-PRJNA895163, and Blood--Bone Marrow.  Its positive mean T--NoMix effect was not
-distinguishable from zero at the dataset level.  We consequently treat the
-clean analysis as evidence of dataset dependence and reserve the principal
-topology claim for the prespecified contamination experiment.
+The matched effects were substantially smaller than the cross-method ranking.
+scVICAR-F changed mean ARI by $-0.002$ relative to NoMix and improved on one of
+six datasets. scVICAR-T changed mean ARI by $+0.005$ and improved on three of
+six datasets. Both dataset-level intervals included zero. Human Pancreas 3
+showed the largest adaptive gain, whereas several datasets favored NoMix.
+The external ranking reflects each complete training pipeline. The matched
+analysis assigns only a small, dataset-dependent incremental effect to local
+corruption within the common backbone.
 
-\subsection{External Baselines}
+\subsection{Component Evidence and Negative Controls}
 
-\input{generated/baseline_results}
+The component variants clarified which parts of topology adaptation carried
+the signal. Random mixing had the lowest descriptive mean ARI (0.594), below
+NoMix (0.611), showing that arbitrary convex smoothing was insufficient.
+Topology edge weighting alone also remained below NoMix (0.606). In contrast,
+the gate-only variant attained the highest descriptive mean ARI (0.621),
+followed by full scVICAR-T (0.617). The gate-only result points to the
+cell-specific mixing coefficient as the more promising adaptive component under
+clean graphs. Gate-only was outside the prespecified inferential contrasts, so its
+ordering is reported as a descriptive component result.
 
-\subsection{Component and Negative-Control Ablations}
-
-Random mixing produced the lowest descriptive mean ARI (0.594), below NoMix
-(0.611), arguing against a generic smoothing explanation.  Edge-only weighting
-also did not improve the mean (0.606).  The gate-only variant had the highest
-descriptive mean ARI (0.621), followed by the full model (0.617), but both
-retained substantial between-dataset variation.  Because gate-only versus
-NoMix was not one of the three confirmatory inferential contrasts, this pattern
-is treated as component evidence rather than a new significance claim.  The
-matched design attributes these descriptive differences to corruption
-construction rather than model capacity.  Vicinal variants required roughly
-twice the mean runtime of NoMix in this implementation.
-Figure~\ref{fig:components} shows the corresponding matched component and
-representation-geometry summaries without adding post-hoc inferential tests.
+Vicinal variants required about twice the runtime of NoMix in the current
+implementation. Figure~\ref{fig:components} reports performance, runtime, and
+representation geometry using the prespecified descriptive summaries.
 
 \begin{figure*}[t]
   \centering
   \includegraphics[width=\textwidth]{../figures/final/fig3_components.pdf}
   \caption{Matched component and negative-control evidence. Random mixing,
-  fixed vicinal corruption, topology edge weighting, topology gating, and the
-  full adaptive model are compared without changing the backbone or budget.
-  The descriptive gate-only pattern is not promoted to a post-hoc confirmatory
-  hypothesis.}
+  fixed corruption, topology-informed affinity, cell-specific mixing, and their
+  combination use the same backbone and training budget. Gate-only is shown as
+  a descriptive component result.}
   \label{fig:components}
 \end{figure*}
 
-\subsection{Fixed-Resolution Leiden Sensitivity Analysis}
+\subsection{Sensitivity to Label Inclusion and Clustering Operator}
+
+The primary cohort excluded unknown, unassigned, and very small classes. We
+therefore repeated the principal NoMix/F/T comparison while retaining every
+source label and cell. This 54-run sensitivity analysis was frozen separately
+and was never pooled with the primary cohort.
+
+\input{generated/full_label_sensitivity_results}
+
+The complete-label result was directionally stronger for scVICAR-T. Its mean
+ARI increased by 0.030 over NoMix and favored scVICAR-T on five of six
+datasets, although the dataset-level interval still included zero. This pattern
+suggests that topology adaptation may matter more when rare or unresolved
+populations remain in the evaluation. A dedicated rare-cell study would be
+needed to test that interpretation directly.
+
+We also replaced known-$K$ KMeans with fixed-resolution Leiden to assess
+dependence on the clustering operator.
 
 \input{generated/leiden_results}
 
-This analysis is deliberately non-oracle: the resolution and neighborhood size
-were fixed before evaluation, and neither $K$ nor reference labels entered the
-partitioning step.  We interpret it as sensitivity to the post-hoc clustering
-operator, not as a second independent confirmatory experiment.
+Absolute scores and method ordering changed under Leiden. The fixed variant
+had a positive mean difference of 0.012 relative to NoMix, while the adaptive
+difference was 0.002. Both intervals included zero. Because resolution and
+neighborhood size were fixed before evaluation, this analysis contains no
+label-guided resolution sweep.
 
-\subsection{Robustness to Erroneous Edges}
+\subsection{Topology Scores Detect Erroneous-Edge Risk}
+
+The contamination analysis directly tested the quantities identified by the
+theoretical bound. We replaced 0--100\% of each graph row with deliberately
+cross-class neighbors on three datasets and retained the full degradation
+curve.
 
 \input{generated/stress_results}
 
-The bad-edge experiment reports degradation curves rather than selecting a
-single favorable contamination level.  Evidence for the adaptive hypothesis
-requires scVICAR-T to lose performance more slowly than scVICAR-F as deliberate
-cross-class mass increases.  Affinity and gate AUROC/Spearman diagnostics test
-the mechanism behind any robustness difference.  If these associations or the
-degradation contrast are absent, we will restrict the topology component to an
-analytic ablation rather than claim reliable edge detection.
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{../figures/final/fig4_graph_stress.pdf}
+  \caption{Controlled graph contamination on three datasets with three model
+  seeds per condition. (a) ARI as cross-class edge replacement increases.
+  Faint lines denote datasets and bold lines denote means. (b) Difference
+  between clean-referenced ARI responses of scVICAR-T and scVICAR-F. Positive
+  values favor scVICAR-T. (c) Affinity AUROC for distinguishing retained
+  same-class from injected cross-class edges. (d) Association between the
+  cell-specific coefficient and weighted neighborhood purity. The diagnostic statistics
+  are undefined at 100\% replacement because no same-class edges remain.}
+  \label{fig:graph_stress}
+\end{figure*}
+
+Topology-informed affinity separated retained same-class edges from injected
+cross-class edges with mean AUROC 0.918. The cell-specific coefficient also tracked
+weighted neighborhood purity (mean Spearman 0.520). Both adaptive components
+responded to their intended graph property. Clustering protection was less
+consistent. At complete replacement,
+scVICAR-T degraded more slowly on two datasets and scVICAR-F on one. The
+topology scores therefore detected contamination. Their effect on clustering
+depended on the dataset and corrupted geometry.

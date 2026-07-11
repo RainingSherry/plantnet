@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Macosko,scMAE + I-JEPA context-target,42,rank22_ijepa_context_target_full,screen,scaled encoder + log_expr ordered JEPA target encoder,0.27811997857525445,0.2897914632066277,0.15926072992272425,0.14502592517652613,0.3923757945071052,0.28979146320662774,0.43127936060551797,0.21820569387318223,12,,fixed,kmeans_known_k,True

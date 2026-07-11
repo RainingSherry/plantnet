@@ -1,2 +1,0 @@
-dataset,method,seed,variant,stage,preprocessing,count_source,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,scMAE + scVGAE ZINB variational decoder,42,rank06_scvgae_zinb_variational_full,screen,scaled encoder + log_expr rec + count ZINB,raw_count_source,0.7415201005025126,0.7021671962812153,0.5253488315373424,0.7333982474128644,0.7488537137409802,0.7021671962812152,0.8940164549223558,0.5781092631813667,5,,fixed,kmeans_known_k,True

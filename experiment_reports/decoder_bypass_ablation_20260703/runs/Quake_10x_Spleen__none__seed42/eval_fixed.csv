@@ -1,2 +1,0 @@
-dataset,method,seed,decoder_mode,mask_rank,variance_weight,acc,nmi,ari,f1_macro,fmi,v_measure,homogeneity,completeness,n_pred_clusters,silhouette,protocol,cluster_method,uses_known_k
-Quake_10x_Spleen,decoder-bypass ablation,42,none,16,0.02,0.9492252931323283,0.8322708232963559,0.9200096093129827,0.7039437085088357,0.9643032639479745,0.8322708232963558,0.8669890145988208,0.800226122456041,5,,fixed,kmeans_known_k,True
