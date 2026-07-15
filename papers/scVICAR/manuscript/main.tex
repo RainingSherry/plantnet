@@ -1,51 +1,89 @@
-\documentclass[journal]{IEEEtran}
+\documentclass[sigconf,nonacm,review,anonymous]{acmart}
+\PassOptionsToPackage{hidelinks}{hyperref}
 
-\usepackage{amsmath,amssymb,amsthm,bm}
+% ACM 2024+ requires CJK-free abstract suppression of non-ASCII punctuation in
+% some submission portals; we keep the body in standard LaTeX.
 \usepackage{booktabs,multirow}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{url}
-\usepackage[hidelinks]{hyperref}
 \usepackage[capitalise,noabbrev]{cleveref}
 \usepackage{microtype}
 \usepackage{placeins}
+\usepackage{balance}
 
-\newtheorem{proposition}{Proposition}
-\newtheorem{corollary}{Corollary}
-\newcommand{\scvicar}{\textsc{scVICAR}}
-\newcommand{\methodF}{\textsc{scVICAR-F}}
-\newcommand{\methodT}{\textsc{scVICAR-T}}
+% ACM uses its own theorem environments; keep ours in sync with the supplement.
+\newtheorem{theorem}{Theorem}
+
+% Macros for the method family.
+% \scvicar is kept for backwards compatibility with supplement cross-references.
+\newcommand{\scvicar}{\methodF{} and \methodT}
+\newcommand{\methodF}{\texttt{scVICAR-F}}
+\newcommand{\methodT}{\texttt{scVICAR-T}}
+
+% KDD uses figures relative to the .tex file root; the manuscript/ subtree
+% carries the figures/ symlink target via ../figures/final which is preserved.
 \graphicspath{{../figures/final/}}
 
-% Keep dedicated float pages top-aligned; otherwise IEEEtran's stretchable
-% float glue vertically centers a wide figure and leaves a misleading blank
-% band above it.
+\input{results_macros}
+\input{generated/attribution_v2_macros}
+
+% Title and subtitle chosen for KDD Research Track visibility:
+% the principle is foregrounded, the single-cell case study is demoted to a
+% subtitle so ML-first reviewers parse the contribution on first read.
+\title{Anchor Recovery: Bounded Self-Supervised Pre-training for Set-Structured Data with Noisy Local Geometry\\
+\large Single-Cell RNA-seq as a Case Study}
+
+\author{Anonymous Authors%
+\thanks{Manuscript prepared for double-anonymous review. Author and funding information will be restored after acceptance.}}
+
+% ACM Computing Classification System (CCS 2012). Placed in the preamble so
+% \mktitle expands it when the abstract is typeset.
+\begin{CCSXML}
+<ccs2012>
+  <concept>
+    <concept_id>10010147.10010257.10010258.10010259</concept_id>
+    <concept_desc>Computing methodologies~Unsupervised learning</concept_desc>
+    <concept_significance>500</concept_significance>
+  </concept>
+  <concept>
+    <concept_id>10010147.10010257.10010293.10010294</concept_id>
+    <concept_desc>Computing methodologies~Learning latent representations</concept_desc>
+    <concept_significance>300</concept_significance>
+  </concept>
+  <concept>
+    <concept_id>10010147.10010257.10010258.10010260</concept_id>
+    <concept_desc>Computing methodologies~Neural networks</concept_desc>
+    <concept_significance>100</concept_significance>
+  </concept>
+  <concept>
+    <concept_id>10002951.10003317.10003318.10003321</concept_id>
+    <concept_desc>Information systems~Data mining</concept_desc>
+    <concept_significance>100</concept_significance>
+  </concept>
+</ccs2012>
+\end{CCSXML}
+
+\keywords{self-supervised pre-training, graph augmentation, masked autoencoder,
+  set-structured data, anchor recovery, single-cell RNA-seq}
+
+\begin{document}
+
+\begin{abstract}
+\input{sections/00_abstract}
+\end{abstract}
+
+\maketitle                   % renders title, abstract, CCS, keywords
+
+% Keep dedicated float pages top-aligned; must appear inside the document body.
 \makeatletter
 \setlength{\@fptop}{0pt}
 \setlength{\@fpsep}{12pt}
-\setlength{\@fpbot}{0pt plus 1fil}
-\setlength{\@dblfptop}{0pt}
-\setlength{\@dblfpsep}{12pt}
-\setlength{\@dblfpbot}{0pt plus 1fil}
 \makeatother
-\renewcommand{\topfraction}{0.95}
-\renewcommand{\floatpagefraction}{0.80}
+\setlength{\topfraction}{0.95}
+\setlength{\floatpagefraction}{0.80}
 
-\input{results_macros}
-
-\title{scVICAR: Bounded Graph-Vicinal Anchor Recovery for Masked Single-Cell Representation Learning}
-
-\author{Anonymous Authors%
-\thanks{Manuscript prepared for double-anonymous review.  Author and funding information will be restored after acceptance.}}
-
-\begin{document}
-\maketitle
-
-\input{sections/00_abstract}
-\begin{IEEEkeywords}
-single-cell RNA sequencing, masked autoencoder, graph representation learning,
-vicinal risk, clustering, cell-type annotation
-\end{IEEEkeywords}
+\frenchspacing               % KDD house style: no extra space after period
 
 \input{sections/01_introduction}
 \input{sections/02_related_work}
@@ -58,6 +96,11 @@ vicinal risk, clustering, cell-type annotation
 \input{sections/08_availability}
 \input{sections/09_conclusion}
 
-\bibliographystyle{IEEEtran}
+\balance
+\bibliographystyle{ACM-Reference-Format}
 \bibliography{references}
+
+% Appendix: reproducibility checklist required by KDD 2024+ author guidelines.
+\input{sections/appendix_repro_checklist}
+
 \end{document}

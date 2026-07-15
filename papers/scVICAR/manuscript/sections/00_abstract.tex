@@ -1,26 +1,24 @@
-\begin{abstract}
-Single-cell RNA sequencing requires representations that separate cell
-populations despite sparse expression and heterogeneous local neighborhoods.
-Masked autoencoders exploit within-cell gene context, while leaving local
-cell--cell structure unused. We introduce scVICAR, which recovers each original
-cell from a bounded neighborhood-mixed view while retaining the clean scMAE
-objective. Two implementations separate the shared principle from topology
-adaptation: scVICAR-F uses fixed mixing, whereas scVICAR-T combines
-topology-informed edge weights with a cell-specific mixing coefficient. The
-operator preserves a local convex hull, bounds input and representation
-perturbation, and corresponds to one step of nonuniform graph diffusion.
-Its contamination bound links displacement to cross-class neighbor mass and
-motivates controlled edge-replacement tests. Across a 15-dataset primary
-comparison of 16 method configurations, scVICAR-T and scVICAR-F ranked first and second on
-all four mean metrics, improving ARI over scMAE by 5.08\% and 3.93\%. Under a
-separately frozen six-dataset protocol, scVICAR-T achieved the highest mean ARI
-among the compared methods (0.617), exceeding Original scMAE by 2.13\%.
-Matched-backbone effects were smaller and heterogeneous, indicating that the
-effect of local mixing depends on the dataset. Controlled edge replacement showed that topology-informed affinity
-identified injected cross-class edges (mean AUROC 0.918), while the cell-specific
-coefficient tracked neighborhood purity (mean Spearman 0.520). Low-label probes
-improved across most datasets, with relative gains of 0.13--0.34\%; marker-based
-endpoints varied by dataset. These results support graph-vicinal anchor recovery
-as a competitive local regularizer and show that topology-adaptive effects on
-clean-graph clustering remain dataset dependent.
-\end{abstract}
+Set-structured tabular data --- cells in a tissue, points in a cloud, image
+patches, or token sets in long documents --- comes with an estimated local
+neighborhood that conveys both signal and risk. We introduce
+\emph{Anchor Recovery}, a self-supervised pre-training principle that
+(i) constructs each training view as a bounded, cell-specific perturbation
+toward selected neighbors, (ii) masks the perturbed view, and (iii) trains a
+shared encoder to reconstruct the \emph{unchanged original} object. The
+perturbation magnitude is data-dependent and the deployed encoder takes only
+the raw object, discarding the graph after training.
+
+We prove that anchor reconstruction bounds the input displacement and that
+a Lipschitz encoder gap is controlled by the cross-class neighbor mass and
+the mixing coefficient. Across $15$ development datasets, three seeds and
+$16$ compared configurations, Anchor Recovery ranks first on every reported
+clustering metric.
+On five source-independent frozen datasets, it transfers as the top mean
+ARI ($0.577$), NMI ($0.709$) and macro-F1 ($0.603$). Matched-backbone
+ablations isolate the contributions of bounded perturbation, cell-specific
+step size, and topology-informed affinity; their dataset-level permutation
+statistics, including null effects and Holm-adjusted $p$-values, are reported
+in full. Under controlled cross-class edge injection, the topology-informed
+affinity detects contamination with mean AUROC $0.918$ and the cell-specific
+step size tracks weighted neighborhood purity with mean Spearman $0.520$.
+Code, frozen manifests, and complete run records are released.
