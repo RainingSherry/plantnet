@@ -154,12 +154,22 @@ def try_leiden_fixed(embedding: np.ndarray, labels: np.ndarray, config: dict[str
     try:
         from methods.DeepLearning.CAAM_scMAE.evaluation.local_metrics import leiden_fixed
 
-        metrics, pred = leiden_fixed(
+        _legacy_metrics, pred = leiden_fixed(
             embedding,
             labels,
             resolution=float(config["evaluation"]["leiden_fixed_resolution"]),
             n_neighbors=int(config["evaluation"]["n_neighbors"]),
             seed=int(config["seed"]),
+        )
+        pred = np.asarray(pred, dtype=np.int64)
+        validate_embedding_inputs(embedding, labels, max(1, int(np.unique(pred).size)))
+        metrics = mapped_clustering_metrics(labels, pred)
+        metrics.update(
+            {
+                "uses_known_k": False,
+                "oracle-K": False,
+                "cluster_method": "leiden_fixed",
+            }
         )
         return {"status": "success", "metrics": metrics, "pred": pred.astype(np.int64)}
     except (ImportError, ModuleNotFoundError) as exc:
