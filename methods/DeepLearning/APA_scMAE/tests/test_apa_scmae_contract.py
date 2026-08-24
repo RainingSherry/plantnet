@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import sys
+import types
 from pathlib import Path
 
 import anndata as ad
@@ -35,6 +37,7 @@ from methods.DeepLearning.APA_scMAE.run import (
     hungarian_map,
     mapped_clustering_metrics,
     resolve_device,
+    try_leiden_fixed,
     validate_runtime_config,
     validate_embedding_inputs,
     validate_required_files,
@@ -418,6 +421,42 @@ def test_cyclic_and_extra_cluster_metrics():
     metrics = mapped_clustering_metrics(np.array([0, 0, 1, 1]), np.array([0, 1, 2, 3]))
     assert metrics["acc"] < 1.0
     assert metrics["f1_macro"] < 1.0
+
+
+def test_leiden_metrics_are_recomputed_with_apa_mapper(monkeypatch):
+    labels = np.array([0, 0, 1, 1])
+    pred = np.array([0, 1, 2, 3])
+    embedding = np.arange(8, dtype=np.float32).reshape(4, 2)
+    fake_module = types.ModuleType("methods.DeepLearning.CAAM_scMAE.evaluation.local_metrics")
+    fake_module.leiden_fixed = lambda *_args, **_kwargs: ({"acc": 1.0, "f1_macro": 1.0}, pred)
+    monkeypatch.setitem(sys.modules, fake_module.__name__, fake_module)
+
+    result = try_leiden_fixed(
+        embedding,
+        labels,
+        {"seed": 7, "evaluation": {"leiden_fixed_resolution": 1.0, "n_neighbors": 3}},
+    )
+
+    assert result["status"] == "success"
+    assert result["metrics"]["acc"] < 1.0
+    assert result["metrics"]["f1_macro"] < 1.0
+    assert result["metrics"]["cluster_method"] == "leiden_fixed"
+
+
+def test_leiden_unexpected_exceptions_surface(monkeypatch):
+    fake_module = types.ModuleType("methods.DeepLearning.CAAM_scMAE.evaluation.local_metrics")
+
+    def fail(*_args, **_kwargs):
+        raise RuntimeError("evaluation bug")
+
+    fake_module.leiden_fixed = fail
+    monkeypatch.setitem(sys.modules, fake_module.__name__, fake_module)
+    with pytest.raises(RuntimeError, match="evaluation bug"):
+        try_leiden_fixed(
+            np.ones((4, 2), dtype=np.float32),
+            np.array([0, 0, 1, 1]),
+            {"seed": 7, "evaluation": {"leiden_fixed_resolution": 1.0, "n_neighbors": 3}},
+        )
 
 
 def test_embedding_validation_errors():
